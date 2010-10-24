@@ -1,0 +1,190 @@
+<html>
+<head>
+<link rel='stylesheet' type='text/css' href='/dtr/static/css/dtr.css'>
+<script type='text/javascript' src='/dtr/static/js/webUI_common.js'></script>
+</head>
+<body>
+<table background=/dtr/static/img/line.gif width=100% cellpadding=0px
+	cellspacing=0px border=0px border-collapse=collapse>
+	<tbody style="background-color: transparent">
+		<tr>
+			<td width=270px height=62px align=left valign=top><img
+				src=/dtr/static/img/HeaderLeft.gif alt=image width=271 height=50>
+			</td>
+			<td width=auto height=62px align=right valign=top><img
+				src=/dtr/static/img/HeaderRight.jpg alt=image width=501 height=50>
+			</td>
+		</tr>
+	</tbody>
+</table>
+<table width=100% cellspacing=0 cellpadding=0 border=0 height=25>
+	<tr>
+		<td align=left height=23><font face="Arial, Verdana, Helvetica"
+			size="2" color="#003366"><b>Repository Browser</b></font></td>
+		<td align=right height=23><a
+			href="/dtr/system-tools/reports/ActivityQuery"><img
+			src="/dtr/static/img/ACTIVITY.gif" border=0 alt="Activity Search"
+			title="Activity Search"></a>&nbsp;<a
+			href="/dtr/system-tools/reports/FileQuery?searchFolderPath=/ws/Example"><img
+			src="/dtr/static/img/SEARCH.gif" border=0 alt="File/Folder Search"
+			title="File/Folder Search"></a>&nbsp;<a
+			href="/dtr/system-tools/reports/WorkspaceIntegrations?showMoreOptions=true"><img
+			src="/dtr/static/img/WSP_INT.gif" border=0
+			alt="Workspace Integrations" title="Workspace Integrations"></a>&nbsp;<a
+			href="/dtr/system-tools/reports/WorkspaceComparison"><img
+			src="/dtr/static/img/WSP_COMP.gif" border=0
+			alt="Workspace Comparison" title="Workspace Comparison"></a>&nbsp;<a
+			href="/dtr/system-tools/reports/VersionSetComparison"><img
+			src="/dtr/static/img/VS_COMP.gif" border=0
+			alt="VersionSet Comparison" title="VersionSet Comparison"></a>&nbsp;<a
+			href="/dtr/system-tools/reports/CollisionQuery"><img
+			src="/dtr/static/img/CONFLICT.gif" border=0 alt="Conflict Search"
+			title="Conflict Search"></a>&nbsp;<a
+			href="/dtr/system-tools/reports/ResourceDetails?technical=false"><img
+			src="/dtr/static/img/RES_LOOKUP.gif" border=0 alt="Resource Lookup"
+			title="Resource Lookup"></a>&nbsp;<a href="/dtr/ws/Example"><img
+			src="/dtr/static/img/REP_BROW.gif" border=0 alt="Repository Browser"
+			title="Repository Browser"></a>&nbsp;<a
+			href="/dtr/system-tools/ShowOpenActivities"><img
+			src="/dtr/static/img/open_activities.gif" border=0
+			alt="My open activities" title="My open activities"></a>&nbsp;<a
+			href="/dtr/ws/Example?showDeleted"><img
+			src="/dtr/static/img/show_deleted_files.gif" border=0
+			alt="show deleted" title="show deleted"></a></td>
+	</tr>
+	<tr bgcolor=b9cee3>
+		<td colspan=2 height=2><img width=1 height=1 border=0 alt=""></td>
+	</tr>
+</table>
+<font face="Arial, Verdana, Helvetica" size="2" color="#000000">
+<table width="100%" cellspacing=2 cellpadding=2>
+	<tr>
+		<th>Resource</th>
+		<th>Author</th>
+		<th>Content Type</th>
+		<th>Size</th>
+		<th>Created</th>
+		<th>Last Modified</th>
+		<th>Actions</th>
+	</tr>
+	<tr>
+		<td><a href="/dtr/"><img src="/dtr/static/img/ROOT.gif"
+			border=0 alt="Root" title="Root">&nbsp;</a></td>
+		<td>&nbsp;</td>
+		<td>&nbsp;</td>
+		<td>&nbsp;</td>
+		<td>&nbsp;</td>
+		<td>&nbsp;</td>
+		<td><a
+			href="/dtr/system-tools/reports/ResourceDetails?technical=false&path=/"><img
+			src="/dtr/static/img/PROPERTIES.gif" border=0 alt="Show Details"
+			title="Show Details"></a>&nbsp;<a
+			href="/dtr/system-tools/DeleteResource?path=/"><img
+			src="/dtr/static/img/delete.gif" border=0 alt="Delete resource"
+			title="Delete resource"></a>&nbsp;<a
+			href="/dtr/system-tools/CreateNewResource?folderPath=/"><img
+			src="/dtr/static/img/add.gif" border=0 alt="Add new resource"
+			title="Add new resource"></a></td>
+	</tr>
+	<tr>
+		<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/dtr/ws"><img
+			src="/dtr/static/img/FOLDER.gif" border=0 alt="Folder" title="Folder">&nbsp;ws</a></td>
+		<td>&nbsp;</td>
+		<td>&nbsp;</td>
+		<td>&nbsp;</td>
+		<td>&nbsp;</td>
+		<td>&nbsp;</td>
+		<td><a
+			href="/dtr/system-tools/reports/ResourceDetails?technical=false&path=/ws"><img
+			src="/dtr/static/img/PROPERTIES.gif" border=0 alt="Show Details"
+			title="Show Details"></a>&nbsp;<a
+			href="/dtr/system-tools/DeleteResource?path=/ws"><img
+			src="/dtr/static/img/delete.gif" border=0 alt="Delete resource"
+			title="Delete resource"></a>&nbsp;<a
+			href="/dtr/system-tools/CreateNewResource?folderPath=/ws"><img
+			src="/dtr/static/img/add.gif" border=0 alt="Add new resource"
+			title="Add new resource"></a></td>
+	</tr>
+	<tr>
+		<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img
+			src="/dtr/static/img/FOLDER.gif" border=0 alt="Folder" title="Folder">&nbsp;Example</td>
+		<td>&nbsp;</td>
+		<td>&nbsp;</td>
+		<td>&nbsp;</td>
+		<td>&nbsp;</td>
+		<td>&nbsp;</td>
+		<td><a
+			href="/dtr/system-tools/reports/ResourceDetails?technical=false&path=/ws/Example"><img
+			src="/dtr/static/img/PROPERTIES.gif" border=0 alt="Show Details"
+			title="Show Details"></a>&nbsp;<a
+			href="/dtr/system-tools/DeleteResource?path=/ws/Example"><img
+			src="/dtr/static/img/delete.gif" border=0 alt="Delete resource"
+			title="Delete resource"></a>&nbsp;<a
+			href="/dtr/system-tools/CreateNewResource?folderPath=/ws/Example"><img
+			src="/dtr/static/img/add.gif" border=0 alt="Add new resource"
+			title="Add new resource"></a></td>
+	</tr>
+	<tr>
+		<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a
+			href="/dtr/ws/Example/example.com_EXAMPLE_SC1"><img
+			src="/dtr/static/img/FOLDER.gif" border=0 alt="Folder" title="Folder">&nbsp;example.com_EXAMPLE_SC1</a></td>
+		<td>NWDI_CMSADM</td>
+		<td>&nbsp;</td>
+		<td>&nbsp;</td>
+		<td>14.01.2010 10:24:47 GMT</td>
+		<td>14.01.2010 10:24:47 GMT</td>
+		<td><a
+			href="/dtr/system-tools/reports/ResourceDetails?technical=false&path=/ws/Example/example.com_EXAMPLE_SC1"><img
+			src="/dtr/static/img/PROPERTIES.gif" border=0 alt="Show Details"
+			title="Show Details"></a>&nbsp;<a
+			href="/dtr/system-tools/DeleteResource?path=/ws/Example/example.com_EXAMPLE_SC1"><img
+			src="/dtr/static/img/delete.gif" border=0 alt="Delete resource"
+			title="Delete resource"></a>&nbsp;<a
+			href="/dtr/system-tools/CreateNewResource?folderPath=/ws/Example/example.com_EXAMPLE_SC1"><img
+			src="/dtr/static/img/add.gif" border=0 alt="Add new resource"
+			title="Add new resource"></a></td>
+	</tr>
+	<tr>
+		<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a
+			href="/dtr/ws/Example/example.com_EXAMPLE_SC2"><img
+			src="/dtr/static/img/FOLDER.gif" border=0 alt="Folder" title="Folder">&nbsp;example.com_EXAMPLE_SC2</a></td>
+		<td>NWDI_CMSADM</td>
+		<td>&nbsp;</td>
+		<td>&nbsp;</td>
+		<td>14.01.2010 10:24:48 GMT</td>
+		<td>14.01.2010 10:24:48 GMT</td>
+		<td><a
+			href="/dtr/system-tools/reports/ResourceDetails?technical=false&path=/ws/Example/example.com_EXAMPLE_SC2"><img
+			src="/dtr/static/img/PROPERTIES.gif" border=0 alt="Show Details"
+			title="Show Details"></a>&nbsp;<a
+			href="/dtr/system-tools/DeleteResource?path=/ws/Example/example.com_EXAMPLE_SC2"><img
+			src="/dtr/static/img/delete.gif" border=0 alt="Delete resource"
+			title="Delete resource"></a>&nbsp;<a
+			href="/dtr/system-tools/CreateNewResource?folderPath=/ws/Example/example.com_EXAMPLE_SC2"><img
+			src="/dtr/static/img/add.gif" border=0 alt="Add new resource"
+			title="Add new resource"></a></td>
+	</tr>
+	<tr>
+		<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a
+			href="/dtr/ws/Example/example.com_EXAMPLE_SC3"><img
+			src="/dtr/static/img/FOLDER.gif" border=0 alt="Folder" title="Folder">&nbsp;example.com_EXAMPLE_SC3</a></td>
+		<td>NWDI_CMSADM</td>
+		<td>&nbsp;</td>
+		<td>&nbsp;</td>
+		<td>14.01.2010 10:24:49 GMT</td>
+		<td>14.01.2010 10:24:49 GMT</td>
+		<td><a
+			href="/dtr/system-tools/reports/ResourceDetails?technical=false&path=/ws/Example/example.com_EXAMPLE_SC3"><img
+			src="/dtr/static/img/PROPERTIES.gif" border=0 alt="Show Details"
+			title="Show Details"></a>&nbsp;<a
+			href="/dtr/system-tools/DeleteResource?path=/ws/Example/example.com_EXAMPLE_SC3"><img
+			src="/dtr/static/img/delete.gif" border=0 alt="Delete resource"
+			title="Delete resource"></a>&nbsp;<a
+			href="/dtr/system-tools/CreateNewResource?folderPath=/ws/Example/example.com_EXAMPLE_SC3"><img
+			src="/dtr/static/img/add.gif" border=0 alt="Add new resource"
+			title="Add new resource"></a></td>
+	</tr>
+</table>
+</font>
+</body>
+</html>

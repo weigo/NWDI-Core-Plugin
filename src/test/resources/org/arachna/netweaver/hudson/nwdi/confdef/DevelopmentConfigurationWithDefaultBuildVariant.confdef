@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration
+		 xmlns="http://xml.sap.com/2002/11/DevelopmentConfiguration"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://xml.sap.com/2002/11/DevelopmentConfiguration confdef.xsd"
+		 name="DI0_Example_D"
+		 document-type-version="1.0"
+		 caption="Example Track_dev_dev"
+		 config-version="0000000551"
+		 sl-location="DI0_Example_D"
+		 cms-url="http://di0db:54000"
+		 name-server-url="http://di0db:54000"
+		 is-local="no"
+		 xmlns:IDX="urn:sap.com:DevelopmentConfiguration:1.0">
+	<config-description>Example Track_dev</config-description>
+	<build-server>http://di0db:54000</build-server>
+	<properties>
+		<pns0:SDM_URL xmlns:pns0="http://xml.sap.com/2003/07/DevelopmentConfiguration/Transport-Controller">http://dummySDMURL:50018</pns0:SDM_URL>
+		<pns1:TRANS_D xmlns:pns1="http://xml.sap.com/2003/07/DevelopmentConfiguration/Transport-Controller">G:\usr\sap\JTrans</pns1:TRANS_D>
+		<pns2:NOTIFY_TCS xmlns:pns2="http://xml.sap.com/2003/07/DevelopmentConfiguration/Transport-Controller">true</pns2:NOTIFY_TCS>
+		<pns3:TCS_SERVLET xmlns:pns3="http://xml.sap.com/2003/07/DevelopmentConfiguration/Transport-Controller">http://di0db:54000/TCS/Deployer</pns3:TCS_SERVLET>
+	</properties>
+	<sc-compartments>
+		<sc-compartment name="example.com_EXAMPLE_SC1_1" caption="example.com_EXAMPLE_SC1_1" archive-state="yes" default-compartment="yes" sc-vendor="example.com" sc-name="EXAMPLE_SC1">
+			<compartment-description></compartment-description>
+			<properties>
+				<pns0:terminology_domain xmlns:pns0="http://xml.sap.com/2004/08/DevelopmentConfiguration/Configuration-Controller"/>
+				<pns1:original_language xmlns:pns1="http://xml.sap.com/2004/08/DevelopmentConfiguration/Configuration-Controller"/>
+			</properties>
+			<dependencies>
+				<used-compartment>example.com_LIBJEE_1</used-compartment>
+				<used-compartment>sap.com_SAP_BUILDT_1</used-compartment>
+				<used-compartment>sap.com_EP_BUILDT_1</used-compartment>
+				<used-compartment>sap.com_SAP-JEE_1</used-compartment>
+				<used-compartment>sap.com_SAP_JTECHS_1</used-compartment>
+			</dependencies>
+			<build-variants>
+				<build-variant name="default">
+					<variant-mappings>
+						<variant-mapping used-compartment="example.com_LIBJEE_1" used-variant-name="default"/>
+						<variant-mapping used-compartment="sap.com_EP_BUILDT_1" used-variant-name="default"/>
+						<variant-mapping used-compartment="sap.com_SAP-JEE_1" used-variant-name="default"/>
+						<variant-mapping used-compartment="sap.com_SAP_BUILDT_1" used-variant-name="default"/>
+						<variant-mapping used-compartment="sap.com_SAP_JTECHS_1" used-variant-name="default"/>
+					</variant-mappings>
+				</build-variant>
+			</build-variants>
+		</sc-compartment>
+		<sc-compartment name="example.com_EXAMPLE_SC2_1" caption="example.com_EXAMPLE_SC2_1" archive-state="no" default-compartment="yes" sc-vendor="example.com" sc-name="EXAMPLE_SC2">
+			<compartment-description></compartment-description>
+			<properties>
+				<pns0:terminology_domain xmlns:pns0="http://xml.sap.com/2004/08/DevelopmentConfiguration/Configuration-Controller"/>
+				<pns1:original_language xmlns:pns1="http://xml.sap.com/2004/08/DevelopmentConfiguration/Configuration-Controller"/>
+			</properties>
+			<source-state type="activation">
+				<repository type="DTR" url="http://di0db:54000/dtr"/>
+				<inactive-location>ws/exupk1/example.com_EXAMPLE_SC2/dev/inactive/</inactive-location>
+				<location>ws/exupk1/example.com_EXAMPLE_SC2/dev/active/</location>
+			</source-state>
+			<dependencies>
+				<used-compartment>example.com_LIBJEE_1</used-compartment>
+				<used-compartment>sap.com_SAP_BUILDT_1</used-compartment>
+				<used-compartment>sap.com_EP_BUILDT_1</used-compartment>
+				<used-compartment>sap.com_SAP-JEE_1</used-compartment>
+				<used-compartment>sap.com_SAP_JTECHS_1</used-compartment>
+				<used-compartment>example.com_EXAMPLE_SC1_1</used-compartment>
+			</dependencies>
+			<build-variants>
+				<build-variant name="default" required-for-activation="yes">
+					<variant-mappings>
+						<variant-mapping used-compartment="example.com_EXAMPLE_SC1_1" used-variant-name="default"/>
+						<variant-mapping used-compartment="example.com_LIBJEE_1" used-variant-name="default"/>
+						<variant-mapping used-compartment="sap.com_EP_BUILDT_1" used-variant-name="default"/>
+						<variant-mapping used-compartment="sap.com_SAP-JEE_1" used-variant-name="default"/>
+						<variant-mapping used-compartment="sap.com_SAP_BUILDT_1" used-variant-name="default"/>
+						<variant-mapping used-compartment="sap.com_SAP_JTECHS_1" used-variant-name="default"/>
+					</variant-mappings>
+				</build-variant>
+			</build-variants>
+		</sc-compartment>
+		<sc-compartment name="example.com_LIBJEE_1" caption="example.com_LIBJEE_1" archive-state="yes" default-compartment="yes" sc-vendor="example.com" sc-name="LIBJEE">
+			<compartment-description></compartment-description>
+			<properties>
+				<pns0:terminology_domain xmlns:pns0="http://xml.sap.com/2004/08/DevelopmentConfiguration/Configuration-Controller"/>
+				<pns1:original_language xmlns:pns1="http://xml.sap.com/2004/08/DevelopmentConfiguration/Configuration-Controller"/>
+			</properties>
+			<dependencies>
+				<used-compartment>sap.com_SAP_BUILDT_1</used-compartment>
+				<used-compartment>sap.com_EP_BUILDT_1</used-compartment>
+			</dependencies>
+			<build-variants>
+				<build-variant name="default">
+					<variant-mappings>
+						<variant-mapping used-compartment="sap.com_EP_BUILDT_1" used-variant-name="default"/>
+						<variant-mapping used-compartment="sap.com_SAP_BUILDT_1" used-variant-name="default"/>
+					</variant-mappings>
+				</build-variant>
+			</build-variants>
+		</sc-compartment>
+		<sc-compartment name="sap.com_EP_BUILDT_1" caption="sap.com_EP_BUILDT_1" archive-state="yes" default-compartment="yes" sc-vendor="sap.com" sc-name="EP_BUILDT">
+			<compartment-description></compartment-description>
+			<properties>
+				<pns0:terminology_domain xmlns:pns0="http://xml.sap.com/2004/08/DevelopmentConfiguration/Configuration-Controller"/>
+				<pns1:original_language xmlns:pns1="http://xml.sap.com/2004/08/DevelopmentConfiguration/Configuration-Controller"/>
+			</properties>
+			<dependencies>
+				<used-compartment>sap.com_SAP_BUILDT_1</used-compartment>
+			</dependencies>
+			<build-variants>
+				<build-variant name="default">
+					<variant-mappings>
+						<variant-mapping used-compartment="sap.com_SAP_BUILDT_1" used-variant-name="default"/>
+					</variant-mappings>
+				</build-variant>
+			</build-variants>
+		</sc-compartment>
+		<sc-compartment name="sap.com_SAP-JEE_1" caption="sap.com_SAP-JEE_1" archive-state="yes" default-compartment="yes" sc-vendor="sap.com" sc-name="SAP-JEE">
+			<compartment-description></compartment-description>
+			<properties>
+				<pns0:terminology_domain xmlns:pns0="http://xml.sap.com/2004/08/DevelopmentConfiguration/Configuration-Controller"/>
+				<pns1:original_language xmlns:pns1="http://xml.sap.com/2004/08/DevelopmentConfiguration/Configuration-Controller"/>
+			</properties>
+			<build-variants>
+				<build-variant name="default">
+				</build-variant>
+			</build-variants>
+		</sc-compartment>
+		<sc-compartment name="sap.com_SAP_BUILDT_1" caption="sap.com_SAP_BUILDT_1" archive-state="yes" default-compartment="yes" sc-vendor="sap.com" sc-name="SAP_BUILDT">
+			<compartment-description></compartment-description>
+			<properties>
+				<pns0:terminology_domain xmlns:pns0="http://xml.sap.com/2004/08/DevelopmentConfiguration/Configuration-Controller"/>
+				<pns1:original_language xmlns:pns1="http://xml.sap.com/2004/08/DevelopmentConfiguration/Configuration-Controller"/>
+			</properties>
+			<build-variants>
+				<build-variant name="default">
+				</build-variant>
+			</build-variants>
+		</sc-compartment>
+		<sc-compartment name="sap.com_SAP_JTECHS_1" caption="sap.com_SAP_JTECHS_1" archive-state="yes" default-compartment="yes" sc-vendor="sap.com" sc-name="SAP_JTECHS">
+			<compartment-description></compartment-description>
+			<properties>
+				<pns0:terminology_domain xmlns:pns0="http://xml.sap.com/2004/08/DevelopmentConfiguration/Configuration-Controller"/>
+				<pns1:original_language xmlns:pns1="http://xml.sap.com/2004/08/DevelopmentConfiguration/Configuration-Controller"/>
+			</properties>
+			<build-variants>
+				<build-variant name="default">
+				</build-variant>
+			</build-variants>
+		</sc-compartment>
+	</sc-compartments>
+</configuration>
