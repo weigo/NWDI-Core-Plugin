@@ -16,11 +16,11 @@ import java.util.List;
 import org.junit.Test;
 
 /**
- * Unit test for {@link ActivityListBrowser}.
+ * Unit test for {@link ActivityListParser}.
  * 
  * @author Dirk Weigenand
  */
-public class ActivityListBrowserTest {
+public class ActivityListParserTest {
     /**
      * URL for activity query.
      */
@@ -29,7 +29,7 @@ public class ActivityListBrowserTest {
             + "developer00_t_2010_05_17_14_29_57_GMT_50220574-193f-45a9-82bc-eb730df05ccc";
 
     /**
-     * Test method for {@link org.arachna.dtr.repository.browser.ActivityListParser#parse(java.io.InputStream)} .
+     * Test method for {@link org.arachna.netweaver.hudson.dtr.browser.ActivityListParser#parse(java.io.InputStream)} .
      */
     @Test
     public final void testExctractActivities() {

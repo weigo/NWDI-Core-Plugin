@@ -15,11 +15,11 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Unit tests for {@link SoftwareComponentsBrowser}.
+ * Unit tests for {@link SoftwareComponentsParser}.
  * 
  * @author Dirk Weigenand
  */
-public class SoftwareComponentsBrowserTest {
+public class SoftwareComponentsParserTest {
     /**
      * expected compartment names.
      */
