@@ -4,11 +4,14 @@
 package org.arachna.netweaver.hudson.dtr.browser;
 
 /**
- * Principal.
+ * A Principal representing UME users checking in activities.
  * 
- * @author G526521
+ * @author Dirk Weigenand
  */
 public class Principal {
+    /**
+     * the user this principal represents.
+     */
     private final String user;
 
     /**

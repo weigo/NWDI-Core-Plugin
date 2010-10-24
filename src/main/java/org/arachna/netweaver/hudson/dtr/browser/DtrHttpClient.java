@@ -9,7 +9,6 @@ import java.io.InputStream;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.BasicHttpContext;
@@ -53,23 +52,23 @@ final class DtrHttpClient {
      *            argument to validate.
      * @param argumentDescription
      *            description for error message.
-     * @throws IllegalArgumentException
-     *             when the given argument is null or empty.
      */
-    private void validateArgument(final String arg, final String argumentDescription) throws IllegalArgumentException {
+    private void validateArgument(final String arg, final String argumentDescription) {
         if (arg == null || arg.trim().length() == 0) {
             throw new IllegalArgumentException(String.format("The argument '%s' must not be null or empty!", argumentDescription));
         }
     }
 
     /**
+     * Get the content of the page returned by the given query.
+     * 
      * @param queryUrl
-     * @return
+     *            url for querying activities for a given compartment.
+     * @return the content of the page returned by the given query.
      * @throws IOException
-     * @throws ClientProtocolException
-     * @throws IllegalStateException
+     *             when an error occured reading the response.
      */
-    InputStream getContent(final String queryUrl) throws IOException, ClientProtocolException, IllegalStateException {
+    InputStream getContent(final String queryUrl) throws IOException {
         final HttpGet httpget = new HttpGet(queryUrl);
         final HttpResponse response = this.httpClient.execute(httpget, this.localContext);
 

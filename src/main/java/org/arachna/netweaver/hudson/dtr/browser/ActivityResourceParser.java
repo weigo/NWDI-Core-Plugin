@@ -97,7 +97,6 @@ public final class ActivityResourceParser {
      * 
      * @param node
      *            node to extract the <code>ActivityResource</code> from.
-     * @return the extracted <code>ActivityResource</code> or <code>null</code>.
      */
     private void addResource(final Node node) {
         final String resourcePath = node.getNodeValue();

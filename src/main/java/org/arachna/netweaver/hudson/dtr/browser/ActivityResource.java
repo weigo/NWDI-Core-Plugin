@@ -8,7 +8,7 @@ import org.arachna.netweaver.dc.types.DevelopmentComponent;
 /**
  * A resource attached to an activity.
  * 
- * @author g526521
+ * @author Dirk Weigenand
  */
 public class ActivityResource {
     /**
@@ -32,8 +32,7 @@ public class ActivityResource {
      * @param activity
      *            {@link Activity} this resource is associated with.
      * @param developmentComponent
-     *            {@link org.arachna.netweaver.dc.types.DevelopmentComponent}
-     *            this resource belongs to.
+     *            {@link org.arachna.netweaver.dc.types.DevelopmentComponent} this resource belongs to.
      * @param path
      *            path of resource in the containing development component.
      */
@@ -64,5 +63,4 @@ public class ActivityResource {
     public DevelopmentComponent getDevelopmentComponent() {
         return developmentComponent;
     }
-
 }

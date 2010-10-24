@@ -18,13 +18,17 @@ import org.w3c.dom.Node;
 /**
  * Parser for a DTR activity list.
  * 
- * @author G526521
+ * @author Dirk Weigenand
  */
 final class ActivityListParser {
     /**
-     * {@link ActivityFilter} to use when parsing activities.
-     * 
-     * Initialized with an accept all filter.
+     * XPath expression for extracting activities.
+     */
+    private static final String XPATH =
+            "//a[starts-with(@href, '/dtr/system-tools/reports/ResourceDetails?technical=false&path=/act/')]/../..";
+
+    /**
+     * {@link ActivityFilter} to use when parsing activities. Initialized with an accept all filter.
      */
     private ActivityFilter activityFilter = new ActivityFilter() {
         public boolean accept(final Activity activity) {
@@ -32,11 +36,29 @@ final class ActivityListParser {
         }
     };
 
-    private static final String XPATH = "//a[starts-with(@href, '/dtr/system-tools/reports/ResourceDetails?technical=false&path=/act/')]/../..";
+    /**
+     * date parser for check in times.
+     */
     private final SimpleDateFormat dateParser = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss z");
+
+    /**
+     * XPath for matching check in dates.
+     */
     private DOMXPath checkInDateXPath;
+
+    /**
+     * XPath for matching the description of an activity.
+     */
     private DOMXPath descriptionXPath;
+
+    /**
+     * XPath for matching the principal of an activity.
+     */
     private DOMXPath principalXPath;
+
+    /**
+     * XPath for matching check in dates.
+     */
     private DOMXPath activityXPath;
 
     /**
@@ -48,6 +70,9 @@ final class ActivityListParser {
 
     /**
      * Create an instance of an {@link ActivityListParser}.
+     * 
+     * @param activityFilter
+     *            the {@link ActivityFilter} to be used.
      */
     ActivityListParser(final ActivityFilter activityFilter) {
         if (activityFilter == null) {
@@ -90,7 +115,7 @@ final class ActivityListParser {
             Activity activity;
 
             for (final Object returnValue : xPath.selectNodes(document)) {
-                node = (Node) returnValue;
+                node = (Node)returnValue;
                 activity = createActivity(node);
 
                 if (activity != null && this.activityFilter.accept(activity)) {
@@ -109,15 +134,13 @@ final class ActivityListParser {
     }
 
     /**
-     * Create an instance of an {@link Activity} from the given
-     * {@link org.w3c.dom.Node}.
+     * Create an instance of an {@link Activity} from the given {@link org.w3c.dom.Node}.
      * 
      * @param node
      *            the node the activity's data should be read from.
      * @return the activity extracted from the given node.
      * @throws JaxenException
-     *             when there was an error evaluating the XPath expressions used
-     *             to extract the data
+     *             when there was an error evaluating the XPath expressions used to extract the data
      * @throws ParseException
      *             when there was an error parsing the activity's date.
      */
@@ -126,33 +149,31 @@ final class ActivityListParser {
     }
 
     /**
-     * Get the checkin date from the given node.
+     * Get the check in date from the given node.
      * 
      * @param node
-     *            the node the activity's checkin date should be read from.
-     * @return the checkin date extracted from the given node.
+     *            the node the activity's check in date should be read from.
+     * @return the check in date extracted from the given node.
      * @throws JaxenException
-     *             when there was an error evaluating the XPath expressions used
-     *             to extract the data
+     *             when there was an error evaluating the XPath expressions used to extract the data
      * @throws ParseException
      *             when there was an error parsing the activity's date.
      */
     private Date getCheckInDate(final Node node) throws JaxenException, ParseException {
-        return dateParser.parse(checkInDateXPath.stringValueOf(node));
+        return this.dateParser.parse(this.checkInDateXPath.stringValueOf(node));
     }
 
     /**
-     * Get the checkin date from the given node.
+     * Get the check in date from the given node.
      * 
      * @param node
-     *            the node the activity's checkin date should be read from.
-     * @return the checkin date extracted from the given node.
+     *            the node the activity's check in date should be read from.
+     * @return the check in date extracted from the given node.
      * @throws JaxenException
-     *             when there was an error evaluating the XPath expressions used
-     *             to extract the data
+     *             when there was an error evaluating the XPath expressions used to extract the data
      */
     private String getDescription(final Node node) throws JaxenException {
-        return descriptionXPath.stringValueOf(node);
+        return this.descriptionXPath.stringValueOf(node);
     }
 
     /**
@@ -162,11 +183,10 @@ final class ActivityListParser {
      *            the node the UME princiapl's name should be read from.
      * @return the UME principal's name extracted from the given node.
      * @throws JaxenException
-     *             when there was an error evaluating the XPath expressions used
-     *             to extract the data
+     *             when there was an error evaluating the XPath expressions used to extract the data
      */
     private Principal getPrincipal(final Node node) throws JaxenException {
-        return new Principal(principalXPath.stringValueOf(node).replace("/principals/", ""));
+        return new Principal(this.principalXPath.stringValueOf(node).replace("/principals/", ""));
     }
 
     /**
@@ -176,10 +196,9 @@ final class ActivityListParser {
      *            the node the activity's url should be read from.
      * @return the activity's url extracted from the given node.
      * @throws JaxenException
-     *             when there was an error evaluating the XPath expressions used
-     *             to extract the data
+     *             when there was an error evaluating the XPath expressions used to extract the data
      */
     private String getActivityUrl(final Node node) throws JaxenException {
-        return activityXPath.stringValueOf(node);
+        return this.activityXPath.stringValueOf(node);
     }
 }

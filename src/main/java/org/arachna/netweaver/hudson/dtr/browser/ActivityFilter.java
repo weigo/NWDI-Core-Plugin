@@ -6,17 +6,15 @@ package org.arachna.netweaver.hudson.dtr.browser;
 /**
  * Interfaces for filters on activities.
  * 
- * @author g526521
+ * @author Dirk Weigenand
  */
 public interface ActivityFilter {
     /**
-     * Test whether the given {@link Activity} passes a certain test implemented
-     * bei implementors of this interface.
+     * Test whether the given {@link Activity} passes a certain test implemented by implementors of this interface.
      * 
      * @param activity
      *            activity to test
-     * @return <code>true</code> when the activity passes the test,
-     *         <code>false</code> otherwise.
+     * @return <code>true</code> when the activity passes the test, <code>false</code> otherwise.
      */
     boolean accept(Activity activity);
 }

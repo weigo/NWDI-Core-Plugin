@@ -17,7 +17,7 @@ import org.w3c.dom.Node;
 /**
  * Extractor for {@link Compartment} objects from a DTR workspace listing.
  * 
- * @author G526521
+ * @author Dirk Weigenand
  */
 final class SoftwareComponentsParser {
     /**
@@ -48,7 +48,7 @@ final class SoftwareComponentsParser {
 
             for (final Object returnValue : xPath.selectNodes(document)) {
                 node = (Node)returnValue;
-                compartments.add(createCompartment((node.getAttributes().getNamedItem("href").getNodeValue())));
+                compartments.add(createCompartment(node.getAttributes().getNamedItem("href").getNodeValue()));
             }
         }
         catch (final JaxenException e) {

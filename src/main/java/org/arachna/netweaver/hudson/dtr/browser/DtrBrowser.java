@@ -32,10 +32,10 @@ public final class DtrBrowser {
     private static final Logger LOGGER = Logger.getLogger(DtrBrowser.class.getName());
 
     /**
-     *
+     * query for reading activities for a given compartment.
      */
     private static final String ACTIVITY_QUERY = "%s/dtr/system-tools/reports/ActivityQuery?wspPath=/%s"
-            + "&user=&closedOnly=on&isnFrom=&isnTo=&nonEmptyOnly=on&folderPath=&command=Show";
+        + "&user=&closedOnly=on&isnFrom=&isnTo=&nonEmptyOnly=on&folderPath=&command=Show";
     /**
      * DtrHttpClient for browsing the DTR.
      */
@@ -64,7 +64,7 @@ public final class DtrBrowser {
      *            password to authenticate the user against the DTR's UME.
      */
     public DtrBrowser(final DevelopmentConfiguration config, final DevelopmentComponentFactory dcFactory, final String dtrUser,
-            final String password) {
+        final String password) {
         this.config = config;
         this.dtrHttpClient = new DtrHttpClient(dtrUser, password);
         this.dcFactory = dcFactory;
@@ -80,7 +80,8 @@ public final class DtrBrowser {
         final List<Compartment> compartments = new ArrayList<Compartment>();
 
         try {
-            // FIXME: should use the dtr location of a software component of the given development configuration
+            // FIXME: should use the dtr location of a software component of the
+            // given development configuration
             final String queryUrl = String.format("%s/dtr/ws/%s", this.config.getCmsUrl(), this.config.getWorkspace());
             final InputStream result = this.dtrHttpClient.getContent(queryUrl);
             compartments.addAll(componentsBrowser.parse(result, config.getWorkspace()));
@@ -96,7 +97,8 @@ public final class DtrBrowser {
     }
 
     /**
-     * Get list of activities in the given workspace containing the given compartment.
+     * Get list of activities in the given workspace containing the given
+     * compartment.
      * 
      * @param compartment
      *            compartment to use for retrieving activities.
@@ -117,7 +119,7 @@ public final class DtrBrowser {
         }
         catch (final IOException e) {
             LOGGER.log(Level.SEVERE, String.format("There was an error reading the list of activities (for %s/%s_%s) from the DTR.",
-                    config.getWorkspace(), compartment.getVendor(), compartment.getName()), e);
+                config.getWorkspace(), compartment.getVendor(), compartment.getName()), e);
         }
 
         return activities;
@@ -127,18 +129,21 @@ public final class DtrBrowser {
      * Extract changed development components from the given list of activities.
      * 
      * @param activities
-     *            activities the changed development components shall be extracted from.
-     * @return list of changed development components associated with the given activities.
+     *            activities the changed development components shall be
+     *            extracted from.
+     * @return list of changed development components associated with the given
+     *         activities.
      */
     public Set<DevelopmentComponent> getDevelopmentComponents(final List<Activity> activities) {
         final DevelopmentComponentCollector collector =
-                new DevelopmentComponentCollector(this.dtrHttpClient, this.config.getCmsUrl(), this.dcFactory);
+            new DevelopmentComponentCollector(this.dtrHttpClient, this.config.getCmsUrl(), this.dcFactory);
 
         return collector.collect(activities);
     }
 
     /**
-     * Get a list of changed development components for the given workspace since the given date.
+     * Get a list of changed development components for the given workspace
+     * since the given date.
      * 
      * @return a list of changed development components
      */
@@ -147,11 +152,13 @@ public final class DtrBrowser {
     }
 
     /**
-     * Get a list of changed development components for the given workspace since the given date.
+     * Get a list of changed development components for the given workspace
+     * since the given date.
      * 
      * @param activityFilter
      *            filter the activities using the given {@link ActivityFilter}.
-     * @return a list of changed development components matched by the given {@link ActivityFilter}.
+     * @return a list of changed development components matched by the given
+     *         {@link ActivityFilter}.
      */
     private Set<DevelopmentComponent> getChangedDevelopmentComponents(final ActivityFilter activityFilter) {
         final List<Activity> activities = this.getActivities(activityFilter);
@@ -165,11 +172,14 @@ public final class DtrBrowser {
     }
 
     /**
-     * Get a list of activities in the given workspace matching the given {@link ActivityFilter}.
+     * Get a list of activities in the given workspace matching the given
+     * {@link ActivityFilter}.
      * 
      * @param activityFilter
-     *            an {@link ActivityFilter} for filtering the list of returned activities.
-     * @return a list of activities matching the given {@link ActivityFilter} in the given workspace.
+     *            an {@link ActivityFilter} for filtering the list of returned
+     *            activities.
+     * @return a list of activities matching the given {@link ActivityFilter} in
+     *         the given workspace.
      */
     public List<Activity> getActivities(final ActivityFilter activityFilter) {
         final List<Activity> activities = new ArrayList<Activity>();
@@ -201,7 +211,8 @@ public final class DtrBrowser {
     }
 
     /**
-     * Get a list of activities in the given workspace matching the given {@link ActivityFilter}.
+     * Get a list of activities in the given workspace matching the given
+     * {@link ActivityFilter}.
      * 
      * @param since
      *            date after which to look for activities.
@@ -212,7 +223,8 @@ public final class DtrBrowser {
     }
 
     /**
-     * Get a list of changed development components for the given workspace since the given date.
+     * Get a list of changed development components for the given workspace
+     * since the given date.
      * 
      * @param since
      *            date after which to look for activities.
@@ -225,14 +237,16 @@ public final class DtrBrowser {
     /**
      * @param since
      *            start date for activity filtering.
-     * @return the configured filter (with the given start date and the current time).
+     * @return the configured filter (with the given start date and the current
+     *         time).
      */
     private ActivityFilter createActivityCheckinDateFilter(final Date since) {
         return new ActivityCheckinDateFilter(since, Calendar.getInstance().getTime());
     }
 
     /**
-     * Compute the time spent since the given start time and log it using the given message.
+     * Compute the time spent since the given start time and log it using the
+     * given message.
      * 
      * @param start
      *            the start time to use for computing the duration until now

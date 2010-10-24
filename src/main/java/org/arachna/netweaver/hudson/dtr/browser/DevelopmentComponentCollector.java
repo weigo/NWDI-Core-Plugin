@@ -21,6 +21,12 @@ import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
  */
 final class DevelopmentComponentCollector {
     /**
+     * error message when an error occured computing the associated development components of the given set of activities.
+     */
+    private static final String ERROR_CALCULATING_AFFECTED_DEVELOPMENT_COMPONENTS =
+            "There was an error calculating the affected development components for the given set of activities.";
+
+    /**
      * Logger to use.
      */
     private static final Logger LOG = Logger.getLogger(DevelopmentComponentCollector.class.getName());
@@ -98,13 +104,13 @@ final class DevelopmentComponentCollector {
             }
         }
         catch (final ClientProtocolException e) {
-            LOG.log(Level.SEVERE, "There was an error calculating the affected development components for the given set of activities.", e);
+            LOG.log(Level.SEVERE, ERROR_CALCULATING_AFFECTED_DEVELOPMENT_COMPONENTS, e);
         }
         catch (final IllegalStateException e) {
-            LOG.log(Level.SEVERE, "There was an error calculating the affected development components for the given set of activities.", e);
+            LOG.log(Level.SEVERE, ERROR_CALCULATING_AFFECTED_DEVELOPMENT_COMPONENTS, e);
         }
         catch (final IOException e) {
-            LOG.log(Level.SEVERE, "There was an error calculating the affected development components for the given set of activities.", e);
+            LOG.log(Level.SEVERE, ERROR_CALCULATING_AFFECTED_DEVELOPMENT_COMPONENTS, e);
         }
 
         return components;
