@@ -9,7 +9,7 @@
   </parent>
 
   <groupId>org.arachna.netweaver</groupId>
-  <artifactId>NWDI-Plugin</artifactId>
+  <artifactId>Hudson-NWDI-SCM-Plugin</artifactId>
   <name>Hudson NWDI SCM plugin</name>
   <version>1.0-SNAPSHOT</version>
   <packaging>hpi</packaging>
