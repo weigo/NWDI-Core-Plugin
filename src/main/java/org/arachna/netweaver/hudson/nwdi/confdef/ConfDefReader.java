@@ -15,7 +15,8 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
 /**
- * Reader for <code>.confdef</code> configuration files for development configurations.
+ * Reader for <code>.confdef</code> configuration files for development
+ * configurations.
  * 
  * @author Dirk Weigenand
  */
@@ -66,10 +67,12 @@ public final class ConfDefReader extends AbstractDefaultHandler {
     private CompartmentReader compartmentReader;
 
     /**
-     * Create an instance of a <code>ConfDefReader</code> using the given {@link XMLReader}.
+     * Create an instance of a <code>ConfDefReader</code> using the given
+     * {@link XMLReader}.
      * 
      * @param xmlReader
-     *            the <code>XMLReader</code> to be used to read the <code>.confdef</code> configuration file.
+     *            the <code>XMLReader</code> to be used to read the
+     *            <code>.confdef</code> configuration file.
      */
     public ConfDefReader(final XMLReader xmlReader) {
         super(xmlReader, null);
@@ -78,7 +81,9 @@ public final class ConfDefReader extends AbstractDefaultHandler {
 
     /*
      * (non-Javadoc)
-     * @see org.xml.sax.ContentHandler#endElement(java.lang.String, java.lang.String, java.lang.String)
+     * 
+     * @see org.xml.sax.ContentHandler#endElement(java.lang.String,
+     * java.lang.String, java.lang.String)
      */
     @Override
     public void endElement(final String uri, final String localName, final String name) throws SAXException {
@@ -97,10 +102,13 @@ public final class ConfDefReader extends AbstractDefaultHandler {
 
     /*
      * (non-Javadoc)
-     * @see org.xml.sax.ContentHandler#startElement(java.lang.String, java.lang.String, java.lang.String, org.xml.sax.Attributes)
+     * 
+     * @see org.xml.sax.ContentHandler#startElement(java.lang.String,
+     * java.lang.String, java.lang.String, org.xml.sax.Attributes)
      */
     @Override
-    public void startElement(final String uri, final String localName, final String name, final Attributes atts) throws SAXException {
+    public void startElement(final String uri, final String localName, final String name, final Attributes atts)
+        throws SAXException {
         if (CONFIGURATION.equals(localName)) {
             this.developmentConfiguration = new DevelopmentConfiguration(atts.getValue(NAME));
             this.developmentConfiguration.setCaption(atts.getValue(CAPTION));
@@ -119,7 +127,7 @@ public final class ConfDefReader extends AbstractDefaultHandler {
      *            the <code>InputStream</code> to read the configuration from.
      * @return the developmentConfiguration just read.
      */
-    public DevelopmentConfiguration read(final InputStream config) throws SAXException, IOException {
+    public DevelopmentConfiguration read(final InputStream config) {
         return read(new InputStreamReader(config));
     }
 
