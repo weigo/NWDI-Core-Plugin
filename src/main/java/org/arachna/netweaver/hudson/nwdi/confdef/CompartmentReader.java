@@ -98,27 +98,27 @@ public final class CompartmentReader extends AbstractDefaultHandler {
     private static final String SC_COMPARTMENTS = "sc-compartments";
 
     /**
-     * enthaltene Softwarekomponenten.
+     * {@link Compartment}s read.
      */
     private final List<Compartment> compartments = new ArrayList<Compartment>();
 
     /**
-     * aktuell einzulesenes Compartment.
+     * compartment currently processed.
      */
     private Compartment compartment;
 
     /**
-     * Default BuildVariante.
+     * {@link BuildVariant} for the currently processed compartment.
      */
     private BuildVariant buildVariant;
 
     /**
-     * Name der aktuellen build option.
+     * name of the current build option.
      */
     private String buildOptionName;
 
     /**
-     * Name der aktuellen Build-Variante.
+     * name of the current build variant.
      */
     private String buildVariantName;
 
