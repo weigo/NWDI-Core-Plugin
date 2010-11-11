@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<clients>
+  <client name="%s" clientFilter="" absoluteLocalRoot="%s" logicalSystem="%s">
+    <mountPoints>
+    </mountPoints>
+  </client>
+</clients>
