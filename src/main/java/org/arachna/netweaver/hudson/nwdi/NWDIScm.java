@@ -29,6 +29,8 @@ import net.sf.json.JSONObject;
 
 import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
+import org.arachna.netweaver.dctool.DCToolCommandExecutor;
+import org.arachna.netweaver.dctool.LoadConfigCommandGenerator;
 import org.arachna.netweaver.hudson.dtr.browser.Activity;
 import org.arachna.netweaver.hudson.dtr.browser.DtrBrowser;
 import org.arachna.netweaver.hudson.nwdi.confdef.ConfDefReader;
@@ -49,19 +51,10 @@ public class NWDIScm extends SCM {
     private static final Logger LOGGER = Logger.getLogger(NWDIScm.class.getName());
 
     /**
-     * Content of .confdef file (development configuration of track to be monitored).
+     * Content of .confdef file (development configuration of track to be
+     * monitored).
      */
     private final String confdef;
-
-    /**
-     * UME user of NWDI server.
-     */
-    private String user;
-
-    /**
-     * authenticate user using this password.
-     */
-    private String password;
 
     /**
      * Get a clean copy of all development components from NWDI.
@@ -77,9 +70,11 @@ public class NWDIScm extends SCM {
      * Create an instance of a <code>NWDIScm</code>.
      * 
      * @param confdef
-     *            the uploaded <code>.confdef</code> development configuration file to use.
+     *            the uploaded <code>.confdef</code> development configuration
+     *            file to use.
      * @param cleanCopy
-     *            indicate whether only changed development components should be loaded from the NWDI or all that are contained in the
+     *            indicate whether only changed development components should be
+     *            loaded from the NWDI or all that are contained in the
      *            indicated CBS workspace
      */
     @DataBoundConstructor
@@ -88,26 +83,6 @@ public class NWDIScm extends SCM {
         this.confdef = confdef;
         this.cleanCopy = cleanCopy;
         this.getDevelopmentConfiguration();
-    }
-
-    /**
-     * Set the user to use for authentication.
-     * 
-     * @param user
-     *            the user to use for authentication against the UME.
-     */
-    void setUser(final String user) {
-        this.user = user;
-    }
-
-    /**
-     * Set the password to use for authentication.
-     * 
-     * @param password
-     *            the password to use for authentication against the UME.
-     */
-    void setPassword(final String password) {
-        this.password = password;
     }
 
     /**
@@ -146,36 +121,58 @@ public class NWDIScm extends SCM {
 
     /*
      * (non-Javadoc)
-     * @see hudson.scm.SCM#checkout(hudson.model.AbstractBuild, hudson.Launcher, hudson.FilePath, hudson.model.BuildListener, java.io.File)
+     * @see hudson.scm.SCM#checkout(hudson.model.AbstractBuild, hudson.Launcher,
+     * hudson.FilePath, hudson.model.BuildListener, java.io.File)
      */
     @Override
-    public boolean checkout(final AbstractBuild build, final Launcher launcher, final FilePath workspace, final BuildListener listener,
-            final File changelogFile) throws IOException, InterruptedException {
+    public boolean checkout(final AbstractBuild build, final Launcher launcher, final FilePath workspace,
+        final BuildListener listener, final File changelogFile) throws IOException, InterruptedException {
+        final DescriptorImpl descriptor = this.getDescriptor();
+        final DevelopmentComponentFactory dcFactory = new DevelopmentComponentFactory();
+        final List<Activity> activities = this.getActivities(build.getPreviousBuild(), dcFactory);
 
-        final DtrBrowser browser = new DtrBrowser(this.developmentConfiguration, null, this.user, this.password);
-        // FIXME: get the list of activities from the NWDIRevisionState object calculated by calcRevisionsFromBuild
-        final List<Activity> activities = this.getActivities(build.getPreviousBuild());
+        this.writeChangeLog(build, changelogFile, activities);
 
-        // update activities with their respective resources
-        // FIXME: add methods to DtrBrowser that get activities with their
-        // respective resources!
-        browser.getDevelopmentComponents(activities);
+        final FilePath dtrDirectory = this.createOrUpdateConfiguration(workspace);
+        final DCToolCommandExecutor dcToolExecutor =
+            new DCToolCommandExecutor(descriptor.getNwdiToolLibFolder(),
+                this.developmentConfiguration.getBuildVariant(), null);
 
-        final DtrChangeLogWriter dtrChangeLogWriter =
-                new DtrChangeLogWriter(new DtrChangeLogSet(build, activities), new FileWriter(changelogFile));
-        dtrChangeLogWriter.write();
+        final LoadConfigCommandGenerator loadConfigCommandGenerator =
+            new LoadConfigCommandGenerator(descriptor.getUser(), descriptor.getPassword(), dtrDirectory.absolutize()
+                .getName());
+        final SyncDevelopmentComponentsCommandBuilder commandBuilder =
+            new SyncDevelopmentComponentsCommandBuilder(loadConfigCommandGenerator, this.developmentConfiguration,
+                this.cleanCopy);
+        listener.getLogger().append(dcToolExecutor.execute(launcher, workspace, commandBuilder));
 
         return !activities.isEmpty();
     }
 
-    /*
-     * (non-Javadoc)
-     * @see hudson.scm.SCM#pollChanges(hudson.model.AbstractProject, hudson.Launcher, hudson.FilePath, hudson.model.TaskListener)
+    /**
+     * @param workspace
+     * @return
+     * @throws IOException
+     * @throws InterruptedException
      */
-    @Override
-    public boolean pollChanges(final AbstractProject project, final Launcher launcher, final FilePath workspace, final TaskListener listener)
-            throws IOException, InterruptedException {
-        return !this.getActivities(project.getLastBuild()).isEmpty();
+    private FilePath createOrUpdateConfiguration(final FilePath workspace) throws IOException, InterruptedException {
+        final DtrConfigCreator configCreator =
+            new DtrConfigCreator(workspace, this.developmentConfiguration, this.confdef);
+        final FilePath dtrDirectory = configCreator.execute();
+        return dtrDirectory;
+    }
+
+    /**
+     * @param build
+     * @param changelogFile
+     * @param activities
+     * @throws IOException
+     */
+    private void writeChangeLog(final AbstractBuild build, final File changelogFile, final List<Activity> activities)
+        throws IOException {
+        final DtrChangeLogWriter dtrChangeLogWriter =
+            new DtrChangeLogWriter(new DtrChangeLogSet(build, activities), new FileWriter(changelogFile));
+        dtrChangeLogWriter.write();
     }
 
     /**
@@ -197,6 +194,24 @@ public class NWDIScm extends SCM {
          */
         private String password;
 
+        /**
+         * folder where the NWDI tool library files are stored.
+         */
+        private String nwdiToolLibFolder;
+
+        /**
+         * path to the 'JDK_1_3_1_HOME' installation.
+         */
+        private String jdk131Home;
+
+        /**
+         * path to the 'JDK_1_4_2_HOME' installation.
+         */
+        private String jdk142Home;
+
+        /**
+         * Create an instance of {@link NWDIScm}s descriptor.
+         */
         public DescriptorImpl() {
             super(NWDIScm.class, null);
             load();
@@ -232,6 +247,51 @@ public class NWDIScm extends SCM {
             this.password = password;
         }
 
+        /**
+         * @return the nwdiToolLibFolder
+         */
+        public String getNwdiToolLibFolder() {
+            return nwdiToolLibFolder;
+        }
+
+        /**
+         * @param nwdiToolLibFolder
+         *            the nwdiToolLibFolder to set
+         */
+        public void setNwdiToolLibFolder(final String nwdiToolLibFolder) {
+            this.nwdiToolLibFolder = nwdiToolLibFolder;
+        }
+
+        /**
+         * @return the jdk131Home
+         */
+        public String getJdk131Home() {
+            return jdk131Home;
+        }
+
+        /**
+         * @param jdk131Home
+         *            the jdk131Home to set
+         */
+        public void setJdk131Home(final String jdk131Home) {
+            this.jdk131Home = jdk131Home;
+        }
+
+        /**
+         * @return the jdk142Home
+         */
+        public String getJdk142Home() {
+            return jdk142Home;
+        }
+
+        /**
+         * @param jdk142Home
+         *            the jdk142Home to set
+         */
+        public void setJdk142Home(final String jdk142Home) {
+            this.jdk142Home = jdk142Home;
+        }
+
         @Override
         public String getDisplayName() {
             return "NetWeaver Development Infrastructure";
@@ -239,7 +299,9 @@ public class NWDIScm extends SCM {
 
         /*
          * (non-Javadoc)
-         * @see hudson.model.Descriptor#configure(org.kohsuke.stapler.StaplerRequest, net.sf.json.JSONObject)
+         * @see
+         * hudson.model.Descriptor#configure(org.kohsuke.stapler.StaplerRequest,
+         * net.sf.json.JSONObject)
          */
         @Override
         public boolean configure(final StaplerRequest req, final JSONObject json) throws FormException {
@@ -249,25 +311,31 @@ public class NWDIScm extends SCM {
         }
 
         @Override
-        public SCM newInstance(final StaplerRequest req, final JSONObject formData) throws hudson.model.Descriptor.FormException {
-            NWDIScm scm = (NWDIScm)super.newInstance(req, formData);
-            scm.setPassword(this.password);
-            scm.setUser(this.user);
-
-            return scm;
+        public SCM newInstance(final StaplerRequest req, final JSONObject formData)
+            throws hudson.model.Descriptor.FormException {
+            return super.newInstance(req, formData);
         }
     }
 
     /**
-     * Get list of activities since last run. If <code>lastRun</code> is <code>null</code> all activities will be calculated.
+     * Get list of activities since last run. If <code>lastRun</code> is
+     * <code>null</code> all activities will be calculated.
      * 
      * @param lastRun
-     *            last run of a build or <code>null</code> if this run is the first.
-     * @return a list of {@link Activity} objects that were checked in since the last run or all activities.
+     *            last run of a build or <code>null</code> if this run is the
+     *            first.
+     * @param dcFactory
+     *            the {@link DevelopmentComponentFactory} to use when updating
+     *            the found activities with their resources as is requested when
+     *            this parameter is not <code>null</code>.
+     * @return a list of {@link Activity} objects that were checked in since the
+     *         last run or all activities.
      */
-    private List<Activity> getActivities(final Run lastRun) {
+    private List<Activity> getActivities(final Run lastRun, DevelopmentComponentFactory dcFactory) {
+        final DescriptorImpl descriptor = this.getDescriptor();
         final DtrBrowser browser =
-                new DtrBrowser(this.developmentConfiguration, new DevelopmentComponentFactory(), this.user, this.password);
+            new DtrBrowser(this.developmentConfiguration, dcFactory, descriptor.getUser(), descriptor.getPassword());
+
         final List<Activity> activities = new ArrayList<Activity>();
 
         if (lastRun == null) {
@@ -277,21 +345,27 @@ public class NWDIScm extends SCM {
             activities.addAll(browser.getActivities(lastRun.getTime()));
         }
 
+        if (dcFactory != null) {
+            // update activities with their respective resources
+            // FIXME: add methods to DtrBrowser that get activities with their
+            // respective resources!
+            browser.getDevelopmentComponents(activities);
+        }
+
         return activities;
     }
 
     @Override
-    public SCMRevisionState calcRevisionsFromBuild(AbstractBuild<?, ?> build, Launcher launcher, TaskListener listener) throws IOException,
-            InterruptedException {
-        return new NWDIRevisionState(this.getActivities(build));
+    public SCMRevisionState calcRevisionsFromBuild(AbstractBuild<?, ?> build, Launcher launcher, TaskListener listener)
+        throws IOException, InterruptedException {
+        return new NWDIRevisionState(this.getActivities(build, null));
     }
 
     /**
      */
     private void getDevelopmentConfiguration() {
-        ConfDefReader confdefReader = null;
         try {
-            confdefReader = new ConfDefReader(XMLReaderFactory.createXMLReader());
+            ConfDefReader confdefReader = new ConfDefReader(XMLReaderFactory.createXMLReader());
             this.developmentConfiguration = confdefReader.read(new StringReader(this.confdef));
         }
         catch (SAXException e) {
@@ -301,7 +375,7 @@ public class NWDIScm extends SCM {
 
     @Override
     protected PollingResult compareRemoteRevisionWith(AbstractProject<?, ?> project, Launcher launcher, FilePath path,
-            TaskListener listener, SCMRevisionState revisionState) throws IOException, InterruptedException {
+        TaskListener listener, SCMRevisionState revisionState) throws IOException, InterruptedException {
         // TODO Auto-generated method stub
         return null;
     }
