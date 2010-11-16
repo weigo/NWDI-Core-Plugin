@@ -1,0 +1,13 @@
+
+syntax: regexp
+^\.checkstyle$
+syntax: regexp
+^\.classpath$
+syntax: regexp
+^\.project$
+syntax: regexp
+^\.owner$
+syntax: regexp
+^target$
+syntax: regexp
+^\.settings$
