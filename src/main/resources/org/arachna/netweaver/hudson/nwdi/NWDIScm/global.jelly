@@ -10,6 +10,17 @@
       optional @help points to the help document HTML. /plugin/NWDI-Plugin is mapped to our webapp/ directory, so this is a convenient way
       to serve static resources.
     -->
+    <f:entry title="NWDI tool library location" description="Enter the location of your NWDI tool library." help="/plugin/NWDI-Plugin/help-globalConfig.html">
+      <f:textbox name="NWDIPlugin.nwdiToolLibFolder" value="${descriptor.nwdiToolLibFolder}" />
+    </f:entry>
+    <f:entry title="JDK_1.3.1_HOME" description="Enter the location of your Java installation that corresponds to your NWDIs path variable 'JDK_1.3.1_HOME'."
+             help="/plugin/NWDI-Plugin/help-globalConfig.html">
+      <f:textbox name="NWDIPlugin.jdk131Home" value="${descriptor.jdk131Home}" />
+    </f:entry>
+    <f:entry title="JDK_1.4.2_HOME" description="Enter the location of your Java installation that corresponds to your NWDIs path variable 'JDK_1.4.2_HOME'."
+             help="/plugin/NWDI-Plugin/help-globalConfig.html">
+      <f:textbox name="NWDIPlugin.jdk142Home" value="${descriptor.jdk142Home}" />
+    </f:entry>
     <f:entry title="NWDI user" description="Enter the user name to use for authentification against the NWDI" help="/plugin/NWDI-Plugin/help-globalConfig.html">
       <f:textbox name="NWDIPlugin.user" value="${descriptor.user}" />
     </f:entry>
