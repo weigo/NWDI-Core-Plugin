@@ -10,7 +10,6 @@ import org.arachna.netweaver.dc.types.Compartment;
 import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 import org.arachna.netweaver.dctool.AbstractDCToolCommandBuilder;
-import org.arachna.netweaver.dctool.LoadConfigCommandGenerator;
 
 /**
  * Builder for DCTool synchronize commands for a development configurations
@@ -52,17 +51,15 @@ public final class SyncDevelopmentComponentsCommandBuilder extends AbstractDCToo
     /**
      * create a builder for development component listing and syncing commands.
      * 
-     * @param loadConfigCommandGenerator
-     *            Generator for 'locadconfig' commands.
      * @param developmentConfiguration
      *            development configuration to synchronize development
      *            components for.
      * @param cleanCopy
      *            indicate whether a clean copy of the workspace is needed.
      */
-    SyncDevelopmentComponentsCommandBuilder(final LoadConfigCommandGenerator loadConfigCommandGenerator,
-        final DevelopmentConfiguration developmentConfiguration, final boolean cleanCopy) {
-        super(loadConfigCommandGenerator, developmentConfiguration);
+    SyncDevelopmentComponentsCommandBuilder(final DevelopmentConfiguration developmentConfiguration,
+        final boolean cleanCopy) {
+        super(developmentConfiguration);
         this.cleanCopy = cleanCopy;
     }
 

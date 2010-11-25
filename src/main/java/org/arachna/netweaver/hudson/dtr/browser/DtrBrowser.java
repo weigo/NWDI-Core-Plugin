@@ -63,8 +63,8 @@ public final class DtrBrowser {
      * @param password
      *            password to authenticate the user against the DTR's UME.
      */
-    public DtrBrowser(final DevelopmentConfiguration config, final DevelopmentComponentFactory dcFactory, final String dtrUser,
-        final String password) {
+    public DtrBrowser(final DevelopmentConfiguration config, final DevelopmentComponentFactory dcFactory,
+        final String dtrUser, final String password) {
         this.config = config;
         this.dtrHttpClient = new DtrHttpClient(dtrUser, password);
         this.dcFactory = dcFactory;
@@ -84,7 +84,7 @@ public final class DtrBrowser {
             // given development configuration
             final String queryUrl = String.format("%s/dtr/ws/%s", this.config.getCmsUrl(), this.config.getWorkspace());
             final InputStream result = this.dtrHttpClient.getContent(queryUrl);
-            compartments.addAll(componentsBrowser.parse(result, config.getWorkspace()));
+            compartments.addAll(componentsBrowser.parse(result, config));
         }
         catch (final ClientProtocolException e) {
             LOGGER.log(Level.SEVERE, "An error occured communicating with the DTR.", e);
@@ -111,15 +111,18 @@ public final class DtrBrowser {
         final ActivityListParser activityListBrowser = new ActivityListParser(activityFilter);
 
         try {
-            final String queryUrl = String.format(ACTIVITY_QUERY, compartment.getDtrUrl(), compartment.getInactiveLocation());
+            final String queryUrl =
+                String.format(ACTIVITY_QUERY, compartment.getDtrUrl(), compartment.getInactiveLocation());
             activities.addAll(activityListBrowser.parse(this.dtrHttpClient.getContent(queryUrl)));
         }
         catch (final ClientProtocolException e) {
             LOGGER.log(Level.SEVERE, "There occured an error communicating with the DTR.", e);
         }
         catch (final IOException e) {
-            LOGGER.log(Level.SEVERE, String.format("There was an error reading the list of activities (for %s/%s_%s) from the DTR.",
-                config.getWorkspace(), compartment.getVendor(), compartment.getName()), e);
+            LOGGER.log(
+                Level.SEVERE,
+                String.format("There was an error reading the list of activities (for %s/%s_%s) from the DTR.",
+                    config.getWorkspace(), compartment.getVendor(), compartment.getName()), e);
         }
 
         return activities;

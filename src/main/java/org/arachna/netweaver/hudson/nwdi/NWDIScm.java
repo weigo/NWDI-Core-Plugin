@@ -6,6 +6,7 @@ package org.arachna.netweaver.hudson.nwdi;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
+import hudson.Util;
 import hudson.model.BuildListener;
 import hudson.model.TaskListener;
 import hudson.model.AbstractBuild;
@@ -23,14 +24,19 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 import net.sf.json.JSONObject;
 
+import org.arachna.netweaver.dc.types.Compartment;
+import org.arachna.netweaver.dc.types.CompartmentState;
+import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
+import org.arachna.netweaver.dctool.DCToolCommandBuilder;
 import org.arachna.netweaver.dctool.DCToolCommandExecutor;
-import org.arachna.netweaver.dctool.LoadConfigCommandGenerator;
+import org.arachna.netweaver.dctool.DCToolDescriptor;
+import org.arachna.netweaver.dctool.JdkHomeAlias;
+import org.arachna.netweaver.dctool.JdkHomePaths;
 import org.arachna.netweaver.hudson.dtr.browser.Activity;
 import org.arachna.netweaver.hudson.dtr.browser.DtrBrowser;
 import org.arachna.netweaver.hudson.nwdi.confdef.ConfDefReader;
@@ -45,11 +51,6 @@ import org.xml.sax.helpers.XMLReaderFactory;
  * @author Dirk Weigenand
  */
 public class NWDIScm extends SCM {
-    /**
-     * Logger.
-     */
-    private static final Logger LOGGER = Logger.getLogger(NWDIScm.class.getName());
-
     /**
      * Content of .confdef file (development configuration of track to be
      * monitored).
@@ -82,7 +83,7 @@ public class NWDIScm extends SCM {
         super();
         this.confdef = confdef;
         this.cleanCopy = cleanCopy;
-        this.getDevelopmentConfiguration();
+        this.developmentConfiguration = this.getDevelopmentConfiguration();
     }
 
     /**
@@ -94,6 +95,7 @@ public class NWDIScm extends SCM {
 
     /*
      * (non-Javadoc)
+     * 
      * @see hudson.scm.SCM#getDescriptor()
      */
     @Override
@@ -103,6 +105,7 @@ public class NWDIScm extends SCM {
 
     /*
      * (non-Javadoc)
+     * 
      * @see hudson.scm.SCM#createChangeLogParser()
      */
     @Override
@@ -112,15 +115,17 @@ public class NWDIScm extends SCM {
 
     /*
      * (non-Javadoc)
+     * 
      * @see hudson.scm.SCM#requiresWorkspaceForPolling()
      */
     @Override
     public boolean requiresWorkspaceForPolling() {
-        return false;
+        return true;
     }
 
     /*
      * (non-Javadoc)
+     * 
      * @see hudson.scm.SCM#checkout(hudson.model.AbstractBuild, hudson.Launcher,
      * hudson.FilePath, hudson.model.BuildListener, java.io.File)
      */
@@ -130,23 +135,69 @@ public class NWDIScm extends SCM {
         final DescriptorImpl descriptor = this.getDescriptor();
         final DevelopmentComponentFactory dcFactory = new DevelopmentComponentFactory();
         final List<Activity> activities = this.getActivities(build.getPreviousBuild(), dcFactory);
+        final boolean rebuildNeeded = !activities.isEmpty();
 
-        this.writeChangeLog(build, changelogFile, activities);
+        if (rebuildNeeded) {
+            this.writeChangeLog(build, changelogFile, activities);
 
-        final FilePath dtrDirectory = this.createOrUpdateConfiguration(workspace);
-        final DCToolCommandExecutor dcToolExecutor =
-            new DCToolCommandExecutor(descriptor.getNwdiToolLibFolder(),
-                this.developmentConfiguration.getBuildVariant(), null);
+            final FilePath dtrDirectory = this.createOrUpdateConfiguration(workspace);
+            final DCToolDescriptor dcToolDescriptor =
+                new DCToolDescriptor(descriptor.getUser(), descriptor.getPassword(), descriptor.getNwdiToolLibFolder(),
+                    dtrDirectory.getName(), descriptor.getConfiguredJdkHomePaths());
+            final DCToolCommandExecutor dcToolExecutor =
+                new DCToolCommandExecutor(launcher, workspace, dcToolDescriptor, this.developmentConfiguration);
 
-        final LoadConfigCommandGenerator loadConfigCommandGenerator =
-            new LoadConfigCommandGenerator(descriptor.getUser(), descriptor.getPassword(), dtrDirectory.absolutize()
-                .getName());
+            listener.getLogger().append(
+                listDevelopmentComponents(dcToolExecutor, this.developmentConfiguration, dcFactory));
+            listener.getLogger().append(syncDevelopmentComponents(dcToolExecutor));
+        }
+
+        build.addAction(new NWDIRevisionState(activities));
+
+        return rebuildNeeded;
+    }
+
+    private String listDevelopmentComponents(final DCToolCommandExecutor dcToolExecutor,
+        final DevelopmentConfiguration developmentConfiguration, final DevelopmentComponentFactory dcFactory)
+        throws IOException, InterruptedException {
+        final String output = dcToolExecutor.execute(new DCToolCommandBuilder() {
+            public List<String> execute() {
+                final List<String> commands = new ArrayList<String>();
+
+                for (final Compartment compartment : developmentConfiguration.getCompartments()) {
+                    commands.add(String.format("listdcs -s %s;", compartment.getName()));
+                }
+
+                return commands;
+            }
+        });
+
+        final DevelopmentComponentsReader developmentComponentsReader =
+            new DevelopmentComponentsReader(new StringReader(output), dcFactory, this.developmentConfiguration);
+        developmentComponentsReader.read();
+
+        for (final Compartment currentCompartment : this.developmentConfiguration.getCompartments()) {
+            if (this.cleanCopy && CompartmentState.Source.equals(currentCompartment.getState())) {
+                for (final DevelopmentComponent component : currentCompartment.getDevelopmentComponents()) {
+                    component.setNeedsRebuild(true);
+                }
+            }
+        }
+
+        return output;
+    }
+
+    /**
+     * @param listener
+     * @param dcToolExecutor
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    private String syncDevelopmentComponents(final DCToolCommandExecutor dcToolExecutor) throws IOException,
+        InterruptedException {
         final SyncDevelopmentComponentsCommandBuilder commandBuilder =
-            new SyncDevelopmentComponentsCommandBuilder(loadConfigCommandGenerator, this.developmentConfiguration,
-                this.cleanCopy);
-        listener.getLogger().append(dcToolExecutor.execute(launcher, workspace, commandBuilder));
-
-        return !activities.isEmpty();
+            new SyncDevelopmentComponentsCommandBuilder(this.developmentConfiguration, this.cleanCopy);
+        return dcToolExecutor.execute(commandBuilder);
     }
 
     /**
@@ -299,21 +350,58 @@ public class NWDIScm extends SCM {
 
         /*
          * (non-Javadoc)
+         * 
          * @see
          * hudson.model.Descriptor#configure(org.kohsuke.stapler.StaplerRequest,
          * net.sf.json.JSONObject)
          */
         @Override
         public boolean configure(final StaplerRequest req, final JSONObject json) throws FormException {
+            this.jdk131Home = getParameter(req, "NWDIPlugin.jdk131Home");
+            this.jdk142Home = getParameter(req, "NWDIPlugin.jdk142Home");
+            this.nwdiToolLibFolder = getParameter(req, "NWDIPlugin.nwdiToolLibFolder");
+            this.user = getParameter(req, "NWDIPlugin.user");
+            this.password = getParameter(req, "NWDIPlugin.password");
+
             save();
 
             return super.configure(req, json);
+        }
+
+        /**
+         * Returns the requested parameter from the given {@link StaplerRequest}
+         * .
+         * 
+         * @param req
+         *            the <code>StaplerRequest</code> to extract the parameter
+         *            from.
+         * @param parameter
+         *            the name of the requested parameter.
+         * @return the requested parameter from the given
+         *         <code>StaplerRequest</code>.
+         */
+        private String getParameter(final StaplerRequest req, final String parameter) {
+            return Util.fixEmpty(req.getParameter(parameter).trim());
         }
 
         @Override
         public SCM newInstance(final StaplerRequest req, final JSONObject formData)
             throws hudson.model.Descriptor.FormException {
             return super.newInstance(req, formData);
+        }
+
+        /**
+         * Returns the path mappings for the configured JDK homes.
+         * 
+         * @return path mappings for the configured JDK homes.
+         */
+        JdkHomePaths getConfiguredJdkHomePaths() {
+            final JdkHomePaths paths = new JdkHomePaths();
+
+            paths.add(JdkHomeAlias.Jdk131Home, this.getJdk131Home());
+            paths.add(JdkHomeAlias.Jdk142Home, this.getJdk142Home());
+
+            return paths;
         }
     }
 
@@ -331,10 +419,11 @@ public class NWDIScm extends SCM {
      * @return a list of {@link Activity} objects that were checked in since the
      *         last run or all activities.
      */
-    private List<Activity> getActivities(final Run lastRun, DevelopmentComponentFactory dcFactory) {
+    private List<Activity> getActivities(final Run lastRun, final DevelopmentComponentFactory dcFactory) {
         final DescriptorImpl descriptor = this.getDescriptor();
         final DtrBrowser browser =
-            new DtrBrowser(this.developmentConfiguration, dcFactory, descriptor.getUser(), descriptor.getPassword());
+            new DtrBrowser(this.getDevelopmentConfiguration(), dcFactory, descriptor.getUser(),
+                descriptor.getPassword());
 
         final List<Activity> activities = new ArrayList<Activity>();
 
@@ -356,26 +445,31 @@ public class NWDIScm extends SCM {
     }
 
     @Override
-    public SCMRevisionState calcRevisionsFromBuild(AbstractBuild<?, ?> build, Launcher launcher, TaskListener listener)
-        throws IOException, InterruptedException {
-        return new NWDIRevisionState(this.getActivities(build, null));
+    public SCMRevisionState calcRevisionsFromBuild(final AbstractBuild<?, ?> build, final Launcher launcher,
+        final TaskListener listener) throws IOException, InterruptedException {
+        return null;
     }
 
     /**
      */
-    private void getDevelopmentConfiguration() {
+    private DevelopmentConfiguration getDevelopmentConfiguration() {
+        DevelopmentConfiguration developmentConfiguration = null;
+
         try {
-            ConfDefReader confdefReader = new ConfDefReader(XMLReaderFactory.createXMLReader());
-            this.developmentConfiguration = confdefReader.read(new StringReader(this.confdef));
+            final ConfDefReader confdefReader = new ConfDefReader(XMLReaderFactory.createXMLReader());
+            developmentConfiguration = confdefReader.read(new StringReader(this.confdef));
         }
-        catch (SAXException e) {
+        catch (final SAXException e) {
             throw new RuntimeException(e);
         }
+
+        return developmentConfiguration;
     }
 
     @Override
-    protected PollingResult compareRemoteRevisionWith(AbstractProject<?, ?> project, Launcher launcher, FilePath path,
-        TaskListener listener, SCMRevisionState revisionState) throws IOException, InterruptedException {
+    protected PollingResult compareRemoteRevisionWith(final AbstractProject<?, ?> project, final Launcher launcher,
+        final FilePath path, final TaskListener listener, final SCMRevisionState revisionState) throws IOException,
+        InterruptedException {
         // TODO Auto-generated method stub
         return null;
     }

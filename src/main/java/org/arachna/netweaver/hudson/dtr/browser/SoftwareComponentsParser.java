@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.arachna.netweaver.dc.types.Compartment;
-import org.arachna.netweaver.dc.types.CompartmentState;
+import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 import org.jaxen.JaxenException;
 import org.jaxen.dom.DOMXPath;
 import org.w3c.dom.Document;
@@ -37,9 +37,9 @@ final class SoftwareComponentsParser {
      * @return list of {@link Compartment} that were extracted from the
      *         HTML-Page
      */
-    public List<Compartment> parse(final InputStream compartmentList, final String workSpace) {
+    public List<Compartment> parse(final InputStream compartmentList, final DevelopmentConfiguration config) {
         final List<Compartment> compartments = new ArrayList<Compartment>();
-        final String path = String.format(XPATH, workSpace);
+        final String path = String.format(XPATH, config.getWorkspace());
         final Document document = JTidyHelper.getDocument(compartmentList);
 
         try {
@@ -48,7 +48,8 @@ final class SoftwareComponentsParser {
 
             for (final Object returnValue : xPath.selectNodes(document)) {
                 node = (Node)returnValue;
-                compartments.add(createCompartment(node.getAttributes().getNamedItem("href").getNodeValue()));
+                compartments.add(config.getCompartment(createCompartmentName(node.getAttributes().getNamedItem("href")
+                    .getNodeValue())));
             }
         }
         catch (final JaxenException e) {
@@ -65,11 +66,10 @@ final class SoftwareComponentsParser {
      *            link to compartment in html page.
      * @return compartment object parsed from given link.
      */
-    private Compartment createCompartment(final String href) {
+    private String createCompartmentName(final String href) {
         final int firstUnderScore = href.indexOf('_');
-        final String vendor = href.substring(href.lastIndexOf('/') + 1, firstUnderScore);
         final String name = href.substring(firstUnderScore + 1, href.length());
 
-        return new Compartment(name, CompartmentState.Source, vendor, "", name);
+        return name;
     }
 }
