@@ -14,6 +14,7 @@ import hudson.model.AbstractProject;
 import hudson.model.Run;
 import hudson.scm.ChangeLogParser;
 import hudson.scm.PollingResult;
+import hudson.scm.PollingResult.Change;
 import hudson.scm.SCMDescriptor;
 import hudson.scm.SCMRevisionState;
 import hudson.scm.SCM;
@@ -95,7 +96,6 @@ public class NWDIScm extends SCM {
 
     /*
      * (non-Javadoc)
-     * 
      * @see hudson.scm.SCM#getDescriptor()
      */
     @Override
@@ -105,7 +105,6 @@ public class NWDIScm extends SCM {
 
     /*
      * (non-Javadoc)
-     * 
      * @see hudson.scm.SCM#createChangeLogParser()
      */
     @Override
@@ -115,7 +114,6 @@ public class NWDIScm extends SCM {
 
     /*
      * (non-Javadoc)
-     * 
      * @see hudson.scm.SCM#requiresWorkspaceForPolling()
      */
     @Override
@@ -125,7 +123,6 @@ public class NWDIScm extends SCM {
 
     /*
      * (non-Javadoc)
-     * 
      * @see hudson.scm.SCM#checkout(hudson.model.AbstractBuild, hudson.Launcher,
      * hudson.FilePath, hudson.model.BuildListener, java.io.File)
      */
@@ -350,7 +347,6 @@ public class NWDIScm extends SCM {
 
         /*
          * (non-Javadoc)
-         * 
          * @see
          * hudson.model.Descriptor#configure(org.kohsuke.stapler.StaplerRequest,
          * net.sf.json.JSONObject)
@@ -447,7 +443,7 @@ public class NWDIScm extends SCM {
     @Override
     public SCMRevisionState calcRevisionsFromBuild(final AbstractBuild<?, ?> build, final Launcher launcher,
         final TaskListener listener) throws IOException, InterruptedException {
-        return null;
+        return SCMRevisionState.NONE;
     }
 
     /**
@@ -470,7 +466,6 @@ public class NWDIScm extends SCM {
     protected PollingResult compareRemoteRevisionWith(final AbstractProject<?, ?> project, final Launcher launcher,
         final FilePath path, final TaskListener listener, final SCMRevisionState revisionState) throws IOException,
         InterruptedException {
-        // TODO Auto-generated method stub
-        return null;
+        return new PollingResult(SCMRevisionState.NONE, project.getAction(NWDIRevisionState.class), Change.SIGNIFICANT);
     }
 }
