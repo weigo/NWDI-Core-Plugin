@@ -41,6 +41,7 @@ import org.arachna.netweaver.dctool.JdkHomePaths;
 import org.arachna.netweaver.hudson.dtr.browser.Activity;
 import org.arachna.netweaver.hudson.dtr.browser.DtrBrowser;
 import org.arachna.netweaver.hudson.nwdi.confdef.ConfDefReader;
+import org.arachna.netweaver.hudson.nwdi.dcupdater.DevelopmentComponentUpdater;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 import org.xml.sax.SAXException;
@@ -48,7 +49,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
 
 /**
  * Interface to NetWeaver Developer Infrastructure.
- * 
+ *
  * @author Dirk Weigenand
  */
 public class NWDIScm extends SCM {
@@ -70,7 +71,7 @@ public class NWDIScm extends SCM {
 
     /**
      * Create an instance of a <code>NWDIScm</code>.
-     * 
+     *
      * @param confdef
      *            the uploaded <code>.confdef</code> development configuration
      *            file to use.
@@ -84,7 +85,7 @@ public class NWDIScm extends SCM {
         super();
         this.confdef = confdef;
         this.cleanCopy = cleanCopy;
-        this.developmentConfiguration = this.getDevelopmentConfiguration();
+        this.getDevelopmentConfiguration();
     }
 
     /**
@@ -96,6 +97,7 @@ public class NWDIScm extends SCM {
 
     /*
      * (non-Javadoc)
+     *
      * @see hudson.scm.SCM#getDescriptor()
      */
     @Override
@@ -105,6 +107,7 @@ public class NWDIScm extends SCM {
 
     /*
      * (non-Javadoc)
+     *
      * @see hudson.scm.SCM#createChangeLogParser()
      */
     @Override
@@ -114,6 +117,7 @@ public class NWDIScm extends SCM {
 
     /*
      * (non-Javadoc)
+     *
      * @see hudson.scm.SCM#requiresWorkspaceForPolling()
      */
     @Override
@@ -123,6 +127,7 @@ public class NWDIScm extends SCM {
 
     /*
      * (non-Javadoc)
+     *
      * @see hudson.scm.SCM#checkout(hudson.model.AbstractBuild, hudson.Launcher,
      * hudson.FilePath, hudson.model.BuildListener, java.io.File)
      */
@@ -132,7 +137,7 @@ public class NWDIScm extends SCM {
         final DescriptorImpl descriptor = this.getDescriptor();
         final DevelopmentComponentFactory dcFactory = new DevelopmentComponentFactory();
         final List<Activity> activities = this.getActivities(build.getPreviousBuild(), dcFactory);
-        final boolean rebuildNeeded = !activities.isEmpty();
+        final boolean rebuildNeeded = this.cleanCopy || !activities.isEmpty();
 
         if (rebuildNeeded) {
             this.writeChangeLog(build, changelogFile, activities);
@@ -142,11 +147,16 @@ public class NWDIScm extends SCM {
                 new DCToolDescriptor(descriptor.getUser(), descriptor.getPassword(), descriptor.getNwdiToolLibFolder(),
                     dtrDirectory.getName(), descriptor.getConfiguredJdkHomePaths());
             final DCToolCommandExecutor dcToolExecutor =
-                new DCToolCommandExecutor(launcher, workspace, dcToolDescriptor, this.developmentConfiguration);
+                new DCToolCommandExecutor(launcher, workspace, dcToolDescriptor, this.getDevelopmentConfiguration());
 
-            listener.getLogger().append(
-                listDevelopmentComponents(dcToolExecutor, this.developmentConfiguration, dcFactory));
+            listener.getLogger().append(listDevelopmentComponents(dcToolExecutor, dcFactory));
             listener.getLogger().append(syncDevelopmentComponents(dcToolExecutor));
+
+            final DevelopmentComponentUpdater updater =
+                new DevelopmentComponentUpdater(workspace.absolutize().getName(), dcFactory);
+            updater.execute();
+
+            // TODO: add current development configuration to this build.
         }
 
         build.addAction(new NWDIRevisionState(activities));
@@ -155,8 +165,9 @@ public class NWDIScm extends SCM {
     }
 
     private String listDevelopmentComponents(final DCToolCommandExecutor dcToolExecutor,
-        final DevelopmentConfiguration developmentConfiguration, final DevelopmentComponentFactory dcFactory)
-        throws IOException, InterruptedException {
+        final DevelopmentComponentFactory dcFactory) throws IOException, InterruptedException {
+        final DevelopmentConfiguration developmentConfiguration = this.getDevelopmentConfiguration();
+
         final String output = dcToolExecutor.execute(new DCToolCommandBuilder() {
             public List<String> execute() {
                 final List<String> commands = new ArrayList<String>();
@@ -170,10 +181,10 @@ public class NWDIScm extends SCM {
         });
 
         final DevelopmentComponentsReader developmentComponentsReader =
-            new DevelopmentComponentsReader(new StringReader(output), dcFactory, this.developmentConfiguration);
+            new DevelopmentComponentsReader(new StringReader(output), dcFactory, developmentConfiguration);
         developmentComponentsReader.read();
 
-        for (final Compartment currentCompartment : this.developmentConfiguration.getCompartments()) {
+        for (final Compartment currentCompartment : this.getDevelopmentConfiguration().getCompartments()) {
             if (this.cleanCopy && CompartmentState.Source.equals(currentCompartment.getState())) {
                 for (final DevelopmentComponent component : currentCompartment.getDevelopmentComponents()) {
                     component.setNeedsRebuild(true);
@@ -193,7 +204,7 @@ public class NWDIScm extends SCM {
     private String syncDevelopmentComponents(final DCToolCommandExecutor dcToolExecutor) throws IOException,
         InterruptedException {
         final SyncDevelopmentComponentsCommandBuilder commandBuilder =
-            new SyncDevelopmentComponentsCommandBuilder(this.developmentConfiguration, this.cleanCopy);
+            new SyncDevelopmentComponentsCommandBuilder(this.getDevelopmentConfiguration(), this.cleanCopy);
         return dcToolExecutor.execute(commandBuilder);
     }
 
@@ -205,7 +216,7 @@ public class NWDIScm extends SCM {
      */
     private FilePath createOrUpdateConfiguration(final FilePath workspace) throws IOException, InterruptedException {
         final DtrConfigCreator configCreator =
-            new DtrConfigCreator(workspace, this.developmentConfiguration, this.confdef);
+            new DtrConfigCreator(workspace, this.getDevelopmentConfiguration(), this.confdef);
         final FilePath dtrDirectory = configCreator.execute();
         return dtrDirectory;
     }
@@ -347,6 +358,7 @@ public class NWDIScm extends SCM {
 
         /*
          * (non-Javadoc)
+         *
          * @see
          * hudson.model.Descriptor#configure(org.kohsuke.stapler.StaplerRequest,
          * net.sf.json.JSONObject)
@@ -367,7 +379,7 @@ public class NWDIScm extends SCM {
         /**
          * Returns the requested parameter from the given {@link StaplerRequest}
          * .
-         * 
+         *
          * @param req
          *            the <code>StaplerRequest</code> to extract the parameter
          *            from.
@@ -388,7 +400,7 @@ public class NWDIScm extends SCM {
 
         /**
          * Returns the path mappings for the configured JDK homes.
-         * 
+         *
          * @return path mappings for the configured JDK homes.
          */
         JdkHomePaths getConfiguredJdkHomePaths() {
@@ -404,7 +416,7 @@ public class NWDIScm extends SCM {
     /**
      * Get list of activities since last run. If <code>lastRun</code> is
      * <code>null</code> all activities will be calculated.
-     * 
+     *
      * @param lastRun
      *            last run of a build or <code>null</code> if this run is the
      *            first.
@@ -449,17 +461,17 @@ public class NWDIScm extends SCM {
     /**
      */
     private DevelopmentConfiguration getDevelopmentConfiguration() {
-        DevelopmentConfiguration developmentConfiguration = null;
-
-        try {
-            final ConfDefReader confdefReader = new ConfDefReader(XMLReaderFactory.createXMLReader());
-            developmentConfiguration = confdefReader.read(new StringReader(this.confdef));
+        if (this.developmentConfiguration == null) {
+            try {
+                final ConfDefReader confdefReader = new ConfDefReader(XMLReaderFactory.createXMLReader());
+                this.developmentConfiguration = confdefReader.read(new StringReader(this.confdef));
+            }
+            catch (final SAXException e) {
+                throw new RuntimeException(e);
+            }
         }
-        catch (final SAXException e) {
-            throw new RuntimeException(e);
-        }
 
-        return developmentConfiguration;
+        return this.developmentConfiguration;
     }
 
     @Override

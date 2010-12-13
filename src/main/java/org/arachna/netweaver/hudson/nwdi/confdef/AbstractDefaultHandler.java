@@ -52,7 +52,7 @@ public abstract class AbstractDefaultHandler extends DefaultHandler {
      */
     @Override
     public final void characters(final char[] ch, final int start, final int length) throws SAXException {
-        text.append(new String(ch, start, length));
+        this.text.append(new String(ch, start, length));
     }
 
     /**
@@ -73,13 +73,13 @@ public abstract class AbstractDefaultHandler extends DefaultHandler {
      * @return the xmlReader
      */
     public final XMLReader getXmlReader() {
-        return xmlReader;
+        return this.xmlReader;
     }
 
     /**
      * @return the parent
      */
     protected final DefaultHandler getParent() {
-        return parent;
+        return this.parent;
     }
 }

@@ -98,8 +98,15 @@ final class DtrConfigCreator {
         createOrUpdateServersXml(dtrDirectory);
         createOrUpdateClientsXml(dtrDirectory, dtcDirectory);
         createOrUpdateDotConfDef(dtcDirectory);
+        createOrUpdateTrackNameDotSystem(dtrDirectory);
 
         return dtrDirectory;
+    }
+
+    private void createOrUpdateTrackNameDotSystem(final FilePath dtrDirectory) throws IOException, InterruptedException {
+        dtrDirectory.child(this.config.getName() + ".system").write(
+            String.format(this.getTemplate("template.system"), this.config.getName(), this.config.getDtrServerUrl(),
+                this.config.getBuildServer()), DEFAULT_ENCODING);
     }
 
     /**

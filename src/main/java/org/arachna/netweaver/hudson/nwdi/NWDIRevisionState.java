@@ -29,8 +29,8 @@ public final class NWDIRevisionState extends SCMRevisionState implements Seriali
     private final Collection<Activity> activities = new ArrayList<Activity>();
 
     /**
-     * Create an instance of <code></code> with the given collection of
-     * activities.
+     * Create an instance of <code>NWDIRevisionState</code> with the given
+     * collection of activities.
      * 
      * @param activities
      *            the activities checked in since the last build.
@@ -48,6 +48,6 @@ public final class NWDIRevisionState extends SCMRevisionState implements Seriali
      * @return the activities that were checked in since the last build.
      */
     public Collection<Activity> getActivities() {
-        return Collections.unmodifiableCollection(activities);
+        return Collections.unmodifiableCollection(this.activities);
     }
 }

@@ -48,8 +48,16 @@ final class SoftwareComponentsParser {
 
             for (final Object returnValue : xPath.selectNodes(document)) {
                 node = (Node)returnValue;
-                compartments.add(config.getCompartment(createCompartmentName(node.getAttributes().getNamedItem("href")
-                    .getNodeValue())));
+                final String compartmentName =
+                    createCompartmentName(node.getAttributes().getNamedItem("href").getNodeValue());
+                final Compartment compartment = config.getCompartment(compartmentName);
+
+                if (compartment != null) {
+                    compartments.add(compartment);
+                }
+                else {
+                    System.err.println(compartmentName + " could not be found in " + config.getName());
+                }
             }
         }
         catch (final JaxenException e) {
@@ -67,8 +75,8 @@ final class SoftwareComponentsParser {
      * @return compartment object parsed from given link.
      */
     private String createCompartmentName(final String href) {
-        final int firstUnderScore = href.indexOf('_');
-        final String name = href.substring(firstUnderScore + 1, href.length());
+        final int firstUnderScore = href.lastIndexOf('/');
+        final String name = href.substring(firstUnderScore + 1, href.length()) + "_1";
 
         return name;
     }
