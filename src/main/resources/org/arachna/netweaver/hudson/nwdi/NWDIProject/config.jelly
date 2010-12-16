@@ -3,9 +3,9 @@
 
   <!-- Creates a text field that shows the value of the "name" property. When submitted, it will be passed to the corresponding constructor parameter. -->
   <f:entry title="${%confdef}" description="${%confdef.description}" field="confdef">
-    <f:textarea value="${scm.confdef}" />
+    <f:textarea value="${project.confdef}" />
   </f:entry>
   <f:entry title="${%clean copy}" description="${%cleanCopy.description}" field="cleanCopy">
-    <f:checkbox default="false" value="${scm.cleanCopy}" clazz="required" />
+    <f:checkbox default="false" value="${project.cleanCopy}" clazz="required" />
   </f:entry>
 </j:jelly>

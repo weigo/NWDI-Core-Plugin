@@ -1,33 +1,36 @@
 <!-- The MIT License Copyright (c) 2004-2009, Sun Microsystems, Inc. Permission is hereby granted, free of charge, to any person obtaining a
- copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation
- the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the
- Software is furnished to do so, subject to the following conditions: The above copyright notice and this permission notice shall be included
- in all copies or substantial portions of the Software. THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
- BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
- COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT
- OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. -->
+  copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation
+  the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the
+  Software is furnished to do so, subject to the following conditions: The above copyright notice and this permission notice shall be included
+  in all copies or substantial portions of the Software. THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
+  BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+  COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT
+  OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. -->
 
 <!-- Config page -->
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
- <f:section title="NetWeaver Development Infrastructure">
-  <!-- optional @help points to the help document HTML. /plugin/NWDI-Plugin is mapped to our webapp/ directory, so this is a convenient way to
-   serve static resources. -->
-  <f:entry title="NWDI tool library location" description="Enter the location of your NWDI tool library." help="/plugin/NWDI-Plugin/help-globalConfig.html">
-   <f:textbox name="NWDIPlugin.nwdiToolLibFolder" value="${descriptor.nwdiToolLibFolder}" />
-  </f:entry>
-  <f:entry title="JDK_1.3.1_HOME" description="Enter the location of your Java installation that corresponds to your NWDIs path variable 'JDK_1.3.1_HOME'."
-   help="/plugin/NWDI-Plugin/help-globalConfig.html">
-   <f:textbox name="NWDIPlugin.jdk131Home" value="${descriptor.jdk131Home}" />
-  </f:entry>
-  <f:entry title="JDK_1.4.2_HOME" description="Enter the location of your Java installation that corresponds to your NWDIs path variable 'JDK_1.4.2_HOME'."
-   help="/plugin/NWDI-Plugin/help-globalConfig.html">
-   <f:textbox name="NWDIPlugin.jdk142Home" value="${descriptor.jdk142Home}" />
-  </f:entry>
-  <f:entry title="NWDI user" description="Enter the user name to use for authentification against the NWDI" help="/plugin/NWDI-Plugin/help-globalConfig.html">
-   <f:textbox name="NWDIPlugin.user" value="${descriptor.user}" />
-  </f:entry>
-  <f:entry title="NWDI password" description="Enter the password to use for authentification against the NWDI" help="/plugin/NWDI-Plugin/help-globalConfig.html">
-   <input type="password" class="setting-input" name="NWDIPlugin.password" value="${descriptor.password}" />
-  </f:entry>
- </f:section>
+  <f:section title="${%NetWeaver developer infrastructure}">
+    <!-- optional @help points to the help document HTML. /plugin/Hudson-NWDI-SCM-Plugin is mapped to our webapp/ directory, so this is a convenient
+      way to serve static resources. -->
+    <f:entry title="${%NWDI tool library location}" description="${%Enter the location of your NWDI tool library folder.}" help="/plugin/Hudson-NWDI-SCM-Plugin/help-nwdiToolLibFolder.html">
+      <f:textbox clazz="required" name="NWDIPlugin.nwdiToolLibFolder" value="${descriptor.nwdiToolLibFolder}"
+        checkUrl="'descriptorByName/NWDIProject/nwdiToolLibFolderCheck?value='+escape(this.value)" />
+    </f:entry>
+    <f:entry title="JDK_1.3.1_HOME" description="${%Enter the location of your Java installation that corresponds to your NWDIs path variable 'JDK_1.3.1_HOME'.}"
+      help="/plugin/Hudson-NWDI-SCM-Plugin/help-jdkHomes.html">
+      <f:textbox name="NWDIPlugin.jdk131Home" value="${descriptor.jdk131Home}" />
+    </f:entry>
+    <f:entry title="JDK_1.4.2_HOME" description="${%Enter the location of your Java installation that corresponds to your NWDIs path variable 'JDK_1.4.2_HOME'.}"
+      help="/plugin/Hudson-NWDI-SCM-Plugin/help-jdkHomes.html">
+      <f:textbox name="NWDIPlugin.jdk142Home" value="${descriptor.jdk142Home}" />
+    </f:entry>
+    <f:entry title="${%NWDI user}" description="${%Enter the user name to use for authentication against the NWDI.}" help="/plugin/Hudson-NWDI-SCM-Plugin/help-UME.html">
+      <f:textbox clazz="required" name="NWDIPlugin.user" value="${descriptor.user}"
+        checkUrl="'descriptorByName/NWDIProject/userCheck?value='+escape(this.value)" />
+    </f:entry>
+    <f:entry title="${%NWDI password}" description="${%Enter the password to use for authentication against the NWDI.}" help="/plugin/Hudson-NWDI-SCM-Plugin/help-UME.html">
+      <f:password clazz="required setting-input" name="NWDIPlugin.password" value="${descriptor.password}"
+        checkUrl="'descriptorByName/NWDIProject/passwordCheck?value='+escape(this.value)" />
+    </f:entry>
+  </f:section>
 </j:jelly>

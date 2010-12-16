@@ -17,7 +17,7 @@ import org.arachna.netweaver.dctool.AbstractDCToolCommandBuilder;
  * 
  * @author Dirk Weigenand
  */
-public final class SyncDevelopmentComponentsCommandBuilder extends AbstractDCToolCommandBuilder {
+final class SyncDevelopmentComponentsCommandBuilder extends AbstractDCToolCommandBuilder {
     /**
      * command for syncing an inactive DC.
      */
@@ -65,7 +65,6 @@ public final class SyncDevelopmentComponentsCommandBuilder extends AbstractDCToo
 
     /*
      * (non-Javadoc)
-     * 
      * @see
      * org.arachna.netweaver.dc.analyzer.dctool.DCToolCommandBuilder#execute ()
      */
