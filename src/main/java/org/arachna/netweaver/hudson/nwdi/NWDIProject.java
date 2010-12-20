@@ -9,10 +9,12 @@ import hudson.Util;
 import hudson.model.DependencyGraph;
 import hudson.model.Descriptor;
 import hudson.model.Descriptor.FormException;
+import hudson.model.Item;
 import hudson.model.ItemGroup;
 import hudson.model.TopLevelItem;
 import hudson.model.AbstractProject;
 import hudson.model.Hudson;
+import hudson.scm.SCM;
 import hudson.tasks.Publisher;
 import hudson.util.DescribableList;
 import hudson.util.FormValidation;
@@ -36,6 +38,13 @@ import org.kohsuke.stapler.StaplerResponse;
  * @author Dirk Weigenand
  */
 public final class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> implements TopLevelItem {
+    private static final String PARAMETER_CLEAN_COPY = "cleanCopy";
+
+    /**
+     * The content of the development configuration file '.confdef'.
+     */
+    private static final String PARAMETER_CONF_DEF = "confDef";
+
     /**
      * Global descriptor/configuraton for NWDIProjects.
      */
@@ -43,14 +52,50 @@ public final class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> i
     public static final DescriptorImpl DESCRIPTOR = new DescriptorImpl();
 
     /**
+     * Store the content of the '.confdef' configuration file for a development
+     * configuration.
+     */
+    private String confDef;
+
+    /**
+     * clean workspace before building when <code>true</code>.
+     */
+    private boolean cleanCopy;
+
+    /**
+     * Publishers for this project.
+     */
+    private DescribableList<Publisher, Descriptor<Publisher>> publishers;
+
+    /**
      * Create an instance of a NWDI project.
      * 
      * @param parent
+     *            the parent <code>ItemGroup</code> in the project configuration
+     *            page.
      * @param name
+     *            project name
      */
     public NWDIProject(final ItemGroup parent, final String name) {
         super(parent, name);
+    }
 
+    /**
+     * Create an instance of a NWDI project using the given project name and
+     * configuration.
+     * 
+     * @param name
+     *            project name
+     * @param confDef
+     *            development configuration file
+     * @param cleanCopy
+     *            clean workspace before building when <code>true</code>
+     */
+
+    public NWDIProject(final String name, final String confDef, final boolean cleanCopy) {
+        super(Hudson.getInstance(), name);
+        this.confDef = confDef;
+        this.cleanCopy = cleanCopy;
     }
 
     /**
@@ -77,11 +122,29 @@ public final class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> i
     }
 
     /**
+     * Returns the SCM to be used by this NWDI project.
+     * 
+     * @return SCM to be used by this NWDI project.
+     */
+    @Override
+    public SCM getScm() {
+        return new NWDIScm(this.cleanCopy);
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
     protected void submit(final StaplerRequest req, final StaplerResponse rsp) throws IOException, ServletException,
         FormException {
+        if (req.hasParameter(PARAMETER_CONF_DEF)) {
+            this.confDef = req.getParameter(PARAMETER_CONF_DEF);
+        }
+
+        this.cleanCopy = req.hasParameter(PARAMETER_CLEAN_COPY);
+
+        this.save();
+
         super.submit(req, rsp);
     }
 
@@ -90,9 +153,10 @@ public final class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> i
      * used for different NWDI tracks.
      * 
      * @author Dirk Weigenand
-     * 
      */
     public static final class DescriptorImpl extends AbstractProjectDescriptor {
+        private static final String DC_SUB_FOLDER = "dc";
+
         /**
          * UME user to use when connecting to NWDI.
          */
@@ -117,6 +181,14 @@ public final class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> i
          * path to the 'JDK_1_4_2_HOME' installation.
          */
         private String jdk142Home;
+
+        /**
+         * Create descriptor for NWDI-Projects and load global configuration
+         * data.
+         */
+        public DescriptorImpl() {
+            load();
+        }
 
         /**
          * @return the user
@@ -243,7 +315,7 @@ public final class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> i
                     result = FormValidation.error(Messages.NWDIProject_NwdiToolLibFolder_ioexception());
                 }
                 catch (InterruptedException e) {
-                    result = FormValidation.error("The form validation has been cancelled.");
+                    result = FormValidation.error("Form validation has been cancelled.");
                 }
             }
 
@@ -265,8 +337,8 @@ public final class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> i
          *             when the operation was canceled.
          */
         protected FormValidation validateDcToolFolder(final FilePath folder) throws IOException, InterruptedException {
-            return folder != null && folder.child("dc").exists() ? FormValidation.ok() : FormValidation
-                .error("The given folder does not point to a proper NWDI tool library installation!");
+            return folder != null && folder.child(DC_SUB_FOLDER).exists() ? FormValidation.ok() : FormValidation
+                .error(Messages.NWDIProject_NwdiToolLibFolder_no_proper_installation_folder(DC_SUB_FOLDER));
         }
 
         /**
@@ -293,20 +365,20 @@ public final class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> i
          * @return the form validation value.
          */
         public FormValidation doUserCheck(@QueryParameter final String value) {
-            return Util.fixEmptyAndTrim(value) == null ? FormValidation
-                .error("Please provide the UME user to authenticate with.") : FormValidation.ok();
+            return Util.fixEmptyAndTrim(value) == null ? FormValidation.error(Messages.NWDIProject_user_missing())
+                : FormValidation.ok();
         }
 
         /**
-         * Validate the 'user' parameter.
+         * Validate the 'password' parameter.
          * 
          * @param value
-         *            the form value for the 'user' field.
+         *            the form value for the 'password' field.
          * @return the form validation value.
          */
         public FormValidation doPasswordCheck(@QueryParameter final String value) {
-            return Util.fixEmptyAndTrim(value) == null ? FormValidation
-                .error("Please provide the password for the UME user to authenticate with.") : FormValidation.ok();
+            return Util.fixEmptyAndTrim(value) == null ? FormValidation.error(Messages.NWDIProject_password_missing())
+                : FormValidation.ok();
         }
 
         /**
@@ -323,12 +395,17 @@ public final class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> i
             return paths;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public String getDisplayName() {
-            // FIXME: return localized display name
-            return "NWDI Project";
+            return Messages.NWDIProject_title();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public NWDIProject newInstance(final String name) {
             return new NWDIProject(Hudson.getInstance(), name);
@@ -350,5 +427,54 @@ public final class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> i
     @Override
     protected void buildDependencyGraph(final DependencyGraph graph) {
         // TODO Auto-generated method stub
+    }
+
+    /**
+     * 
+     * {@inheritDoc}
+     */
+    @Override
+    public void onLoad(ItemGroup<? extends Item> parent, String name) throws IOException {
+        super.onLoad(parent, name);
+
+        if (this.publishers == null) {
+            this.publishers = new DescribableList<Publisher, Descriptor<Publisher>>(this);
+        }
+
+        this.publishers.setOwner(this);
+    }
+
+    /**
+     * Set the content of the '.confdef' configuration file.
+     * 
+     * @param confDef
+     *            content of the '.confdef' configuration file.
+     */
+    public void setConfDef(final String confDef) {
+        this.confDef = confDef;
+    }
+
+    /**
+     * Return the content of the '.confdef' configuration file.
+     * 
+     * @return the content of the '.confdef' configuration file.
+     */
+    public String getConfDef() {
+        return confDef;
+    }
+
+    /**
+     * @return the cleanCopy
+     */
+    public boolean isCleanCopy() {
+        return cleanCopy;
+    }
+
+    /**
+     * @param cleanCopy
+     *            the cleanCopy to set
+     */
+    public void setCleanCopy(final boolean cleanCopy) {
+        this.cleanCopy = cleanCopy;
     }
 }

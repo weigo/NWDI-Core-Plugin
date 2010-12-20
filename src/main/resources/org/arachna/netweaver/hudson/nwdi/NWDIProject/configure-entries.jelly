@@ -1,11 +1,17 @@
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form"
+  xmlns:p="/lib/hudson/project">
   <!-- This jelly script is used for per-project configuration. See global.jelly for a general discussion about jelly script. -->
 
   <!-- Creates a text field that shows the value of the "name" property. When submitted, it will be passed to the corresponding constructor parameter. -->
   <f:entry title="${%confdef}" description="${%confdef.description}" field="confdef">
-    <f:textarea value="${project.confdef}" />
+    <f:textarea value="${it.confdef}" />
   </f:entry>
   <f:entry title="${%clean copy}" description="${%cleanCopy.description}" field="cleanCopy">
     <f:checkbox default="false" value="${project.cleanCopy}" clazz="required" />
   </f:entry>
+  <p:config-builder />
+  <p:config-trigger>
+  </p:config-trigger>
+  <p:config-buildWrappers />
+  <p:config-publishers />
 </j:jelly>
