@@ -28,6 +28,7 @@ import net.sf.json.JSONObject;
 
 import org.arachna.netweaver.dctool.JdkHomeAlias;
 import org.arachna.netweaver.dctool.JdkHomePaths;
+import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
@@ -38,10 +39,15 @@ import org.kohsuke.stapler.StaplerResponse;
  * @author Dirk Weigenand
  */
 public final class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> implements TopLevelItem {
+    /**
+     * parameter name for project configuration controlling whether the
+     * workspace should be clean before building.
+     */
     private static final String PARAMETER_CLEAN_COPY = "cleanCopy";
 
     /**
-     * The content of the development configuration file '.confdef'.
+     * parameter name for the content of the development configuration file
+     * '.confdef'.
      */
     private static final String PARAMETER_CONF_DEF = "confDef";
 
@@ -91,7 +97,7 @@ public final class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> i
      * @param cleanCopy
      *            clean workspace before building when <code>true</code>
      */
-
+    @DataBoundConstructor
     public NWDIProject(final String name, final String confDef, final boolean cleanCopy) {
         super(Hudson.getInstance(), name);
         this.confDef = confDef;
@@ -137,12 +143,11 @@ public final class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> i
     @Override
     protected void submit(final StaplerRequest req, final StaplerResponse rsp) throws IOException, ServletException,
         FormException {
-        if (req.hasParameter(PARAMETER_CONF_DEF)) {
-            this.confDef = req.getParameter(PARAMETER_CONF_DEF);
-        }
+        final JSONObject json = req.getSubmittedForm();
+        this.confDef = Util.fixNull(json.getString(PARAMETER_CONF_DEF));
+        this.cleanCopy = json.getBoolean(PARAMETER_CLEAN_COPY);
 
-        this.cleanCopy = req.hasParameter(PARAMETER_CLEAN_COPY);
-
+        this.setScm(new NWDIScm(this.cleanCopy));
         this.save();
 
         super.submit(req, rsp);
@@ -412,10 +417,12 @@ public final class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> i
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public DescribableList<Publisher, Descriptor<Publisher>> getPublishersList() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.publishers;
     }
 
     @Override
@@ -426,15 +433,13 @@ public final class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> i
 
     @Override
     protected void buildDependencyGraph(final DependencyGraph graph) {
-        // TODO Auto-generated method stub
     }
 
     /**
-     * 
      * {@inheritDoc}
      */
     @Override
-    public void onLoad(ItemGroup<? extends Item> parent, String name) throws IOException {
+    public void onLoad(final ItemGroup<? extends Item> parent, final String name) throws IOException {
         super.onLoad(parent, name);
 
         if (this.publishers == null) {
@@ -460,19 +465,25 @@ public final class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> i
      * @return the content of the '.confdef' configuration file.
      */
     public String getConfDef() {
-        return confDef;
+        return this.confDef;
     }
 
     /**
-     * @return the cleanCopy
+     * Return whether the workspace should be cleaned before building.
+     * 
+     * @return whether the workspace should be cleaned before building (
+     *         <code>true</code> yes, leave it as it is otherwise).
      */
     public boolean isCleanCopy() {
-        return cleanCopy;
+        return this.cleanCopy;
     }
 
     /**
+     * Indicate whether the workspace should be cleaned before building.
+     * 
      * @param cleanCopy
-     *            the cleanCopy to set
+     *            whether the workspace should be cleaned before building (
+     *            <code>true</code> yes, leave it as it is otherwise).
      */
     public void setCleanCopy(final boolean cleanCopy) {
         this.cleanCopy = cleanCopy;
