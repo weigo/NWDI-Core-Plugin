@@ -28,13 +28,11 @@ abstract class AbstractComponentConfigurationReader extends AbstractDefaultHandl
     /**
      * message for IO errors.
      */
-    // FIXME: Message should be read from Properties.
     private static final String IO_EXCEPTION_MESSAGE = "There was a problem reading %s.";
 
     /**
      * message regarding SAX parse(r) errors.
      */
-    // FIXME: Message should be read from Properties.
     private static final String SAX_EXCEPTION_MESSAGE = "There was a problem parsing %s.";
 
     /**
@@ -130,7 +128,7 @@ abstract class AbstractComponentConfigurationReader extends AbstractDefaultHandl
         final int index = getVendorSeparationIndex(reference);
 
         if (index > -1) {
-            // FIXME: references without vendor aren't handlet correctly (i.e.:)
+            // FIXME: references without vendor aren't handled correctly (i.e.:)
             final String vendor = reference.substring(0, index);
             final String libraryReference = reference.substring(index + 1).replace('~', '/');
             final PublicPartReference ppReference = new PublicPartReference(vendor, libraryReference);
