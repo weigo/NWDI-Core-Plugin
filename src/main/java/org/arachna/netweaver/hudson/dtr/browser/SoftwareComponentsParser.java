@@ -32,8 +32,8 @@ final class SoftwareComponentsParser {
      * 
      * @param compartmentList
      *            HTML-Page containing the listing of the given workspace
-     * @param workSpace
-     *            name of workspace that was listed
+     * @param config
+     *            development configuration to use
      * @return list of {@link Compartment} that were extracted from the
      *         HTML-Page
      */
@@ -76,6 +76,7 @@ final class SoftwareComponentsParser {
      */
     private String createCompartmentName(final String href) {
         final int firstUnderScore = href.lastIndexOf('/');
+        // FIXME: fix generation of compartment name.
         final String name = href.substring(firstUnderScore + 1, href.length()) + "_1";
 
         return name;
