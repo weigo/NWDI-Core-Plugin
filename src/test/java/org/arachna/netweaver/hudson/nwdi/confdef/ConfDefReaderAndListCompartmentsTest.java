@@ -5,8 +5,8 @@ package org.arachna.netweaver.hudson.nwdi.confdef;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertTrue;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -94,7 +94,7 @@ public class ConfDefReaderAndListCompartmentsTest {
         final Compartment compartment = this.developmentConfiguration.getCompartment("example.com_EXAMPLE_SC1_1");
 
         for (final DevelopmentComponent component : compartment.getDevelopmentComponents()) {
-            assertTrue(EXPECTED_DEVELOPMENT_COMPONENTS.contains(component.getVendor() + ":" + component.getName()));
+            assertThat(EXPECTED_DEVELOPMENT_COMPONENTS, hasItem(component.getVendor() + ":" + component.getName()));
         }
     }
 
