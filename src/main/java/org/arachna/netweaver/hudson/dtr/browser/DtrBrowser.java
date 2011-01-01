@@ -256,7 +256,7 @@ public final class DtrBrowser {
      * @param msg
      *            message to log.
      */
-    private final void duration(final long start, final String msg) {
+    private void duration(final long start, final String msg) {
         final long duration = System.currentTimeMillis() - start;
         LOGGER.log(Level.INFO, String.format("%s took %d.%d sec. to complete.", msg, duration / 1000, duration % 1000));
     }
