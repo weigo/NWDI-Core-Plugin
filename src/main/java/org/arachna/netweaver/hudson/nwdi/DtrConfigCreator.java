@@ -62,6 +62,17 @@ final class DtrConfigCreator {
     private final String confDef;
 
     /**
+     * Folder where DTR configuration files are to be created/updated.
+     */
+    private FilePath dtrDirectory;
+
+    /**
+     * Folder where the development configurations and its repsective
+     * development components live.
+     */
+    private FilePath dtcDirectory;
+
+    /**
      * Create an instance of {@link DtrConfigCreator}.
      * 
      * @param workspace
@@ -92,19 +103,27 @@ final class DtrConfigCreator {
      *             when the user canceled the operation.
      */
     FilePath execute() throws IOException, InterruptedException {
-        final FilePath dtrDirectory = createFolder(DOT_DTR);
-        final FilePath dtcDirectory = createFolder(DOT_DTC);
+        this.dtrDirectory = createFolder(DOT_DTR);
+        this.dtcDirectory = createFolder(DOT_DTC);
 
-        createOrUpdateServersXml(dtrDirectory);
-        createOrUpdateClientsXml(dtrDirectory, dtcDirectory);
-        createOrUpdateDotConfDef(dtcDirectory);
-        createOrUpdateTrackNameDotSystem(dtrDirectory);
+        createOrUpdateServersXml();
+        createOrUpdateClientsXml();
+        createOrUpdateDotConfDef();
+        createOrUpdateTrackNameDotSystem();
 
-        return dtrDirectory;
+        return this.dtrDirectory;
     }
 
-    private void createOrUpdateTrackNameDotSystem(final FilePath dtrDirectory) throws IOException, InterruptedException {
-        dtrDirectory.child(this.config.getName() + ".system").write(
+    /**
+     * Creates the DTR client configuration file.
+     * 
+     * @throws IOException
+     *             when an error occurred creating the configuration file.
+     * @throws InterruptedException
+     *             when the user canceled the operation.
+     */
+    private void createOrUpdateTrackNameDotSystem() throws IOException, InterruptedException {
+        this.dtrDirectory.child(this.config.getName() + ".system").write(
             String.format(this.getTemplate("template.system"), this.config.getName(), this.config.getDtrServerUrl(),
                 this.config.getBuildServer()), DEFAULT_ENCODING);
     }
@@ -112,16 +131,13 @@ final class DtrConfigCreator {
     /**
      * Creates/Updates the <code>.confdef</code> file.
      * 
-     * @param dtcDirectory
-     *            directory where <code>.confdef</code> file should be created.
      * @throws IOException
      *             when an error occurred creating the configuration file.
      * @throws InterruptedException
      *             when the user canceled the operation.
      */
-    private void createOrUpdateDotConfDef(final FilePath dtcDirectory) throws IOException, InterruptedException {
-        final FilePath confDef = dtcDirectory.child(".confdef");
-        confDef.write(this.confDef, DEFAULT_ENCODING);
+    private void createOrUpdateDotConfDef() throws IOException, InterruptedException {
+        this.dtcDirectory.child(".confdef").write(this.confDef, DEFAULT_ENCODING);
     }
 
     /**
@@ -149,38 +165,31 @@ final class DtrConfigCreator {
     /**
      * Creates/Updates the 'clients.xml' in the given DTR folder.
      * 
-     * @param dtrDirectory
-     *            folder for DTR configuration files.
-     * @param dtcDirectory
-     *            folder for '.confdef' development configuration file.
      * @throws IOException
      *             when an error occurred creating the configuration file in the
      *             given folder.
      * @throws InterruptedException
      *             when the user canceled the operation.
      */
-    private void createOrUpdateClientsXml(final FilePath dtrDirectory, final FilePath dtcDirectory) throws IOException,
-        InterruptedException {
-        final String path = makeAbsolute(dtcDirectory);
+    private void createOrUpdateClientsXml() throws IOException, InterruptedException {
+        final String path = makeAbsolute(this.dtcDirectory);
 
         final String content =
             String.format(this.getTemplate(CLIENTS_XML), this.config.getName(), path.toString(), this.config.getName());
-        dtrDirectory.child(CLIENTS_XML).write(content, DEFAULT_ENCODING);
+        this.dtrDirectory.child(CLIENTS_XML).write(content, DEFAULT_ENCODING);
     }
 
     /**
      * Creates/Updates the 'servers.xml' in the given DTR configuration folder.
      * 
-     * @param dtrDirectory
-     *            folder for DTR configuration files.
      * @throws IOException
      *             when an error occurred creating the configuration file in the
      *             given folder.
      * @throws InterruptedException
      *             when the user canceled the operation.
      */
-    private void createOrUpdateServersXml(final FilePath dtrDirectory) throws IOException, InterruptedException {
-        dtrDirectory.child(SERVERS_XML).write(
+    private void createOrUpdateServersXml() throws IOException, InterruptedException {
+        this.dtrDirectory.child(SERVERS_XML).write(
             String.format(this.getTemplate(SERVERS_XML), this.config.getBuildServer()), DEFAULT_ENCODING);
     }
 
