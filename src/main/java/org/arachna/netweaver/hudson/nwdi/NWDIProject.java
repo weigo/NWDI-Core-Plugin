@@ -82,7 +82,7 @@ public final class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> i
      * @param name
      *            project name
      */
-    public NWDIProject(final ItemGroup parent, final String name) {
+    public NWDIProject(final ItemGroup<?> parent, final String name) {
         super(parent, name);
     }
 
@@ -427,7 +427,6 @@ public final class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> i
 
     @Override
     public boolean isFingerprintConfigured() {
-        // TODO Auto-generated method stub
         return false;
     }
 
