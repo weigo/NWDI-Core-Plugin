@@ -10,7 +10,6 @@ import hudson.model.BuildListener;
 import hudson.model.TaskListener;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
-import hudson.model.Run;
 import hudson.scm.ChangeLogParser;
 import hudson.scm.PollingResult;
 import hudson.scm.PollingResult.Change;
@@ -21,22 +20,17 @@ import hudson.scm.SCM;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.json.JSONObject;
 
-import org.arachna.netweaver.dc.types.Compartment;
-import org.arachna.netweaver.dc.types.CompartmentState;
-import org.arachna.netweaver.dc.types.DevelopmentComponent;
-import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 import org.arachna.netweaver.dctool.DCToolCommandExecutor;
-import org.arachna.netweaver.dctool.DCToolDescriptor;
 import org.arachna.netweaver.hudson.dtr.browser.Activity;
 import org.arachna.netweaver.hudson.dtr.browser.DtrBrowser;
-import org.arachna.netweaver.hudson.nwdi.dcupdater.DevelopmentComponentUpdater;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
@@ -51,21 +45,6 @@ public class NWDIScm extends SCM {
      * Get a clean copy of all development components from NWDI.
      */
     private final boolean cleanCopy;
-
-    /**
-     * Executor for DC tool commands used throughout.
-     */
-    private transient DCToolCommandExecutor dcToolExecutor;
-
-    /**
-     * registry for development components.
-     */
-    private transient DevelopmentComponentFactory dcFactory;
-
-    /**
-     * the development configuration of this track.
-     */
-    private transient DevelopmentConfiguration developmentConfiguration;
 
     /**
      * Create an instance of a <code>NWDIScm</code>.
@@ -117,73 +96,82 @@ public class NWDIScm extends SCM {
     public boolean checkout(final AbstractBuild<?, ?> build, final Launcher launcher, final FilePath workspace,
         final BuildListener listener, final File changelogFile) throws IOException, InterruptedException {
         final NWDIBuild currentBuild = (NWDIBuild)build;
-        final NWDIProject project = (NWDIProject)build.getProject();
-        final NWDIProject.DescriptorImpl descriptor = project.getDescriptor();
-        this.dcFactory = new DevelopmentComponentFactory();
-        this.developmentConfiguration = currentBuild.getDevelopmentConfiguration();
-        final List<Activity> activities = this.getActivities(build.getPreviousBuild(), descriptor);
+        final List<Activity> activities = this.getActivities(currentBuild);
+
+        this.writeChangeLog(build, changelogFile, activities);
+        build.addAction(new NWDIRevisionState(activities));
+
         final boolean rebuildNeeded = this.cleanCopy || !activities.isEmpty();
 
         if (rebuildNeeded) {
-            this.writeChangeLog(build, changelogFile, activities);
-
-            // final FilePath dtrDirectory =
-            // this.createOrUpdateConfiguration(workspace);
-            final DCToolDescriptor dcToolDescriptor =
-                new DCToolDescriptor(descriptor.getUser(), descriptor.getPassword(), descriptor.getNwdiToolLibFolder(),
-                    build.getWorkspace().child(".dtr").getName(), descriptor.getConfiguredJdkHomePaths());
-            this.dcToolExecutor =
-                new DCToolCommandExecutor(launcher, workspace, dcToolDescriptor,
-                    currentBuild.getDevelopmentConfiguration());
-
-            listener.getLogger().append(listDevelopmentComponents());
-            listener.getLogger().append(syncDevelopmentComponents());
-
-            final DevelopmentComponentUpdater updater =
-                new DevelopmentComponentUpdater(workspace.absolutize().getName(), dcFactory);
-            updater.execute();
-
-            // TODO: add current development configuration to this build.
+            final DCToolCommandExecutor dcToolExecutor = currentBuild.getDCToolExecutor(launcher);
+            this.listDevelopmentComponents(listener.getLogger(), currentBuild, dcToolExecutor);
+            this.syncDevelopmentComponents(listener.getLogger(), currentBuild.getDevelopmentConfiguration(),
+                dcToolExecutor);
         }
-
-        build.addAction(new NWDIRevisionState(activities));
 
         return rebuildNeeded;
     }
 
-    private String listDevelopmentComponents() throws IOException, InterruptedException {
-
-        final String output = this.dcToolExecutor.execute(new ListDcCommandBuilder(developmentConfiguration));
+    /**
+     * Lists the development components contained in this projects development
+     * configuration and inserts them into the {@see #developmentConfiguration}
+     * object (under the respective compartment).
+     * 
+     * @param logger
+     *            logger to be used logging the DC tool output.
+     * @param currentBuild
+     *            currently running build
+     * @throws IOException
+     *             when writing the 'listdcs' command file failed
+     * @throws InterruptedException
+     *             when the operation was canceled by the user
+     */
+    private void listDevelopmentComponents(final PrintStream logger, final NWDIBuild currentBuild,
+        final DCToolCommandExecutor executor) throws IOException, InterruptedException {
+        final String output = executor.execute(new ListDcCommandBuilder(currentBuild.getDevelopmentConfiguration()));
+        logger.append(output);
 
         final DevelopmentComponentsReader developmentComponentsReader =
-            new DevelopmentComponentsReader(new StringReader(output), dcFactory, developmentConfiguration);
+            new DevelopmentComponentsReader(new StringReader(output), currentBuild.getDevelopmentComponentFactory(),
+                currentBuild.getDevelopmentConfiguration());
         developmentComponentsReader.read();
-
-        for (final Compartment currentCompartment : developmentConfiguration.getCompartments()) {
-            if (this.cleanCopy && CompartmentState.Source.equals(currentCompartment.getState())) {
-                for (final DevelopmentComponent component : currentCompartment.getDevelopmentComponents()) {
-                    component.setNeedsRebuild(true);
-                }
-            }
-        }
-
-        return output;
     }
 
     /**
+     * Synchronize the development components. The DCs will be synchronized
+     * depending on the projects parameter <code>cleanCopy</code>. When it is
+     * <code>true</code> all DCs will be synchronized, only those involved in
+     * activities since the last build otherwise.
+     * 
+     * @param logger
+     *            logger to be used logging the DC tool output.
+     * @param developmentConfiguration
+     *            development configuration to use when computing the 'syncdc'
+     *            commands.
+     * @param executor
      * @throws IOException
+     *             when writing the 'syncdcs' command file failed
      * @throws InterruptedException
+     *             when the operation was canceled by the user
      */
-    private String syncDevelopmentComponents() throws IOException, InterruptedException {
+    private void syncDevelopmentComponents(final PrintStream logger,
+        final DevelopmentConfiguration developmentConfiguration, final DCToolCommandExecutor executor)
+        throws IOException, InterruptedException {
         final SyncDevelopmentComponentsCommandBuilder commandBuilder =
-            new SyncDevelopmentComponentsCommandBuilder(this.developmentConfiguration, this.cleanCopy);
-        return this.dcToolExecutor.execute(commandBuilder);
+            new SyncDevelopmentComponentsCommandBuilder(developmentConfiguration, this.cleanCopy);
+        logger.append(executor.execute(commandBuilder));
     }
 
     /**
+     * Write the change log using the given list of activities.
+     * 
      * @param build
+     *            the {@link AbstractBuild} to use writing the change log.
      * @param changelogFile
+     *            file to write the change log to.
      * @param activities
+     *            list of activities to write to change log.
      * @throws IOException
      */
     private void writeChangeLog(final AbstractBuild<?, ?> build, final File changelogFile,
@@ -191,13 +179,6 @@ public class NWDIScm extends SCM {
         final DtrChangeLogWriter dtrChangeLogWriter =
             new DtrChangeLogWriter(new DtrChangeLogSet(build, activities), new FileWriter(changelogFile));
         dtrChangeLogWriter.write();
-    }
-
-    /**
-     * @return the cleanCopy
-     */
-    public boolean isCleanCopy() {
-        return cleanCopy;
     }
 
     @Extension
@@ -226,32 +207,30 @@ public class NWDIScm extends SCM {
      * Get list of activities since last run. If <code>lastRun</code> is
      * <code>null</code> all activities will be calculated.
      * 
-     * @param lastRun
-     *            last run of a build or <code>null</code> if this run is the
-     *            first.
+     * @param build
+     *            the build currently running
      * @return a list of {@link Activity} objects that were checked in since the
      *         last run or all activities.
      */
-    private List<Activity> getActivities(final Run<?, ?> lastRun, NWDIProject.DescriptorImpl descriptor) {
+    private List<Activity> getActivities(final NWDIBuild build) {
+        final NWDIProject.DescriptorImpl descriptor = build.getParent().getDescriptor();
         final DtrBrowser browser =
-            new DtrBrowser(this.developmentConfiguration, this.dcFactory, descriptor.getUser(),
-                descriptor.getPassword());
+            new DtrBrowser(build.getDevelopmentConfiguration(), build.getDevelopmentComponentFactory(),
+                descriptor.getUser(), descriptor.getPassword());
 
         final List<Activity> activities = new ArrayList<Activity>();
 
-        if (lastRun == null) {
+        if (build.getPreviousBuild() == null) {
             activities.addAll(browser.getActivities());
         }
         else {
-            activities.addAll(browser.getActivities(lastRun.getTime()));
+            activities.addAll(browser.getActivities(build.getPreviousBuild().getTime()));
         }
 
-        if (this.dcFactory != null) {
-            // update activities with their respective resources
-            // FIXME: add methods to DtrBrowser that get activities with their
-            // respective resources!
-            browser.getDevelopmentComponents(activities);
-        }
+        // update activities with their respective resources
+        // FIXME: add methods to DtrBrowser that get activities with their
+        // respective resources!
+        browser.getDevelopmentComponents(activities);
 
         return activities;
     }
