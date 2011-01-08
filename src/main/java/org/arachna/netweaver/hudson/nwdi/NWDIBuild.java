@@ -53,24 +53,13 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
      * @throws IOException
      *             when saving the current build number fails.
      */
-    protected NWDIBuild(final NWDIProject project) throws IOException {
+    public NWDIBuild(final NWDIProject project) throws IOException {
         super(project);
     }
 
     @Override
     public void run() {
-        try {
-            this.createOrUpdateConfiguration();
-            run(new RunnerImpl());
-        }
-        catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        run(new RunnerImpl());
     }
 
     /**
@@ -128,22 +117,6 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
     }
 
     /**
-     * Creates or updates the DTR and development configuration files used by DC
-     * tool.
-     * 
-     * @throws IOException
-     *             when creation of one of the configuration files fails.
-     * @throws InterruptedException
-     *             when the operation was canceled by the user.
-     */
-    private void createOrUpdateConfiguration() throws IOException, InterruptedException {
-        final DtrConfigCreator configCreator =
-            new DtrConfigCreator(this.getWorkspace(), this.getDevelopmentConfiguration(), this.getProject()
-                .getConfDef());
-        configCreator.execute();
-    }
-
-    /**
      * Run the build.
      * 
      * @author Dirk Weigenand
@@ -169,6 +142,7 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
          */
         @Override
         protected Result doRun(final BuildListener listener) throws Exception {
+            this.createOrUpdateConfiguration();
             this.reporters = getProject().getPublishersList().toList();
 
             if (!preBuild(listener, reporters)) {
@@ -185,6 +159,22 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
             updater.execute();
 
             return r;
+        }
+
+        /**
+         * Creates or updates the DTR and development configuration files used
+         * by DC tool.
+         * 
+         * @throws IOException
+         *             when creation of one of the configuration files fails.
+         * @throws InterruptedException
+         *             when the operation was canceled by the user.
+         */
+        private void createOrUpdateConfiguration() throws IOException, InterruptedException {
+            final DtrConfigCreator configCreator =
+                new DtrConfigCreator(getWorkspace(), NWDIBuild.this.getDevelopmentConfiguration(), NWDIBuild.this
+                    .getProject().getConfDef());
+            configCreator.execute();
         }
 
         /**
