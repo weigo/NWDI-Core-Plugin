@@ -62,6 +62,7 @@ public class NWDIScm extends SCM {
 
     /*
      * (non-Javadoc)
+     * 
      * @see hudson.scm.SCM#getDescriptor()
      */
     @Override
@@ -71,6 +72,7 @@ public class NWDIScm extends SCM {
 
     /*
      * (non-Javadoc)
+     * 
      * @see hudson.scm.SCM#createChangeLogParser()
      */
     @Override
@@ -80,6 +82,7 @@ public class NWDIScm extends SCM {
 
     /*
      * (non-Javadoc)
+     * 
      * @see hudson.scm.SCM#requiresWorkspaceForPolling()
      */
     @Override
@@ -89,6 +92,7 @@ public class NWDIScm extends SCM {
 
     /*
      * (non-Javadoc)
+     * 
      * @see hudson.scm.SCM#checkout(hudson.model.AbstractBuild, hudson.Launcher,
      * hudson.FilePath, hudson.model.BuildListener, java.io.File)
      */
@@ -113,6 +117,19 @@ public class NWDIScm extends SCM {
         return rebuildNeeded;
     }
 
+    @Override
+    public SCMRevisionState calcRevisionsFromBuild(final AbstractBuild<?, ?> build, final Launcher launcher,
+        final TaskListener listener) throws IOException, InterruptedException {
+        return SCMRevisionState.NONE;
+    }
+
+    @Override
+    protected PollingResult compareRemoteRevisionWith(final AbstractProject<?, ?> project, final Launcher launcher,
+        final FilePath path, final TaskListener listener, final SCMRevisionState revisionState) throws IOException,
+        InterruptedException {
+        return new PollingResult(SCMRevisionState.NONE, project.getAction(NWDIRevisionState.class), Change.SIGNIFICANT);
+    }
+
     /**
      * Lists the development components contained in this projects development
      * configuration and inserts them into the {@see #developmentConfiguration}
@@ -129,6 +146,7 @@ public class NWDIScm extends SCM {
      */
     private void listDevelopmentComponents(final PrintStream logger, final NWDIBuild currentBuild,
         final DCToolCommandExecutor executor) throws IOException, InterruptedException {
+        final long start = System.currentTimeMillis();
         final String output = executor.execute(new ListDcCommandBuilder(currentBuild.getDevelopmentConfiguration()));
         logger.append(output);
 
@@ -136,6 +154,7 @@ public class NWDIScm extends SCM {
             new DevelopmentComponentsReader(new StringReader(output), currentBuild.getDevelopmentComponentFactory(),
                 currentBuild.getDevelopmentConfiguration());
         developmentComponentsReader.read();
+        logger.append(duration(start, "'listdcs'"));
     }
 
     /**
@@ -158,9 +177,11 @@ public class NWDIScm extends SCM {
     private void syncDevelopmentComponents(final PrintStream logger,
         final DevelopmentConfiguration developmentConfiguration, final DCToolCommandExecutor executor)
         throws IOException, InterruptedException {
+        final long start = System.currentTimeMillis();
         final SyncDevelopmentComponentsCommandBuilder commandBuilder =
             new SyncDevelopmentComponentsCommandBuilder(developmentConfiguration, this.cleanCopy);
         logger.append(executor.execute(commandBuilder));
+        logger.append(duration(start, "'syncdcs'"));
     }
 
     /**
@@ -235,16 +256,9 @@ public class NWDIScm extends SCM {
         return activities;
     }
 
-    @Override
-    public SCMRevisionState calcRevisionsFromBuild(final AbstractBuild<?, ?> build, final Launcher launcher,
-        final TaskListener listener) throws IOException, InterruptedException {
-        return SCMRevisionState.NONE;
-    }
+    private String duration(final long start, final String message) {
+        final long duration = System.currentTimeMillis() - start;
 
-    @Override
-    protected PollingResult compareRemoteRevisionWith(final AbstractProject<?, ?> project, final Launcher launcher,
-        final FilePath path, final TaskListener listener, final SCMRevisionState revisionState) throws IOException,
-        InterruptedException {
-        return new PollingResult(SCMRevisionState.NONE, project.getAction(NWDIRevisionState.class), Change.SIGNIFICANT);
+        return String.format("%s took %d.%d sec.\n", message, (duration / 1000), (duration % 1000));
     }
 }
