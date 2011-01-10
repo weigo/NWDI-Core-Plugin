@@ -9,8 +9,10 @@ import hudson.model.Result;
 import hudson.model.AbstractBuild;
 import hudson.tasks.Publisher;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
@@ -55,6 +57,21 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
      */
     public NWDIBuild(final NWDIProject project) throws IOException {
         super(project);
+    }
+
+    /**
+     * Create an instance of <code>NWDIBuild</code> using the given
+     * <code>NWDIProject</code> and build directory.
+     * 
+     * @param project
+     *            parent to use for creating this build.
+     * @param buildDir
+     *            build directory used for this build.
+     * @throws IOException
+     *             when saving the current build number fails.
+     */
+    public NWDIBuild(final NWDIProject project, final File buildDir) throws IOException {
+        super(project, buildDir);
     }
 
     @Override
@@ -125,7 +142,7 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
         /**
          * collection of reporter plugins to be run prior to building.
          */
-        private List<Publisher> reporters;
+        private final List<Publisher> reporters = new ArrayList<Publisher>();
 
         /**
          * Builds all (changed) development components and updates the in core
@@ -135,21 +152,20 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
          * control or generation of documentation.
          * 
          * @param listener
-         *            the {@link BuildListener} to use for i.e. reporting.
+         *            the {@link BuildListener} to use for e.g. reporting.
          * @return the build result {@see Result}.
          * @throws Exception
          *             forward all Exceptions thrown by underlying code
          */
         @Override
         protected Result doRun(final BuildListener listener) throws Exception {
-            this.createOrUpdateConfiguration();
-            this.reporters = getProject().getPublishersList().toList();
+            this.reporters.addAll(getProject().getPublishersList().toList());
 
-            if (!preBuild(listener, reporters)) {
+            if (!preBuild(listener, this.reporters)) {
                 return Result.FAILURE;
             }
 
-            Result r = null;
+            final Result r = null;
             final NWDIBuild build = NWDIBuild.this;
             buildDevelopmentComponents(listener, build);
             // update DCs with info from various config/log files now on disk
@@ -159,22 +175,6 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
             updater.execute();
 
             return r;
-        }
-
-        /**
-         * Creates or updates the DTR and development configuration files used
-         * by DC tool.
-         * 
-         * @throws IOException
-         *             when creation of one of the configuration files fails.
-         * @throws InterruptedException
-         *             when the operation was canceled by the user.
-         */
-        private void createOrUpdateConfiguration() throws IOException, InterruptedException {
-            final DtrConfigCreator configCreator =
-                new DtrConfigCreator(getWorkspace(), NWDIBuild.this.getDevelopmentConfiguration(), NWDIBuild.this
-                    .getProject().getConfDef());
-            configCreator.execute();
         }
 
         /**
@@ -196,7 +196,7 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
          */
         @Override
         protected void post2(final BuildListener listener) throws Exception {
-            if (!performAllBuildSteps(listener, reporters, true)) {
+            if (!performAllBuildSteps(listener, this.reporters, true)) {
                 setResult(Result.FAILURE);
             }
 
