@@ -5,13 +5,16 @@ package org.arachna.netweaver.hudson.nwdi;
 
 import hudson.Extension;
 import hudson.FilePath;
+import hudson.Launcher;
 import hudson.Util;
+import hudson.model.BuildListener;
 import hudson.model.DependencyGraph;
 import hudson.model.Descriptor;
 import hudson.model.Descriptor.FormException;
 import hudson.model.Item;
 import hudson.model.ItemGroup;
 import hudson.model.TopLevelItem;
+import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.Hudson;
 import hudson.scm.SCM;
@@ -102,6 +105,9 @@ public final class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> i
         super(Hudson.getInstance(), name);
         this.confDef = confDef;
         this.cleanCopy = cleanCopy;
+
+        this.publishers = new DescribableList<Publisher, Descriptor<Publisher>>(this);
+        this.publishers.setOwner(this);
     }
 
     /**
@@ -118,6 +124,22 @@ public final class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> i
     @Override
     public Hudson getParent() {
         return Hudson.getInstance();
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see hudson.model.AbstractProject#checkout(hudson.model.AbstractBuild,
+     * hudson.Launcher, hudson.model.BuildListener, java.io.File)
+     */
+    @Override
+    public boolean checkout(final AbstractBuild build, final Launcher launcher, final BuildListener listener,
+        final File changelogFile) throws IOException, InterruptedException {
+        final DtrConfigCreator configCreator =
+            new DtrConfigCreator(getWorkspace(), ((NWDIBuild)build).getDevelopmentConfiguration(), this.getConfDef());
+        configCreator.execute();
+
+        return super.checkout(build, launcher, listener, changelogFile);
     }
 
     /**
@@ -272,6 +294,7 @@ public final class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> i
 
         /*
          * (non-Javadoc)
+         * 
          * @see
          * hudson.model.Descriptor#configure(org.kohsuke.stapler.StaplerRequest,
          * net.sf.json.JSONObject)
@@ -316,10 +339,10 @@ public final class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> i
                         result = validateDcToolFolder(folder.getParent());
                     }
                 }
-                catch (IOException e) {
+                catch (final IOException e) {
                     result = FormValidation.error(Messages.NWDIProject_NwdiToolLibFolder_ioexception());
                 }
-                catch (InterruptedException e) {
+                catch (final InterruptedException e) {
                     result = FormValidation.error("Form validation has been cancelled.");
                 }
             }
@@ -422,7 +445,7 @@ public final class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> i
      */
     @Override
     public DescribableList<Publisher, Descriptor<Publisher>> getPublishersList() {
-        return this.publishers;
+        return this.publishers == null ? new DescribableList<Publisher, Descriptor<Publisher>>(this) : this.publishers;
     }
 
     @Override
