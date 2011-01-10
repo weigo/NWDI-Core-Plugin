@@ -34,7 +34,7 @@ public final class DtrBrowser {
     /**
      * query for reading activities for a given compartment.
      */
-    private static final String ACTIVITY_QUERY = "%s/dtr/system-tools/reports/ActivityQuery?wspPath=/%s"
+    private static final String ACTIVITY_QUERY = "%s/system-tools/reports/ActivityQuery?wspPath=/%s"
         + "&user=&closedOnly=on&isnFrom=&isnTo=&nonEmptyOnly=on&folderPath=&command=Show";
     /**
      * DtrHttpClient for browsing the DTR.
