@@ -1,0 +1,144 @@
+<html>
+<head>
+<link rel='stylesheet' type='text/css' href='/dtr/static/css/dtr.css'>
+<script type='text/javascript' src='/dtr/static/js/webUI_common.js'></script>
+</head>
+<body>
+<table background=/dtr/static/img/line.gif width=100% cellpadding=0px
+	cellspacing=0px border=0px border-collapse=collapse>
+	<tbody style="background-color: transparent">
+		<tr>
+			<td width=270px height=62px align=left valign=top><img
+				src=/dtr/static/img/HeaderLeft.gif alt=image width=271 height=50>
+			</td>
+			<td width=auto height=62px align=right valign=top><img
+				src=/dtr/static/img/HeaderRight.jpg alt=image width=501 height=50>
+			</td>
+		</tr>
+	</tbody>
+</table>
+<table width=100% cellspacing=0 cellpadding=0 border=0 height=25>
+	<tr>
+		<td align=left height=23><font face="Arial, Verdana, Helvetica"
+			size="2" color="#003366"><b>Resource Lookup</b></font></td>
+		<td align=right height=23><a
+			href="/dtr/system-tools/reports/ActivityQuery"><img
+			src="/dtr/static/img/ACTIVITY.gif" border=0 alt="Activity Search"
+			title="Activity Search"></a>&nbsp;<a
+			href="/dtr/system-tools/reports/FileQuery?searchFolderPath=/vh/423868a51e4311e0a4ef005056935b82"><img
+			src="/dtr/static/img/SEARCH.gif" border=0 alt="File/Folder Search"
+			title="File/Folder Search"></a>&nbsp;<a
+			href="/dtr/system-tools/reports/WorkspaceIntegrations?showMoreOptions=true"><img
+			src="/dtr/static/img/WSP_INT.gif" border=0
+			alt="Workspace Integrations" title="Workspace Integrations"></a>&nbsp;<a
+			href="/dtr/system-tools/reports/WorkspaceComparison"><img
+			src="/dtr/static/img/WSP_COMP.gif" border=0
+			alt="Workspace Comparison" title="Workspace Comparison"></a>&nbsp;<a
+			href="/dtr/system-tools/reports/VersionSetComparison"><img
+			src="/dtr/static/img/VS_COMP.gif" border=0
+			alt="VersionSet Comparison" title="VersionSet Comparison"></a>&nbsp;<a
+			href="/dtr/system-tools/reports/CollisionQuery"><img
+			src="/dtr/static/img/CONFLICT.gif" border=0 alt="Conflict Search"
+			title="Conflict Search"></a>&nbsp;<a
+			href="/dtr/system-tools/reports/ResourceDetails?technical=true&path=/vh/423868a51e4311e0a4ef005056935b82/423868a31e4311e0c4c4005056935b82"><img
+			src="/dtr/static/img/ADVANCED_PROP.gif" border=0 alt="Technical View"
+			title="Technical View"></a>&nbsp;<a
+			href="/dtr/vh/423868a51e4311e0a4ef005056935b82"><img
+			src="/dtr/static/img/REP_BROW.gif" border=0 alt="Repository Browser"
+			title="Repository Browser"></a>&nbsp;<a
+			href="/dtr/system-tools/ShowOpenActivities"><img
+			src="/dtr/static/img/open_activities.gif" border=0
+			alt="My open activities" title="My open activities"></a></td>
+	</tr>
+	<tr bgcolor=b9cee3>
+		<td colspan=2 height=2><img width=1 height=1 border=0 alt=""></td>
+	</tr>
+</table>
+<font face="Arial, Verdana, Helvetica" size="2" color="#000000">
+<form action="" method=get>
+<table>
+	<tr>
+		<td><label><b>Resource Identifier</b> (A 32 character
+		case-independent technical ID. Example:
+		DB02F51B105C11D9C330000BCD38168B)<br>
+		<input type=text name=resourceID value="" size=60></label></td>
+	</tr>
+	<tr>
+		<td><label><b>Resource Path</b> (Host and context
+		independent path of the resource. Example:
+		/ws/folder1/workspace1/dir1/a.txt)<br>
+		<input type=text name=path
+			value="/vh/423868a51e4311e0a4ef005056935b82/423868a31e4311e0c4c4005056935b82"
+			size=255></label></td>
+	</tr>
+	<tr>
+		<td><input type=submit name=command value="Show" class=submit></td>
+	</tr>
+</table>
+</form>
+<HR width="100%" SIZE="2" color="#003366">
+VERSION :
+/vh/423868a51e4311e0a4ef005056935b82/423868a31e4311e0c4c4005056935b82<br>
+<table width="100%" cellspacing=2 cellpadding=2>
+	<tr>
+		<th>Property Name</th>
+		<th>Property Value</th>
+	</tr>
+	<tr>
+		<td>Display Name</td>
+		<td>test.html</td>
+	</tr>
+	<tr>
+		<td>Path</td>
+		<td>/DCs/example.com/example/_comp/src.test/com/example/package/test.html</td>
+	</tr>
+	<tr>
+		<td>Original Creator</td>
+		<td>exampleUser</td>
+	</tr>
+	<tr>
+		<td>Owner</td>
+		<td><a
+			href="/dtr/system-tools/reports/ResourceDetails?technical=false&path=/principals/exampleUser">/principals/exampleUser</a></td>
+	</tr>
+	<tr>
+		<td>Creation Date</td>
+		<td>12.01.2011 11:58:31 GMT</td>
+	</tr>
+	<tr>
+		<td>Last Modification</td>
+		<td>12.01.2011 12:02:33 GMT</td>
+	</tr>
+	<tr>
+		<td>Last Modified By</td>
+		<td>exampleUser</td>
+	</tr>
+	<tr>
+		<td>Comment</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>Workspace</td>
+		<td>&nbsp;</td>
+	</tr>
+	<tr>
+		<td>Created in Workspace</td>
+		<td>/dtr/ws/Example/example.com_EXAMPLE_SC/dev/inactive</td>
+	</tr>
+	<tr>
+		<td>Sequence Number</td>
+		<td>1</td>
+	</tr>
+	<tr>
+		<td>Is Deleted</td>
+		<td>Yes</td>
+	</tr>
+	<tr>
+		<td>Delete Forbidden</td>
+		<td>No</td>
+	</tr>
+</table>
+</font>
+
+</body>
+</html>
