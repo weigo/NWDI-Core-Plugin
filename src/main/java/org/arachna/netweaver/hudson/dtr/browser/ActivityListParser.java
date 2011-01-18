@@ -22,13 +22,22 @@ import org.w3c.dom.Node;
  */
 final class ActivityListParser {
     /**
+     * date format for activity dates, resource modification dates etc.
+     */
+    // FIXME: this format might be dependent on the Locale the NWDI JVM is
+    // running with. Should probably be configurable in the NWDI SCM config
+    // snippet on the hudson configuration page.
+    static final String ACTIVITY_DATE_FORMAT = "dd.MM.yyyy HH:mm:ss z";
+
+    /**
      * XPath expression for extracting activities.
      */
     private static final String XPATH =
-            "//a[starts-with(@href, '/dtr/system-tools/reports/ResourceDetails?technical=false&path=/act/')]/../..";
+        "//a[starts-with(@href, '/dtr/system-tools/reports/ResourceDetails?technical=false&path=/act/')]/../..";
 
     /**
-     * {@link ActivityFilter} to use when parsing activities. Initialized with an accept all filter.
+     * {@link ActivityFilter} to use when parsing activities. Initialized with
+     * an accept all filter.
      */
     private ActivityFilter activityFilter = new ActivityFilter() {
         public boolean accept(final Activity activity) {
@@ -39,7 +48,7 @@ final class ActivityListParser {
     /**
      * date parser for check in times.
      */
-    private final SimpleDateFormat dateParser = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss z");
+    private final SimpleDateFormat dateParser = new SimpleDateFormat(ACTIVITY_DATE_FORMAT);
 
     /**
      * XPath for matching check in dates.
@@ -134,13 +143,15 @@ final class ActivityListParser {
     }
 
     /**
-     * Create an instance of an {@link Activity} from the given {@link org.w3c.dom.Node}.
+     * Create an instance of an {@link Activity} from the given
+     * {@link org.w3c.dom.Node}.
      * 
      * @param node
      *            the node the activity's data should be read from.
      * @return the activity extracted from the given node.
      * @throws JaxenException
-     *             when there was an error evaluating the XPath expressions used to extract the data
+     *             when there was an error evaluating the XPath expressions used
+     *             to extract the data
      * @throws ParseException
      *             when there was an error parsing the activity's date.
      */
@@ -155,7 +166,8 @@ final class ActivityListParser {
      *            the node the activity's check in date should be read from.
      * @return the check in date extracted from the given node.
      * @throws JaxenException
-     *             when there was an error evaluating the XPath expressions used to extract the data
+     *             when there was an error evaluating the XPath expressions used
+     *             to extract the data
      * @throws ParseException
      *             when there was an error parsing the activity's date.
      */
@@ -170,7 +182,8 @@ final class ActivityListParser {
      *            the node the activity's check in date should be read from.
      * @return the check in date extracted from the given node.
      * @throws JaxenException
-     *             when there was an error evaluating the XPath expressions used to extract the data
+     *             when there was an error evaluating the XPath expressions used
+     *             to extract the data
      */
     private String getDescription(final Node node) throws JaxenException {
         return this.descriptionXPath.stringValueOf(node);
@@ -183,7 +196,8 @@ final class ActivityListParser {
      *            the node the UME princiapl's name should be read from.
      * @return the UME principal's name extracted from the given node.
      * @throws JaxenException
-     *             when there was an error evaluating the XPath expressions used to extract the data
+     *             when there was an error evaluating the XPath expressions used
+     *             to extract the data
      */
     private Principal getPrincipal(final Node node) throws JaxenException {
         return new Principal(this.principalXPath.stringValueOf(node).replace("/principals/", ""));
@@ -196,7 +210,8 @@ final class ActivityListParser {
      *            the node the activity's url should be read from.
      * @return the activity's url extracted from the given node.
      * @throws JaxenException
-     *             when there was an error evaluating the XPath expressions used to extract the data
+     *             when there was an error evaluating the XPath expressions used
+     *             to extract the data
      */
     private String getActivityUrl(final Node node) throws JaxenException {
         return this.activityXPath.stringValueOf(node);
