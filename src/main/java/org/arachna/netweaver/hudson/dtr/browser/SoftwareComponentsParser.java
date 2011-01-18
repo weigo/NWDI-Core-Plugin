@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.arachna.netweaver.dc.types.Compartment;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 import org.jaxen.JaxenException;
@@ -20,6 +21,11 @@ import org.w3c.dom.Node;
  * @author Dirk Weigenand
  */
 final class SoftwareComponentsParser {
+    /**
+     * Logger.
+     */
+    private static final Logger LOGGER = Logger.getLogger(SoftwareComponentsParser.class);
+
     /**
      * XPath expression for extracting compartments from a workspace listing in
      * DTR.
@@ -56,7 +62,7 @@ final class SoftwareComponentsParser {
                     compartments.add(compartment);
                 }
                 else {
-                    System.err.println(compartmentName + " could not be found in " + config.getName());
+                    LOGGER.error(String.format("%s could not be found in %s.", compartmentName, config.getName()));
                 }
             }
         }
