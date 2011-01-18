@@ -96,9 +96,15 @@ final class ResourceDetailsParser {
     }
 
     /**
+     * Extracts the node's value as text at the given index.
+     * 
      * @param nodes
-     * @return
+     *            a list of {@link Nodes} representing a XPath selection result.
+     * 
+     * @return node's value as text at the given index.
      * @throws DOMException
+     *             when the text to be returned does not fit into the DOMString
+     *             implementation
      */
     private String nodeValueAt(final List nodes, final int index) throws DOMException {
         return ((Node)nodes.get(index)).getFirstChild().getNodeValue();
