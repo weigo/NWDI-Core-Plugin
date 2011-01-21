@@ -47,9 +47,10 @@ public class ActivityResourceParserTest {
 
     @Test
     public void testActivityResourceExctraction() {
-        final Collection<ActivityResource> resources = this.getActivityResources("ResourceDetails.htm");
+        final Collection<ActivityResource> resources = this.getActivityResources("ResourceList.html");
         assertNotNull(resources);
-        final DevelopmentComponent component = this.developmentComponentFactory.get("example.com", "example/development/component");
+        final DevelopmentComponent component =
+            this.developmentComponentFactory.get("example.com", "example/development/component");
 
         for (final ActivityResource resource : resources) {
             assertEquals(this.activity, resource.getActivity());

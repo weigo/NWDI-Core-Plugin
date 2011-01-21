@@ -42,7 +42,7 @@ public class ResourceDetailsParserTest {
     public void setUp() throws Exception {
         this.resource =
             new ActivityResource(new Activity("", new Principal(""), "", Calendar.getInstance().getTime()),
-                new DevelopmentComponent("", ""), "");
+                new DevelopmentComponent("", ""), "", "");
         this.parser = new ResourceDetailsParser(this.resource);
     }
 
