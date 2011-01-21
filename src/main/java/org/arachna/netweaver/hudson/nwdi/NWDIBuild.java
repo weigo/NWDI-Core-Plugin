@@ -113,7 +113,6 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
             final DCToolDescriptor dcToolDescriptor =
                 new DCToolDescriptor(descriptor.getUser(), descriptor.getPassword(), descriptor.getNwdiToolLibFolder(),
                     this.getWorkspace().child(".dtr").getName(), descriptor.getConfiguredJdkHomePaths());
-
             this.dcToolExecutor =
                 new DCToolCommandExecutor(launcher, this.getWorkspace(), dcToolDescriptor,
                     this.getDevelopmentConfiguration());
@@ -165,9 +164,8 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
                 return Result.FAILURE;
             }
 
-            final Result r = null;
             final NWDIBuild build = NWDIBuild.this;
-            buildDevelopmentComponents(listener, build);
+            final Result r = buildDevelopmentComponents(listener, build);
             // update DCs with info from various config/log files now on disk
             final DevelopmentComponentUpdater updater =
                 new DevelopmentComponentUpdater(build.getWorkspace().absolutize().getName(),
@@ -183,12 +181,20 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
          * @throws IOException
          * @throws InterruptedException
          */
-        protected void buildDevelopmentComponents(final BuildListener listener, final NWDIBuild build)
+        protected Result buildDevelopmentComponents(final BuildListener listener, final NWDIBuild build)
             throws IOException, InterruptedException {
-            final DCToolCommandExecutor executor = build.getDCToolExecutor(this.launcher);
-            listener.getLogger().append(
+            Result result = null;
+
+            try {
+                final DCToolCommandExecutor executor = build.getDCToolExecutor(this.launcher);
                 executor.execute(new BuildDevelopmentComponentsCommandBuilder(build.getDevelopmentComponentFactory(),
-                    build.getDevelopmentConfiguration())));
+                    build.getDevelopmentConfiguration()));
+            }
+            catch (final RuntimeException rte) {
+                result = Result.FAILURE;
+            }
+
+            return result;
         }
 
         /**
