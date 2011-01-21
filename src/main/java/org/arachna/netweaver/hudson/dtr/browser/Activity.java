@@ -27,9 +27,16 @@ public final class Activity {
     private final Principal principal;
 
     /**
-     * short description of activity as given by principal that created this activity.
+     * short description of activity as given by principal that created this
+     * activity.
      */
-    private final String description;
+    private final String comment;
+
+    /**
+     * long description of activity as given by principal that created this
+     * activity.
+     */
+    private String description;
 
     /**
      * date and time of check in of this activity.
@@ -42,22 +49,24 @@ public final class Activity {
     private final Set<ActivityResource> resources = new HashSet<ActivityResource>();
 
     /**
-     * Create an instance of an <code>Activity</code> using the principal that created it, its description and checkin date. Also contains
-     * the relative URL where the content of the activity can be browsed.
+     * Create an instance of an <code>Activity</code> using the principal that
+     * created it, its description and checkin date. Also contains the relative
+     * URL where the content of the activity can be browsed.
      * 
      * @param activityUrl
      *            relative URL where the content of the activity can be browsed.
      * @param principal
      *            user that created the activity.
-     * @param description
-     *            the short description of the activity as was given by the user creating it.
+     * @param comment
+     *            the short description of the activity as was given by the user
+     *            creating it.
      * @param checkinTime
      *            time the activity was checked into the DTR.
      */
-    Activity(final String activityUrl, final Principal principal, final String description, final Date checkinTime) {
+    Activity(final String activityUrl, final Principal principal, final String comment, final Date checkinTime) {
         this.activityUrl = activityUrl;
         this.principal = principal;
-        this.description = description;
+        this.comment = comment;
         this.checkinTime = this.cloneDate(checkinTime);
     }
 
@@ -76,6 +85,16 @@ public final class Activity {
     }
 
     /**
+     * Set the long description of this activity.
+     * 
+     * @param description
+     *            long description of this activity.
+     */
+    void setDescription(final String description) {
+        this.description = description;
+    }
+
+    /**
      * @return the activityUrl
      */
     public String getActivityUrl() {
@@ -87,6 +106,15 @@ public final class Activity {
      */
     public Principal getPrincipal() {
         return this.principal;
+    }
+
+    /**
+     * Returns the short description of this activity.
+     * 
+     * @return the short description of this activity.
+     */
+    public String getComment() {
+        return this.comment;
     }
 
     /**
@@ -112,18 +140,30 @@ public final class Activity {
         return this.getActivityUrl().substring(this.getActivityUrl().lastIndexOf('/'));
     }
 
+    /**
+     * Returns the path part of the activity url (i.e. the string after
+     * '&path=').
+     * 
+     * @return the path part of the activity url
+     */
+    public String getActivityPath() {
+        return this.getActivityUrl().substring(this.getActivityUrl().indexOf("path=") + 5);
+    }
+
     /*
      * (non-Javadoc)
+     * 
      * @see java.lang.Object#toString()
      */
     @Override
     public String toString() {
-        return "Activity [checkinTime=" + this.checkinTime + ", principal=" + this.principal + ",\ndescription=" + this.description
-                + ",\nactivityUrl=" + this.activityUrl + "]";
+        return "Activity [checkinTime=" + this.checkinTime + ", principal=" + this.principal + ",\ndescription="
+            + this.description + ",\nactivityUrl=" + this.activityUrl + "]";
     }
 
     /**
-     * Add the given resource to this activity's resources. If the given resource is <code>null</code> it is ignored.
+     * Add the given resource to this activity's resources. If the given
+     * resource is <code>null</code> it is ignored.
      * 
      * @param resource
      *            resource to add to this activity's resources.
