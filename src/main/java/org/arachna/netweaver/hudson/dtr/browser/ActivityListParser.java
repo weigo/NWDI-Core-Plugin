@@ -56,9 +56,9 @@ final class ActivityListParser {
     private DOMXPath checkInDateXPath;
 
     /**
-     * XPath for matching the description of an activity.
+     * XPath for matching the short description of an activity.
      */
-    private DOMXPath descriptionXPath;
+    private DOMXPath commentXPath;
 
     /**
      * XPath for matching the principal of an activity.
@@ -97,7 +97,7 @@ final class ActivityListParser {
      */
     private void setUpXPaths() throws RuntimeException {
         try {
-            descriptionXPath = new DOMXPath("td[1]/a");
+            commentXPath = new DOMXPath("td[1]/a");
             principalXPath = new DOMXPath("td[3]/a");
             checkInDateXPath = new DOMXPath("td[4]/text()");
             activityXPath = new DOMXPath("td[1]/a/@href");
@@ -156,7 +156,21 @@ final class ActivityListParser {
      *             when there was an error parsing the activity's date.
      */
     private Activity createActivity(final Node node) throws JaxenException, ParseException {
-        return new Activity(getActivityUrl(node), getPrincipal(node), getDescription(node), getCheckInDate(node));
+        return new Activity(getActivityUrl(node), getPrincipal(node), getComment(node), getCheckInDate(node));
+    }
+
+    /**
+     * Get the short description from the given node.
+     * 
+     * @param node
+     *            the node the short description should be read from.
+     * @return the short description extracted from the given node.
+     * @throws JaxenException
+     *             when there was an error evaluating the XPath expressions used
+     *             to extract the data
+     */
+    private String getComment(final Node node) throws JaxenException {
+        return this.commentXPath.stringValueOf(node);
     }
 
     /**
@@ -173,20 +187,6 @@ final class ActivityListParser {
      */
     private Date getCheckInDate(final Node node) throws JaxenException, ParseException {
         return this.dateParser.parse(this.checkInDateXPath.stringValueOf(node));
-    }
-
-    /**
-     * Get the check in date from the given node.
-     * 
-     * @param node
-     *            the node the activity's check in date should be read from.
-     * @return the check in date extracted from the given node.
-     * @throws JaxenException
-     *             when there was an error evaluating the XPath expressions used
-     *             to extract the data
-     */
-    private String getDescription(final Node node) throws JaxenException {
-        return this.descriptionXPath.stringValueOf(node);
     }
 
     /**
