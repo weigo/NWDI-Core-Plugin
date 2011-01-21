@@ -20,13 +20,15 @@ import hudson.scm.SCM;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.sf.json.JSONObject;
 
+import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 import org.arachna.netweaver.dctool.DCToolCommandExecutor;
 import org.arachna.netweaver.hudson.dtr.browser.Activity;
@@ -40,6 +42,10 @@ import org.kohsuke.stapler.StaplerRequest;
  * @author Dirk Weigenand
  */
 public class NWDIScm extends SCM {
+    /**
+     * Logger.
+     */
+    private static final Logger LOGGER = Logger.getLogger(NWDIScm.class.getName());
 
     /**
      * Get a clean copy of all development components from NWDI.
@@ -109,9 +115,8 @@ public class NWDIScm extends SCM {
 
         if (rebuildNeeded) {
             final DCToolCommandExecutor dcToolExecutor = currentBuild.getDCToolExecutor(launcher);
-            this.listDevelopmentComponents(listener.getLogger(), currentBuild, dcToolExecutor);
-            this.syncDevelopmentComponents(listener.getLogger(), currentBuild.getDevelopmentConfiguration(),
-                dcToolExecutor);
+            this.listDevelopmentComponents(currentBuild, dcToolExecutor);
+            this.syncDevelopmentComponents(currentBuild.getDevelopmentConfiguration(), dcToolExecutor);
         }
 
         return rebuildNeeded;
@@ -135,8 +140,6 @@ public class NWDIScm extends SCM {
      * configuration and inserts them into the {@see #developmentConfiguration}
      * object (under the respective compartment).
      * 
-     * @param logger
-     *            logger to be used logging the DC tool output.
      * @param currentBuild
      *            currently running build
      * @throws IOException
@@ -144,17 +147,13 @@ public class NWDIScm extends SCM {
      * @throws InterruptedException
      *             when the operation was canceled by the user
      */
-    private void listDevelopmentComponents(final PrintStream logger, final NWDIBuild currentBuild,
-        final DCToolCommandExecutor executor) throws IOException, InterruptedException {
-        final long start = System.currentTimeMillis();
+    private void listDevelopmentComponents(final NWDIBuild currentBuild, final DCToolCommandExecutor executor)
+        throws IOException, InterruptedException {
         final String output = executor.execute(new ListDcCommandBuilder(currentBuild.getDevelopmentConfiguration()));
-        logger.append(output);
-
         final DevelopmentComponentsReader developmentComponentsReader =
             new DevelopmentComponentsReader(new StringReader(output), currentBuild.getDevelopmentComponentFactory(),
                 currentBuild.getDevelopmentConfiguration());
         developmentComponentsReader.read();
-        logger.append(duration(start, "'listdcs'"));
     }
 
     /**
@@ -163,8 +162,6 @@ public class NWDIScm extends SCM {
      * <code>true</code> all DCs will be synchronized, only those involved in
      * activities since the last build otherwise.
      * 
-     * @param logger
-     *            logger to be used logging the DC tool output.
      * @param developmentConfiguration
      *            development configuration to use when computing the 'syncdc'
      *            commands.
@@ -174,14 +171,11 @@ public class NWDIScm extends SCM {
      * @throws InterruptedException
      *             when the operation was canceled by the user
      */
-    private void syncDevelopmentComponents(final PrintStream logger,
-        final DevelopmentConfiguration developmentConfiguration, final DCToolCommandExecutor executor)
-        throws IOException, InterruptedException {
-        final long start = System.currentTimeMillis();
+    private void syncDevelopmentComponents(final DevelopmentConfiguration developmentConfiguration,
+        final DCToolCommandExecutor executor) throws IOException, InterruptedException {
         final SyncDevelopmentComponentsCommandBuilder commandBuilder =
             new SyncDevelopmentComponentsCommandBuilder(developmentConfiguration, this.cleanCopy);
-        logger.append(executor.execute(commandBuilder));
-        logger.append(duration(start, "'syncdcs'"));
+        executor.execute(commandBuilder);
     }
 
     /**
@@ -240,6 +234,7 @@ public class NWDIScm extends SCM {
                 descriptor.getUser(), descriptor.getPassword());
 
         final List<Activity> activities = new ArrayList<Activity>();
+        long start = System.currentTimeMillis();
 
         if (build.getPreviousBuild() == null) {
             activities.addAll(browser.getActivities());
@@ -248,17 +243,23 @@ public class NWDIScm extends SCM {
             activities.addAll(browser.getActivities(build.getPreviousBuild().getTime()));
         }
 
+        this.duration(start, "getActivities");
+        start = System.currentTimeMillis();
         // update activities with their respective resources
         // FIXME: add methods to DtrBrowser that get activities with their
         // respective resources!
-        browser.getDevelopmentComponents(activities);
+        for (final DevelopmentComponent component : browser.getDevelopmentComponents(activities)) {
+            component.setNeedsRebuild(true);
+        }
+
+        this.duration(start, "getDevelopmentComponents");
 
         return activities;
     }
 
-    private String duration(final long start, final String message) {
+    private void duration(final long start, final String message) {
         final long duration = System.currentTimeMillis() - start;
 
-        return String.format("%s took %d.%d sec.\n", message, (duration / 1000), (duration % 1000));
+        LOGGER.log(Level.INFO, String.format("%s took %d.%d sec.\n", message, (duration / 1000), (duration % 1000)));
     }
 }
