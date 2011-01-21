@@ -7,8 +7,9 @@ import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.apache.log4j.Logger;
 import org.jaxen.JaxenException;
 import org.jaxen.dom.DOMXPath;
 import org.w3c.dom.DOMException;
@@ -24,7 +25,7 @@ final class ResourceDetailsParser {
     /**
      * Logger for errors.
      */
-    private static final Logger LOGGER = Logger.getLogger(ResourceDetailsParser.class);
+    private static final Logger LOGGER = Logger.getLogger(ResourceDetailsParser.class.getName());
 
     /**
      * index into property table for the resources creation date.
@@ -86,10 +87,10 @@ final class ResourceDetailsParser {
             this.resource.setDeleted(Boolean.valueOf("yes".equals(nodeValueAt(nodes, IS_DELETED).toLowerCase())));
         }
         catch (final JaxenException e) {
-            LOGGER.error(String.format("Error parsing response to resource request using:\n%s", XPATH), e);
+            LOGGER.log(Level.SEVERE, String.format("Error parsing response to resource request using:\n%s", XPATH), e);
         }
         catch (final ParseException e) {
-            LOGGER.error(
+            LOGGER.log(Level.SEVERE,
                 String.format("Error parsing date using format string:\n%s", ActivityListParser.ACTIVITY_DATE_FORMAT),
                 e);
         }
