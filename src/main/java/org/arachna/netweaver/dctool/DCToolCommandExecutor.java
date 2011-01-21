@@ -108,7 +108,7 @@ public final class DCToolCommandExecutor {
     public String execute(final DCToolCommandBuilder commandBuilder) throws IOException, InterruptedException {
         final List<String> commands = commandBuilder.execute();
 
-        String dcToolLogoutput = "";
+        final String dcToolLogoutput = "";
 
         if (commands.size() > 0) {
             final FilePath commandFile = this.workspace.child("dctool.in");
@@ -131,7 +131,7 @@ public final class DCToolCommandExecutor {
                 throw new RuntimeException(String.format("dctool returned with an exit code of %d!", result));
             }
 
-            dcToolLogoutput = this.workspace.child(logFileName).readToString();
+            this.launcher.getListener().getLogger().append(this.workspace.child(logFileName).readToString());
         }
 
         return dcToolLogoutput;
@@ -155,7 +155,7 @@ public final class DCToolCommandExecutor {
         final StringBuilder commandBuilder = new StringBuilder();
 
         for (final String command : commands) {
-            commandBuilder.append(command);
+            commandBuilder.append(command).append('\n');
         }
 
         commandFile.write(commandBuilder.toString(), "UTF-8");
