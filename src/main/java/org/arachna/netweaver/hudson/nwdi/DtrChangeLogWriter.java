@@ -7,10 +7,12 @@ import java.io.IOException;
 import java.io.Writer;
 import java.text.SimpleDateFormat;
 
+import org.arachna.netweaver.hudson.nwdi.DtrChangeLogEntry.Item;
+
 /**
  * Persist a {@link DtrChangeLogSet} to a file as XML.
  * 
- * @author G526521
+ * @author Dirk Weigenand
  */
 public class DtrChangeLogWriter {
     /**
@@ -57,10 +59,12 @@ public class DtrChangeLogWriter {
             changeLog.write(String.format("\t\t<date>%s</date>\n", format.format(entry.getCheckInTime())));
             changeLog.write(String.format("\t\t<user>%s</user>\n", entry.getAuthor()));
             changeLog.write(String.format("\t\t<comment>%s</comment>\n", entry.getMsg()));
+            changeLog.write(String.format("\t\t<description>%s</description>\n", entry.getDescription()));
             changeLog.write("\t\t<items>\n");
 
-            for (final String affectedPath : entry.getAffectedPaths()) {
-                changeLog.write(String.format("\t\t\t<item action=\"%s\">%s</item>\n", "EDIT", affectedPath));
+            for (final Item item : entry.getItems()) {
+                changeLog
+                    .write(String.format("\t\t\t<item action=\"%s\">%s</item>\n", item.getAction(), item.getPath()));
             }
 
             changeLog.write("\t\t</items>\n");

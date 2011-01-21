@@ -7,21 +7,25 @@ import hudson.Util;
 import hudson.model.User;
 import hudson.scm.ChangeLogSet;
 import hudson.scm.ChangeLogSet.Entry;
+import hudson.scm.EditType;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
+import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.arachna.netweaver.hudson.dtr.browser.Activity;
 import org.arachna.netweaver.hudson.dtr.browser.ActivityResource;
 
 /**
  * An entry in a changelog for DTR activities.
  * 
- * @author G526521
+ * @author Dirk Weigenand
  */
 public final class DtrChangeLogEntry extends Entry {
     static final String DATE_FORMAT_SPEC = "yyyyMMdd HH:mm:ss Z";
@@ -29,7 +33,7 @@ public final class DtrChangeLogEntry extends Entry {
     /**
      * affected resources of the activity.
      */
-    private final Set<String> affectedPaths = new HashSet<String>();
+    private final List<Item> items = new LinkedList<Item>();
 
     /**
      * the user responsible for the activity.
@@ -40,6 +44,11 @@ public final class DtrChangeLogEntry extends Entry {
      * the commit message.
      */
     private String msg = "";
+
+    /**
+     * long description of activity.
+     */
+    private String description = "";
 
     /**
      * Id of the activity.
@@ -58,12 +67,38 @@ public final class DtrChangeLogEntry extends Entry {
      *            activity to use creating the change log.
      */
     public DtrChangeLogEntry(final Activity activity) {
-        this(activity.getPrincipal().getUser(), activity.getDescription(), activity.getActivityId(), activity
-                .getCheckinTime());
+        this(activity.getPrincipal().getUser(), activity.getComment(), activity.getActivityUrl(), activity
+            .getCheckinTime());
+        this.setDescription(activity.getDescription());
 
         for (final ActivityResource resource : activity.getResources()) {
-            this.affectedPaths.add(resource.getPath());
+            createAndAddItem(resource);
         }
+    }
+
+    /**
+     * @param resource
+     */
+    private void createAndAddItem(final ActivityResource resource) {
+        String action = "edit";
+
+        if (resource.isDeleted()) {
+            action = "delete";
+        }
+        else if (Integer.valueOf(1).equals(resource.getSequenceNumber())) {
+            action = "add";
+        }
+
+        final DevelopmentComponent dc = resource.getDevelopmentComponent();
+        add(new Item(String.format("%s/%s/comp_/%s", dc.getVendor(), dc.getName(), resource.getPath()), action));
+    }
+
+    /**
+     * @param item
+     */
+    void add(final Item item) {
+        item.setParent(this);
+        this.items.add(item);
     }
 
     /**
@@ -90,7 +125,17 @@ public final class DtrChangeLogEntry extends Entry {
 
     @Override
     public Collection<String> getAffectedPaths() {
+        final Set<String> affectedPaths = new HashSet<String>();
+
+        for (final Item item : this.items) {
+            affectedPaths.add(item.getPath());
+        }
+
         return affectedPaths;
+    }
+
+    public Collection<Item> getItems() {
+        return this.items;
     }
 
     @Override
@@ -104,7 +149,8 @@ public final class DtrChangeLogEntry extends Entry {
     }
 
     public String getVersion() {
-        return this.activityId;
+        // FIXME: Aktivitäts-ID herausfinden
+        return this.activityId.substring(this.activityId.lastIndexOf('_') + 1);
     }
 
     public Date getCheckInTime() {
@@ -143,10 +189,6 @@ public final class DtrChangeLogEntry extends Entry {
         }
     }
 
-    public void addAffectedPath(final String path) {
-        this.affectedPaths.add(path);
-    }
-
     void setUser(final String user) {
         this.user = user;
     }
@@ -158,8 +200,81 @@ public final class DtrChangeLogEntry extends Entry {
         return user;
     }
 
+    public String getActivityUrl() {
+        return String.format("%s/dtr/system-tools/reports/ResourceDetails?technical=false&path=/act%s", "",
+            this.activityId);
+    }
+
+    /**
+     * Returns the long description of this DtrChangeLogEntry ({@link Activity}.
+     * 
+     * @return the long description of this DtrChangeLogEntry
+     */
+    public String getDescription() {
+        return Util.xmlEscape(this.description);
+    }
+
+    /**
+     * Sets the long description of this DtrChangeLogEntry ({@link Activity}.
+     * 
+     * @param description
+     *            the long description of this DtrChangeLogEntry
+     */
+    void setDescription(final String description) {
+        this.description = description == null ? "" : description;
+    }
+
     @Override
     protected void setParent(final ChangeLogSet parent) {
         super.setParent(parent);
+    }
+
+    public static final class Item {
+        private final String path;
+        private final String action;
+        private DtrChangeLogEntry parent;
+
+        Item(final String path, final String action) {
+            this.path = path;
+            this.action = action;
+        }
+
+        void setParent(final DtrChangeLogEntry parent) {
+            this.parent = parent;
+        }
+
+        /**
+         * @return the path
+         */
+        public String getPath() {
+            return path;
+        }
+
+        /**
+         * @return the action
+         */
+        public String getAction() {
+            return action;
+        }
+
+        /**
+         * @return the parent
+         */
+        public DtrChangeLogEntry getParent() {
+            return parent;
+        }
+
+        public EditType getEditType() {
+            EditType editType = EditType.EDIT;
+
+            if (this.action.equalsIgnoreCase("delete")) {
+                editType = EditType.DELETE;
+            }
+            else if (action.equalsIgnoreCase("add")) {
+                editType = EditType.ADD;
+            }
+
+            return editType;
+        }
     }
 }
