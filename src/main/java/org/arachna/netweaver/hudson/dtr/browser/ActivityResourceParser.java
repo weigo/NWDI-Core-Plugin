@@ -14,7 +14,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 /**
- * A parser for {@link ActivityResource}s. Parses a DTR HTML report of a specific activity and returns the found resources.
+ * A parser for {@link ActivityResource}s. Parses a DTR HTML report of a
+ * specific activity and returns the found resources.
  * 
  * @author Dirk Weigenand
  */
@@ -23,7 +24,12 @@ public final class ActivityResourceParser {
      * XPath expression to extract resources.
      */
     private static final String XPATH =
-            "//a[starts-with(@href, '/dtr/system-tools/reports/ResourceDetails?technical=false&path=/vh/')]/text()";
+        "//a[starts-with(@href, '/dtr/system-tools/reports/ResourceDetails?technical=false&path=/vh/')]";
+
+    /**
+     * Pattern matching the resources ID.
+     */
+    private final Pattern resourceIdPattern = Pattern.compile("^.*?\\/vh\\/(.*?)$");
 
     /**
      * Pattern matching the vendor.
@@ -38,7 +44,7 @@ public final class ActivityResourceParser {
     /**
      * Pattern matching the development component name.
      */
-    private final Pattern resourcePathPattern = Pattern.compile("^\\/.*?\\/_comp(.*?)$");
+    private final Pattern resourcePathPattern = Pattern.compile("^\\/.*?\\/_comp\\/(.*?)$");
 
     /**
      * Registry for development components.
@@ -54,7 +60,8 @@ public final class ActivityResourceParser {
      * Create an instance of an <code>ActivityResourceParser</code>.
      * 
      * @param developmentComponentFactory
-     *            registry to use for creating/getting development components changed in the given activity.
+     *            registry to use for creating/getting development components
+     *            changed in the given activity.
      * @param activity
      *            activity to associate with the parsed resources.
      */
@@ -72,7 +79,8 @@ public final class ActivityResourceParser {
     }
 
     /**
-     * Parses a DTR HTML report of a specific activity and updates the activity with the found resources.
+     * Parses a DTR HTML report of a specific activity and updates the activity
+     * with the found resources.
      * 
      * @param dtrActivityReportPage
      *            HTML report containing the activities resources.
@@ -99,20 +107,26 @@ public final class ActivityResourceParser {
      *            node to extract the <code>ActivityResource</code> from.
      */
     private void addResource(final Node node) {
-        final String resourcePath = node.getNodeValue();
+        final String resourcePath = node.getChildNodes().item(0).getNodeValue();
 
         if (this.isResourcePathDevelopmentComponentResource(resourcePath)) {
-            this.activity.add(new ActivityResource(this.activity, this.developmentComponentFactory.create(
-                    this.getDevelopmentComponentName(resourcePath), this.getVendor(resourcePath)), this.getResourcePath(resourcePath)));
+            final ActivityResource resource =
+                new ActivityResource(this.activity, this.developmentComponentFactory.create(
+                    this.getDevelopmentComponentName(resourcePath), this.getVendor(resourcePath)),
+                    this.getResourcePath(resourcePath), this.getResourceId(node.getAttributes().getNamedItem("href")
+                        .getNodeValue()));
+            this.activity.add(resource);
         }
     }
 
     /**
-     * Checks whether the given resource path belongs to a development component (i.e. it starts with '/DCs').
+     * Checks whether the given resource path belongs to a development component
+     * (i.e. it starts with '/DCs').
      * 
      * @param resourcePath
      *            resource path to check
-     * @return <code>true</code> iff the given resource path starts with '/DCs', <code>false</code> otherwise.
+     * @return <code>true</code> iff the given resource path starts with '/DCs',
+     *         <code>false</code> otherwise.
      */
     private boolean isResourcePathDevelopmentComponentResource(final String resourcePath) {
         return resourcePath != null && this.developmentComponentNamePattern.matcher(resourcePath).matches();
@@ -133,7 +147,8 @@ public final class ActivityResourceParser {
      * Return the development component name encoded in the given resource path.
      * 
      * @param resourcePath
-     *            path to resource the development component name should be extracted from.
+     *            path to resource the development component name should be
+     *            extracted from.
      * @return development component name encoded in the given resource path.
      */
     private String getDevelopmentComponentName(final String resourcePath) {
@@ -141,14 +156,27 @@ public final class ActivityResourceParser {
     }
 
     /**
-     * Return the path to the respective resource encoded in the given resource path.
+     * Return the path to the respective resource encoded in the given resource
+     * path.
      * 
      * @param resourcePath
      *            path to resource the resource name should be extracted from.
-     * @return path to the respective resource encoded in the given resource path.
+     * @return path to the respective resource encoded in the given resource
+     *         path.
      */
     private String getResourcePath(final String resourcePath) {
         return extractPatternMatch(this.resourcePathPattern, resourcePath);
+    }
+
+    /**
+     * Gets the ID of this resource from the given resource path.
+     * 
+     * @param href
+     *            the resource path in the report.
+     * @return the resource ID
+     */
+    private String getResourceId(final String href) {
+        return extractPatternMatch(this.resourceIdPattern, href);
     }
 
     /**
@@ -157,7 +185,8 @@ public final class ActivityResourceParser {
      * @param pattern
      *            pattern to use matching
      * @param resourcePath
-     *            resource path used matching the pattern. * @return the found match
+     *            resource path used matching the pattern.
+     * @return the found match
      */
     private String extractPatternMatch(final Pattern pattern, final String resourcePath) {
         final Matcher matcher = pattern.matcher(resourcePath);
