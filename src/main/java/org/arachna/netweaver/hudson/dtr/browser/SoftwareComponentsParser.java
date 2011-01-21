@@ -6,8 +6,8 @@ package org.arachna.netweaver.hudson.dtr.browser;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
-import org.apache.log4j.Logger;
 import org.arachna.netweaver.dc.types.Compartment;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 import org.jaxen.JaxenException;
@@ -24,7 +24,7 @@ final class SoftwareComponentsParser {
     /**
      * Logger.
      */
-    private static final Logger LOGGER = Logger.getLogger(SoftwareComponentsParser.class);
+    private static final Logger LOGGER = Logger.getLogger(SoftwareComponentsParser.class.getName());
 
     /**
      * XPath expression for extracting compartments from a workspace listing in
@@ -62,7 +62,7 @@ final class SoftwareComponentsParser {
                     compartments.add(compartment);
                 }
                 else {
-                    LOGGER.error(String.format("%s could not be found in %s.", compartmentName, config.getName()));
+                    LOGGER.warning(String.format("%s could not be found in %s.", compartmentName, config.getName()));
                 }
             }
         }
