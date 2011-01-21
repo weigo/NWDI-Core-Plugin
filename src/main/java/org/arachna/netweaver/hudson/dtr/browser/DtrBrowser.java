@@ -116,7 +116,7 @@ public final class DtrBrowser {
             activities.addAll(activityListBrowser.parse(this.dtrHttpClient.getContent(queryUrl)));
         }
         catch (final ClientProtocolException e) {
-            LOGGER.log(Level.SEVERE, "There occured an error communicating with the DTR.", e);
+            LOGGER.log(Level.SEVERE, "An error occured communicating with the DTR.", e);
         }
         catch (final IOException e) {
             LOGGER.log(
