@@ -28,9 +28,26 @@ final class DevelopmentComponentCollector {
         "There was an error calculating the affected development components for the given set of activities.";
 
     /**
+     * template for querying details of a activity.
+     */
+    private static final String ACTIVITY_DETAIL_QUERY_TEMPLATE =
+        "%s/dtr/system-tools/reports/ResourceDetails?technical=false&path=%s";
+
+    /**
+     * Template for querying resources of an activity.
+     */
+    private static final String RESOURCE_QUERY_TEMPLATE =
+        "%s/dtr/system-tools/reports/ResourceSetDetails?namespace=DAV:&path=%s&name=activity-version-set";
+
+    /**
+     * Template for querying details of a resource of an activity.
+     */
+    private static final String RESOURCE_DETAIL_QUERY_TEMPLATE =
+        "%s/dtr/system-tools/reports/ResourceDetails?technical=false&path=/vh/%s";
+    /**
      * Logger to use.
      */
-    private static final Logger LOG = Logger.getLogger(DevelopmentComponentCollector.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(DevelopmentComponentCollector.class.getName());
 
     /**
      * DtrHttpClient for browsing the DTR.
@@ -102,26 +119,44 @@ final class DevelopmentComponentCollector {
         final Set<DevelopmentComponent> components = new HashSet<DevelopmentComponent>();
 
         try {
-            final ActivityResourceParser activityResourceParser = new ActivityResourceParser(this.dcFactory, activity);
+            updateActivityDetails(activity);
+            createActivityResources(activity);
 
-            activityResourceParser.parse(this.dtrHttpClient.getContent(this.dtrUrl + activity.getActivityUrl()));
+            ResourceDetailsParser detailParser;
 
             for (final ActivityResource resource : activity.getResources()) {
-                final DevelopmentComponent developmentComponent = resource.getDevelopmentComponent();
-                developmentComponent.setNeedsRebuild(true);
-                components.add(developmentComponent);
+                detailParser = new ResourceDetailsParser(resource);
+                detailParser.parse(this.dtrHttpClient.getContent(String.format(RESOURCE_DETAIL_QUERY_TEMPLATE,
+                    this.dtrUrl, resource.getId())));
+                components.add(resource.getDevelopmentComponent());
             }
         }
         catch (final ClientProtocolException e) {
-            LOG.log(Level.SEVERE, ERROR_CALCULATING_AFFECTED_DEVELOPMENT_COMPONENTS, e);
+            LOGGER.log(Level.SEVERE, ERROR_CALCULATING_AFFECTED_DEVELOPMENT_COMPONENTS, e);
         }
         catch (final IllegalStateException e) {
-            LOG.log(Level.SEVERE, ERROR_CALCULATING_AFFECTED_DEVELOPMENT_COMPONENTS, e);
+            LOGGER.log(Level.SEVERE, ERROR_CALCULATING_AFFECTED_DEVELOPMENT_COMPONENTS, e);
         }
         catch (final IOException e) {
-            LOG.log(Level.SEVERE, ERROR_CALCULATING_AFFECTED_DEVELOPMENT_COMPONENTS, e);
+            LOGGER.log(Level.SEVERE, ERROR_CALCULATING_AFFECTED_DEVELOPMENT_COMPONENTS, e);
         }
 
         return components;
+    }
+
+    private void createActivityResources(final Activity activity) throws IOException {
+        final ActivityResourceParser activityResourceParser = new ActivityResourceParser(this.dcFactory, activity);
+        final String queryURL = String.format(RESOURCE_QUERY_TEMPLATE, this.dtrUrl, activity.getActivityPath());
+        activityResourceParser.parse(this.dtrHttpClient.getContent(queryURL));
+    }
+
+    /**
+     * @param activity
+     * @throws IOException
+     */
+    private void updateActivityDetails(final Activity activity) throws IOException {
+        final ActivityDetailParser activityDetailParser = new ActivityDetailParser(activity);
+        activityDetailParser.parse(this.dtrHttpClient.getContent(String.format(ACTIVITY_DETAIL_QUERY_TEMPLATE,
+            this.dtrUrl, activity.getActivityPath())));
     }
 }
