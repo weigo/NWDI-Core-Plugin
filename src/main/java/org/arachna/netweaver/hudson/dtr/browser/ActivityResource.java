@@ -29,6 +29,11 @@ public class ActivityResource {
     private final DevelopmentComponent developmentComponent;
 
     /**
+     * resource ID.
+     */
+    private final String id;
+
+    /**
      * date the resource was created at.
      */
     private Date creationDate;
@@ -58,12 +63,16 @@ public class ActivityResource {
      *            this resource belongs to.
      * @param path
      *            path of resource in the containing development component.
+     * @param id
+     *            the resource id
      */
-    public ActivityResource(final Activity activity, final DevelopmentComponent developmentComponent, final String path) {
+    public ActivityResource(final Activity activity, final DevelopmentComponent developmentComponent,
+        final String path, final String id) {
         super();
         this.activity = activity;
         this.developmentComponent = developmentComponent;
         this.path = path;
+        this.id = id;
     }
 
     /**
@@ -145,5 +154,28 @@ public class ActivityResource {
      */
     void setSequenceNumber(final Integer sequenceNumber) {
         this.sequenceNumber = sequenceNumber;
+    }
+
+    /**
+     * Resturns the ID of this resource.
+     * 
+     * @return the id of this resource.
+     */
+    String getId() {
+        return id;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return String
+            .format(
+                "ActivityResource[creationDate = '%s', id = '%s', lastModified = '%s', path = '%s', deleted = '%s', sequenceNumber = '%s']",
+                this.getCreationDate(), this.getId(), this.getLastModified(), this.getPath(), this.isDeleted(),
+                this.getSequenceNumber());
     }
 }
