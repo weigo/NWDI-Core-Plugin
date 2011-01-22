@@ -31,12 +31,19 @@ public final class DtrChangeLogParser extends ChangeLogParser {
         SAXException {
         // Do the actual parsing
         final DtrChangeLogSet changeSet = new DtrChangeLogSet(build);
-        final InternalDtrChangeLogParser handler = new InternalDtrChangeLogParser(changeSet);
-        final FileReader reader = new FileReader(changelogFile);
-        final XMLReader xmlReader = XMLReaderFactory.createXMLReader();
-        xmlReader.setContentHandler(handler);
-        xmlReader.parse(new InputSource(reader));
-        reader.close();
+        FileReader reader = null;
+
+        try {
+            reader = new FileReader(changelogFile);
+            final XMLReader xmlReader = XMLReaderFactory.createXMLReader();
+            xmlReader.setContentHandler(new InternalDtrChangeLogParser(changeSet));
+            xmlReader.parse(new InputSource(reader));
+        }
+        finally {
+            if (reader != null) {
+                reader.close();
+            }
+        }
 
         return changeSet;
     }
@@ -53,7 +60,6 @@ public final class DtrChangeLogParser extends ChangeLogParser {
 
         /*
          * (non-Javadoc)
-         * 
          * @see org.xml.sax.helpers.DefaultHandler#characters(char[], int, int)
          */
         @Override
@@ -63,7 +69,6 @@ public final class DtrChangeLogParser extends ChangeLogParser {
 
         /*
          * (non-Javadoc)
-         * 
          * @see org.xml.sax.helpers.DefaultHandler#endElement(java.lang.String,
          * java.lang.String, java.lang.String)
          */
@@ -95,7 +100,6 @@ public final class DtrChangeLogParser extends ChangeLogParser {
 
         /*
          * (non-Javadoc)
-         * 
          * @see
          * org.xml.sax.helpers.DefaultHandler#startElement(java.lang.String,
          * java.lang.String, java.lang.String, org.xml.sax.Attributes)
