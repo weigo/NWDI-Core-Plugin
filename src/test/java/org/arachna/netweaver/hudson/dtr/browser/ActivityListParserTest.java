@@ -3,9 +3,11 @@
  */
 package org.arachna.netweaver.hudson.dtr.browser;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.fail;
 
 import java.io.InputStream;
@@ -38,16 +40,20 @@ public class ActivityListParserTest {
         final ActivityListParser browser = new ActivityListParser();
         final InputStream input = this.getClass().getResourceAsStream("ExampleTrackActivityQuery.html");
         final List<Activity> activities = browser.parse(input);
-        assertNotNull(activities);
-        assertTrue(activities.size() > 0);
+
+        assertThat(null, is(not(equalTo(activities))));
+        assertThat(activities.size(), is(greaterThan(0)));
+
         final Activity activity = activities.get(0);
-        assertEquals(ACTIVITY_QUERY_URL, activity.getActivityUrl());
-        assertEquals("Anpassung configArchive", activity.getDescription());
-        assertEquals("developer00", activity.getPrincipal().getUser());
+
+        assertThat(ACTIVITY_QUERY_URL, is(equalTo(activity.getActivityUrl())));
+        assertThat("Anpassung configArchive", is(equalTo(activity.getComment())));
+        assertThat("developer00", is(equalTo(activity.getPrincipal().getUser())));
+
         final SimpleDateFormat format = new SimpleDateFormat(ActivityListParser.ACTIVITY_DATE_FORMAT);
 
         try {
-            assertEquals(format.parse("17.05.2010 14:40:12 GMT"), activity.getCheckinTime());
+            assertThat(format.parse("17.05.2010 14:40:12 GMT"), is(equalTo(activity.getCheckinTime())));
         }
         catch (final ParseException e) {
             fail(e.getMessage());
