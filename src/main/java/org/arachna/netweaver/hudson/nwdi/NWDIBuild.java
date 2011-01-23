@@ -4,9 +4,9 @@
 package org.arachna.netweaver.hudson.nwdi;
 
 import hudson.Launcher;
+import hudson.model.Build;
 import hudson.model.BuildListener;
 import hudson.model.Result;
-import hudson.model.AbstractBuild;
 import hudson.tasks.Publisher;
 
 import java.io.File;
@@ -30,7 +30,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
  * @author Dirk Weigenand
  * 
  */
-public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
+public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
     /**
      * Executor for DC tool commands used throughout.
      */

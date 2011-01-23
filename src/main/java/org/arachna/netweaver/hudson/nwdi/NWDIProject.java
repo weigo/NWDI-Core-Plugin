@@ -15,8 +15,8 @@ import hudson.model.Item;
 import hudson.model.ItemGroup;
 import hudson.model.TopLevelItem;
 import hudson.model.AbstractBuild;
-import hudson.model.AbstractProject;
 import hudson.model.Hudson;
+import hudson.model.Project;
 import hudson.scm.SCM;
 import hudson.tasks.Publisher;
 import hudson.util.DescribableList;
@@ -41,7 +41,7 @@ import org.kohsuke.stapler.StaplerResponse;
  * 
  * @author Dirk Weigenand
  */
-public final class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> implements TopLevelItem {
+public final class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopLevelItem {
     /**
      * parameter name for project configuration controlling whether the
      * workspace should be clean before building.
