@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -234,7 +235,7 @@ public class NWDIScm extends SCM {
                 descriptor.getUser(), descriptor.getPassword());
 
         final List<Activity> activities = new ArrayList<Activity>();
-        long start = System.currentTimeMillis();
+        final long start = System.currentTimeMillis();
 
         if (build.getPreviousBuild() == null) {
             activities.addAll(browser.getActivities());
@@ -244,17 +245,29 @@ public class NWDIScm extends SCM {
         }
 
         this.duration(start, "getActivities");
+        this.updateActivitiesWithResources(browser, activities);
+
+        return activities;
+    }
+
+    /**
+     * @param browser
+     * @param activities
+     */
+    private void updateActivitiesWithResources(final DtrBrowser browser, final List<Activity> activities) {
+        long start;
         start = System.currentTimeMillis();
         // update activities with their respective resources
         // FIXME: add methods to DtrBrowser that get activities with their
         // respective resources!
-        for (final DevelopmentComponent component : browser.getDevelopmentComponents(activities)) {
+
+        final Set<DevelopmentComponent> developmentComponents = browser.getDevelopmentComponents(activities);
+
+        for (final DevelopmentComponent component : developmentComponents) {
             component.setNeedsRebuild(true);
         }
 
         this.duration(start, "getDevelopmentComponents");
-
-        return activities;
     }
 
     private void duration(final long start, final String message) {
