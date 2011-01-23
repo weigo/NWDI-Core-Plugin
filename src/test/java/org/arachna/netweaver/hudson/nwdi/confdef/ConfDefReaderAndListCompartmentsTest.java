@@ -8,6 +8,8 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -15,6 +17,7 @@ import org.arachna.netweaver.dc.types.Compartment;
 import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
+import org.arachna.netweaver.hudson.nwdi.DevelopmentComponentsReader;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -71,13 +74,11 @@ public class ConfDefReaderAndListCompartmentsTest {
         this.developmentConfiguration =
             developmentConfigurationReader.read(this.getClass().getResourceAsStream("Example.confdef"));
 
-        // final Reader dcToolOutputReader =
-        // new
-        // InputStreamReader(this.getClass().getResourceAsStream("ListDevelopmentComponentsLIBJEE.out"));
-        // final DevelopmentComponentsReader developmentComponentsReader =
-        // new DevelopmentComponentsReader(dcToolOutputReader, this.dcFactory,
-        // this.developmentConfiguration);
-        // developmentComponentsReader.read();
+        final Reader dcToolOutputReader =
+            new InputStreamReader(this.getClass().getResourceAsStream("ListDevelopmentComponentsExample.out"));
+        final DevelopmentComponentsReader developmentComponentsReader =
+            new DevelopmentComponentsReader(dcToolOutputReader, this.dcFactory, this.developmentConfiguration);
+        developmentComponentsReader.read();
     }
 
     /**

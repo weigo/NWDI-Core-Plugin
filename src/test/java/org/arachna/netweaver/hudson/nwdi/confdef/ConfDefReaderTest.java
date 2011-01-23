@@ -6,6 +6,8 @@ package org.arachna.netweaver.hudson.nwdi.confdef;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -93,18 +95,11 @@ public final class ConfDefReaderTest {
 
             final Collection<Compartment> compartments = configuration.getCompartments();
 
-            assertThat(compartments.size(), equalTo(6));
+            assertThat(8, equalTo(compartments.size()));
 
-            final Set<String> compartmentNames = new HashSet<String>();
-            compartmentNames.add("example.com_EXAMPLE_SC1_1");
-            compartmentNames.add("sap.com_FRAMEWORK_1");
-            compartmentNames.add("sap.com_ENGFACADE_1");
-            compartmentNames.add("sap.com_EP_BUILDT_1");
-            compartmentNames.add("sap.com_FRAMEWORK_1");
-            compartmentNames.add("sap.com_SAP_BUILDT_1");
-            compartmentNames.add("sap.com_WD-RUNTIME_1");
+            final Set<String> compartmentNames = getExpectedCompartmentNames();
 
-            for (Compartment compartment : compartments) {
+            for (final Compartment compartment : compartments) {
                 assertThat(compartmentNames, hasItem(compartment.getName()));
             }
         }
@@ -114,6 +109,42 @@ public final class ConfDefReaderTest {
         catch (final SAXException e) {
             fail(e.getLocalizedMessage());
         }
+    }
+
+    @Test
+    public void testReadExampleConfDefAndVerifyThatGetCompartmentsReturnsTheCorrectCompartments() {
+        try {
+            final DevelopmentConfiguration configuration = readDevelopmentConfiguration("Example.confdef");
+
+            for (final String compartmentName : getExpectedCompartmentNames()) {
+                assertThat(null, is(not(equalTo(configuration.getCompartment(compartmentName)))));
+            }
+        }
+        catch (final IOException e) {
+            fail(e.getLocalizedMessage());
+        }
+        catch (final SAXException e) {
+            fail(e.getLocalizedMessage());
+        }
+    }
+
+    /**
+     * @return
+     */
+    private Set<String> getExpectedCompartmentNames() {
+        final Set<String> compartmentNames = new HashSet<String>();
+
+        compartmentNames.add("example.com_EXAMPLE_SC1_1");
+        compartmentNames.add("sap.com_FRAMEWORK_1");
+        compartmentNames.add("sap.com_ENGFACADE_1");
+        compartmentNames.add("sap.com_EP_BUILDT_1");
+        compartmentNames.add("sap.com_FRAMEWORK_1");
+        compartmentNames.add("sap.com_SAP_BUILDT_1");
+        compartmentNames.add("sap.com_SAP_JTECHS_1");
+        compartmentNames.add("sap.com_SAP-JEE_1");
+        compartmentNames.add("sap.com_WD-RUNTIME_1");
+
+        return compartmentNames;
     }
 
     /**

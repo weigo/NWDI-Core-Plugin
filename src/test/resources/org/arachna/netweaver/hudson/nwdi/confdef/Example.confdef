@@ -1,126 +1,158 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configuration
-		caption="Example Track_dev"
-		cms-url="http://di0db:53000"
-		config-version="0000000378"
-		document-type-version="1.0"
-		is-local="no"
-		name="DI0_Example_D"
-		name-server-url="http://di0db:53000/sld/cimom"
-		sl-location="DI0_Example_D"
-		xmlns="http://xml.sap.com/2002/11/DevelopmentConfiguration"
-		xmlns:IDX="urn:sap.com:DevelopmentConfiguration:1.0"
-		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		xsi:schemaLocation="http://xml.sap.com/2002/11/DevelopmentConfiguration confdef.xsd">
-	<config-description>Libraries for NW CE_dev</config-description>
-	<build-server>http://di0db:53000</build-server>
-	<properties>
-		<NOTIFY_TCS xmlns="http://xml.sap.com/2003/07/DevelopmentConfiguration/Transport-Controller">true</NOTIFY_TCS>
-		<SDM_URL xmlns="http://xml.sap.com/2003/07/DevelopmentConfiguration/Transport-Controller">http://dummySDMURL:50018</SDM_URL>
-		<TCS_SERVLET xmlns="http://xml.sap.com/2003/07/DevelopmentConfiguration/Transport-Controller">http://di0db:53000/TCS/Deployer</TCS_SERVLET>
-		<TRANS_D xmlns="http://xml.sap.com/2003/07/DevelopmentConfiguration/Transport-Controller">E:\usr\sap\trans\EPS\in\CMSdi0db</TRANS_D>
-	</properties>
-	<sc-compartments>
-		<sc-compartment archive-state="no" caption="example.com_EXAMPLE_SC1_1" default-compartment="yes" name="example.com_EXAMPLE_SC1_1" sc-name="EXAMPLE_SC1" sc-vendor="example.com">
-			<properties>
-				<original_language xmlns="http://xml.sap.com/2004/08/DevelopmentConfiguration/Configuration-Controller"/>
-				<terminology_domain xmlns="http://xml.sap.com/2004/08/DevelopmentConfiguration/Configuration-Controller"/>
-			</properties>
-			<source-state type="activation">
-				<repository type="DTR" url="http://di0db:53000/dtr"/>
-				<inactive-location>ws/Example/example.com_EXAMPLE_SC1/dev/inactive/</inactive-location>
-				<location>ws/Example/example.com_EXAMPLE_SC1/dev/active/</location>
-			</source-state>
-			<dependencies>
-<used-compartment>sap.com_ENGFACADE_1</used-compartment>
-<used-compartment>sap.com_EP_BUILDT_1</used-compartment>
-<used-compartment>sap.com_FRAMEWORK_1</used-compartment>
-<used-compartment>sap.com_SAP_BUILDT_1</used-compartment>
-<used-compartment>sap.com_WD-RUNTIME_1</used-compartment>
-</dependencies>
-<build-variants>
-<build-variant name="default" required-for-activation="yes">
-<variant-mappings>
-<variant-mapping used-compartment="sap.com_ENGFACADE_1" used-variant-name="default"/>
-<variant-mapping used-compartment="sap.com_EP_BUILDT_1" used-variant-name="default"/>
-<variant-mapping used-compartment="sap.com_FRAMEWORK_1" used-variant-name="default"/>
-<variant-mapping used-compartment="sap.com_SAP_BUILDT_1" used-variant-name="default"/>
-<variant-mapping used-compartment="sap.com_WD-RUNTIME_1" used-variant-name="default"/>
-</variant-mappings>
-</build-variant>
-</build-variants>
-		</sc-compartment>
-		<sc-compartment archive-state="yes" caption="sap.com_ENGFACADE_1" default-compartment="yes" name="sap.com_ENGFACADE_1" sc-name="ENGFACADE" sc-vendor="sap.com">
-			<properties>
-				<original_language xmlns="http://xml.sap.com/2004/08/DevelopmentConfiguration/Configuration-Controller"/>
-				<terminology_domain xmlns="http://xml.sap.com/2004/08/DevelopmentConfiguration/Configuration-Controller"> </terminology_domain>
-			</properties>
-			<dependencies>
-</dependencies>
-<build-variants>
-<build-variant name="default" required-for-activation="yes">
-<variant-mappings>
-</variant-mappings>
-</build-variant>
-</build-variants>
-		</sc-compartment>
-		<sc-compartment archive-state="yes" caption="sap.com_EP_BUILDT_1" default-compartment="yes" name="sap.com_EP_BUILDT_1" sc-name="EP_BUILDT" sc-vendor="sap.com">
-			<properties>
-				<original_language xmlns="http://xml.sap.com/2004/08/DevelopmentConfiguration/Configuration-Controller"/>
-				<terminology_domain xmlns="http://xml.sap.com/2004/08/DevelopmentConfiguration/Configuration-Controller"> </terminology_domain>
-			</properties>
-			<dependencies>
-<used-compartment>sap.com_SAP_BUILDT_1</used-compartment>
-</dependencies>
-<build-variants>
-<build-variant name="default" required-for-activation="yes">
-<variant-mappings>
-<variant-mapping used-compartment="sap.com_SAP_BUILDT_1" used-variant-name="default"/>
-</variant-mappings>
-</build-variant>
-</build-variants>
-		</sc-compartment>
-		<sc-compartment archive-state="yes" caption="sap.com_FRAMEWORK_1" default-compartment="yes" name="sap.com_FRAMEWORK_1" sc-name="FRAMEWORK" sc-vendor="sap.com">
-			<properties>
-				<original_language xmlns="http://xml.sap.com/2004/08/DevelopmentConfiguration/Configuration-Controller"/>
-				<terminology_domain xmlns="http://xml.sap.com/2004/08/DevelopmentConfiguration/Configuration-Controller">BC</terminology_domain>
-			</properties>
-			<dependencies>
-</dependencies>
-<build-variants>
-<build-variant name="default" required-for-activation="yes">
-<variant-mappings>
-</variant-mappings>
-</build-variant>
-</build-variants>
-		</sc-compartment>
-		<sc-compartment archive-state="yes" caption="sap.com_SAP_BUILDT_1" default-compartment="yes" name="sap.com_SAP_BUILDT_1" sc-name="SAP_BUILDT" sc-vendor="sap.com">
-			<properties>
-				<original_language xmlns="http://xml.sap.com/2004/08/DevelopmentConfiguration/Configuration-Controller"/>
-				<terminology_domain xmlns="http://xml.sap.com/2004/08/DevelopmentConfiguration/Configuration-Controller"> </terminology_domain>
-			</properties>
-			<dependencies>
-</dependencies>
-<build-variants>
-<build-variant name="default" required-for-activation="yes">
-<variant-mappings>
-</variant-mappings>
-</build-variant>
-</build-variants>
-		</sc-compartment>
-		<sc-compartment archive-state="yes" caption="sap.com_WD-RUNTIME_1" default-compartment="yes" name="sap.com_WD-RUNTIME_1" sc-name="WD-RUNTIME" sc-vendor="sap.com">
-			<properties>
-				<original_language xmlns="http://xml.sap.com/2004/08/DevelopmentConfiguration/Configuration-Controller"/>
-				<terminology_domain xmlns="http://xml.sap.com/2004/08/DevelopmentConfiguration/Configuration-Controller">BC</terminology_domain>
-			</properties>
-			<dependencies>
-</dependencies>
-<build-variants>
-<build-variant name="default" required-for-activation="yes">
-<variant-mappings>
-</variant-mappings>
-</build-variant>
-</build-variants>
-		</sc-compartment>
-	</sc-compartments>
+<configuration caption="Example Track_dev" cms-url="http://di0db:53000" config-version="0000000378" document-type-version="1.0"
+ is-local="no" name="DI0_Example_D" name-server-url="http://di0db:53000/sld/cimom" sl-location="DI0_Example_D"
+ xmlns="http://xml.sap.com/2002/11/DevelopmentConfiguration" xmlns:IDX="urn:sap.com:DevelopmentConfiguration:1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://xml.sap.com/2002/11/DevelopmentConfiguration confdef.xsd">
+ <config-description>Libraries for NW CE_dev</config-description>
+ <build-server>http://di0db:53000</build-server>
+ <properties>
+  <NOTIFY_TCS xmlns="http://xml.sap.com/2003/07/DevelopmentConfiguration/Transport-Controller">true</NOTIFY_TCS>
+  <SDM_URL xmlns="http://xml.sap.com/2003/07/DevelopmentConfiguration/Transport-Controller">http://dummySDMURL:50018</SDM_URL>
+  <TCS_SERVLET xmlns="http://xml.sap.com/2003/07/DevelopmentConfiguration/Transport-Controller">http://di0db:53000/TCS/Deployer</TCS_SERVLET>
+  <TRANS_D xmlns="http://xml.sap.com/2003/07/DevelopmentConfiguration/Transport-Controller">E:\usr\sap\trans\EPS\in\CMSdi0db</TRANS_D>
+ </properties>
+ <sc-compartments>
+  <sc-compartment archive-state="no" caption="example.com_EXAMPLE_SC1_1" default-compartment="yes" name="example.com_EXAMPLE_SC1_1"
+   sc-name="EXAMPLE_SC1" sc-vendor="example.com">
+   <properties>
+    <original_language xmlns="http://xml.sap.com/2004/08/DevelopmentConfiguration/Configuration-Controller" />
+    <terminology_domain xmlns="http://xml.sap.com/2004/08/DevelopmentConfiguration/Configuration-Controller" />
+   </properties>
+   <source-state type="activation">
+    <repository type="DTR" url="http://di0db:53000/dtr" />
+    <inactive-location>ws/Example/example.com_EXAMPLE_SC1/dev/inactive/</inactive-location>
+    <location>ws/Example/example.com_EXAMPLE_SC1/dev/active/</location>
+   </source-state>
+   <dependencies>
+    <used-compartment>sap.com_ENGFACADE_1</used-compartment>
+    <used-compartment>sap.com_EP_BUILDT_1</used-compartment>
+    <used-compartment>sap.com_FRAMEWORK_1</used-compartment>
+    <used-compartment>sap.com_SAP_BUILDT_1</used-compartment>
+    <used-compartment>sap.com_WD-RUNTIME_1</used-compartment>
+   </dependencies>
+   <build-variants>
+    <build-variant name="default" required-for-activation="yes">
+     <variant-mappings>
+      <variant-mapping used-compartment="sap.com_ENGFACADE_1" used-variant-name="default" />
+      <variant-mapping used-compartment="sap.com_EP_BUILDT_1" used-variant-name="default" />
+      <variant-mapping used-compartment="sap.com_FRAMEWORK_1" used-variant-name="default" />
+      <variant-mapping used-compartment="sap.com_SAP_BUILDT_1" used-variant-name="default" />
+      <variant-mapping used-compartment="sap.com_WD-RUNTIME_1" used-variant-name="default" />
+     </variant-mappings>
+    </build-variant>
+   </build-variants>
+  </sc-compartment>
+  <sc-compartment archive-state="yes" caption="sap.com_ENGFACADE_1" default-compartment="yes" name="sap.com_ENGFACADE_1"
+   sc-name="ENGFACADE" sc-vendor="sap.com">
+   <properties>
+    <original_language xmlns="http://xml.sap.com/2004/08/DevelopmentConfiguration/Configuration-Controller" />
+    <terminology_domain xmlns="http://xml.sap.com/2004/08/DevelopmentConfiguration/Configuration-Controller">
+    </terminology_domain>
+   </properties>
+   <dependencies>
+   </dependencies>
+   <build-variants>
+    <build-variant name="default" required-for-activation="yes">
+     <variant-mappings>
+     </variant-mappings>
+    </build-variant>
+   </build-variants>
+  </sc-compartment>
+  <sc-compartment archive-state="yes" caption="sap.com_EP_BUILDT_1" default-compartment="yes" name="sap.com_EP_BUILDT_1"
+   sc-name="EP_BUILDT" sc-vendor="sap.com">
+   <properties>
+    <original_language xmlns="http://xml.sap.com/2004/08/DevelopmentConfiguration/Configuration-Controller" />
+    <terminology_domain xmlns="http://xml.sap.com/2004/08/DevelopmentConfiguration/Configuration-Controller">
+    </terminology_domain>
+   </properties>
+   <dependencies>
+    <used-compartment>sap.com_SAP_BUILDT_1</used-compartment>
+   </dependencies>
+   <build-variants>
+    <build-variant name="default" required-for-activation="yes">
+     <variant-mappings>
+      <variant-mapping used-compartment="sap.com_SAP_BUILDT_1" used-variant-name="default" />
+     </variant-mappings>
+    </build-variant>
+   </build-variants>
+  </sc-compartment>
+  <sc-compartment archive-state="yes" caption="sap.com_FRAMEWORK_1" default-compartment="yes" name="sap.com_FRAMEWORK_1"
+   sc-name="FRAMEWORK" sc-vendor="sap.com">
+   <properties>
+    <original_language xmlns="http://xml.sap.com/2004/08/DevelopmentConfiguration/Configuration-Controller" />
+    <terminology_domain xmlns="http://xml.sap.com/2004/08/DevelopmentConfiguration/Configuration-Controller">BC</terminology_domain>
+   </properties>
+   <dependencies>
+   </dependencies>
+   <build-variants>
+    <build-variant name="default" required-for-activation="yes">
+     <variant-mappings>
+     </variant-mappings>
+    </build-variant>
+   </build-variants>
+  </sc-compartment>
+  <sc-compartment archive-state="yes" caption="sap.com_SAP_BUILDT_1" default-compartment="yes" name="sap.com_SAP_BUILDT_1"
+   sc-name="SAP_BUILDT" sc-vendor="sap.com">
+   <properties>
+    <original_language xmlns="http://xml.sap.com/2004/08/DevelopmentConfiguration/Configuration-Controller" />
+    <terminology_domain xmlns="http://xml.sap.com/2004/08/DevelopmentConfiguration/Configuration-Controller">
+    </terminology_domain>
+   </properties>
+   <dependencies>
+   </dependencies>
+   <build-variants>
+    <build-variant name="default" required-for-activation="yes">
+     <variant-mappings>
+     </variant-mappings>
+    </build-variant>
+   </build-variants>
+  </sc-compartment>
+  <sc-compartment archive-state="yes" caption="sap.com_SAP_JTECHS_1" default-compartment="yes" name="sap.com_SAP_JTECHS_1"
+   sc-name="SAP_JTECHS" sc-vendor="sap.com">
+   <properties>
+    <original_language xmlns="http://xml.sap.com/2004/08/DevelopmentConfiguration/Configuration-Controller" />
+    <terminology_domain xmlns="http://xml.sap.com/2004/08/DevelopmentConfiguration/Configuration-Controller">
+    </terminology_domain>
+   </properties>
+   <dependencies>
+   </dependencies>
+   <build-variants>
+    <build-variant name="default" required-for-activation="yes">
+     <variant-mappings>
+     </variant-mappings>
+    </build-variant>
+   </build-variants>
+  </sc-compartment>
+  <sc-compartment archive-state="yes" caption="sap.com_SAP-JEE_1" default-compartment="yes" name="sap.com_SAP-JEE_1"
+   sc-name="SAP-JEE" sc-vendor="sap.com">
+   <properties>
+    <original_language xmlns="http://xml.sap.com/2004/08/DevelopmentConfiguration/Configuration-Controller" />
+    <terminology_domain xmlns="http://xml.sap.com/2004/08/DevelopmentConfiguration/Configuration-Controller">
+    </terminology_domain>
+   </properties>
+   <dependencies>
+   </dependencies>
+   <build-variants>
+    <build-variant name="default" required-for-activation="yes">
+     <variant-mappings>
+     </variant-mappings>
+    </build-variant>
+   </build-variants>
+  </sc-compartment>
+  <sc-compartment archive-state="yes" caption="sap.com_WD-RUNTIME_1" default-compartment="yes" name="sap.com_WD-RUNTIME_1"
+   sc-name="WD-RUNTIME" sc-vendor="sap.com">
+   <properties>
+    <original_language xmlns="http://xml.sap.com/2004/08/DevelopmentConfiguration/Configuration-Controller" />
+    <terminology_domain xmlns="http://xml.sap.com/2004/08/DevelopmentConfiguration/Configuration-Controller">BC</terminology_domain>
+   </properties>
+   <dependencies>
+   </dependencies>
+   <build-variants>
+    <build-variant name="default" required-for-activation="yes">
+     <variant-mappings>
+     </variant-mappings>
+    </build-variant>
+   </build-variants>
+  </sc-compartment>
+ </sc-compartments>
 </configuration>

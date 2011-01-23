@@ -1,0 +1,856 @@
+Execution of command "logfile" finished Sa, 22. Jan 2011 at 23:46:28.744 CET, after 0 milliseconds.
+
+
+Executing command: loadconfig -u entwickler00 -p ***** -c .dtr -r .dtc  ...
+
+
+Execution of command "loadconfig" started Sa, 22. Jan 2011 at 23:46:28.806 CET.
+
+Successfully imported development configuration "DI0_Example_D".
+Configuration data is located under directory "C:\tmp\hudson\jobs\Example\workspace\.dtc".
+
+Execution of command "loadconfig" finished Sa, 22. Jan 2011 at 23:46:38.666 CET, after 9.860 seconds.
+
+
+Executing command: listdcs -s example.com_SOFTWARE_COMPONENT_1  ...
+
+
+Execution of command "listdcs" started Sa, 22. Jan 2011 at 23:46:38.853 CET.
+
+Retrieving / updating DC meta data, this may take a while ...
+Error while accessing compartment "sap.com_SAP_JTECHS_1" in build space "DI0_Example_D"
+Illegal Character in "tc~sec~sso~app" at position 2 character: '~'
+
+Compartment example.com_EXAMPLE_SC1_1 (source state)  contains 14 DCs
+1)    DC name:   lib/service/mail
+      DC vendor: example.com
+      DC source: inactive + active
+      DC type:   Java
+
+2)    DC name:   jee/commons
+      DC vendor: apache.org
+      DC source: inactive + active
+      DC type:   External Library
+
+3)    DC name:   jee/log4j
+      DC vendor: apache.org
+      DC source: inactive + active
+      DC type:   External Library
+
+4)    DC name:   itext1.2
+      DC vendor: itext.org
+      DC source: inactive + active
+      DC type:   External Library
+
+5)    DC name:   log4j
+      DC vendor: apache.org
+      DC source: inactive + active
+      DC type:   J2EE Server Component
+
+6)    DC name:   lib/junit
+      DC vendor: example.com
+      DC source: inactive + active
+      DC type:   External Library
+
+7)    DC name:   lib/jee/service/mail
+      DC vendor: example.com
+      DC source: inactive + active
+      DC type:   External Library
+
+8)    DC name:   jee/itext2
+      DC vendor: itext.org
+      DC source: inactive + active
+      DC type:   J2EE Server Component
+
+9)    DC name:   commons
+      DC vendor: apache.org
+      DC source: inactive + active
+      DC type:   J2EE Server Component
+
+10)   DC name:   lib/jdbc
+      DC vendor: example.com
+      DC source: inactive + active
+      DC type:   Java
+
+11)   DC name:   lib/spring
+      DC vendor: example.com
+      DC source: inactive + active
+      DC type:   J2EE Server Component
+
+12)   DC name:   struts1.2
+      DC vendor: apache.org
+      DC source: inactive + active
+      DC type:   J2EE Server Component
+
+13)   DC name:   lib/jee/spring
+      DC vendor: example.com
+      DC source: inactive + active
+      DC type:   External Library
+
+14)   DC name:   lib/struts1.2
+      DC vendor: apache.org
+      DC source: inactive + active
+      DC type:   J2EE Server Component
+
+
+
+Execution of command "listdcs" finished Sa, 22. Jan 2011 at 23:46:44.400 CET, after 5.547 seconds.
+
+
+Executing command: listdcs -s sap.com_SAP_JTECHS_1  ...
+
+
+Execution of command "listdcs" started Sa, 22. Jan 2011 at 23:46:44.635 CET.
+
+
+Compartment sap.com_SAP_JTECHS_1 (archive state)  contains 95 DCs
+1)    DC name:   com.sapportals.supportplatform
+      DC vendor: sap.com
+
+2)    DC name:   com.sap.rprof.remoteProfile
+      DC vendor: sap.com
+
+3)    DC name:   SQLTrace
+      DC vendor: sap.com
+
+4)    DC name:   com.sap.mobile.clientinfo
+      DC vendor: sap.com
+
+5)    DC name:   com.sap.util.monitor.grmg
+      DC vendor: sap.com
+
+6)    DC name:   com.sap.sl.ut.jddi.content
+      DC vendor: sap.com
+
+7)    DC name:   tc/sld/data
+      DC vendor: sap.com
+
+8)    DC name:   com.sap.engine.heartbeat
+      DC vendor: sap.com
+
+9)    DC name:   tc/bcb/api
+      DC vendor: sap.com
+
+10)   DC name:   com.sap.lcr.saprfc
+      DC vendor: sap.com
+
+11)   DC name:   tc/bizc/lib
+      DC vendor: sap.com
+
+12)   DC name:   epbc.prtapi._coreservice
+      DC vendor: sap.com
+
+13)   DC name:   compilation_lib
+      DC vendor: sap.com
+
+14)   DC name:   tc/di/scm/transport_api
+      DC vendor: sap.com
+
+15)   DC name:   epbc.prtapi._deploymentapi
+      DC vendor: sap.com
+
+16)   DC name:   tc/TechSrv/XML_DAS_Connector_Schema
+      DC vendor: sap.com
+
+17)   DC name:   sl.ut.content.nw
+      DC vendor: sap.com
+
+18)   DC name:   com.sapportals.supportplatform.dbschema
+      DC vendor: sap.com
+
+19)   DC name:   tc/conn/connectorframework
+      DC vendor: sap.com
+
+20)   DC name:   epbc.prtapi._api
+      DC vendor: sap.com
+
+21)   DC name:   tc/sdt/cvl
+      DC vendor: sap.com
+
+22)   DC name:   com.sap.sl.ut.jddi.schema
+      DC vendor: sap.com
+
+23)   DC name:   com.sap.util.monitor.jarm
+      DC vendor: sap.com
+
+24)   DC name:   com.sap.mdi
+      DC vendor: sap.com
+
+25)   DC name:   com.sap.engine.docs.examples
+      DC vendor: sap.com
+
+26)   DC name:   com.sap.aii.util.rb
+      DC vendor: sap.com
+
+27)   DC name:   tc/epbc/pcm/adminapi/java
+      DC vendor: sap.com
+
+28)   DC name:   tc/di/scm/cts_adapter
+      DC vendor: sap.com
+
+29)   DC name:   com.sap.jdo
+      DC vendor: sap.com
+
+30)   DC name:   com.sap.engine.class.download
+      DC vendor: sap.com
+
+31)   DC name:   tc/sdt/appmigration/srv
+      DC vendor: sap.com
+
+32)   DC name:   epbc.prtpars._soap
+      DC vendor: sap.com
+
+33)   DC name:   com.sap.lcr
+      DC vendor: sap.com
+
+34)   DC name:   com.sap.aii.util.misc
+      DC vendor: sap.com
+
+35)   DC name:   com.sap.engine.services.webservices.tool
+      DC vendor: sap.com
+
+36)   DC name:   tc/SL/utility/wsear
+      DC vendor: sap.com
+
+37)   DC name:   com.sap.util.monitor.jarm.ccms
+      DC vendor: sap.com
+
+38)   DC name:   tc/ats/test_api
+      DC vendor: sap.com
+
+39)   DC name:   epbc.prtcore._deployment
+      DC vendor: sap.com
+
+40)   DC name:   tc_SL_SDM_Client
+      DC vendor: sap.com
+
+41)   DC name:   tc/SL/CMS/Util
+      DC vendor: sap.com
+
+42)   DC name:   com.sap.lcr.namealloc
+      DC vendor: sap.com
+
+43)   DC name:   tc/col/api
+      DC vendor: sap.com
+
+44)   DC name:   com.sap.util.monitor.jarm.j2ee
+      DC vendor: sap.com
+
+45)   DC name:   com.sap.lcr.api.cimclient
+      DC vendor: sap.com
+
+46)   DC name:   tc/graphics/igs
+      DC vendor: sap.com
+
+47)   DC name:   com.sap.aii.ibtransportclient
+      DC vendor: sap.com
+
+48)   DC name:   tc/licensemeasurement/dbschema
+      DC vendor: sap.com
+
+49)   DC name:   tc/licensemeasurement
+      DC vendor: sap.com
+
+50)   DC name:   tc/col/runtime
+      DC vendor: sap.com
+
+51)   DC name:   tc.httpclient
+      DC vendor: sap.com
+
+52)   DC name:   tc/com.sap.tmw.clients/_ctsa_manager
+      DC vendor: sap.com
+
+53)   DC name:   com.sap.pmi.adm
+      DC vendor: sap.com
+
+54)   DC name:   epbc.prtapi._test
+      DC vendor: sap.com
+
+55)   DC name:   com.sap.km.trex.client
+      DC vendor: sap.com
+
+56)   DC name:   tc/sld/dp/j2ee
+      DC vendor: sap.com
+
+57)   DC name:   tc/wd/dispwda
+      DC vendor: sap.com
+
+58)   DC name:   com.sap.engine.customizing.ccms
+      DC vendor: sap.com
+
+59)   DC name:   tc/bcb/ici
+      DC vendor: sap.com
+
+60)   DC name:   sl.ut.infoprovider
+      DC vendor: sap.com
+
+61)   DC name:   tc/TechSrv/XML_DAS_Connector
+      DC vendor: sap.com
+
+62)   DC name:   com.sap.aii.proxy.framework
+      DC vendor: sap.com
+
+63)   DC name:   com.sap.rprof.dbprofiles
+      DC vendor: sap.com
+
+64)   DC name:   synclog
+      DC vendor: sap.com
+
+65)   DC name:   tc/sec/app
+      DC vendor: sap.com
+
+66)   DC name:   tc/cmi
+      DC vendor: sap.com
+
+67)   DC name:   tc/com.sap.tmw.clients/_ctsa_client
+      DC vendor: sap.com
+
+68)   DC name:   tc/ddic/metamodel/content
+      DC vendor: sap.com
+
+69)   DC name:   com.sap.lcrabapapi
+      DC vendor: sap.com
+
+70)   DC name:   tc/wd/corecomp
+      DC vendor: sap.com
+
+71)   DC name:   com.sap.security.core.admin
+      DC vendor: sap.com
+
+72)   DC name:   com.sap.aii.util.xml
+      DC vendor: sap.com
+
+73)   DC name:   com.sap.lcr.jddschema
+      DC vendor: sap.com
+
+74)   DC name:   tc/wd/samples/testsuite/uuie
+      DC vendor: sap.com
+
+75)   DC name:   tc/ddic/ddicruntime
+      DC vendor: sap.com
+
+76)   DC name:   tc/TechSrv/xml_das_connector_init
+      DC vendor: sap.com
+
+77)   DC name:   tc_SL_SDM_Util
+      DC vendor: sap.com
+
+78)   DC name:   com.sap.tc.jtools.jver
+      DC vendor: sap.com
+
+79)   DC name:   sl/ut/info
+      DC vendor: sap.com
+
+80)   DC name:   tc/wdp/metamodel/content
+      DC vendor: sap.com
+
+81)   DC name:   epbc.prtpars._htmlb
+      DC vendor: sap.com
+
+82)   DC name:   tc/SL/CMS/IDEClient
+      DC vendor: sap.com
+
+83)   DC name:   com.sap.aii.ibtranslationclient
+      DC vendor: sap.com
+
+84)   DC name:   tc/monitoring/systeminfo
+      DC vendor: sap.com
+
+85)   DC name:   com.sap.rprof.jddschema
+      DC vendor: sap.com
+
+86)   DC name:   com.sapmarkets.mesyncjco
+      DC vendor: sap.com
+
+87)   DC name:   com.sap.engine.configtool
+      DC vendor: sap.com
+
+88)   DC name:   tc/TechSrv/XML_DAS
+      DC vendor: sap.com
+
+89)   DC name:   tc.monitoring.logviewer
+      DC vendor: sap.com
+
+90)   DC name:   tc/wd/wslib
+      DC vendor: sap.com
+
+91)   DC name:   tc/eCATTPing
+      DC vendor: sap.com
+
+92)   DC name:   com.sapportals.htmlb
+      DC vendor: sap.com
+
+93)   DC name:   sl.ut.service
+      DC vendor: sap.com
+
+94)   DC name:   tc/bl/txmanager/plb
+      DC vendor: sap.com
+
+95)   DC name:   com.sapportals.htmlb.ear
+      DC vendor: sap.com
+
+
+
+Execution of command "listdcs" finished Sa, 22. Jan 2011 at 23:46:44.635 CET, after 0 milliseconds.
+
+
+Executing command: listdcs -s sap.com_FRAMEWORK_1  ...
+
+
+Execution of command "listdcs" started Sa, 22. Jan 2011 at 23:46:44.838 CET.
+
+
+Compartment sap.com_FRAMEWORK_1 (archive state)  contains 0 DCs
+
+
+Execution of command "listdcs" finished Sa, 22. Jan 2011 at 23:46:44.853 CET, after 15 milliseconds.
+
+
+Executing command: listdcs -s sap.com_SAP-JEE_1  ...
+
+
+Execution of command "listdcs" started Sa, 22. Jan 2011 at 23:46:45.056 CET.
+
+
+Compartment sap.com_SAP-JEE_1 (archive state)  contains 90 DCs
+1)    DC name:   com.sap.exception
+      DC vendor: sap.com
+
+2)    DC name:   tc/logging
+      DC vendor: sap.com
+
+3)    DC name:   security.class
+      DC vendor: sap.com
+
+4)    DC name:   uddi4j
+      DC vendor: sap.com
+
+5)    DC name:   tc/wd/webdynpro
+      DC vendor: sap.com
+
+6)    DC name:   com.sap.engine.lib.add_ejb
+      DC vendor: sap.com
+
+7)    DC name:   opensql
+      DC vendor: sap.com
+
+8)    DC name:   com.sap.engine.offlinedeploy.sdm
+      DC vendor: sap.com
+
+9)    DC name:   dsr_ejbcontext_api
+      DC vendor: sap.com
+
+10)   DC name:   jaxrpc
+      DC vendor: sap.com
+
+11)   DC name:   IAIKSecurity
+      DC vendor: sap.com
+
+12)   DC name:   log_configurator
+      DC vendor: sap.com
+
+13)   DC name:   runtimeinfo
+      DC vendor: sap.com
+
+14)   DC name:   webservices
+      DC vendor: sap.com
+
+15)   DC name:   ejbmonitor_api
+      DC vendor: sap.com
+
+16)   DC name:   ejb20
+      DC vendor: sap.com
+
+17)   DC name:   tc/sec/saml/service
+      DC vendor: sap.com
+
+18)   DC name:   jaas
+      DC vendor: sap.com
+
+19)   DC name:   monitor
+      DC vendor: sap.com
+
+20)   DC name:   IAIKSecurityFS
+      DC vendor: sap.com
+
+21)   DC name:   tc/sec/vsi/service
+      DC vendor: sap.com
+
+22)   DC name:   tc/sec/secstorefs
+      DC vendor: sap.com
+
+23)   DC name:   dsr
+      DC vendor: sap.com
+
+24)   DC name:   classload
+      DC vendor: sap.com
+
+25)   DC name:   ejbcomponent_api
+      DC vendor: sap.com
+
+26)   DC name:   httptunneling
+      DC vendor: sap.com
+
+27)   DC name:   jnet
+      DC vendor: sap.com
+
+28)   DC name:   servlet
+      DC vendor: sap.com
+
+29)   DC name:   jms
+      DC vendor: sap.com
+
+30)   DC name:   j2eeca
+      DC vendor: sap.com
+
+31)   DC name:   jmx
+      DC vendor: sap.com
+
+32)   DC name:   failover
+      DC vendor: sap.com
+
+33)   DC name:   tc/sec/securestorage/service
+      DC vendor: sap.com
+
+34)   DC name:   applocking
+      DC vendor: sap.com
+
+35)   DC name:   monitortree
+      DC vendor: sap.com
+
+36)   DC name:   keystore_api
+      DC vendor: sap.com
+
+37)   DC name:   tc/sec/vsi/interface
+      DC vendor: sap.com
+
+38)   DC name:   rfcengine
+      DC vendor: sap.com
+
+39)   DC name:   com.sap.mw.jco
+      DC vendor: sap.com
+
+40)   DC name:   container_api
+      DC vendor: sap.com
+
+41)   DC name:   ejblocking_api
+      DC vendor: sap.com
+
+42)   DC name:   activation
+      DC vendor: sap.com
+
+43)   DC name:   com.sap.security.core.sda
+      DC vendor: sap.com
+
+44)   DC name:   jcert
+      DC vendor: sap.com
+
+45)   DC name:   tc/monitoring/api
+      DC vendor: sap.com
+
+46)   DC name:   tc/sec/destinations/service
+      DC vendor: sap.com
+
+47)   DC name:   jddi
+      DC vendor: sap.com
+
+48)   DC name:   com.sap.mw.idoc
+      DC vendor: sap.com
+
+49)   DC name:   r3startup
+      DC vendor: sap.com
+
+50)   DC name:   com.sap.guid
+      DC vendor: sap.com
+
+51)   DC name:   jmsconnector
+      DC vendor: sap.com
+
+52)   DC name:   jta
+      DC vendor: sap.com
+
+53)   DC name:   sapxmltoolkit
+      DC vendor: sap.com
+
+54)   DC name:   tc/jmx
+      DC vendor: sap.com
+
+55)   DC name:   connector
+      DC vendor: sap.com
+
+56)   DC name:   webservices_lib
+      DC vendor: sap.com
+
+57)   DC name:   tc/sec/destinations/interface
+      DC vendor: sap.com
+
+58)   DC name:   jms_provider
+      DC vendor: sap.com
+
+59)   DC name:   com.sapall.security.likey
+      DC vendor: sap.com
+
+60)   DC name:   visual_administration_api
+      DC vendor: sap.com
+
+61)   DC name:   dbpool
+      DC vendor: sap.com
+
+62)   DC name:   kernel.sda
+      DC vendor: sap.com
+
+63)   DC name:   idl
+      DC vendor: sap.com
+
+64)   DC name:   com.sap.security.core.ume.service
+      DC vendor: sap.com
+
+65)   DC name:   tc/sec/wssec/api
+      DC vendor: sap.com
+
+66)   DC name:   ejbserialization_api
+      DC vendor: sap.com
+
+67)   DC name:   apptracing
+      DC vendor: sap.com
+
+68)   DC name:   com.sap.ip.basecomps
+      DC vendor: sap.com
+
+69)   DC name:   jaxm
+      DC vendor: sap.com
+
+70)   DC name:   configuration
+      DC vendor: sap.com
+
+71)   DC name:   tc/sl/util
+      DC vendor: sap.com
+
+72)   DC name:   tc/i18n/s2x
+      DC vendor: sap.com
+
+73)   DC name:   file
+      DC vendor: sap.com
+
+74)   DC name:   com.sap.tc.Logging
+      DC vendor: sap.com
+
+75)   DC name:   com.sap.engine.client.lib
+      DC vendor: sap.com
+
+76)   DC name:   javamail
+      DC vendor: sap.com
+
+77)   DC name:   naming_api
+      DC vendor: sap.com
+
+78)   DC name:   deploy
+      DC vendor: sap.com
+
+79)   DC name:   jdbc20
+      DC vendor: sap.com
+
+80)   DC name:   com.sap.security.api.sda
+      DC vendor: sap.com
+
+81)   DC name:   ejb
+      DC vendor: sap.com
+
+82)   DC name:   com.sap.engine.deploy.online
+      DC vendor: sap.com
+
+83)   DC name:   mail
+      DC vendor: sap.com
+
+84)   DC name:   security_api
+      DC vendor: sap.com
+
+85)   DC name:   servlet_jsp
+      DC vendor: sap.com
+
+86)   DC name:   adminadapter
+      DC vendor: sap.com
+
+87)   DC name:   jsse
+      DC vendor: sap.com
+
+88)   DC name:   http
+      DC vendor: sap.com
+
+89)   DC name:   ejbormapping_api
+      DC vendor: sap.com
+
+90)   DC name:   tc/sec/wssec/service
+      DC vendor: sap.com
+
+
+
+Execution of command "listdcs" finished Sa, 22. Jan 2011 at 23:46:45.056 CET, after 0 milliseconds.
+
+
+Executing command: listdcs -s sap.com_SAP_BUILDT_1  ...
+
+
+Execution of command "listdcs" started Sa, 22. Jan 2011 at 23:46:45.275 CET.
+
+
+Compartment sap.com_SAP_BUILDT_1 (archive state)  contains 52 DCs
+1)    DC name:   tc/bi/buildtool
+      DC vendor: sap.com
+
+2)    DC name:   tc/bi/bp/migrationarchive
+      DC vendor: sap.com
+
+3)    DC name:   tc/bi/bp/compatibilitycheck
+      DC vendor: sap.com
+
+4)    DC name:   tc/bi/bp/externalarchive
+      DC vendor: sap.com
+
+5)    DC name:   tc/bi/velocity
+      DC vendor: sap.com
+
+6)    DC name:   tc/bi/bp/enginekernel
+      DC vendor: sap.com
+
+7)    DC name:   tc/bi/framework
+      DC vendor: sap.com
+
+8)    DC name:   bi/mmr/buildByTask
+      DC vendor: sap.com
+
+9)    DC name:   tc/bi/bp/nop
+      DC vendor: sap.com
+
+10)   DC name:   tc/bi/ddictech
+      DC vendor: sap.com
+
+11)   DC name:   tc/bi/util/debug
+      DC vendor: sap.com
+
+12)   DC name:   tc/bi/bp/javadoc
+      DC vendor: sap.com
+
+13)   DC name:   tc/bi/jtools
+      DC vendor: sap.com
+
+14)   DC name:   tc/bi/bp/fssda
+      DC vendor: sap.com
+
+15)   DC name:   tc/bi/tssap
+      DC vendor: sap.com
+
+16)   DC name:   tc/bi/bp/resourceadapter
+      DC vendor: sap.com
+
+17)   DC name:   tc/bi/bp/webDynpro
+      DC vendor: sap.com
+
+18)   DC name:   tc/bi/core
+      DC vendor: sap.com
+
+19)   DC name:   tc/bi/bp/webService
+      DC vendor: sap.com
+
+20)   DC name:   tc/bi/bp/content
+      DC vendor: sap.com
+
+21)   DC name:   tc/bi/javatech
+      DC vendor: sap.com
+
+22)   DC name:   tc/bi/extsql
+      DC vendor: sap.com
+
+23)   DC name:   tc/bi/xml
+      DC vendor: sap.com
+
+24)   DC name:   tc/bi/bp/bp
+      DC vendor: sap.com
+
+25)   DC name:   tc/bi/extddic
+      DC vendor: sap.com
+
+26)   DC name:   tc/bi/fct/content
+      DC vendor: sap.com
+
+27)   DC name:   tc/bi/i18n
+      DC vendor: sap.com
+
+28)   DC name:   tc/bi/fct/extlib
+      DC vendor: sap.com
+
+29)   DC name:   tc/bi/wdtech
+      DC vendor: sap.com
+
+30)   DC name:   tc/bi/bp/j2eeservice
+      DC vendor: sap.com
+
+31)   DC name:   tc/bi/bp/addLib
+      DC vendor: sap.com
+
+32)   DC name:   tc/bi/bp/ddic
+      DC vendor: sap.com
+
+33)   DC name:   tc/bi/bp/dbcontent
+      DC vendor: sap.com
+
+34)   DC name:   tc/bi/exception
+      DC vendor: sap.com
+
+35)   DC name:   tc/bi/anttasks
+      DC vendor: sap.com
+
+36)   DC name:   tc/bi/bp/appclient
+      DC vendor: sap.com
+
+37)   DC name:   tc/bi/extgf
+      DC vendor: sap.com
+
+38)   DC name:   tc/bi/jlincbs
+      DC vendor: sap.com
+
+39)   DC name:   tc/bi/bp/ats
+      DC vendor: sap.com
+
+40)   DC name:   tc/bi/extddicdb
+      DC vendor: sap.com
+
+41)   DC name:   tc/bi/bp/ejbmodule
+      DC vendor: sap.com
+
+42)   DC name:   tc/bi/extcm
+      DC vendor: sap.com
+
+43)   DC name:   tc/bi/extmm
+      DC vendor: sap.com
+
+44)   DC name:   tc/bi/bp/webmodule
+      DC vendor: sap.com
+
+45)   DC name:   tc/bi/bp/javaLib
+      DC vendor: sap.com
+
+46)   DC name:   tc/bi/settings
+      DC vendor: sap.com
+
+47)   DC name:   tc/bi/ant
+      DC vendor: sap.com
+
+48)   DC name:   tc/bi/bp/eclipse
+      DC vendor: sap.com
+
+49)   DC name:   bi/mmr/builddeployfiles
+      DC vendor: sap.com
+
+50)   DC name:   tc/bi/bp/enterpriseApplication
+      DC vendor: sap.com
+
+51)   DC name:   tc/bi/extwd
+      DC vendor: sap.com
+
+52)   DC name:   tc/bi/util
+      DC vendor: sap.com
+
+
+
+Execution of command "listdcs" finished Sa, 22. Jan 2011 at 23:46:45.275 CET, after 0 milliseconds.
