@@ -96,6 +96,7 @@ public final class DevelopmentComponentsReader extends AbstractDcToolOutputReade
                     else {
                         this.readLine();
                         final String type = this.readLine(this.dcTypePattern);
+
                         compartment.add(this.dcFactory.create(name, vendor,
                             DevelopmentComponentType.fromString(type, "")));
                     }

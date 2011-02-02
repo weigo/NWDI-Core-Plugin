@@ -11,14 +11,17 @@ import hudson.tasks.Publisher;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 import org.arachna.netweaver.dctool.DCToolCommandExecutor;
 import org.arachna.netweaver.dctool.DCToolDescriptor;
+import org.arachna.netweaver.dctool.DcToolCommandExecutionResult;
 import org.arachna.netweaver.hudson.nwdi.confdef.ConfDefReader;
 import org.arachna.netweaver.hudson.nwdi.dcupdater.DevelopmentComponentUpdater;
 import org.xml.sax.SAXException;
@@ -76,7 +79,7 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
 
     @Override
     public void run() {
-        run(new RunnerImpl());
+        run(new RunnerImpl(this.getDevelopmentConfiguration(), this.getDevelopmentComponentFactory()));
     }
 
     /**
@@ -89,7 +92,7 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
         if (this.developmentConfiguration == null) {
             try {
                 final ConfDefReader confdefReader = new ConfDefReader(XMLReaderFactory.createXMLReader());
-                this.developmentConfiguration = confdefReader.read(new StringReader(this.getProject().getConfDef()));
+                this.developmentConfiguration = confdefReader.read(new StringReader(this.project.getConfDef()));
             }
             catch (final SAXException e) {
                 throw new RuntimeException(e);
@@ -97,6 +100,17 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
         }
 
         return this.developmentConfiguration;
+    }
+
+    /**
+     * Returns the {@link DevelopmentComponentFactory} used throughout this
+     * build.
+     * 
+     * @return <code>DevelopmentComponentFactory</code> used as registry for
+     *         development components.
+     */
+    DevelopmentComponentFactory getDevelopmentComponentFactory() {
+        return this.dcFactory;
     }
 
     /**
@@ -122,22 +136,27 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
     }
 
     /**
-     * Returns the {@link DevelopmentComponentFactory} used throughout this
-     * build.
-     * 
-     * @return <code>DevelopmentComponentFactory</code> used as registry for
-     *         development components.
-     */
-    DevelopmentComponentFactory getDevelopmentComponentFactory() {
-        return this.dcFactory;
-    }
-
-    /**
-     * Run the build.
+     * Runner for this build.
      * 
      * @author Dirk Weigenand
      */
     private final class RunnerImpl extends AbstractRunner {
+        /**
+         * registry/factory for development components to use throughout the
+         * build.
+         */
+        private final DevelopmentComponentFactory dcFactory;
+
+        /**
+         * development configuration to use throughout the build.
+         */
+        private final DevelopmentConfiguration developmentConfiguration;
+
+        RunnerImpl(final DevelopmentConfiguration developmentConfiguration, final DevelopmentComponentFactory dcFactory) {
+            this.developmentConfiguration = developmentConfiguration;
+            this.dcFactory = dcFactory;
+        }
+
         /**
          * collection of reporter plugins to be run prior to building.
          */
@@ -165,14 +184,28 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
             }
 
             final NWDIBuild build = NWDIBuild.this;
-            final Result r = buildDevelopmentComponents(listener, build);
-            // update DCs with info from various config/log files now on disk
+            final PrintStream logger = listener.getLogger();
+
+            final Result r = buildDevelopmentComponents(logger, build);
+
+            // FIXME: doesn't find any DCs at the moment
             final DevelopmentComponentUpdater updater =
-                new DevelopmentComponentUpdater(build.getWorkspace().absolutize().getName(),
-                    build.getDevelopmentComponentFactory());
+                new DevelopmentComponentUpdater(build.getWorkspace().absolutize().getName(), this.dcFactory);
             updater.execute();
 
             return r;
+        }
+
+        private int countOfDcsNeedingRebuild() {
+            int count = 0;
+
+            for (final DevelopmentComponent component : this.dcFactory.getAll()) {
+                if (component.isNeedsRebuild()) {
+                    count++;
+                }
+            }
+
+            return count;
         }
 
         /**
@@ -181,20 +214,18 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
          * @throws IOException
          * @throws InterruptedException
          */
-        protected Result buildDevelopmentComponents(final BuildListener listener, final NWDIBuild build)
+        protected Result buildDevelopmentComponents(final PrintStream logger, final NWDIBuild build)
             throws IOException, InterruptedException {
-            Result result = null;
+            logger.append(String.format("Building %s development components.\n", countOfDcsNeedingRebuild()));
 
-            try {
-                final DCToolCommandExecutor executor = build.getDCToolExecutor(this.launcher);
-                executor.execute(new BuildDevelopmentComponentsCommandBuilder(build.getDevelopmentComponentFactory(),
-                    build.getDevelopmentConfiguration()));
-            }
-            catch (final RuntimeException rte) {
-                result = Result.FAILURE;
-            }
+            // TODO: annotate build results with links to build.log files.
+            final DCToolCommandExecutor executor = build.getDCToolExecutor(this.launcher);
+            final DcToolCommandExecutionResult result =
+                executor.execute(new BuildDevelopmentComponentsCommandBuilder(this.dcFactory,
+                    this.developmentConfiguration));
+            logger.append("Done building development components.\n");
 
-            return result;
+            return result.getExitCode() == 0 ? null : Result.FAILURE;
         }
 
         /**

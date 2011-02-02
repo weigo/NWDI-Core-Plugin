@@ -3,6 +3,7 @@
  */
 package org.arachna.netweaver.dc.types;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -158,6 +159,25 @@ public final class DevelopmentConfiguration {
     }
 
     /**
+     * Returns the compartments filtered by the given {@link CompartmentState}.
+     * 
+     * @param state
+     *            <code>CompartmentState</code> that should be filtered by.
+     * @return compartments filtered by the given {@link CompartmentState}.
+     */
+    public Collection<Compartment> getCompartments(final CompartmentState state) {
+        final Collection<Compartment> compartments = new ArrayList<Compartment>();
+
+        for (final Compartment compartment : this.compartments) {
+            if (state.equals(compartment.getState())) {
+                compartments.add(compartment);
+            }
+        }
+
+        return compartments;
+    }
+
+    /**
      * Get a compartment by name.
      * 
      * @param name
@@ -235,6 +255,7 @@ public final class DevelopmentConfiguration {
 
     /*
      * (non-Javadoc)
+     * 
      * @see java.lang.Object#hashCode()
      */
     @Override
@@ -244,6 +265,7 @@ public final class DevelopmentConfiguration {
 
     /*
      * (non-Javadoc)
+     * 
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override

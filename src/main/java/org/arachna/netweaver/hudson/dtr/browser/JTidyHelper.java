@@ -23,10 +23,12 @@ final class JTidyHelper {
     }
 
     /**
-     * Parse HTML from {@link java.io.InputStream} and return a {@link org.w3c.dom.Document}.
+     * Parse HTML from {@link java.io.InputStream} and return a
+     * {@link org.w3c.dom.Document}.
      * 
      * @param input
-     *            the InputStream containing the HTML that should be parsed into a Document
+     *            the InputStream containing the HTML that should be parsed into
+     *            a Document
      * @return Document parsed from InputStream
      */
     public static Document getDocument(final InputStream input) {
@@ -35,7 +37,9 @@ final class JTidyHelper {
         tidy.setErrout(new PrintWriter(new StringWriter()));
         tidy.setNumEntities(true);
         tidy.setXmlOut(true);
+        final Document doc = tidy.parseDOM(input, null);
+        // tidy.pprint(doc, System.out);
 
-        return tidy.parseDOM(input, null);
+        return doc;
     }
 }

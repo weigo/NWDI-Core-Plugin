@@ -173,7 +173,6 @@ final class DtrConfigCreator {
      */
     private void createOrUpdateClientsXml() throws IOException, InterruptedException {
         final String path = makeAbsolute(this.dtcDirectory);
-
         final String content =
             String.format(this.getTemplate(CLIENTS_XML), this.config.getName(), path.toString(), this.config.getName());
         this.dtrDirectory.child(CLIENTS_XML).write(content, DEFAULT_ENCODING);

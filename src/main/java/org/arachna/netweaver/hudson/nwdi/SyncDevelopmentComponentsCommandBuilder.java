@@ -65,6 +65,7 @@ final class SyncDevelopmentComponentsCommandBuilder extends AbstractDCToolComman
 
     /*
      * (non-Javadoc)
+     * 
      * @see
      * org.arachna.netweaver.dc.analyzer.dctool.DCToolCommandBuilder#execute ()
      */
@@ -76,16 +77,20 @@ final class SyncDevelopmentComponentsCommandBuilder extends AbstractDCToolComman
             if (compartment.isSourceState()) {
                 if (this.cleanCopy) {
                     commands.add(String.format(UNSYNC_ALL_DCS_COMMAND, compartment.getName()));
-                    commands.add(String.format(SYNC_ALL_DCS_COMMAND, compartment.getName()));
+                    // commands.add(String.format(SYNC_ALL_DCS_COMMAND,
+                    // compartment.getName()));
                 }
-                else {
-                    for (final DevelopmentComponent component : compartment.getDevelopmentComponents()) {
-                        if (component.isNeedsRebuild()) {
-                            commands.add(createUnsyncDCCommand(component));
-                            commands.add(createSyncInactiveDCCommand(component));
-                        }
-                    }
-                }
+
+                commands.add(String.format(SYNC_ALL_DCS_COMMAND, compartment.getName()));
+                // else {
+                // for (final DevelopmentComponent component :
+                // compartment.getDevelopmentComponents()) {
+                // if (component.isNeedsRebuild()) {
+                // // commands.add(createUnsyncDCCommand(component));
+                // commands.add(createSyncInactiveDCCommand(component));
+                // }
+                // }
+                // }
             }
             else {
                 commands.add(String.format(SYNC_DCS_IN_ARCHIVE_MODE_COMMAND, compartment.getName()));

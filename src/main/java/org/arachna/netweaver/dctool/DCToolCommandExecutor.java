@@ -105,10 +105,12 @@ public final class DCToolCommandExecutor {
      * @throws InterruptedException
      *             when the user canceled the action.
      */
-    public String execute(final DCToolCommandBuilder commandBuilder) throws IOException, InterruptedException {
+    public DcToolCommandExecutionResult execute(final DCToolCommandBuilder commandBuilder) throws IOException,
+        InterruptedException {
         final List<String> commands = commandBuilder.execute();
 
         String dcToolLogoutput = "";
+        int result = 0;
 
         if (commands.size() > 0) {
             final FilePath commandFile = this.workspace.child("dctool.in");
@@ -125,17 +127,12 @@ public final class DCToolCommandExecutor {
             starter.envs(this.createEnvironment());
             starter.cmds(this.createDcToolCommand(launcher.isUnix(), commandFile));
 
-            final int result = starter.join();
-
-            if (result != 0) {
-                throw new RuntimeException(String.format("dctool returned with an exit code of %d!", result));
-            }
-
+            result = starter.join();
             dcToolLogoutput = this.workspace.child(logFileName).readToString();
             this.launcher.getListener().getLogger().append(dcToolLogoutput);
         }
 
-        return dcToolLogoutput;
+        return new DcToolCommandExecutionResult(dcToolLogoutput, result);
     }
 
     /**

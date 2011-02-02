@@ -182,4 +182,37 @@ public final class Activity {
     public Collection<ActivityResource> getResources() {
         return Collections.unmodifiableCollection(this.resources);
     }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        return this.getActivityId().hashCode();
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+
+        final Activity other = (Activity)obj;
+
+        return this.hashCode() == other.hashCode();
+    }
+
 }

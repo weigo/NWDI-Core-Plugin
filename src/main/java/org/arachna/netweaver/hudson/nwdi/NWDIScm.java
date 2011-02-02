@@ -20,8 +20,11 @@ import hudson.scm.SCM;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
@@ -30,8 +33,10 @@ import java.util.logging.Logger;
 import net.sf.json.JSONObject;
 
 import org.arachna.netweaver.dc.types.DevelopmentComponent;
+import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 import org.arachna.netweaver.dctool.DCToolCommandExecutor;
+import org.arachna.netweaver.dctool.DcToolCommandExecutionResult;
 import org.arachna.netweaver.hudson.dtr.browser.Activity;
 import org.arachna.netweaver.hudson.dtr.browser.DtrBrowser;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -54,6 +59,16 @@ public class NWDIScm extends SCM {
     private final boolean cleanCopy;
 
     /**
+     * user to authenticate against DTR.
+     */
+    private final transient String dtrUser;
+
+    /**
+     * password to use for authentication against the DTR.
+     */
+    private final transient String password;
+
+    /**
      * Create an instance of a <code>NWDIScm</code>.
      * 
      * @param cleanCopy
@@ -62,13 +77,15 @@ public class NWDIScm extends SCM {
      *            indicated CBS workspace
      */
     @DataBoundConstructor
-    public NWDIScm(final boolean cleanCopy) {
+    public NWDIScm(final boolean cleanCopy, final String dtrUser, final String password) {
         super();
         this.cleanCopy = cleanCopy;
+        this.dtrUser = dtrUser;
+        this.password = password;
     }
 
     /*
-     * (non-Javadoc)
+     * (non-Javadoc * *
      * 
      * @see hudson.scm.SCM#getDescriptor()
      */
@@ -78,7 +95,7 @@ public class NWDIScm extends SCM {
     }
 
     /*
-     * (non-Javadoc)
+     * (non-Javado * *
      * 
      * @see hudson.scm.SCM#createChangeLogParser()
      */
@@ -88,7 +105,7 @@ public class NWDIScm extends SCM {
     }
 
     /*
-     * (non-Javadoc)
+     * (non-Javad * *
      * 
      * @see hudson.scm.SCM#requiresWorkspaceForPolling()
      */
@@ -98,7 +115,7 @@ public class NWDIScm extends SCM {
     }
 
     /*
-     * (non-Javadoc)
+     * (non-Java * *
      * 
      * @see hudson.scm.SCM#checkout(hudson.model.AbstractBuild, hudson.Launcher,
      * hudson.FilePath, hudson.model.BuildListener, java.io.File)
@@ -107,80 +124,92 @@ public class NWDIScm extends SCM {
     public boolean checkout(final AbstractBuild<?, ?> build, final Launcher launcher, final FilePath workspace,
         final BuildListener listener, final File changelogFile) throws IOException, InterruptedException {
         final NWDIBuild currentBuild = (NWDIBuild)build;
-        final List<Activity> activities = this.getActivities(currentBuild);
+        final PrintStream logger = listener.getLogger();
+        final DevelopmentConfiguration config = currentBuild.getDevelopmentConfiguration();
+        logger.append(String.format("Reading development components for %s from NWDI.\n", config.getName()));
 
-        this.writeChangeLog(build, changelogFile, activities);
-        build.addAction(new NWDIRevisionState(activities));
+        final Collection<Activity> activities = new ArrayList<Activity>();
+        final DCToolCommandExecutor executor = currentBuild.getDCToolExecutor(launcher);
 
-        final boolean rebuildNeeded = this.cleanCopy || !activities.isEmpty();
+        DcToolCommandExecutionResult result = executor.execute(new ListDcCommandBuilder(config));
 
-        if (rebuildNeeded) {
-            final DCToolCommandExecutor dcToolExecutor = currentBuild.getDCToolExecutor(launcher);
-            this.listDevelopmentComponents(currentBuild, dcToolExecutor);
-            this.syncDevelopmentComponents(currentBuild.getDevelopmentConfiguration(), dcToolExecutor);
+        if (result.isExitCodeOk()) {
+            // currentBuild.getWorkspace().act(new FilePermissionSetter());
+
+            final DevelopmentComponentFactory dcFactory = currentBuild.getDevelopmentComponentFactory();
+            new DevelopmentComponentsReader(new StringReader(result.getOutput()), dcFactory, config).read();
+            logger.append(String.format("Read %s development components from NWDI.\n", dcFactory.getAll().size()));
+
+            // FIXME: last build or last successful one?
+            final NWDIBuild lastSuccessfulBuild = currentBuild.getParent().getLastSuccessfulBuild();
+
+            logger.append("Synchronizing development components from NWDI.\n");
+            result = executor.execute(new SyncDevelopmentComponentsCommandBuilder(config, this.cleanCopy));
+            logger.append("Done synchronizing development components from NWDI.\n");
+
+            if (lastSuccessfulBuild != null) {
+                logger.append(String.format("Getting activities from DTR (since last successful build #%s).\n",
+                    lastSuccessfulBuild.getNumber()));
+            }
+            else {
+                logger.append("Getting all activities from DTR.\n");
+            }
+
+            activities.addAll(this.getActivities(this.getDtrBrowser(config, dcFactory),
+                lastSuccessfulBuild != null ? lastSuccessfulBuild.getAction(NWDIRevisionState.class).getCreationDate()
+                    : null));
+            logger.append(String.format("Read %s activities.\n", activities.size()));
         }
 
-        return rebuildNeeded;
+        build.addAction(new NWDIRevisionState(activities));
+        this.writeChangeLog(build, changelogFile, activities);
+
+        return result.isExitCodeOk();
     }
 
     @Override
     public SCMRevisionState calcRevisionsFromBuild(final AbstractBuild<?, ?> build, final Launcher launcher,
         final TaskListener listener) throws IOException, InterruptedException {
-        return SCMRevisionState.NONE;
+        listener.getLogger().append(String.format("Calculating revisions from build #%s.", build.getNumber()));
+        final NWDIRevisionState lastRevision = build.getAction(NWDIRevisionState.class);
+
+        return lastRevision == null ? SCMRevisionState.NONE : lastRevision;
     }
 
     @Override
     protected PollingResult compareRemoteRevisionWith(final AbstractProject<?, ?> project, final Launcher launcher,
         final FilePath path, final TaskListener listener, final SCMRevisionState revisionState) throws IOException,
         InterruptedException {
-        return new PollingResult(SCMRevisionState.NONE, project.getAction(NWDIRevisionState.class), Change.SIGNIFICANT);
+        final NWDIBuild lastBuild = ((NWDIProject)project).getLastBuild();
+        final PrintStream logger = listener.getLogger();
+        logger
+            .append(String.format("Comparing base line activities with activities accumulated since last build (#%s).",
+                lastBuild.getNumber()));
+        final List<Activity> activities =
+            this.getActivities(
+                this.getDtrBrowser(lastBuild.getDevelopmentConfiguration(), new DevelopmentComponentFactory()),
+                getCreationDate(revisionState));
+        logger.append(activities.toString());
+
+        final Change changeState = activities.isEmpty() ? Change.NONE : Change.SIGNIFICANT;
+        logger.append(String.format("Found changes: %s.", changeState.toString()));
+
+        return new PollingResult(revisionState, new NWDIRevisionState(activities), changeState);
+    }
+
+    private Date getCreationDate(final SCMRevisionState revisionState) {
+        Date creationDate = null;
+
+        if (NWDIRevisionState.class.equals(revisionState.getClass())) {
+            final NWDIRevisionState baseRevision = (NWDIRevisionState)revisionState;
+            creationDate = baseRevision.getCreationDate();
+        }
+
+        return creationDate;
     }
 
     /**
-     * Lists the development components contained in this projects development
-     * configuration and inserts them into the {@see #developmentConfiguration}
-     * object (under the respective compartment).
-     * 
-     * @param currentBuild
-     *            currently running build
-     * @throws IOException
-     *             when writing the 'listdcs' command file failed
-     * @throws InterruptedException
-     *             when the operation was canceled by the user
-     */
-    private void listDevelopmentComponents(final NWDIBuild currentBuild, final DCToolCommandExecutor executor)
-        throws IOException, InterruptedException {
-        final String output = executor.execute(new ListDcCommandBuilder(currentBuild.getDevelopmentConfiguration()));
-        final DevelopmentComponentsReader developmentComponentsReader =
-            new DevelopmentComponentsReader(new StringReader(output), currentBuild.getDevelopmentComponentFactory(),
-                currentBuild.getDevelopmentConfiguration());
-        developmentComponentsReader.read();
-    }
-
-    /**
-     * Synchronize the development components. The DCs will be synchronized
-     * depending on the projects parameter <code>cleanCopy</code>. When it is
-     * <code>true</code> all DCs will be synchronized, only those involved in
-     * activities since the last build otherwise.
-     * 
-     * @param developmentConfiguration
-     *            development configuration to use when computing the 'syncdc'
-     *            commands.
-     * @param executor
-     * @throws IOException
-     *             when writing the 'syncdcs' command file failed
-     * @throws InterruptedException
-     *             when the operation was canceled by the user
-     */
-    private void syncDevelopmentComponents(final DevelopmentConfiguration developmentConfiguration,
-        final DCToolCommandExecutor executor) throws IOException, InterruptedException {
-        final SyncDevelopmentComponentsCommandBuilder commandBuilder =
-            new SyncDevelopmentComponentsCommandBuilder(developmentConfiguration, this.cleanCopy);
-        executor.execute(commandBuilder);
-    }
-
-    /**
-     * Write the change log using the given list of activities.
+     * Write the change log using the given list of activi * *
      * 
      * @param build
      *            the {@link AbstractBuild} to use writing the change log.
@@ -191,7 +220,7 @@ public class NWDIScm extends SCM {
      * @throws IOException
      */
     private void writeChangeLog(final AbstractBuild<?, ?> build, final File changelogFile,
-        final List<Activity> activities) throws IOException {
+        final Collection<Activity> activities) throws IOException {
         final DtrChangeLogWriter dtrChangeLogWriter =
             new DtrChangeLogWriter(new DtrChangeLogSet(build, activities), new FileWriter(changelogFile));
         dtrChangeLogWriter.write();
@@ -221,33 +250,37 @@ public class NWDIScm extends SCM {
 
     /**
      * Get list of activities since last run. If <code>lastRun</code> is
-     * <code>null</code> all activities will be calculated.
+     * <code>null</code> all activities will be calcu *
      * 
      * @param build
      *            the build currently running
      * @return a list of {@link Activity} objects that were checked in since the
      *         last run or all activities.
      */
-    private List<Activity> getActivities(final NWDIBuild build) {
-        final NWDIProject.DescriptorImpl descriptor = build.getParent().getDescriptor();
-        final DtrBrowser browser =
-            new DtrBrowser(build.getDevelopmentConfiguration(), build.getDevelopmentComponentFactory(),
-                descriptor.getUser(), descriptor.getPassword());
-
+    private List<Activity> getActivities(final DtrBrowser browser, final Date since) {
         final List<Activity> activities = new ArrayList<Activity>();
         final long start = System.currentTimeMillis();
 
-        if (build.getPreviousBuild() == null) {
+        if (since == null) {
             activities.addAll(browser.getActivities());
         }
         else {
-            activities.addAll(browser.getActivities(build.getPreviousBuild().getTime()));
+            activities.addAll(browser.getActivities(since));
         }
 
         this.duration(start, "getActivities");
         this.updateActivitiesWithResources(browser, activities);
 
         return activities;
+    }
+
+    /**
+     * @param project
+     * @param descriptor
+     * @return
+     */
+    private DtrBrowser getDtrBrowser(final DevelopmentConfiguration config, final DevelopmentComponentFactory dcFactory) {
+        return new DtrBrowser(config, dcFactory, this.dtrUser, this.password);
     }
 
     /**
@@ -275,4 +308,79 @@ public class NWDIScm extends SCM {
 
         LOGGER.log(Level.INFO, String.format("%s took %d.%d sec.\n", message, (duration / 1000), (duration % 1000)));
     }
+
+    // private class FilePermissionSettingResult {
+    // /**
+    // * number of directories traversed.
+    // */
+    // private long directoryCount;
+    //
+    // /**
+    // * number of files worked on.
+    // */
+    // private long fileCount;
+    //
+    // /**
+    // * number of files that were read only.
+    // */
+    // private long readOnlyFilesCount;
+    //
+    // void directoryProcessed() {
+    // this.directoryCount++;
+    // }
+    //
+    // void fileProcessed() {
+    // this.fileCount++;
+    // }
+    //
+    // void readOnlyFileProcessed() {
+    // this.readOnlyFilesCount++;
+    // }
+    // }
+    //
+    // private class FilePermissionSetter implements
+    // FileCallable<FilePermissionSettingResult> {
+    // private static final long serialVersionUID = -5267949602124408209L;
+    //
+    // public FilePermissionSettingResult invoke(final File f, final
+    // VirtualChannel channel) throws IOException,
+    // InterruptedException {
+    // final FilePermissionSettingResult result = new
+    // FilePermissionSettingResult();
+    //
+    // final DirScanner scanner = new DirScanner.Full();
+    // final PermissionSettingFileVisitor visitor = new
+    // PermissionSettingFileVisitor(result);
+    // scanner.scan(f, visitor);
+    //
+    // return result;
+    // }
+    // }
+    //
+    // private class PermissionSettingFileVisitor extends FileVisitor {
+    // private final FilePermissionSettingResult filePermissionSettingResult;
+    //
+    // PermissionSettingFileVisitor(final FilePermissionSettingResult
+    // filePermissionSettingResult) {
+    // this.filePermissionSettingResult = filePermissionSettingResult;
+    // }
+    //
+    // @Override
+    // public void visit(final File f, final String relativePath) throws
+    // IOException {
+    // System.err.println(f.getAbsolutePath() + ": " + relativePath);
+    //
+    // if (f.isDirectory()) {
+    // this.filePermissionSettingResult.directoryProcessed();
+    // }
+    // else if (f.isFile()) {
+    // this.filePermissionSettingResult.fileProcessed();
+    //
+    // if (!f.canWrite()) {
+    // f.setWritable(true);
+    // this.filePermissionSettingResult.readOnlyFileProcessed();
+    // }
+    // }
+    // }
+    // }
 }

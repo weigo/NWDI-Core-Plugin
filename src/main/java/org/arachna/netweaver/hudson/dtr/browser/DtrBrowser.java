@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 
 import org.apache.http.client.ClientProtocolException;
 import org.arachna.netweaver.dc.types.Compartment;
+import org.arachna.netweaver.dc.types.CompartmentState;
 import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
@@ -116,13 +117,17 @@ public final class DtrBrowser {
             activities.addAll(activityListBrowser.parse(this.dtrHttpClient.getContent(queryUrl)));
         }
         catch (final ClientProtocolException e) {
-            LOGGER.log(Level.SEVERE, "An error occured communicating with the DTR.", e);
+            throw new RuntimeException("An error occured communicating with the DTR.", e);
         }
         catch (final IOException e) {
-            LOGGER.log(
-                Level.SEVERE,
-                String.format("There was an error reading the list of activities (for %s/%s_%s) from the DTR.",
-                    config.getWorkspace(), compartment.getVendor(), compartment.getName()), e);
+            throw new RuntimeException(String.format(
+                "There was an error reading the list of activities (for %s/%s_%s) from the DTR.",
+                config.getWorkspace(), compartment.getVendor(), compartment.getName()), e);
+        }
+        catch (final IllegalStateException ise) {
+            throw new RuntimeException(String.format(
+                "There was an error reading the list of activities (for %s/%s_%s) from the DTR.",
+                config.getWorkspace(), compartment.getVendor(), compartment.getName()), ise);
         }
 
         return activities;
@@ -166,12 +171,8 @@ public final class DtrBrowser {
     private Set<DevelopmentComponent> getChangedDevelopmentComponents(final ActivityFilter activityFilter) {
         final List<Activity> activities = this.getActivities(activityFilter);
         Collections.sort(activities, new ActivityByCheckInDateComparator());
-        final long start = System.currentTimeMillis();
 
-        final Set<DevelopmentComponent> changedComponents = this.getDevelopmentComponents(activities);
-        this.duration(start, "getDevelopmentComponents");
-
-        return changedComponents;
+        return this.getDevelopmentComponents(activities);
     }
 
     /**
@@ -187,13 +188,9 @@ public final class DtrBrowser {
     public List<Activity> getActivities(final ActivityFilter activityFilter) {
         final List<Activity> activities = new ArrayList<Activity>();
 
-        final long start = System.currentTimeMillis();
-
-        for (final Compartment compartment : this.getCompartments()) {
+        for (final Compartment compartment : this.config.getCompartments(CompartmentState.Source)) {
             activities.addAll(this.getActivities(compartment, activityFilter));
         }
-
-        this.duration(start, "getActivities");
 
         return activities;
     }
@@ -245,19 +242,5 @@ public final class DtrBrowser {
      */
     private ActivityFilter createActivityCheckinDateFilter(final Date since) {
         return new ActivityCheckinDateFilter(since, Calendar.getInstance().getTime());
-    }
-
-    /**
-     * Compute the time spent since the given start time and log it using the
-     * given message.
-     * 
-     * @param start
-     *            the start time to use for computing the duration until now
-     * @param msg
-     *            message to log.
-     */
-    private void duration(final long start, final String msg) {
-        final long duration = System.currentTimeMillis() - start;
-        LOGGER.log(Level.INFO, String.format("%s took %d.%d sec. to complete.", msg, duration / 1000, duration % 1000));
     }
 }

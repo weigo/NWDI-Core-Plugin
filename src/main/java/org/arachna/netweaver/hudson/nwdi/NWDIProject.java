@@ -9,7 +9,6 @@ import hudson.Launcher;
 import hudson.Util;
 import hudson.model.BuildListener;
 import hudson.model.DependencyGraph;
-import hudson.model.Descriptor;
 import hudson.model.Descriptor.FormException;
 import hudson.model.Item;
 import hudson.model.ItemGroup;
@@ -18,8 +17,6 @@ import hudson.model.AbstractBuild;
 import hudson.model.Hudson;
 import hudson.model.Project;
 import hudson.scm.SCM;
-import hudson.tasks.Publisher;
-import hudson.util.DescribableList;
 import hudson.util.FormValidation;
 
 import java.io.File;
@@ -72,11 +69,6 @@ public final class NWDIProject extends Project<NWDIProject, NWDIBuild> implement
     private boolean cleanCopy;
 
     /**
-     * Publishers for this project.
-     */
-    private DescribableList<Publisher, Descriptor<Publisher>> publishers;
-
-    /**
      * Create an instance of a NWDI project.
      * 
      * @param parent
@@ -105,9 +97,6 @@ public final class NWDIProject extends Project<NWDIProject, NWDIBuild> implement
         super(Hudson.getInstance(), name);
         this.confDef = confDef;
         this.cleanCopy = cleanCopy;
-
-        this.publishers = new DescribableList<Publisher, Descriptor<Publisher>>(this);
-        this.publishers.setOwner(this);
     }
 
     /**
@@ -156,7 +145,7 @@ public final class NWDIProject extends Project<NWDIProject, NWDIBuild> implement
      */
     @Override
     public SCM getScm() {
-        return new NWDIScm(this.cleanCopy);
+        return new NWDIScm(this.cleanCopy, this.getDescriptor().getUser(), this.getDescriptor().getPassword());
     }
 
     /**
@@ -169,7 +158,7 @@ public final class NWDIProject extends Project<NWDIProject, NWDIBuild> implement
         this.confDef = Util.fixNull(json.getString(PARAMETER_CONF_DEF));
         this.cleanCopy = json.getBoolean(PARAMETER_CLEAN_COPY);
 
-        this.setScm(new NWDIScm(this.cleanCopy));
+        this.setScm(new NWDIScm(this.cleanCopy, this.getDescriptor().getUser(), this.getDescriptor().getPassword()));
         this.save();
 
         super.submit(req, rsp);
@@ -440,14 +429,6 @@ public final class NWDIProject extends Project<NWDIProject, NWDIBuild> implement
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public DescribableList<Publisher, Descriptor<Publisher>> getPublishersList() {
-        return this.publishers == null ? new DescribableList<Publisher, Descriptor<Publisher>>(this) : this.publishers;
-    }
-
     @Override
     public boolean isFingerprintConfigured() {
         return false;
@@ -463,12 +444,6 @@ public final class NWDIProject extends Project<NWDIProject, NWDIBuild> implement
     @Override
     public void onLoad(final ItemGroup<? extends Item> parent, final String name) throws IOException {
         super.onLoad(parent, name);
-
-        if (this.publishers == null) {
-            this.publishers = new DescribableList<Publisher, Descriptor<Publisher>>(this);
-        }
-
-        this.publishers.setOwner(this);
     }
 
     /**
