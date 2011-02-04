@@ -225,7 +225,7 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
                     this.developmentConfiguration));
             logger.append("Done building development components.\n");
 
-            return result.getExitCode() == 0 ? null : Result.FAILURE;
+            return result.isExitCodeOk() ? null : Result.FAILURE;
         }
 
         /**
