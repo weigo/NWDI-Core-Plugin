@@ -7,7 +7,10 @@ import hudson.FilePath;
 import hudson.Launcher;
 import hudson.Launcher.ProcStarter;
 import hudson.util.ArgumentListBuilder;
+import hudson.util.ForkOutputStream;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -43,14 +46,9 @@ public final class DCToolCommandExecutor {
     protected static final String COM_SAP_JDK_HOME_PATH_KEY = "com.sap.jdk.home_path_key";
 
     /**
-     * 'loadconfig' command.
-     */
-    private static final String LOGFILE_COMMAND = "logfile -f %s -m overwrite;";
-
-    /**
      * constant for 'loadconfig' command.
      */
-    private static final String LOAD_CONFIG_COMMAND = "loadconfig -u %s -p %s -c \"%s\" -r \"%s\";";
+    private static final String LOAD_CONFIG_COMMAND = "loadconfig -u %s -p %s -c \"%s\" -r \"%s\";\n";
 
     /**
      * {@link DevelopmentConfiguration} the development configuration to use.
@@ -108,55 +106,44 @@ public final class DCToolCommandExecutor {
     public DcToolCommandExecutionResult execute(final DCToolCommandBuilder commandBuilder) throws IOException,
         InterruptedException {
         final List<String> commands = commandBuilder.execute();
-
-        String dcToolLogoutput = "";
-        int result = 0;
+        final ByteArrayOutputStream output = new ByteArrayOutputStream();
+        int exitCode = 0;
 
         if (commands.size() > 0) {
-            final FilePath commandFile = this.workspace.child("dctool.in");
-            final String logFileName = "dctool.out";
-
-            commands.add(0, "exectime -m on;");
-            commands.add(1, String.format(LOGFILE_COMMAND, logFileName));
-            commands.add(2, String.format(LOAD_CONFIG_COMMAND, this.dcToolDescriptor.getUser(),
-                this.dcToolDescriptor.getPassword(), this.dcToolDescriptor.getDtrDirectory(), ".dtc"));
-            this.createCommandFile(commandFile, commands);
-
             final ProcStarter starter = this.launcher.launch();
             starter.pwd(this.workspace);
             starter.envs(this.createEnvironment());
-            starter.cmds(this.createDcToolCommand(launcher.isUnix(), commandFile));
-
-            result = starter.join();
-            dcToolLogoutput = this.workspace.child(logFileName).readToString();
-            this.launcher.getListener().getLogger().append(dcToolLogoutput);
+            starter.cmds(this.createDcToolCommand(launcher.isUnix(), null));
+            starter.stdin(createCommandInputStream(commands));
+            final ByteArrayOutputStream result = new ByteArrayOutputStream();
+            final ForkOutputStream tee = new ForkOutputStream(launcher.getListener().getLogger(), result);
+            starter.stdout(tee);
+            exitCode = starter.join();
         }
 
-        return new DcToolCommandExecutionResult(dcToolLogoutput, result);
+        return new DcToolCommandExecutionResult(output.toString(), exitCode);
     }
 
     /**
-     * Create the command file for the dc tool in the given workspace using the
-     * given list of commands.
+     * Create an <code>InputStream</code> containing the given dc tool commands.
      * 
-     * @param commandFile
-     *            file path to write commands into.
      * @param commands
-     *            list of commands to be executed by the dc tool.
-     * @throws IOException
-     *             when an error occured writing the the command file.
-     * @throws InterruptedException
-     *             when the user cancelled the action.
+     *            list of dc tool commands
+     * @return <code>InputStream</code> containing the given dc tool commands.
      */
-    private void createCommandFile(final FilePath commandFile, final List<String> commands) throws IOException,
-        InterruptedException {
-        final StringBuilder commandBuilder = new StringBuilder();
+    private ByteArrayInputStream createCommandInputStream(final List<String> commands) {
+        final StringBuilder cmds = new StringBuilder();
+        cmds.append("exectime -m on;\n");
+        cmds.append(String.format(LOAD_CONFIG_COMMAND, this.dcToolDescriptor.getUser(),
+            this.dcToolDescriptor.getPassword(), this.dcToolDescriptor.getDtrDirectory(), ".dtc"));
 
-        for (final String command : commands) {
-            commandBuilder.append(command).append('\n');
+        for (final String cmd : commands) {
+            cmds.append(cmd).append('\n');
         }
 
-        commandFile.write(commandBuilder.toString(), "UTF-8");
+        cmds.append("exit;\n");
+
+        return new ByteArrayInputStream(cmds.toString().getBytes());
     }
 
     /**
@@ -173,7 +160,6 @@ public final class DCToolCommandExecutor {
         final ArgumentListBuilder args = new ArgumentListBuilder();
 
         args.add(getFullyQualifiedDcToolCommand(isUnix));
-        args.add("@" + commandFile.getName());
 
         if (!isUnix) {
             args.prepend("cmd.exe", "/C");
@@ -184,8 +170,12 @@ public final class DCToolCommandExecutor {
     }
 
     /**
+     * Generate the fully qualified command to be used to execute the dc tool.
+     * 
      * @param isUnix
-     * @return
+     *            indicate whether the platform to run on is Unix(oid) or
+     *            Windows.
+     * @return fully qualified command to be used to execute the dc tool.
      */
     private String getFullyQualifiedDcToolCommand(final boolean isUnix) {
         final String command = isUnix ? "dctool.sh" : "dctool.bat";
@@ -196,7 +186,9 @@ public final class DCToolCommandExecutor {
     }
 
     /**
-     * @return
+     * Generate platform dependent path to dc tool.
+     * 
+     * @return platform dependent path to dc tool.
      */
     protected String getDcToolPath() {
         final File libraryFolder = new File(this.dcToolDescriptor.getNwdiToolLibrary());
