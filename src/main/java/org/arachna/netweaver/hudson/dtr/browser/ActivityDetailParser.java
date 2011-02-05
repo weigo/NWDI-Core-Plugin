@@ -3,21 +3,14 @@
  */
 package org.arachna.netweaver.hudson.dtr.browser;
 
-import java.io.InputStream;
 import java.util.List;
 
-import org.jaxen.JaxenException;
-import org.jaxen.dom.DOMXPath;
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-
 /**
- * Parser for a activity detail HTML page.
+ * Parser for an activity detail HTML page.
  * 
  * @author Dirk Weigenand
  */
-final class ActivityDetailParser {
+final class ActivityDetailParser extends AbstractResourceParser {
     /**
      * index of long description in details table.
      */
@@ -34,8 +27,7 @@ final class ActivityDetailParser {
     private final Activity activity;
 
     /**
-     * Create an instance of an <code>ActivityDetailParser</code> with the given
-     * <code>Activity</code>.
+     * Create an instance of an <code>ActivityDetailParser</code> with the given <code>Activity</code>.
      * 
      * @param activity
      *            the <code>Activity</code> whose details shall be updated.
@@ -45,40 +37,18 @@ final class ActivityDetailParser {
     }
 
     /**
-     * Parses the given <code>InputStream</code> and updates the activities
-     * details.
-     * 
-     * @param content
-     *            of the activities detail HTML page.
-     */
-    void parse(final InputStream content) {
-        final Document document = JTidyHelper.getDocument(content);
-
-        try {
-            final DOMXPath xPath = new DOMXPath(XPATH);
-
-            final List nodes = xPath.selectNodes(document);
-            this.activity.setDescription(this.nodeValueAt(nodes, LONG_DESCRIPTION));
-        }
-        catch (final JaxenException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * Extracts the node's value as text at the given index.
+     * Updates the activity's long description.
      * 
      * @param nodes
-     *            a list of {@link Nodes} representing a XPath selection result.
-     * 
-     * @return node's value as text at the given index.
-     * @throws DOMException
-     *             when the text to be returned does not fit into the DOMString
-     *             implementation
+     *            list of nodes containing an activity's details.
      */
-    private String nodeValueAt(final List nodes, final int index) throws DOMException {
-        final Node textNode = ((Node)nodes.get(index)).getFirstChild();
+    @Override
+    void parseInternal(final List<Object> nodes) {
+        this.activity.setDescription(this.nodeValueAt(nodes, LONG_DESCRIPTION));
+    }
 
-        return textNode == null ? "" : textNode.getNodeValue();
+    @Override
+    String getXPath() {
+        return XPATH;
     }
 }
