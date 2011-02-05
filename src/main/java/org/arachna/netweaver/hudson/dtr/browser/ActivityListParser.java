@@ -3,7 +3,6 @@
  */
 package org.arachna.netweaver.hudson.dtr.browser;
 
-import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -12,7 +11,6 @@ import java.util.List;
 
 import org.jaxen.JaxenException;
 import org.jaxen.dom.DOMXPath;
-import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 /**
@@ -20,7 +18,7 @@ import org.w3c.dom.Node;
  * 
  * @author Dirk Weigenand
  */
-final class ActivityListParser {
+final class ActivityListParser extends AbstractResourceParser {
     /**
      * date format for activity dates, resource modification dates etc.
      */
@@ -36,8 +34,12 @@ final class ActivityListParser {
         "//a[starts-with(@href, '/dtr/system-tools/reports/ResourceDetails?technical=false&path=/act/')]/../..";
 
     /**
-     * {@link ActivityFilter} to use when parsing activities. Initialized with
-     * an accept all filter.
+     * List of extracted activities.
+     */
+    private final List<Activity> activities = new ArrayList<Activity>();
+
+    /**
+     * {@link ActivityFilter} to use when parsing activities. Initialized with an accept all filter.
      */
     private ActivityFilter activityFilter = new ActivityFilter() {
         public boolean accept(final Activity activity) {
@@ -93,9 +95,9 @@ final class ActivityListParser {
     }
 
     /**
-     * @throws RuntimeException
+     * Initialize XPath expression used later on to extract details of activities.
      */
-    private void setUpXPaths() throws RuntimeException {
+    private void setUpXPaths() {
         try {
             commentXPath = new DOMXPath("td[1]/a");
             principalXPath = new DOMXPath("td[3]/a");
@@ -108,50 +110,13 @@ final class ActivityListParser {
     }
 
     /**
-     * Extract activities from the given {@link java.io.InputStream}.
-     * 
-     * @param activityList
-     *            InputStream to read activities from.
-     * @return List of DTR activities read from the given InputStream.
-     */
-    List<Activity> parse(final InputStream activityList) {
-        final List<Activity> activities = new ArrayList<Activity>();
-        final Document document = JTidyHelper.getDocument(activityList);
-
-        try {
-            final DOMXPath xPath = new DOMXPath(XPATH);
-            Node node;
-            Activity activity;
-
-            for (final Object returnValue : xPath.selectNodes(document)) {
-                node = (Node)returnValue;
-                activity = createActivity(node);
-
-                if (activity != null && this.activityFilter.accept(activity)) {
-                    activities.add(activity);
-                }
-            }
-        }
-        catch (final JaxenException e) {
-            throw new RuntimeException(e);
-        }
-        catch (final ParseException e) {
-            throw new RuntimeException(e);
-        }
-
-        return activities;
-    }
-
-    /**
-     * Create an instance of an {@link Activity} from the given
-     * {@link org.w3c.dom.Node}.
+     * Create an instance of an {@link Activity} from the given {@link org.w3c.dom.Node}.
      * 
      * @param node
      *            the node the activity's data should be read from.
      * @return the activity extracted from the given node.
      * @throws JaxenException
-     *             when there was an error evaluating the XPath expressions used
-     *             to extract the data
+     *             when there was an error evaluating the XPath expressions used to extract the data
      * @throws ParseException
      *             when there was an error parsing the activity's date.
      */
@@ -166,8 +131,7 @@ final class ActivityListParser {
      *            the node the short description should be read from.
      * @return the short description extracted from the given node.
      * @throws JaxenException
-     *             when there was an error evaluating the XPath expressions used
-     *             to extract the data
+     *             when there was an error evaluating the XPath expressions used to extract the data
      */
     private String getComment(final Node node) throws JaxenException {
         return this.commentXPath.stringValueOf(node);
@@ -180,8 +144,7 @@ final class ActivityListParser {
      *            the node the activity's check in date should be read from.
      * @return the check in date extracted from the given node.
      * @throws JaxenException
-     *             when there was an error evaluating the XPath expressions used
-     *             to extract the data
+     *             when there was an error evaluating the XPath expressions used to extract the data
      * @throws ParseException
      *             when there was an error parsing the activity's date.
      */
@@ -196,8 +159,7 @@ final class ActivityListParser {
      *            the node the UME princiapl's name should be read from.
      * @return the UME principal's name extracted from the given node.
      * @throws JaxenException
-     *             when there was an error evaluating the XPath expressions used
-     *             to extract the data
+     *             when there was an error evaluating the XPath expressions used to extract the data
      */
     private Principal getPrincipal(final Node node) throws JaxenException {
         return new Principal(this.principalXPath.stringValueOf(node).replace("/principals/", ""));
@@ -210,10 +172,52 @@ final class ActivityListParser {
      *            the node the activity's url should be read from.
      * @return the activity's url extracted from the given node.
      * @throws JaxenException
-     *             when there was an error evaluating the XPath expressions used
-     *             to extract the data
+     *             when there was an error evaluating the XPath expressions used to extract the data
      */
     private String getActivityUrl(final Node node) throws JaxenException {
         return this.activityXPath.stringValueOf(node);
+    }
+
+    /**
+     * Extract activities from the given {@link java.io.InputStream}.
+     * 
+     * @param nodes
+     *            extracted from activity list.
+     */
+    @Override
+    void parseInternal(final List<Object> nodes) {
+        Node node;
+        Activity activity;
+
+        try {
+            for (final Object returnValue : nodes) {
+                node = (Node)returnValue;
+                activity = createActivity(node);
+
+                if (activity != null && this.activityFilter.accept(activity)) {
+                    this.activities.add(activity);
+                }
+            }
+        }
+        catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+        catch (JaxenException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    String getXPath() {
+        return XPATH;
+    }
+
+    /**
+     * Returns the list of extracted activities.
+     * 
+     * @return the list of extracted activities.
+     */
+    List<Activity> getActivities() {
+        return this.activities;
     }
 }

@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -27,6 +28,16 @@ import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
  * @author Dirk Weigenand
  */
 public final class DtrBrowser {
+    /**
+     * Error message indicating a communication error with the DTR.
+     */
+    private static final String ERROR_COMMUNICATING_WITH_DTR = "An error occured communicating with the DTR.";
+
+    /**
+     * Error message when extracting activities from DTR failed.
+     */
+    private static final String ERROR_READING_ACTIVITIES = "There was an error reading the list of activities (for %s/%s_%s) from the DTR.";
+
     /**
      * Logger.
      */
@@ -64,8 +75,8 @@ public final class DtrBrowser {
      * @param password
      *            password to authenticate the user against the DTR's UME.
      */
-    public DtrBrowser(final DevelopmentConfiguration config, final DevelopmentComponentFactory dcFactory,
-        final String dtrUser, final String password) {
+    public DtrBrowser(final DevelopmentConfiguration config, final DevelopmentComponentFactory dcFactory, final String dtrUser,
+        final String password) {
         this.config = config;
         this.dtrHttpClient = new DtrHttpClient(dtrUser, password);
         this.dcFactory = dcFactory;
@@ -88,7 +99,7 @@ public final class DtrBrowser {
             compartments.addAll(componentsBrowser.parse(result, config));
         }
         catch (final ClientProtocolException e) {
-            LOGGER.log(Level.SEVERE, "An error occured communicating with the DTR.", e);
+            LOGGER.log(Level.SEVERE, ERROR_COMMUNICATING_WITH_DTR, e);
         }
         catch (final IOException e) {
             LOGGER.log(Level.SEVERE, "An error occured reading the list of compartments from the DTR.", e);
@@ -98,8 +109,7 @@ public final class DtrBrowser {
     }
 
     /**
-     * Get list of activities in the given workspace containing the given
-     * compartment.
+     * Get list of activities in the given workspace containing the given compartment.
      * 
      * @param compartment
      *            compartment to use for retrieving activities.
@@ -112,22 +122,20 @@ public final class DtrBrowser {
         final ActivityListParser activityListBrowser = new ActivityListParser(activityFilter);
 
         try {
-            final String queryUrl =
-                String.format(ACTIVITY_QUERY, compartment.getDtrUrl(), compartment.getInactiveLocation());
-            activities.addAll(activityListBrowser.parse(this.dtrHttpClient.getContent(queryUrl)));
+            final String queryUrl = String.format(ACTIVITY_QUERY, compartment.getDtrUrl(), compartment.getInactiveLocation());
+            activityListBrowser.parse(this.dtrHttpClient.getContent(queryUrl));
+            activities.addAll(activityListBrowser.getActivities());
         }
         catch (final ClientProtocolException e) {
-            throw new RuntimeException("An error occured communicating with the DTR.", e);
+            throw new RuntimeException(ERROR_COMMUNICATING_WITH_DTR, e);
         }
         catch (final IOException e) {
-            throw new RuntimeException(String.format(
-                "There was an error reading the list of activities (for %s/%s_%s) from the DTR.",
-                config.getWorkspace(), compartment.getVendor(), compartment.getName()), e);
+            throw new RuntimeException(String.format(ERROR_READING_ACTIVITIES, config.getWorkspace(), compartment.getVendor(),
+                compartment.getName()), e);
         }
         catch (final IllegalStateException ise) {
-            throw new RuntimeException(String.format(
-                "There was an error reading the list of activities (for %s/%s_%s) from the DTR.",
-                config.getWorkspace(), compartment.getVendor(), compartment.getName()), ise);
+            throw new RuntimeException(String.format(ERROR_READING_ACTIVITIES, config.getWorkspace(), compartment.getVendor(),
+                compartment.getName()), ise);
         }
 
         return activities;
@@ -137,10 +145,8 @@ public final class DtrBrowser {
      * Extract changed development components from the given list of activities.
      * 
      * @param activities
-     *            activities the changed development components shall be
-     *            extracted from.
-     * @return list of changed development components associated with the given
-     *         activities.
+     *            activities the changed development components shall be extracted from.
+     * @return list of changed development components associated with the given activities.
      */
     public Set<DevelopmentComponent> getDevelopmentComponents(final List<Activity> activities) {
         final DevelopmentComponentCollector collector =
@@ -150,8 +156,7 @@ public final class DtrBrowser {
     }
 
     /**
-     * Get a list of changed development components for the given workspace
-     * since the given date.
+     * Get a list of changed development components for the given workspace since the given date.
      * 
      * @return a list of changed development components
      */
@@ -160,13 +165,11 @@ public final class DtrBrowser {
     }
 
     /**
-     * Get a list of changed development components for the given workspace
-     * since the given date.
+     * Get a list of changed development components for the given workspace since the given date.
      * 
      * @param activityFilter
      *            filter the activities using the given {@link ActivityFilter}.
-     * @return a list of changed development components matched by the given
-     *         {@link ActivityFilter}.
+     * @return a list of changed development components matched by the given {@link ActivityFilter}.
      */
     private Set<DevelopmentComponent> getChangedDevelopmentComponents(final ActivityFilter activityFilter) {
         final List<Activity> activities = this.getActivities(activityFilter);
@@ -176,14 +179,11 @@ public final class DtrBrowser {
     }
 
     /**
-     * Get a list of activities in the given workspace matching the given
-     * {@link ActivityFilter}.
+     * Get a list of activities in the given workspace matching the given {@link ActivityFilter}.
      * 
      * @param activityFilter
-     *            an {@link ActivityFilter} for filtering the list of returned
-     *            activities.
-     * @return a list of activities matching the given {@link ActivityFilter} in
-     *         the given workspace.
+     *            an {@link ActivityFilter} for filtering the list of returned activities.
+     * @return a list of activities matching the given {@link ActivityFilter} in the given workspace.
      */
     public List<Activity> getActivities(final ActivityFilter activityFilter) {
         final List<Activity> activities = new ArrayList<Activity>();
@@ -211,8 +211,7 @@ public final class DtrBrowser {
     }
 
     /**
-     * Get a list of activities in the given workspace matching the given
-     * {@link ActivityFilter}.
+     * Get a list of activities in the given workspace matching the given {@link ActivityFilter}.
      * 
      * @param since
      *            date after which to look for activities.
@@ -223,8 +222,7 @@ public final class DtrBrowser {
     }
 
     /**
-     * Get a list of changed development components for the given workspace
-     * since the given date.
+     * Get a list of changed development components for the given workspace since the given date.
      * 
      * @param since
      *            date after which to look for activities.
@@ -237,10 +235,23 @@ public final class DtrBrowser {
     /**
      * @param since
      *            start date for activity filtering.
-     * @return the configured filter (with the given start date and the current
-     *         time).
+     * @return the configured filter (with the given start date and the current time).
      */
     private ActivityFilter createActivityCheckinDateFilter(final Date since) {
         return new ActivityCheckinDateFilter(since, Calendar.getInstance().getTime());
+    }
+
+    /**
+     * Comparator for {@link Activity} by check in date.
+     * 
+     * @author Dirk Weigenand
+     */
+    private static final class ActivityByCheckInDateComparator implements Comparator<Activity> {
+        /**
+         * {@inheritDoc}
+         */
+        public int compare(final Activity activity1, final Activity activity2) {
+            return activity1.getCheckinTime().compareTo(activity2.getCheckinTime());
+        }
     }
 }
