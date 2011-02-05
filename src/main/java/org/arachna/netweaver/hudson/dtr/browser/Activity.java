@@ -17,6 +17,11 @@ import java.util.Set;
  */
 public final class Activity {
     /**
+     * Attribute 'path' in request URL for this activity.
+     */
+    private static final String PATH_REQUEST_ATTRIBUTE = "path=";
+
+    /**
      * relative URL to DTR where the contents of this activity can be queried.
      */
     private final String activityUrl;
@@ -27,14 +32,12 @@ public final class Activity {
     private final Principal principal;
 
     /**
-     * short description of activity as given by principal that created this
-     * activity.
+     * short description of activity as given by principal that created this activity.
      */
     private final String comment;
 
     /**
-     * long description of activity as given by principal that created this
-     * activity.
+     * long description of activity as given by principal that created this activity.
      */
     private String description;
 
@@ -49,17 +52,15 @@ public final class Activity {
     private final Set<ActivityResource> resources = new HashSet<ActivityResource>();
 
     /**
-     * Create an instance of an <code>Activity</code> using the principal that
-     * created it, its description and checkin date. Also contains the relative
-     * URL where the content of the activity can be browsed.
+     * Create an instance of an <code>Activity</code> using the principal that created it, its description and checkin date. Also contains
+     * the relative URL where the content of the activity can be browsed.
      * 
      * @param activityUrl
      *            relative URL where the content of the activity can be browsed.
      * @param principal
      *            user that created the activity.
      * @param comment
-     *            the short description of the activity as was given by the user
-     *            creating it.
+     *            the short description of the activity as was given by the user creating it.
      * @param checkinTime
      *            time the activity was checked into the DTR.
      */
@@ -141,29 +142,26 @@ public final class Activity {
     }
 
     /**
-     * Returns the path part of the activity url (i.e. the string after
-     * '&path=').
+     * Returns the path part of the activity url (i.e. the string after '&path=').
      * 
      * @return the path part of the activity url
      */
     public String getActivityPath() {
-        return this.getActivityUrl().substring(this.getActivityUrl().indexOf("path=") + 5);
+        return this.getActivityUrl().substring(this.getActivityUrl().indexOf(PATH_REQUEST_ATTRIBUTE) + PATH_REQUEST_ATTRIBUTE.length());
     }
 
     /*
      * (non-Javadoc)
-     * 
      * @see java.lang.Object#toString()
      */
     @Override
     public String toString() {
-        return "Activity [checkinTime=" + this.checkinTime + ", principal=" + this.principal + ",\ndescription="
-            + this.description + ",\nactivityUrl=" + this.activityUrl + "]";
+        return "Activity [checkinTime=" + this.checkinTime + ", principal=" + this.principal + ",\ndescription=" + this.description
+            + ",\nactivityUrl=" + this.activityUrl + "]";
     }
 
     /**
-     * Add the given resource to this activity's resources. If the given
-     * resource is <code>null</code> it is ignored.
+     * Add the given resource to this activity's resources. If the given resource is <code>null</code> it is ignored.
      * 
      * @param resource
      *            resource to add to this activity's resources.
@@ -185,7 +183,6 @@ public final class Activity {
 
     /*
      * (non-Javadoc)
-     * 
      * @see java.lang.Object#hashCode()
      */
     @Override
@@ -195,7 +192,6 @@ public final class Activity {
 
     /*
      * (non-Javadoc)
-     * 
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
