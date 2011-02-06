@@ -9,16 +9,27 @@
   </parent>
 
   <groupId>org.arachna.netweaver</groupId>
-  <artifactId>Hudson-NWDI-SCM-Plugin</artifactId>
-  <name>Hudson NWDI SCM plugin</name>
+  <artifactId>NWDI-Core-Plugin</artifactId>
+  <name>NWDI-Core-Plugin</name>
   <version>1.0-SNAPSHOT</version>
   <packaging>hpi</packaging>
 
-  <!-- get every artifact through maven.glassfish.org, which proxies all the artifacts that we need -->
-  <description>Hudson plugin for interfacing with a NetWeaver Development Infrastructure CBS and DTR. Allows for polling the DTR for activities containing changes to development components, getting those changes and building them using the by SAP provided 'dctool'.</description>
+  <description>Hudson plugin for interfacing with a NetWeaver Development Infrastructure CBS and DTR. Allows for polling the DTR for
+    activities containing changes to development components, getting those changes and building them using the by SAP provided 'dctool'.
+  </description>
   <inceptionYear>20100710</inceptionYear>
   <scm>
+    <connection>scm:git:git://github.com/weigo/NWDI-Core-Plugin.git</connection>
+    <developerConnection>scm:git:git@github.com:weigo/NWDI-Core-Plugin.git</developerConnection>
+    <url>https://github.com/weigo/NWDI-Core-Plugin</url>
   </scm>
+  <developers>
+    <developer>
+      <id>weigo</id>
+      <name>Dirk Weigenand</name>
+      <email>Dirk.Weigenand@gmx.de</email>
+    </developer>
+  </developers>
   <repositories>
     <repository>
       <id>m.g.o-public</id>
@@ -145,7 +156,7 @@
             <ruleset>/rulesets/basic.xml</ruleset>
             <ruleset>/rulesets/braces.xml</ruleset>
             <ruleset>/rulesets/codesize.xml</ruleset>
-            <ruleset>/rulesets/controversial.xml</ruleset>
+            <!-- ruleset>/rulesets/controversial.xml</ruleset -->
             <ruleset>/rulesets/coupling.xml</ruleset>
             <ruleset>/rulesets/design.xml</ruleset>
             <!-- ruleset>/rulesets/empty.xml</ruleset -->
