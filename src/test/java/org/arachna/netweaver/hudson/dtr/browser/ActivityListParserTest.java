@@ -31,16 +31,14 @@ public class ActivityListParserTest {
         + "developer00_t_2010_05_17_14_29_57_GMT_50220574-193f-45a9-82bc-eb730df05ccc";
 
     /**
-     * Test method for
-     * {@link org.arachna.netweaver.hudson.dtr.browser.ActivityListParser#parse(java.io.InputStream)}
-     * .
+     * Test method for {@link org.arachna.netweaver.hudson.dtr.browser.ActivityListParser#parse(java.io.InputStream)} .
      */
     @Test
     public final void testExctractActivities() {
         final ActivityListParser browser = new ActivityListParser();
         final InputStream input = this.getClass().getResourceAsStream("ExampleTrackActivityQuery.html");
-        final List<Activity> activities = browser.parse(input);
-
+        browser.parse(input);
+        final List<Activity> activities = browser.getActivities();
         assertThat(null, is(not(equalTo(activities))));
         assertThat(activities.size(), is(greaterThan(0)));
 
