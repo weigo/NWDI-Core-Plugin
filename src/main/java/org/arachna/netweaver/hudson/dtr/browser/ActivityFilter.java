@@ -1,6 +1,3 @@
-/**
- *
- */
 package org.arachna.netweaver.hudson.dtr.browser;
 
 /**
@@ -8,7 +5,7 @@ package org.arachna.netweaver.hudson.dtr.browser;
  * 
  * @author Dirk Weigenand
  */
-public interface ActivityFilter {
+interface ActivityFilter {
     /**
      * Test whether the given {@link Activity} passes a certain test implemented by implementors of this interface.
      * 
