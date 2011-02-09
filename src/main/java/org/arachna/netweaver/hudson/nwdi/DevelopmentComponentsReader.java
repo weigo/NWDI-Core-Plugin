@@ -12,9 +12,8 @@ import org.arachna.netweaver.dc.types.DevelopmentComponentType;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 
 /**
- * Reader for dctool 'listdcs' output of a compartment. The reader will read the
- * generated file and update the compartments with the found development
- * components (and register them).
+ * Reader for dctool 'listdcs' output of a compartment. The reader will read the generated file and update the compartments with the found
+ * development components (and register them).
  * 
  * @author Dirk Weigenand
  */
@@ -45,14 +44,12 @@ public final class DevelopmentComponentsReader extends AbstractDcToolOutputReade
     private final DevelopmentComponentFactory dcFactory;
 
     /**
-     * development configuration to use for updating the compartments with
-     * development components.
+     * development configuration to use for updating the compartments with development components.
      */
     private final DevelopmentConfiguration developmentConfiguration;
 
     /**
-     * Creates a new reader for development components and their respective
-     * compartments from the output of DC tool.
+     * Creates a new reader for development components and their respective compartments from the output of DC tool.
      * 
      * @param input
      *            <code>Reader</code> for reading DC tool output.
@@ -69,8 +66,7 @@ public final class DevelopmentComponentsReader extends AbstractDcToolOutputReade
     }
 
     /**
-     * Reads the DC tool generated output and updates the found compartments
-     * with their associated development components.
+     * Reads the DC tool generated output and updates the found compartments with their associated development components.
      * 
      * @throws IOException
      *             wenn beim Einlesen der Daten ein Fehler auftritt
@@ -91,14 +87,13 @@ public final class DevelopmentComponentsReader extends AbstractDcToolOutputReade
                     }
 
                     if (compartment.isArchiveState()) {
-                        compartment.add(this.dcFactory.create(name, vendor));
+                        compartment.add(this.dcFactory.create(vendor, name));
                     }
                     else {
                         this.readLine();
                         final String type = this.readLine(this.dcTypePattern);
 
-                        compartment.add(this.dcFactory.create(name, vendor,
-                            DevelopmentComponentType.fromString(type, "")));
+                        compartment.add(this.dcFactory.create(vendor, name, DevelopmentComponentType.fromString(type, "")));
                     }
 
                     this.readLine();
@@ -107,31 +102,26 @@ public final class DevelopmentComponentsReader extends AbstractDcToolOutputReade
         }
         catch (final EOFException e) {
             // at EOF simply execute the finally clause...
-        }
-        finally {
+        } finally {
             this.close();
         }
     }
 
     /**
-     * determines whether given supplied is <code>null</code> or white space
-     * only.
+     * determines whether given supplied is <code>null</code> or white space only.
      * 
      * @param name
      *            string to test
-     * @return <code>true</code> iff given string is null or contains only white
-     *         space.
+     * @return <code>true</code> iff given string is null or contains only white space.
      */
     private boolean isEmpty(final String name) {
         return name == null || name.trim().length() == 0;
     }
 
     /**
-     * Liest solange die Ausgabedatei ein, bis die Zeile die
-     * Compartment-Eigenschaften enthält.
+     * Liest solange die Ausgabedatei ein, bis die Zeile die Compartment-Eigenschaften enthält.
      * 
-     * @return a compartment when one could be read a name for or
-     *         <code>null</code>
+     * @return a compartment when one could be read a name for or <code>null</code>
      * @throws IOException
      *             wenn beim Lesen der Eingabe ein Fehler auftritt.
      */

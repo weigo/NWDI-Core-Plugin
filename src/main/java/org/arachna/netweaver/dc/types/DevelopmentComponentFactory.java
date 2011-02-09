@@ -22,20 +22,48 @@ public final class DevelopmentComponentFactory {
     /**
      * Create and register a {@link DevelopmentComponent}.
      * 
-     * @param name
-     *            the name of the development component to register.
      * @param vendor
      *            the vendor of the development component to register.
+     * @param name
+     *            the name of the development component to register.
      * @param type
      *            the type of this development component.
      * @return the newly created or already registered development component
      */
-    public DevelopmentComponent create(final String name, final String vendor, final DevelopmentComponentType type) {
+    public DevelopmentComponent create(final String vendor, final String name, final DevelopmentComponentType type) {
         DevelopmentComponent component = this.get(vendor, name);
 
         if (null == component) {
             component = new DevelopmentComponent(name, vendor, type);
             this.componentMap.put(this.createComponentKey(name, vendor), component);
+        }
+
+        return component;
+    }
+
+    /**
+     * Create a development component using the given vendor, DC name and public parts and public part references.
+     * 
+     * @param vendor
+     *            DC vendor
+     * @param dcName
+     *            DC name
+     * @param publicParts
+     *            public parts of created DC
+     * @param references
+     *            references to public parts
+     * @return the created DC
+     */
+    public DevelopmentComponent create(final String vendor, final String dcName, final PublicPart[] publicParts,
+        final PublicPartReference[] references) {
+        final DevelopmentComponent component = this.create(vendor, dcName);
+
+        for (PublicPart pp : publicParts) {
+            component.add(pp);
+        }
+
+        for (PublicPartReference reference : references) {
+            component.add(reference);
         }
 
         return component;
@@ -48,23 +76,20 @@ public final class DevelopmentComponentFactory {
      *            name to use as part of the key.
      * @param vendor
      *            vendor to use as part of the key.
-     * @return the concatenation of the given vendor, ':' and the given
-     *         component name.
+     * @return the concatenation of the given vendor, ':' and the given component name.
      */
     private String createComponentKey(final String name, final String vendor) {
         return vendor + ":" + name;
     }
 
     /**
-     * Create and register a development component. If the development component
-     * is already registered the existing object will be returned.
+     * Create and register a development component. If the development component is already registered the existing object will be returned.
      * 
-     * @param name
-     *            name of development component.
      * @param vendor
      *            vendor of development component.
-     * @return a development component with the given vendor, name and type
-     *         {@link DevelopmentComponentType#unknown}.
+     * @param name
+     *            name of development component.
+     * @return a development component with the given vendor, name and type {@link DevelopmentComponentType#unknown}.
      */
     public DevelopmentComponent create(final String name, final String vendor) {
         return this.create(name, vendor, DevelopmentComponentType.unknown);
@@ -85,9 +110,8 @@ public final class DevelopmentComponentFactory {
     /**
      * Update the using DCs for all registered DCs.
      * 
-     * For each registered development component the list of public parts it
-     * references will be iterated. The respective development component will be
-     * looked up and the currently worked on DC will be added to its using DCs.
+     * For each registered development component the list of public parts it references will be iterated. The respective development
+     * component will be looked up and the currently worked on DC will be added to its using DCs.
      */
     public void updateUsingDCs() {
         for (final DevelopmentComponent component : this.componentMap.values()) {
@@ -118,15 +142,13 @@ public final class DevelopmentComponentFactory {
     }
 
     /**
-     * Return the development component matching the given vendor and component
-     * name.
+     * Return the development component matching the given vendor and component name.
      * 
      * @param vendor
      *            vendor of development component.
      * @param name
      *            name of development component.
-     * @return the development component asked for or <code>null</code> if it is
-     *         not registered.
+     * @return the development component asked for or <code>null</code> if it is not registered.
      */
     public DevelopmentComponent get(final String vendor, final String name) {
         return this.componentMap.get(createComponentKey(name, vendor));
