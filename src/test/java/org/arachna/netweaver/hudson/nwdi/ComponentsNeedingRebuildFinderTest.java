@@ -18,8 +18,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * @author Dirk Weigenand
+ * Unit test for {@link ComponentsNeedingRebuildFinder}.
  * 
+ * @author Dirk Weigenand
  */
 public class ComponentsNeedingRebuildFinderTest {
     /**
@@ -49,9 +50,7 @@ public class ComponentsNeedingRebuildFinderTest {
     }
 
     /**
-     * Test method for
-     * {@link org.arachna.netweaver.hudson.nwdi.ComponentsNeedingRebuildFinder#calculateDevelopmentComponentsThatNeedRebuilding(java.util.Collection)}
-     * .
+     * Test method for {@link ComponentsNeedingRebuildFinder#calculateDevelopmentComponentsThatNeedRebuilding(java.util.Collection)} .
      */
     @Test
     public final void testCalculateDevelopmentComponentsThatNeedRebuildingWithStandAloneDC() {
@@ -66,9 +65,7 @@ public class ComponentsNeedingRebuildFinderTest {
     }
 
     /**
-     * Test method for
-     * {@link org.arachna.netweaver.hudson.nwdi.ComponentsNeedingRebuildFinder#calculateDevelopmentComponentsThatNeedRebuilding(java.util.Collection)}
-     * .
+     * Test method for {@link ComponentsNeedingRebuildFinder#calculateDevelopmentComponentsThatNeedRebuilding(java.util.Collection)} .
      */
     @Test
     public final void testCalculateDevelopmentComponentsThatNeedRebuildingWithDCWithOneUsage() {
@@ -82,15 +79,12 @@ public class ComponentsNeedingRebuildFinderTest {
         final Collection<DevelopmentComponent> result =
             this.finder.calculateDevelopmentComponentsThatNeedRebuilding(Arrays.asList(new DevelopmentComponent[] { libJetm }));
 
-        assertThat(3, equalTo(result.size()));
-        assertThat(result, hasItems(expected));
         assertThat(result, hasSize(expected.length));
+        assertThat(result, hasItems(expected));
     }
 
     /**
-     * Test method for
-     * {@link org.arachna.netweaver.hudson.nwdi.ComponentsNeedingRebuildFinder#calculateDevelopmentComponentsThatNeedRebuilding(java.util.Collection)}
-     * .
+     * Test method for {@link ComponentsNeedingRebuildFinder#calculateDevelopmentComponentsThatNeedRebuilding(java.util.Collection)} .
      */
     @Test
     public final void testCalculateDevelopmentComponentsThatNeedRebuildingWithTwoBaseDCs() {
@@ -106,7 +100,6 @@ public class ComponentsNeedingRebuildFinderTest {
         final Collection<DevelopmentComponent> result =
             this.finder.calculateDevelopmentComponentsThatNeedRebuilding(Arrays.asList(new DevelopmentComponent[] { libJunit, libJetm }));
 
-        assertThat(4, equalTo(result.size()));
         assertThat(result, hasItems(expected));
         assertThat(result, hasSize(expected.length));
     }
