@@ -1,7 +1,7 @@
 package org.arachna.netweaver.hudson.dtr.browser;
 
 /**
- * Interfaces for filters on activities.
+ * Interface for filters on instances of {@link Activity}.
  * 
  * @author Dirk Weigenand
  */
