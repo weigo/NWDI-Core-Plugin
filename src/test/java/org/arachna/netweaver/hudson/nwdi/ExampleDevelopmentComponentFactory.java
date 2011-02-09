@@ -1,0 +1,93 @@
+/**
+ *
+ */
+package org.arachna.netweaver.hudson.nwdi;
+
+import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
+import org.arachna.netweaver.dc.types.PublicPart;
+import org.arachna.netweaver.dc.types.PublicPartReference;
+
+/**
+ * Factory for example development components for JUnit tests.
+ * 
+ * @author Dirk Weigenand
+ */
+final class ExampleDevelopmentComponentFactory {
+
+    /**
+     *
+     */
+    static final String LIB_JDBC = "lib/jdbc";
+
+    /**
+     * example DC.
+     */
+    static final String LIB_JEE_JETM = "lib/jee/jetm";
+
+    /**
+     * example DC.
+     */
+    static final String LIB_JETM_HELPER = "lib/jetm/helper";
+
+    /**
+     * example DC.
+     */
+    static final String LIB_JUNIT = "lib/junit";
+
+    /**
+     * example DC.
+     */
+    static final String LIB_JETM = "lib/jetm";
+
+    /**
+     * Vendor for example development configuration, compartment and development components.
+     */
+    static final String EXAMPLE_COM = "example.com";
+
+    /**
+     * assembly public part.
+     */
+    private static final PublicPart ASSEMBLY = new PublicPart("ASSEMBLY", "assembly PP", "");
+
+    /**
+     * api public part.
+     */
+    private static final PublicPart API = new PublicPart("API", "api PP", "");
+
+    /**
+     * defLib public part.
+     */
+    private static final PublicPart DEFLIB = new PublicPart("defLib", "defLib PP", "");
+
+    /**
+     * Should not be instantiated.
+     */
+    private ExampleDevelopmentComponentFactory() {
+    }
+
+    /**
+     * Create a {@link DevelopmentComponentFactory} as 'object mother' with an example set of development components and their usage
+     * relationships.
+     * 
+     * @return a <code>DevelopmentComponentFactory</code> with example development components.
+     */
+    static DevelopmentComponentFactory create() {
+        final DevelopmentComponentFactory dcFactory = new DevelopmentComponentFactory();
+        dcFactory.create(EXAMPLE_COM, LIB_JETM, new PublicPart[] { ASSEMBLY, API }, new PublicPartReference[] {});
+
+        dcFactory.create(EXAMPLE_COM, LIB_JETM_HELPER, new PublicPart[] { ASSEMBLY, API },
+            new PublicPartReference[] { new PublicPartReference(EXAMPLE_COM, LIB_JETM, API.getPublicPart()),
+                new PublicPartReference(EXAMPLE_COM, LIB_JUNIT, API.getPublicPart()) });
+
+        dcFactory.create(EXAMPLE_COM, LIB_JEE_JETM, new PublicPart[] { DEFLIB }, new PublicPartReference[] {
+            new PublicPartReference(EXAMPLE_COM, LIB_JETM, ASSEMBLY.getPublicPart()),
+            new PublicPartReference(EXAMPLE_COM, LIB_JETM_HELPER, ASSEMBLY.getPublicPart()) });
+
+        dcFactory.create(EXAMPLE_COM, LIB_JUNIT, new PublicPart[] { API }, new PublicPartReference[] {});
+        dcFactory.create(EXAMPLE_COM, LIB_JDBC, new PublicPart[] { API }, new PublicPartReference[] {});
+
+        dcFactory.updateUsingDCs();
+
+        return dcFactory;
+    }
+}
