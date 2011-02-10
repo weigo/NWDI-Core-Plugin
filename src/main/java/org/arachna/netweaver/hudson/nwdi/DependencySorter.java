@@ -31,8 +31,7 @@ public final class DependencySorter {
     private static final String ROOT_TARGET = "root";
 
     /**
-     * Collection of development components the build sequence is to be
-     * determined.
+     * Collection of development components the build sequence is to be determined.
      */
     private final Collection<DevelopmentComponent> components;
 
@@ -42,28 +41,23 @@ public final class DependencySorter {
     private final DevelopmentComponentFactory dcFactory;
 
     /**
-     * Create an instance of a <code>DependencySorter</code> using the given
-     * list of {@link DevelopmentComponent} objects.
+     * Create an instance of a <code>DependencySorter</code> using the given list of {@link DevelopmentComponent} objects.
      * 
      * @param dcFactory
      *            registry for development components
      * @param components
-     *            Collection of development components the build sequence is to
-     *            be determined.
+     *            Collection of development components the build sequence is to be determined.
      * 
      */
-    public DependencySorter(final DevelopmentComponentFactory dcFactory,
-        final Collection<DevelopmentComponent> components) {
+    public DependencySorter(final DevelopmentComponentFactory dcFactory, final Collection<DevelopmentComponent> components) {
         this.dcFactory = dcFactory;
         this.components = components;
     }
 
     /**
-     * Determine the sequence the given development components should be built
-     * in.
+     * Determine the sequence the given development components should be built in.
      * 
-     * @return a collection of development components in the sequence they
-     *         should be built in.
+     * @return a collection of development components in the sequence they should be built in.
      */
     @SuppressWarnings("unchecked")
     public List<DevelopmentComponent> determineBuildSequence() {
@@ -71,7 +65,7 @@ public final class DependencySorter {
         final Hashtable<String, Target> targets = new Hashtable<String, Target>();
         final Project project = this.createProject(targets);
 
-        for (final Target target : (Vector<Target>) project.topoSort(ROOT_TARGET, targets)) {
+        for (final Target target : (Vector<Target>)project.topoSort(ROOT_TARGET, targets)) {
             if (target.getName().contains(COLON)) {
                 final String[] parts = target.getName().split(COLON);
                 sequence.add(0, this.dcFactory.get(parts[0], parts[1]));
@@ -82,8 +76,7 @@ public final class DependencySorter {
     }
 
     /**
-     * Create an Ant project with respective targets and dependencies from the
-     * collection of development components.
+     * Create an Ant project with respective targets and dependencies from the collection of development components.
      * 
      * @param targets
      *            hash table used when sorting the targets.
@@ -107,9 +100,8 @@ public final class DependencySorter {
     /**
      * Create a target for the given development component.
      * 
-     * The created target will be added to the given parent, project and targets
-     * hashtable. For all development components that use the given development
-     * component the method will be called recursively.
+     * The created target will be added to the given parent, project and targets hashtable. For all development components that use the
+     * given development component the method will be called recursively.
      * 
      * @param targets
      *            table for collecting targets.
@@ -121,8 +113,8 @@ public final class DependencySorter {
      *            the parent target dependencies should be added to
      * @return the created target
      */
-    private Target createTargets(final Hashtable<String, Target> targets, final Project project,
-        final DevelopmentComponent component, final Target parent) {
+    private Target createTargets(final Hashtable<String, Target> targets, final Project project, final DevelopmentComponent component,
+        final Target parent) {
         final Target target = new Target();
         target.setName(this.createTargetName(component.getVendor(), component.getName()));
         targets.put(target.getName(), target);

@@ -4,18 +4,14 @@
 package org.arachna.netweaver.hudson.nwdi;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
-import org.arachna.netweaver.dc.types.Compartment;
-import org.arachna.netweaver.dc.types.CompartmentState;
 import org.arachna.netweaver.dc.types.DevelopmentComponent;
-import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
-import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 import org.arachna.netweaver.dctool.AbstractDCToolCommandBuilder;
 
 /**
- * Builder für 'builddc'-Kommando zum Bauen von Entwicklungskomponenten über das
- * DC-Tool.
+ * Builder for 'builddc' commands for DC tool.
  * 
  * @author Dirk Weigenand
  */
@@ -26,73 +22,33 @@ public final class BuildDevelopmentComponentsCommandBuilder extends AbstractDCTo
     private static final String BUILD_DC_COMMAND = "builddc -s %s -n %s -v %s -o;";
 
     /**
-     * registry for development components.
+     * list of development components to create build commands for.
      */
-    private final DevelopmentComponentFactory dcFactory;
+    private final List<DevelopmentComponent> components = new ArrayList<DevelopmentComponent>();
 
     /**
-     * Erzeugt einen <code>DevelopmentComponentBuilder</code>.
+     * Creates a <code>DevelopmentComponentBuilder</code> instance for the given development components.
      * 
-     * @param dcFactory
-     *            registry for development components.
-     * @param developmentConfiguration
-     *            Entwicklungskonfiguration
+     * @param components
+     *            development components to create build dc commands for.
+     * 
      */
-    public BuildDevelopmentComponentsCommandBuilder(final DevelopmentComponentFactory dcFactory,
-        final DevelopmentConfiguration developmentConfiguration) {
-        super(developmentConfiguration);
-        this.dcFactory = dcFactory;
+    public BuildDevelopmentComponentsCommandBuilder(final Collection<DevelopmentComponent> components) {
+        super(null);
+        this.components.addAll(components);
     }
 
     /**
-     * Erzeugt Befehle für das Bauen der Entwicklungskomponenten und führt dann
-     * das DC-Tool aus.
+     * Erzeugt Befehle für das Bauen der Entwicklungskomponenten und führt dann das DC-Tool aus.
      * 
      * @return Erzeugte 'builddc' Kommandos.
      */
     @Override
     protected List<String> executeInternal() {
-        final DependencySorter sorter = new DependencySorter(this.dcFactory, getDevelopmentComponentsNeedingARebuild());
-
-        return this.generateBuildCommands(sorter.determineBuildSequence());
-    }
-
-    /**
-     * Filter development components of this development configuration by their
-     * <code>needsRebuild</code> property.
-     * 
-     * @return list of development components needing a rebuild.
-     */
-    private List<DevelopmentComponent> getDevelopmentComponentsNeedingARebuild() {
-        final List<DevelopmentComponent> components = new ArrayList<DevelopmentComponent>();
-
-        for (final Compartment compartment : this.getDevelopmentConfiguration().getCompartments()) {
-            if (CompartmentState.Source.equals(compartment.getState())) {
-                for (final DevelopmentComponent component : compartment.getDevelopmentComponents()) {
-                    if (component.isNeedsRebuild()) {
-                        components.add(component);
-                    }
-                }
-            }
-        }
-
-        return components;
-    }
-
-    /**
-     * Erzeugt builddc Befehle für die übergebenen Entwicklungskomponenten.
-     * 
-     * @param components
-     *            Entwicklungskomponenten für die 'builddc'-Kommandos erzeugt
-     *            werden sollen.
-     * @return 'builddc'-Kommandos für die übergebenen Entwicklungskomponenten
-     */
-    private List<String> generateBuildCommands(final List<DevelopmentComponent> components) {
         final List<String> commands = new ArrayList<String>();
 
         for (final DevelopmentComponent component : components) {
-            commands.add(String.format(BUILD_DC_COMMAND, component.getCompartment().getName(), component.getName(),
-                component.getVendor()));
+            commands.add(String.format(BUILD_DC_COMMAND, component.getCompartment().getName(), component.getName(), component.getVendor()));
         }
 
         return commands;
