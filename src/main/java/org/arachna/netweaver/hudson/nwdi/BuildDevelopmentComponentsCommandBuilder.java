@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.arachna.netweaver.dc.types.DevelopmentComponent;
+import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 import org.arachna.netweaver.dctool.AbstractDCToolCommandBuilder;
 
 /**
@@ -29,12 +30,14 @@ public final class BuildDevelopmentComponentsCommandBuilder extends AbstractDCTo
     /**
      * Creates a <code>DevelopmentComponentBuilder</code> instance for the given development components.
      * 
+     * @param config
+     *            development configuration to use for executing dc tool commands.
      * @param components
      *            development components to create build dc commands for.
      * 
      */
-    public BuildDevelopmentComponentsCommandBuilder(final Collection<DevelopmentComponent> components) {
-        super(null);
+    public BuildDevelopmentComponentsCommandBuilder(final DevelopmentConfiguration config, final Collection<DevelopmentComponent> components) {
+        super(config);
         this.components.addAll(components);
     }
 

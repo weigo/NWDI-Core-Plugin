@@ -213,7 +213,9 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
 
             // TODO: annotate build results with links to build.log files.
             final DCToolCommandExecutor executor = NWDIBuild.this.getDCToolExecutor(this.launcher);
-            final DcToolCommandExecutionResult result = executor.execute(new BuildDevelopmentComponentsCommandBuilder(affectedComponents));
+            final DcToolCommandExecutionResult result =
+                executor.execute(new BuildDevelopmentComponentsCommandBuilder(NWDIBuild.this.getDevelopmentConfiguration(),
+                    affectedComponents));
             logger.append("Done building development components.\n");
 
             return result.isExitCodeOk() ? null : Result.FAILURE;
