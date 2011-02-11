@@ -20,7 +20,17 @@ public enum JdkHomeAlias {
     /**
      * JDK 1.4.2 home path.
      */
-    Jdk142Home("JDK1.4.2_HOME");
+    Jdk142Home("JDK1.4.2_HOME"),
+
+    /**
+     * JDK 1.5.0 home path.
+     */
+    Jdk150Home("JDK1.5.0_HOME"),
+
+    /**
+     * JDK 1.5.0 home path.
+     */
+    Jdk160Home("JDK1.6.0_HOME");
 
     /**
      * Aliases for JDK homes in NWDI.
