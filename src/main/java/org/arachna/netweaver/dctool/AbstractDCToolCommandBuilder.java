@@ -14,8 +14,7 @@ import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
  */
 public abstract class AbstractDCToolCommandBuilder implements DCToolCommandBuilder {
     /**
-     * development configuration to list compartments/development components
-     * from.
+     * development configuration to list compartments/development components from.
      */
     private final DevelopmentConfiguration developmentConfiguration;
 
@@ -26,6 +25,7 @@ public abstract class AbstractDCToolCommandBuilder implements DCToolCommandBuild
      *            development configuration to use.
      */
     protected AbstractDCToolCommandBuilder(final DevelopmentConfiguration developmentConfiguration) {
+        assert developmentConfiguration != null;
         this.developmentConfiguration = developmentConfiguration;
     }
 
@@ -48,8 +48,7 @@ public abstract class AbstractDCToolCommandBuilder implements DCToolCommandBuild
     }
 
     /**
-     * Implemented by sub classes to generate the DC Tool commands specific to
-     * this DC tool command builder.
+     * Implemented by sub classes to generate the DC Tool commands specific to this DC tool command builder.
      * 
      * @return DC Tool commands specific to this DC tool command builder.
      */
