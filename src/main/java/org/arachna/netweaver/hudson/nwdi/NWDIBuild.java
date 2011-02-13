@@ -27,7 +27,6 @@ import org.arachna.netweaver.dctool.DcToolCommandExecutionResult;
 import org.arachna.netweaver.hudson.dtr.browser.Activity;
 import org.arachna.netweaver.hudson.dtr.browser.ActivityResource;
 import org.arachna.netweaver.hudson.nwdi.confdef.ConfDefReader;
-import org.arachna.netweaver.hudson.nwdi.dcupdater.DevelopmentComponentUpdater;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.XMLReaderFactory;
 
@@ -54,7 +53,8 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
     private final DevelopmentComponentFactory dcFactory = new DevelopmentComponentFactory();
 
     /**
-     * Create an instance of <code>NWDIBuild</code> using the given <code>NWDIProject</code>.
+     * Create an instance of <code>NWDIBuild</code> using the given
+     * <code>NWDIProject</code>.
      * 
      * @param project
      *            parent to use for creating this build.
@@ -66,7 +66,8 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
     }
 
     /**
-     * Create an instance of <code>NWDIBuild</code> using the given <code>NWDIProject</code> and build directory.
+     * Create an instance of <code>NWDIBuild</code> using the given
+     * <code>NWDIProject</code> and build directory.
      * 
      * @param project
      *            parent to use for creating this build.
@@ -87,7 +88,8 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
     /**
      * Returns the {@link DevelopmentConfiguration} used throughout this build.
      * 
-     * @return the <code>DevelopmentConfiguration</code> used throughout this build.
+     * @return the <code>DevelopmentConfiguration</code> used throughout this
+     *         build.
      */
     public DevelopmentConfiguration getDevelopmentConfiguration() {
         if (this.developmentConfiguration == null) {
@@ -104,16 +106,19 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
     }
 
     /**
-     * Returns the {@link DevelopmentComponentFactory} used throughout this build.
+     * Returns the {@link DevelopmentComponentFactory} used throughout this
+     * build.
      * 
-     * @return <code>DevelopmentComponentFactory</code> used as registry for development components.
+     * @return <code>DevelopmentComponentFactory</code> used as registry for
+     *         development components.
      */
     DevelopmentComponentFactory getDevelopmentComponentFactory() {
         return this.dcFactory;
     }
 
     /**
-     * Returns the {@link DCToolCommandExecutor} used throughout this build using the given {@link Launcher}.
+     * Returns the {@link DCToolCommandExecutor} used throughout this build
+     * using the given {@link Launcher}.
      * 
      * @param launcher
      *            the launcher to use executing DC tool.
@@ -123,10 +128,11 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
         if (this.dcToolExecutor == null) {
             final NWDIProject.DescriptorImpl descriptor = this.getParent().getDescriptor();
             final DCToolDescriptor dcToolDescriptor =
-                new DCToolDescriptor(descriptor.getUser(), descriptor.getPassword(), descriptor.getNwdiToolLibFolder(), this.getWorkspace()
-                    .child(".dtr").getName(), descriptor.getConfiguredJdkHomePaths());
+                new DCToolDescriptor(descriptor.getUser(), descriptor.getPassword(), descriptor.getNwdiToolLibFolder(),
+                    this.getWorkspace().child(".dtr").getName(), descriptor.getConfiguredJdkHomePaths());
             this.dcToolExecutor =
-                new DCToolCommandExecutor(launcher, this.getWorkspace(), dcToolDescriptor, this.getDevelopmentConfiguration());
+                new DCToolCommandExecutor(launcher, this.getWorkspace(), dcToolDescriptor,
+                    this.getDevelopmentConfiguration());
         }
 
         return this.dcToolExecutor;
@@ -139,7 +145,8 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
      */
     private final class RunnerImpl extends AbstractRunner {
         /**
-         * registry/factory for development components to use throughout the build.
+         * registry/factory for development components to use throughout the
+         * build.
          */
         private final DevelopmentComponentFactory dcFactory;
 
@@ -154,7 +161,8 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
         private final List<Publisher> reporters = new ArrayList<Publisher>();
 
         /**
-         * Create an instance of <code>RunnerImpl</code> with the given {@link DevelopmentConfiguration} and
+         * Create an instance of <code>RunnerImpl</code> with the given
+         * {@link DevelopmentConfiguration} and
          * {@link DevelopmentComponentFactory}.
          * 
          * @param developmentConfiguration
@@ -168,9 +176,11 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
         }
 
         /**
-         * Builds all (changed) development components and updates the in core information about them (i.e. all DCs associated with the
-         * current track in the development configuration stored in this build) so that this information can be used in post build tasks for
-         * e.g. quality control or generation of documentation.
+         * Builds all (changed) development components and updates the in core
+         * information about them (i.e. all DCs associated with the current
+         * track in the development configuration stored in this build) so that
+         * this information can be used in post build tasks for e.g. quality
+         * control or generation of documentation.
          * 
          * @param listener
          *            the {@link BuildListener} to use for e.g. reporting.
@@ -190,11 +200,6 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
 
             final Result r = buildDevelopmentComponents(logger);
 
-            // FIXME: doesn't find any DCs at the moment
-            final DevelopmentComponentUpdater updater =
-                new DevelopmentComponentUpdater(NWDIBuild.this.getWorkspace().absolutize().getName(), this.dcFactory);
-            updater.execute();
-
             return r;
         }
 
@@ -211,10 +216,13 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
             final Collection<DevelopmentComponent> affectedComponents = getAffectedDevelopmentComponents();
             logger.append(String.format("Building %s development components.\n", affectedComponents.size()));
 
+            for (final DevelopmentComponent component : affectedComponents) {
+                logger.append(component.getName()).append('\n');
+            }
             // TODO: annotate build results with links to build.log files.
             final DCToolCommandExecutor executor = NWDIBuild.this.getDCToolExecutor(this.launcher);
             final DcToolCommandExecutionResult result =
-                executor.execute(new BuildDevelopmentComponentsCommandBuilder(NWDIBuild.this.getDevelopmentConfiguration(),
+                executor.execute(new BuildDevelopmentComponentsCommandBuilder(this.developmentConfiguration,
                     affectedComponents));
             logger.append("Done building development components.\n");
 
@@ -222,16 +230,19 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
         }
 
         /**
-         * Calculate build sequence for development components affected by activities that triggered this build.
+         * Calculate build sequence for development components affected by
+         * activities that triggered this build.
          * 
-         * @return build sequence for development components affected by activities that triggered this build.
+         * @return build sequence for development components affected by
+         *         activities that triggered this build.
          */
         protected Collection<DevelopmentComponent> getAffectedDevelopmentComponents() {
             final NWDIRevisionState revisionState = NWDIBuild.this.getAction(NWDIRevisionState.class);
             final Collection<DevelopmentComponent> affectedComponents = new HashSet<DevelopmentComponent>();
 
-            for (Activity activity : revisionState.getActivities()) {
-                for (ActivityResource resource : activity.getResources()) {
+            for (final Activity activity : revisionState.getActivities()) {
+                for (final ActivityResource resource : activity.getResources()) {
+                    // FIXME: get DCs from DevelopmentComponentFactory.
                     affectedComponents.add(resource.getDevelopmentComponent());
                 }
             }
@@ -240,7 +251,8 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
             this.dcFactory.updateUsingDCs();
             final ComponentsNeedingRebuildFinder finder = new ComponentsNeedingRebuildFinder();
             final DependencySorter dependencySorter =
-                new DependencySorter(this.dcFactory, finder.calculateDevelopmentComponentsThatNeedRebuilding(affectedComponents));
+                new DependencySorter(this.dcFactory,
+                    finder.calculateDevelopmentComponentsThatNeedRebuilding(affectedComponents));
 
             return dependencySorter.determineBuildSequence();
         }

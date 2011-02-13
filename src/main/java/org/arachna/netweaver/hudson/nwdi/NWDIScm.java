@@ -39,6 +39,8 @@ import org.arachna.netweaver.dctool.DCToolCommandExecutor;
 import org.arachna.netweaver.dctool.DcToolCommandExecutionResult;
 import org.arachna.netweaver.hudson.dtr.browser.Activity;
 import org.arachna.netweaver.hudson.dtr.browser.DtrBrowser;
+import org.arachna.netweaver.hudson.nwdi.dcupdater.DevelopmentComponentUpdater;
+import org.arachna.netweaver.hudson.util.FilePathHelper;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
@@ -134,8 +136,6 @@ public class NWDIScm extends SCM {
         DcToolCommandExecutionResult result = executor.execute(new ListDcCommandBuilder(config));
 
         if (result.isExitCodeOk()) {
-            // currentBuild.getWorkspace().act(new FilePermissionSetter());
-
             final DevelopmentComponentFactory dcFactory = currentBuild.getDevelopmentComponentFactory();
             new DevelopmentComponentsReader(new StringReader(result.getOutput()), dcFactory, config).read();
             logger.append(String.format("Read %s development components from NWDI.\n", dcFactory.getAll().size()));
@@ -159,6 +159,12 @@ public class NWDIScm extends SCM {
                 lastSuccessfulBuild != null ? lastSuccessfulBuild.getAction(NWDIRevisionState.class).getCreationDate()
                     : null));
             logger.append(String.format("Read %s activities.\n", activities.size()));
+
+            // FIXME: doesn't find any DCs at the moment
+            final DevelopmentComponentUpdater updater =
+                new DevelopmentComponentUpdater(FilePathHelper.makeAbsolute(currentBuild.getWorkspace().child(".dtc")),
+                    dcFactory);
+            updater.execute();
         }
 
         build.addAction(new NWDIRevisionState(activities));
@@ -171,6 +177,7 @@ public class NWDIScm extends SCM {
     public SCMRevisionState calcRevisionsFromBuild(final AbstractBuild<?, ?> build, final Launcher launcher,
         final TaskListener listener) throws IOException, InterruptedException {
         listener.getLogger().append(String.format("Calculating revisions from build #%s.", build.getNumber()));
+
         final NWDIRevisionState lastRevision = build.getAction(NWDIRevisionState.class);
 
         return lastRevision == null ? SCMRevisionState.NONE : lastRevision;
@@ -308,79 +315,4 @@ public class NWDIScm extends SCM {
 
         LOGGER.log(Level.INFO, String.format("%s took %d.%d sec.\n", message, (duration / 1000), (duration % 1000)));
     }
-
-    // private class FilePermissionSettingResult {
-    // /**
-    // * number of directories traversed.
-    // */
-    // private long directoryCount;
-    //
-    // /**
-    // * number of files worked on.
-    // */
-    // private long fileCount;
-    //
-    // /**
-    // * number of files that were read only.
-    // */
-    // private long readOnlyFilesCount;
-    //
-    // void directoryProcessed() {
-    // this.directoryCount++;
-    // }
-    //
-    // void fileProcessed() {
-    // this.fileCount++;
-    // }
-    //
-    // void readOnlyFileProcessed() {
-    // this.readOnlyFilesCount++;
-    // }
-    // }
-    //
-    // private class FilePermissionSetter implements
-    // FileCallable<FilePermissionSettingResult> {
-    // private static final long serialVersionUID = -5267949602124408209L;
-    //
-    // public FilePermissionSettingResult invoke(final File f, final
-    // VirtualChannel channel) throws IOException,
-    // InterruptedException {
-    // final FilePermissionSettingResult result = new
-    // FilePermissionSettingResult();
-    //
-    // final DirScanner scanner = new DirScanner.Full();
-    // final PermissionSettingFileVisitor visitor = new
-    // PermissionSettingFileVisitor(result);
-    // scanner.scan(f, visitor);
-    //
-    // return result;
-    // }
-    // }
-    //
-    // private class PermissionSettingFileVisitor extends FileVisitor {
-    // private final FilePermissionSettingResult filePermissionSettingResult;
-    //
-    // PermissionSettingFileVisitor(final FilePermissionSettingResult
-    // filePermissionSettingResult) {
-    // this.filePermissionSettingResult = filePermissionSettingResult;
-    // }
-    //
-    // @Override
-    // public void visit(final File f, final String relativePath) throws
-    // IOException {
-    // System.err.println(f.getAbsolutePath() + ": " + relativePath);
-    //
-    // if (f.isDirectory()) {
-    // this.filePermissionSettingResult.directoryProcessed();
-    // }
-    // else if (f.isFile()) {
-    // this.filePermissionSettingResult.fileProcessed();
-    //
-    // if (!f.canWrite()) {
-    // f.setWritable(true);
-    // this.filePermissionSettingResult.readOnlyFileProcessed();
-    // }
-    // }
-    // }
-    // }
 }
