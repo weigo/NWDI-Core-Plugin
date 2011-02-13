@@ -28,6 +28,9 @@ import org.arachna.netweaver.hudson.dtr.browser.ActivityResource;
  * @author Dirk Weigenand
  */
 public final class DtrChangeLogEntry extends Entry {
+    /**
+     * date format specification for check in times.
+     */
     static final String DATE_FORMAT_SPEC = "yyyyMMdd HH:mm:ss Z";
 
     /**
@@ -77,7 +80,11 @@ public final class DtrChangeLogEntry extends Entry {
     }
 
     /**
+     * Add the given {@link ActivityResource} as an {@link Item} to this
+     * changelog entry.
+     * 
      * @param resource
+     *            <code>ActivityResource</code> to add to change log.
      */
     private void createAndAddItem(final ActivityResource resource) {
         String action = "edit";
@@ -94,6 +101,8 @@ public final class DtrChangeLogEntry extends Entry {
     }
 
     /**
+     * Add {@link Item}
+     * 
      * @param item
      */
     void add(final Item item) {
@@ -120,9 +129,19 @@ public final class DtrChangeLogEntry extends Entry {
         this.setMsg(msg);
     }
 
+    /**
+     * default constructor for xstream.
+     */
     public DtrChangeLogEntry() {
     }
 
+    /**
+     * Get paths (to resources) affected by the recent activities depicted by
+     * this change log.
+     * 
+     * @return paths (to resources) affected by the recent activities depicted
+     *         by this change log.
+     */
     @Override
     public Collection<String> getAffectedPaths() {
         final Set<String> affectedPaths = new HashSet<String>();
@@ -134,25 +153,48 @@ public final class DtrChangeLogEntry extends Entry {
         return affectedPaths;
     }
 
+    /**
+     * Returns the {@link Item}s associated with this entry.
+     * 
+     * @return the {@link Item}s associated with this entry.
+     */
     public Collection<Item> getItems() {
         return this.items;
     }
 
+    /**
+     * Returns the author of this entry.
+     * 
+     * @return the author of this entry.
+     */
     @Override
     public User getAuthor() {
         return User.get(this.user, true);
     }
 
+    /**
+     * Returns the message associated with this entry.
+     */
     @Override
     public String getMsg() {
         return Util.xmlEscape(this.msg);
     }
 
+    /**
+     * Returns the activity ID associated with this entry.
+     * 
+     * @return the activity ID associated with this entry.
+     */
     public String getVersion() {
         // FIXME: Aktivitäts-ID herausfinden
         return this.activityId.substring(this.activityId.lastIndexOf('_') + 1);
     }
 
+    /**
+     * Returns the time this activity was checked in.
+     * 
+     * @return the time this activity was checked in.
+     */
     public Date getCheckInTime() {
         return this.checkInTime;
     }
@@ -200,6 +242,13 @@ public final class DtrChangeLogEntry extends Entry {
         return user;
     }
 
+    /**
+     * Returns the URL that can be used to display information about this
+     * activity.
+     * 
+     * @return the URL that can be used to display information about this
+     *         activity.
+     */
     public String getActivityUrl() {
         return String.format("%s/dtr/system-tools/reports/ResourceDetails?technical=false&path=/act%s", "",
             this.activityId);
@@ -229,41 +278,83 @@ public final class DtrChangeLogEntry extends Entry {
         super.setParent(parent);
     }
 
+    /**
+     * An <code>Item</code> represents a resource associated with an activity an
+     * is used to visualize it.
+     * 
+     * @author Dirk Weigenand
+     */
     public static final class Item {
+        /**
+         * Path to resource in the affected DC.
+         */
         private final String path;
+
+        /**
+         * Action (added, edited, removed).
+         */
         private final String action;
+
+        /**
+         * the change log entry this item belongs to.
+         */
         private DtrChangeLogEntry parent;
 
+        /**
+         * Creates an item with the given path and action.
+         * 
+         * @param path
+         *            Path to resource in the affected DC.
+         * @param action
+         *            Action (added, edited, removed).
+         */
         Item(final String path, final String action) {
             this.path = path;
             this.action = action;
         }
 
+        /**
+         * Set the change log entry this item belongs to.
+         * 
+         * @param parent
+         *            the change log entry this item belongs to.
+         */
         void setParent(final DtrChangeLogEntry parent) {
             this.parent = parent;
         }
 
         /**
-         * @return the path
+         * Returns the path to resource in the affected DC.
+         * 
+         * @return the path to resource in the affected DC.
          */
         public String getPath() {
             return path;
         }
 
         /**
-         * @return the action
+         * Returns the action associated with this item.
+         * 
+         * @return the action associated with this item.
          */
         public String getAction() {
             return action;
         }
 
         /**
-         * @return the parent
+         * Returns the change log entry this item belongs to.
+         * 
+         * @return the change log entry this item belongs to.
          */
         public DtrChangeLogEntry getParent() {
             return parent;
         }
 
+        /**
+         * Returns the {@link EditType} matching this items action.
+         * 
+         * @return the {@link EditType} matching this items action.
+         */
         public EditType getEditType() {
             EditType editType = EditType.EDIT;
 
