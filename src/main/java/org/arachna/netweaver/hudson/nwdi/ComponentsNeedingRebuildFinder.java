@@ -21,14 +21,17 @@ final class ComponentsNeedingRebuildFinder {
     private final Set<DevelopmentComponent> componentsNeedRebuilding = new HashSet<DevelopmentComponent>();
 
     /**
-     * From the given collection of development components find any dependent development components that have to be rebuilt, i.e. calculate
-     * the transitive hull of the given DCs wrt. to rebuilding.
+     * From the given collection of development components find any dependent
+     * development components that have to be rebuilt, i.e. calculate the
+     * transitive hull of the given DCs wrt. to rebuilding.
      * 
      * @param base
-     *            a collection of development components that are associated to activities since the last build.
+     *            a collection of development components that are associated to
+     *            activities since the last build.
      * @return a collection of development components needing a rebuild.
      */
-    public Collection<DevelopmentComponent> calculateDevelopmentComponentsThatNeedRebuilding(final Collection<DevelopmentComponent> base) {
+    public Collection<DevelopmentComponent> calculateDevelopmentComponentsThatNeedRebuilding(
+        final Collection<DevelopmentComponent> base) {
         this.componentsNeedRebuilding.clear();
 
         for (final DevelopmentComponent component : base) {
@@ -39,10 +42,12 @@ final class ComponentsNeedingRebuildFinder {
     }
 
     /**
-     * Update the <code>needsRebuild</code> property recursively for the given components using DCs.
+     * Update the <code>needsRebuild</code> property recursively for the given
+     * components using DCs.
      * 
      * @param component
-     *            the development component whose using DCs have to be set up as needing a rebuild.
+     *            the development component whose using DCs have to be set up as
+     *            needing a rebuild.
      */
     private void calculateDevelopmentComponentsThatNeedRebuilding(final DevelopmentComponent component) {
         if (!this.componentsNeedRebuilding.contains(component)) {
