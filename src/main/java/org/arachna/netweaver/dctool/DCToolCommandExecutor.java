@@ -106,7 +106,7 @@ public final class DCToolCommandExecutor {
     public DcToolCommandExecutionResult execute(final DCToolCommandBuilder commandBuilder) throws IOException,
         InterruptedException {
         final List<String> commands = commandBuilder.execute();
-        final ByteArrayOutputStream output = new ByteArrayOutputStream();
+        final ByteArrayOutputStream result = new ByteArrayOutputStream();
         int exitCode = 0;
 
         if (commands.size() > 0) {
@@ -115,13 +115,12 @@ public final class DCToolCommandExecutor {
             starter.envs(this.createEnvironment());
             starter.cmds(this.createDcToolCommand(launcher.isUnix(), null));
             starter.stdin(createCommandInputStream(commands));
-            final ByteArrayOutputStream result = new ByteArrayOutputStream();
             final ForkOutputStream tee = new ForkOutputStream(launcher.getListener().getLogger(), result);
             starter.stdout(tee);
             exitCode = starter.join();
         }
 
-        return new DcToolCommandExecutionResult(output.toString(), exitCode);
+        return new DcToolCommandExecutionResult(result.toString(), exitCode);
     }
 
     /**
