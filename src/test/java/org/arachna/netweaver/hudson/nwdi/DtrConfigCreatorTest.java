@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
+import org.arachna.netweaver.hudson.util.FilePathHelper;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.custommonkey.xmlunit.XpathEngine;
 import org.custommonkey.xmlunit.exceptions.XpathException;
@@ -127,7 +128,7 @@ public final class DtrConfigCreatorTest {
         assertContent(clientsXml, String.format("/clients/client[@name = '%s']", this.config.getName()));
         assertContent(clientsXml, String.format("/clients/client[@logicalSystem = '%s']", this.config.getName()));
         assertContent(clientsXml,
-            String.format("/clients/client[@absoluteLocalRoot = '%s']", this.configCreator.makeAbsolute(dotDtc)));
+            String.format("/clients/client[@absoluteLocalRoot = '%s']", FilePathHelper.makeAbsolute(dotDtc)));
     }
 
     /**
@@ -147,13 +148,13 @@ public final class DtrConfigCreatorTest {
             assertTrue(String.format("xpath '%s' did not match in document '%s'.", xPath, content), engine
                 .getMatchingNodes(xPath, document).getLength() == 1);
         }
-        catch (SAXException e) {
+        catch (final SAXException e) {
             fail(e.getMessage());
         }
-        catch (IOException e) {
+        catch (final IOException e) {
             fail(e.getMessage());
         }
-        catch (XpathException e) {
+        catch (final XpathException e) {
             fail(e.getMessage() + "'" + xPath + "'");
         }
     }
@@ -170,10 +171,10 @@ public final class DtrConfigCreatorTest {
                 fail("Assert failed: Path " + path.getName() + " does not exist.");
             }
         }
-        catch (IOException e) {
+        catch (final IOException e) {
             fail(e.getMessage());
         }
-        catch (InterruptedException e) {
+        catch (final InterruptedException e) {
             fail(e.getMessage());
         }
 
