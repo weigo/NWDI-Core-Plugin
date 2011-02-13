@@ -6,13 +6,12 @@ package org.arachna.netweaver.hudson.nwdi;
 import hudson.FilePath;
 import hudson.Util;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
-import java.util.Stack;
 
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
+import org.arachna.netweaver.hudson.util.FilePathHelper;
 
 /**
  * Create or update the dtr configuration files.
@@ -172,7 +171,7 @@ final class DtrConfigCreator {
      *             when the user canceled the operation.
      */
     private void createOrUpdateClientsXml() throws IOException, InterruptedException {
-        final String path = makeAbsolute(this.dtcDirectory);
+        final String path = FilePathHelper.makeAbsolute(this.dtcDirectory);
         final String content =
             String.format(this.getTemplate(CLIENTS_XML), this.config.getName(), path.toString(), this.config.getName());
         this.dtrDirectory.child(CLIENTS_XML).write(content, DEFAULT_ENCODING);
@@ -190,31 +189,6 @@ final class DtrConfigCreator {
     private void createOrUpdateServersXml() throws IOException, InterruptedException {
         this.dtrDirectory.child(SERVERS_XML).write(
             String.format(this.getTemplate(SERVERS_XML), this.config.getBuildServer()), DEFAULT_ENCODING);
-    }
-
-    /**
-     * Returns the absolute path of the given <code>path</code>.
-     * 
-     * @param path
-     *            the {@link FilePath} to compute the absolute path for.
-     * @return absolute path for the given file path.
-     */
-    protected String makeAbsolute(final FilePath path) {
-        final Stack<String> paths = new Stack<String>();
-        FilePath parent = path;
-
-        while (parent != null) {
-            paths.push(parent.getName());
-            parent = parent.getParent();
-        }
-
-        final StringBuilder absolutePath = new StringBuilder();
-
-        while (!paths.isEmpty()) {
-            absolutePath.append(paths.pop()).append(File.separatorChar);
-        }
-
-        return absolutePath.toString();
     }
 
     /**
