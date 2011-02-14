@@ -4,7 +4,6 @@
 package org.arachna.netweaver.hudson.dtr.browser;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -12,8 +11,6 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.apache.http.client.ClientProtocolException;
 import org.arachna.netweaver.dc.types.Compartment;
@@ -37,11 +34,6 @@ public final class DtrBrowser {
      * Error message when extracting activities from DTR failed.
      */
     private static final String ERROR_READING_ACTIVITIES = "There was an error reading the list of activities (for %s/%s_%s) from the DTR.";
-
-    /**
-     * Logger.
-     */
-    private static final Logger LOGGER = Logger.getLogger(DtrBrowser.class.getName());
 
     /**
      * query for reading activities for a given compartment.
@@ -80,32 +72,6 @@ public final class DtrBrowser {
         this.config = config;
         this.dtrHttpClient = new DtrHttpClient(dtrUser, password);
         this.dcFactory = dcFactory;
-    }
-
-    /**
-     * Get list of compartments contained in the given workspace.
-     * 
-     * @return list of compartments found in workspace.
-     */
-    public List<Compartment> getCompartments() {
-        final SoftwareComponentsParser componentsBrowser = new SoftwareComponentsParser();
-        final List<Compartment> compartments = new ArrayList<Compartment>();
-
-        try {
-            // FIXME: should use the dtr location of a software component of the
-            // given development configuration
-            final String queryUrl = String.format("%s/dtr/ws/%s", this.config.getCmsUrl(), this.config.getWorkspace());
-            final InputStream result = this.dtrHttpClient.getContent(queryUrl);
-            compartments.addAll(componentsBrowser.parse(result, config));
-        }
-        catch (final ClientProtocolException e) {
-            LOGGER.log(Level.SEVERE, ERROR_COMMUNICATING_WITH_DTR, e);
-        }
-        catch (final IOException e) {
-            LOGGER.log(Level.SEVERE, "An error occured reading the list of compartments from the DTR.", e);
-        }
-
-        return compartments;
     }
 
     /**
