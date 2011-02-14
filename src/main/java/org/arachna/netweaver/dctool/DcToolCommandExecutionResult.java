@@ -20,11 +20,12 @@ public final class DcToolCommandExecutionResult {
     private final int exitCode;
 
     /**
-     * Create an instance of <code>DcToolCommandExecutionResult</code> using the
-     * given output and exit code.
+     * Create an instance of <code>DcToolCommandExecutionResult</code> using the given output and exit code.
      * 
      * @param output
+     *            the output produced by dc tool
      * @param exitCode
+     *            the exit code returned by dc tool
      */
     DcToolCommandExecutionResult(final String output, final int exitCode) {
         this.output = output;
@@ -51,11 +52,9 @@ public final class DcToolCommandExecutionResult {
     }
 
     /**
-     * Returns <code>true</code> when the exit code of this dc tool execution
-     * indocated success, <code>false</code> otherwise.
+     * Returns <code>true</code> when the exit code of this dc tool execution indocated success, <code>false</code> otherwise.
      * 
-     * @return <code>true</code> when the exit code of this dc tool execution
-     *         indocated success, <code>false</code> otherwise.
+     * @return <code>true</code> when the exit code of this dc tool execution indocated success, <code>false</code> otherwise.
      */
     public boolean isExitCodeOk() {
         return 0 == this.getExitCode();
