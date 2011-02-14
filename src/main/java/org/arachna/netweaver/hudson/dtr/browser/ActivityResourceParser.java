@@ -3,14 +3,12 @@
  */
 package org.arachna.netweaver.hudson.dtr.browser;
 
-import java.io.InputStream;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
-import org.jaxen.JaxenException;
-import org.jaxen.dom.DOMXPath;
-import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 /**
@@ -18,7 +16,7 @@ import org.w3c.dom.Node;
  * 
  * @author Dirk Weigenand
  */
-public final class ActivityResourceParser {
+public final class ActivityResourceParser extends AbstractResourceParser {
     /**
      * XPath expression to extract resources.
      */
@@ -75,24 +73,21 @@ public final class ActivityResourceParser {
         this.activity = activity;
     }
 
+    @Override
+    String getXPath() {
+        return XPATH;
+    }
+
     /**
      * Parses a DTR HTML report of a specific activity and updates the activity with the found resources.
      * 
-     * @param dtrActivityReportPage
-     *            HTML report containing the activities resources.
+     * @param nodes
+     *            DOM nodes representing the extracted resources.
      */
-    public void parse(final InputStream dtrActivityReportPage) {
-        final Document document = JTidyHelper.getDocument(dtrActivityReportPage);
-
-        try {
-            final DOMXPath xPath = new DOMXPath(XPATH);
-
-            for (final Object returnValue : xPath.selectNodes(document)) {
-                this.addResource((Node)returnValue);
-            }
-        }
-        catch (final JaxenException e) {
-            throw new RuntimeException(e);
+    @Override
+    public void parseInternal(final List<Object> nodes) {
+        for (final Object returnValue : nodes) {
+            this.addResource((Node)returnValue);
         }
     }
 
@@ -106,10 +101,11 @@ public final class ActivityResourceParser {
         final String resourcePath = node.getChildNodes().item(0).getNodeValue();
 
         if (this.isResourcePathDevelopmentComponentResource(resourcePath)) {
+            final DevelopmentComponent component =
+                this.developmentComponentFactory.create(this.getVendor(resourcePath), this.getDevelopmentComponentName(resourcePath));
             final ActivityResource resource =
-                new ActivityResource(this.activity, this.developmentComponentFactory.create(this.getVendor(resourcePath),
-                    this.getDevelopmentComponentName(resourcePath)), this.getResourcePath(resourcePath), this.getResourceId(node
-                    .getAttributes().getNamedItem("href").getNodeValue()));
+                new ActivityResource(this.activity, component, this.getResourcePath(resourcePath), this.getResourceId(node.getAttributes()
+                    .getNamedItem("href").getNodeValue()));
             this.activity.add(resource);
         }
     }
