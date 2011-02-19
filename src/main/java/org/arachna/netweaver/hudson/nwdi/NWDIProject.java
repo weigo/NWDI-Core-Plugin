@@ -184,7 +184,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
         /**
          * Constant for nwdi tool libraries folder request parameter.
          */
-        protected static final String NWDI_TOOL_LIB_FOLDER = "NWDIPlugin.nwdiToolLibFolder";
+        protected static final String TOOL_LIB_FOLDER = "NWDIPlugin.nwdiToolLibFolder";
 
         /**
          * Constant for JDK home paths request parameter.
@@ -298,7 +298,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
             final ParameterHelper helper = new ParameterHelper(req);
 
             this.jdkHomePaths = helper.getParameter(JDK_HOME_PATHS);
-            this.nwdiToolLibFolder = helper.getParameter(NWDI_TOOL_LIB_FOLDER);
+            this.nwdiToolLibFolder = helper.getParameter(TOOL_LIB_FOLDER);
             this.user = helper.getParameter(USER);
             this.password = helper.getParameter(PASSWORD);
 
