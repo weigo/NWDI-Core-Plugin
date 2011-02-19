@@ -38,7 +38,7 @@ import org.kohsuke.stapler.StaplerResponse;
  * 
  * @author Dirk Weigenand
  */
-public final class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopLevelItem {
+public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopLevelItem {
     /**
      * parameter name for project configuration controlling whether the
      * workspace should be clean before building.
@@ -170,7 +170,30 @@ public final class NWDIProject extends Project<NWDIProject, NWDIBuild> implement
      * 
      * @author Dirk Weigenand
      */
-    public static final class DescriptorImpl extends AbstractProjectDescriptor {
+    public static class DescriptorImpl extends AbstractProjectDescriptor {
+        /**
+         * Constant for password request parameter.
+         */
+        protected static final String NWDI_PLUGIN_PASSWORD = "NWDIPlugin.password";
+
+        /**
+         * Constant for user request parameter.
+         */
+        protected static final String NWDI_PLUGIN_USER = "NWDIPlugin.user";
+
+        /**
+         * Constant for nwdi tool libraries folder request parameter.
+         */
+        protected static final String NWDI_PLUGIN_NWDI_TOOL_LIB_FOLDER = "NWDIPlugin.nwdiToolLibFolder";
+
+        /**
+         * Constant for JDK home paths request parameter.
+         */
+        protected static final String NWDI_PLUGIN_JDK_HOME_PATHS = "NWDIPlugin.jdkHomePaths";
+
+        /**
+         * Constant for dc tool sub folder in nwdi tool library folder.
+         */
         private static final String DC_SUB_FOLDER = "dc";
 
         /**
@@ -189,14 +212,9 @@ public final class NWDIProject extends Project<NWDIProject, NWDIBuild> implement
         private String nwdiToolLibFolder;
 
         /**
-         * path to the 'JDK_1_3_1_HOME' installation.
+         * 'JDK_HOME_PATHS'.
          */
-        private String jdk131Home;
-
-        /**
-         * path to the 'JDK_1_4_2_HOME' installation.
-         */
-        private String jdk142Home;
+        private String jdkHomePaths;
 
         /**
          * Create descriptor for NWDI-Projects and load global configuration
@@ -252,33 +270,20 @@ public final class NWDIProject extends Project<NWDIProject, NWDIBuild> implement
         }
 
         /**
-         * @return the jdk131Home
+         * @return the JDK_HOME_PATHS
          */
-        public String getJdk131Home() {
-            return jdk131Home;
+        public String getJdkHomePaths() {
+            return jdkHomePaths;
         }
 
         /**
-         * @param jdk131Home
-         *            the jdk131Home to set
+         * Set the JDK_HOME_PATHS.
+         * 
+         * @param jdkHomePaths
+         *            the jdkHomePaths to set
          */
-        public void setJdk131Home(final String jdk131Home) {
-            this.jdk131Home = jdk131Home;
-        }
-
-        /**
-         * @return the jdk142Home
-         */
-        public String getJdk142Home() {
-            return jdk142Home;
-        }
-
-        /**
-         * @param jdk142Home
-         *            the jdk142Home to set
-         */
-        public void setJdk142Home(final String jdk142Home) {
-            this.jdk142Home = jdk142Home;
+        public void setJdkHomePaths(final String jdkHomePaths) {
+            this.jdkHomePaths = jdkHomePaths;
         }
 
         /*
@@ -290,11 +295,12 @@ public final class NWDIProject extends Project<NWDIProject, NWDIBuild> implement
          */
         @Override
         public boolean configure(final StaplerRequest req, final JSONObject json) throws FormException {
-            this.jdk131Home = getParameter(req, "NWDIPlugin.jdk131Home");
-            this.jdk142Home = getParameter(req, "NWDIPlugin.jdk142Home");
-            this.nwdiToolLibFolder = getParameter(req, "NWDIPlugin.nwdiToolLibFolder");
-            this.user = getParameter(req, "NWDIPlugin.user");
-            this.password = getParameter(req, "NWDIPlugin.password");
+            final ParameterHelper helper = new ParameterHelper(req);
+
+            this.jdkHomePaths = helper.getParameter(NWDI_PLUGIN_JDK_HOME_PATHS);
+            this.nwdiToolLibFolder = helper.getParameter(NWDI_PLUGIN_NWDI_TOOL_LIB_FOLDER);
+            this.user = helper.getParameter(NWDI_PLUGIN_USER);
+            this.password = helper.getParameter(NWDI_PLUGIN_PASSWORD);
 
             save();
 
@@ -358,6 +364,10 @@ public final class NWDIProject extends Project<NWDIProject, NWDIBuild> implement
                 .error(Messages.NWDIProject_NwdiToolLibFolder_no_proper_installation_folder(DC_SUB_FOLDER));
         }
 
+        protected FormValidation doJdkHomePathsCheck() {
+            return FormValidation.error("");
+        }
+
         /**
          * Returns the requested parameter from the given {@link StaplerRequest}
          * .
@@ -371,7 +381,7 @@ public final class NWDIProject extends Project<NWDIProject, NWDIBuild> implement
          *         <code>StaplerRequest</code>.
          */
         private String getParameter(final StaplerRequest req, final String parameter) {
-            return Util.fixEmpty(req.getParameter(parameter).trim());
+            return Util.fixEmptyAndTrim(req.getParameter(parameter));
         }
 
         /**
@@ -406,8 +416,15 @@ public final class NWDIProject extends Project<NWDIProject, NWDIBuild> implement
         JdkHomePaths getConfiguredJdkHomePaths() {
             final JdkHomePaths paths = new JdkHomePaths();
 
-            paths.add(JdkHomeAlias.Jdk131Home, this.getJdk131Home());
-            paths.add(JdkHomeAlias.Jdk142Home, this.getJdk142Home());
+            for (String pathDef : this.getJdkHomePaths().split(",;")) {
+                final String[] parts = pathDef.split("=");
+
+                final JdkHomeAlias alias = JdkHomeAlias.valueOf(parts[0]);
+
+                if (alias != null) {
+                    paths.add(alias, parts[1]);
+                }
+            }
 
             return paths;
         }
