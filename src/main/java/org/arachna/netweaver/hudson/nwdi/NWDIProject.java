@@ -174,22 +174,22 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
         /**
          * Constant for password request parameter.
          */
-        protected static final String NWDI_PLUGIN_PASSWORD = "NWDIPlugin.password";
+        protected static final String PASSWORD = "NWDIPlugin.password";
 
         /**
          * Constant for user request parameter.
          */
-        protected static final String NWDI_PLUGIN_USER = "NWDIPlugin.user";
+        protected static final String USER = "NWDIPlugin.user";
 
         /**
          * Constant for nwdi tool libraries folder request parameter.
          */
-        protected static final String NWDI_PLUGIN_NWDI_TOOL_LIB_FOLDER = "NWDIPlugin.nwdiToolLibFolder";
+        protected static final String NWDI_TOOL_LIB_FOLDER = "NWDIPlugin.nwdiToolLibFolder";
 
         /**
          * Constant for JDK home paths request parameter.
          */
-        protected static final String NWDI_PLUGIN_JDK_HOME_PATHS = "NWDIPlugin.jdkHomePaths";
+        protected static final String JDK_HOME_PATHS = "NWDIPlugin.jdkHomePaths";
 
         /**
          * Constant for dc tool sub folder in nwdi tool library folder.
@@ -297,10 +297,10 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
         public boolean configure(final StaplerRequest req, final JSONObject json) throws FormException {
             final ParameterHelper helper = new ParameterHelper(req);
 
-            this.jdkHomePaths = helper.getParameter(NWDI_PLUGIN_JDK_HOME_PATHS);
-            this.nwdiToolLibFolder = helper.getParameter(NWDI_PLUGIN_NWDI_TOOL_LIB_FOLDER);
-            this.user = helper.getParameter(NWDI_PLUGIN_USER);
-            this.password = helper.getParameter(NWDI_PLUGIN_PASSWORD);
+            this.jdkHomePaths = helper.getParameter(JDK_HOME_PATHS);
+            this.nwdiToolLibFolder = helper.getParameter(NWDI_TOOL_LIB_FOLDER);
+            this.user = helper.getParameter(USER);
+            this.password = helper.getParameter(PASSWORD);
 
             save();
 
@@ -366,22 +366,6 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
 
         protected FormValidation doJdkHomePathsCheck() {
             return FormValidation.error("");
-        }
-
-        /**
-         * Returns the requested parameter from the given {@link StaplerRequest}
-         * .
-         * 
-         * @param req
-         *            the <code>StaplerRequest</code> to extract the parameter
-         *            from.
-         * @param parameter
-         *            the name of the requested parameter.
-         * @return the requested parameter from the given
-         *         <code>StaplerRequest</code>.
-         */
-        private String getParameter(final StaplerRequest req, final String parameter) {
-            return Util.fixEmptyAndTrim(req.getParameter(parameter));
         }
 
         /**

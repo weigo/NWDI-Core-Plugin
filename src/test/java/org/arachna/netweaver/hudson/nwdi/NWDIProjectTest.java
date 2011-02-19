@@ -96,10 +96,9 @@ public class NWDIProjectTest implements TopLevelItem {
         final String password = "secret";
 
         final StaplerRequest request =
-            new FakeStaplerRequest(new String[] { NWDIProject.DescriptorImpl.NWDI_PLUGIN_JDK_HOME_PATHS,
-                NWDIProject.DescriptorImpl.NWDI_PLUGIN_NWDI_TOOL_LIB_FOLDER,
-                NWDIProject.DescriptorImpl.NWDI_PLUGIN_USER, NWDIProject.DescriptorImpl.NWDI_PLUGIN_PASSWORD },
-                new String[] { jdk16, nwdiToolsFolder, user, password });
+            new FakeStaplerRequest(new String[] { NWDIProject.DescriptorImpl.JDK_HOME_PATHS,
+                NWDIProject.DescriptorImpl.NWDI_TOOL_LIB_FOLDER, NWDIProject.DescriptorImpl.USER,
+                NWDIProject.DescriptorImpl.PASSWORD }, new String[] { jdk16, nwdiToolsFolder, user, password });
 
         this.descriptor.configure(request, null);
 
