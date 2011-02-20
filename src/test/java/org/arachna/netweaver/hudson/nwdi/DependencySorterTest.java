@@ -15,7 +15,7 @@ import org.junit.Test;
 /**
  * Unit test for {@link DependencySorter}.
  * 
- * @author g526521
+ * @author Dirk Weigenand
  */
 public class DependencySorterTest {
     /**
@@ -45,28 +45,32 @@ public class DependencySorterTest {
     @Test
     public final void testDetermineBuildSequenceForLibITextAndDependencies() {
         final DevelopmentComponent libJunit =
-            this.dcFactory.get(ExampleDevelopmentComponentFactory.EXAMPLE_COM, ExampleDevelopmentComponentFactory.LIB_JUNIT);
+            this.dcFactory.get(ExampleDevelopmentComponentFactory.EXAMPLE_COM,
+                ExampleDevelopmentComponentFactory.LIB_JUNIT);
 
-        final DevelopmentComponent[] components = getDevelopmentComponentsBuildSequence(new DevelopmentComponent[] { libJunit });
+        final DevelopmentComponent[] components =
+            getDevelopmentComponentsBuildSequence(new DevelopmentComponent[] { libJunit });
         assertThat(3, equalTo(components.length));
         assertThat(libJunit, equalTo(components[0]));
-        assertThat(this.dcFactory.get(ExampleDevelopmentComponentFactory.EXAMPLE_COM, ExampleDevelopmentComponentFactory.LIB_JETM_HELPER),
-            equalTo(components[1]));
-        assertThat(this.dcFactory.get(ExampleDevelopmentComponentFactory.EXAMPLE_COM, ExampleDevelopmentComponentFactory.LIB_JEE_JETM),
-            equalTo(components[2]));
+        assertThat(this.dcFactory.get(ExampleDevelopmentComponentFactory.EXAMPLE_COM,
+            ExampleDevelopmentComponentFactory.LIB_JETM_HELPER), equalTo(components[1]));
+        assertThat(this.dcFactory.get(ExampleDevelopmentComponentFactory.EXAMPLE_COM,
+            ExampleDevelopmentComponentFactory.LIB_JEE_JETM), equalTo(components[2]));
     }
 
     /**
      * Get build sequence of development components.
      * 
      * @param base
-     *            development components that have been changed in recent activities.
+     *            development components that have been changed in recent
+     *            activities.
      * @return build sequence of development components.
      */
     private DevelopmentComponent[] getDevelopmentComponentsBuildSequence(final DevelopmentComponent[] base) {
         final ComponentsNeedingRebuildFinder finder = new ComponentsNeedingRebuildFinder();
         final DependencySorter sorter =
-            new DependencySorter(this.dcFactory, finder.calculateDevelopmentComponentsThatNeedRebuilding(Arrays.asList(base)));
+            new DependencySorter(this.dcFactory, finder.calculateDevelopmentComponentsThatNeedRebuilding(Arrays
+                .asList(base)));
 
         final Collection<DevelopmentComponent> buildSequence = sorter.determineBuildSequence();
         return buildSequence.toArray(new DevelopmentComponent[buildSequence.size()]);
