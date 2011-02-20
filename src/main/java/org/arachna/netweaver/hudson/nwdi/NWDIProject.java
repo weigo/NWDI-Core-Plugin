@@ -225,15 +225,19 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
         }
 
         /**
-         * @return the user
+         * Returns the user for authentication against the NWDI.
+         * 
+         * @return the user for authentication against the NWDI
          */
         public String getUser() {
             return this.user;
         }
 
         /**
+         * Sets the user for authentication against the NWDI.
+         * 
          * @param user
-         *            the user to set
+         *            the user for authentication against the NWDI.
          */
         public void setUser(final String user) {
             this.user = user;
@@ -270,17 +274,22 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
         }
 
         /**
-         * @return the JDK_HOME_PATHS
+         * Returns the paths to JDK installations to be used for building
+         * tracks.
+         * 
+         * @return the paths to JDK installations to be used for building
+         *         tracks.
          */
         public String getJdkHomePaths() {
-            return jdkHomePaths;
+            return this.jdkHomePaths;
         }
 
         /**
-         * Set the JDK_HOME_PATHS.
+         * Set the paths to JDK installations to be used for building tracks.
          * 
          * @param jdkHomePaths
-         *            the jdkHomePaths to set
+         *            the paths to JDK installations to be used for building
+         *            tracks.
          */
         public void setJdkHomePaths(final String jdkHomePaths) {
             this.jdkHomePaths = jdkHomePaths;
@@ -400,13 +409,15 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
         JdkHomePaths getConfiguredJdkHomePaths() {
             final JdkHomePaths paths = new JdkHomePaths();
 
-            for (String pathDef : this.getJdkHomePaths().split(",;")) {
+            final String[] pathDefs = Util.fixNull(this.getJdkHomePaths()).split(",|;");
+
+            for (String pathDef : pathDefs) {
                 final String[] parts = pathDef.split("=");
 
-                final JdkHomeAlias alias = JdkHomeAlias.valueOf(parts[0]);
+                final JdkHomeAlias alias = JdkHomeAlias.fromString(Util.fixEmptyAndTrim(Util.fixNull(parts[0])));
 
                 if (alias != null) {
-                    paths.add(alias, parts[1]);
+                    paths.add(alias, Util.fixEmptyAndTrim(Util.fixNull(parts[1])));
                 }
             }
 
