@@ -3,6 +3,7 @@
  */
 package org.arachna.netweaver.dctool;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -57,5 +58,16 @@ public final class JdkHomePaths {
         }
 
         return path;
+    }
+
+    /**
+     * Get all configured aliases.
+     * 
+     * Used for testing.
+     * 
+     * @return all configured aliases.
+     */
+    public Collection<JdkHomeAlias> getAliases() {
+        return this.paths.keySet();
     }
 }
