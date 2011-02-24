@@ -49,6 +49,11 @@ import org.kohsuke.stapler.StaplerRequest;
  */
 public class NWDIScm extends SCM {
     /**
+     * 1000 milliseconds.
+     */
+    private static final int A_THOUSAND_MSECS = 1000;
+
+    /**
      * Logger.
      */
     private static final Logger LOGGER = Logger.getLogger(NWDIScm.class.getName());
@@ -323,6 +328,7 @@ public class NWDIScm extends SCM {
     private void duration(final long start, final String message) {
         final long duration = System.currentTimeMillis() - start;
 
-        LOGGER.log(Level.INFO, String.format("%s took %d.%d sec.\n", message, (duration / 1000), (duration % 1000)));
+        LOGGER.log(Level.INFO,
+            String.format("%s took %d.%d sec.\n", message, duration / A_THOUSAND_MSECS, duration % A_THOUSAND_MSECS));
     }
 }
