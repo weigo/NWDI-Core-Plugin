@@ -26,13 +26,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.json.JSONObject;
 
-import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 import org.arachna.netweaver.dctool.DCToolCommandExecutor;
@@ -216,7 +214,7 @@ public class NWDIScm extends SCM {
     }
 
     /**
-     * Write the change log using the given list of activi * *
+     * Write the change log using the given build, file and list of activities.
      * 
      * @param build
      *            the {@link AbstractBuild} to use writing the change log.
@@ -225,6 +223,7 @@ public class NWDIScm extends SCM {
      * @param activities
      *            list of activities to write to change log.
      * @throws IOException
+     *             will be rethrown when writing the change log fails.
      */
     private void writeChangeLog(final AbstractBuild<?, ?> build, final File changelogFile,
         final Collection<Activity> activities) throws IOException {
@@ -233,6 +232,11 @@ public class NWDIScm extends SCM {
         dtrChangeLogWriter.write();
     }
 
+    /**
+     * {@link SCMDescriptor} for {@link NWDIProject}.
+     * 
+     * @author Dirk Weigenand
+     */
     @Extension
     public static class DescriptorImpl extends SCMDescriptor<NWDIScm> {
         /**
@@ -259,14 +263,16 @@ public class NWDIScm extends SCM {
      * Get list of activities since last run. If <code>lastRun</code> is
      * <code>null</code> all activities will be calcu *
      * 
-     * @param build
-     *            the build currently running
+     * @param browser
+     *            the {@link DtrBrowser} to be used getting the activities.
+     * @param since
+     *            since when to get activities
      * @return a list of {@link Activity} objects that were checked in since the
      *         last run or all activities.
      */
     private List<Activity> getActivities(final DtrBrowser browser, final Date since) {
         final List<Activity> activities = new ArrayList<Activity>();
-        final long start = System.currentTimeMillis();
+        long start = System.currentTimeMillis();
 
         if (since == null) {
             activities.addAll(browser.getActivities());
@@ -276,40 +282,44 @@ public class NWDIScm extends SCM {
         }
 
         this.duration(start, "getActivities");
-        this.updateActivitiesWithResources(browser, activities);
+
+        start = System.currentTimeMillis();
+        // update activities with their respective resources
+        // FIXME: add methods to DtrBrowser that get activities with their
+        // respective resources!
+
+        browser.getDevelopmentComponents(activities);
+
+        this.duration(start, "getDevelopmentComponents");
 
         return activities;
     }
 
     /**
-     * @param project
-     * @param descriptor
-     * @return
+     * Returns an instance of {@link DtrBrowser} using the given development
+     * configuration and development component factory.
+     * 
+     * @param config
+     *            the development configuration to be used to connect to the
+     *            DTR.
+     * @param dcFactory
+     *            the development component factory to be used getting
+     *            development components associated with activities.
+     * @return the {@link DtrBrowser} for browsing the DTR for activities.
      */
     private DtrBrowser getDtrBrowser(final DevelopmentConfiguration config, final DevelopmentComponentFactory dcFactory) {
         return new DtrBrowser(config, dcFactory, this.dtrUser, this.password);
     }
 
     /**
-     * @param browser
-     * @param activities
+     * Determine the time in seconds passed since the given start time and log
+     * it using the message given.
+     * 
+     * @param start
+     *            begin of action whose duration should be logged.
+     * @param message
+     *            message to log.
      */
-    private void updateActivitiesWithResources(final DtrBrowser browser, final List<Activity> activities) {
-        long start;
-        start = System.currentTimeMillis();
-        // update activities with their respective resources
-        // FIXME: add methods to DtrBrowser that get activities with their
-        // respective resources!
-
-        final Set<DevelopmentComponent> developmentComponents = browser.getDevelopmentComponents(activities);
-
-        for (final DevelopmentComponent component : developmentComponents) {
-            component.setNeedsRebuild(true);
-        }
-
-        this.duration(start, "getDevelopmentComponents");
-    }
-
     private void duration(final long start, final String message) {
         final long duration = System.currentTimeMillis() - start;
 
