@@ -10,25 +10,22 @@
 <!-- Config page -->
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
   <f:section title="${%NetWeaver developer infrastructure}">
-    <!-- optional @help points to the help document HTML. /plugin/Hudson-NWDI-SCM-Plugin is mapped to our webapp/ directory, so this is a convenient
+    <!-- optional @help points to the help document HTML. /plugin/NWDI-Core-Plugin is mapped to our webapp/ directory, so this is a convenient
       way to serve static resources. -->
-    <f:entry title="${%NWDI tool library location}" description="${%Enter the location of your NWDI tool library folder.}" help="/plugin/Hudson-NWDI-SCM-Plugin/help-nwdiToolLibFolder.html">
+    <f:entry title="${%NWDI tool library location}" description="${%Enter the location of your NWDI tool library folder.}" help="/plugin/NWDI-Core-Plugin/help-nwdiToolLibFolder.html">
       <f:textbox clazz="required" name="NWDIPlugin.nwdiToolLibFolder" value="${descriptor.nwdiToolLibFolder}"
         checkUrl="'descriptorByName/NWDIProject/nwdiToolLibFolderCheck?value='+escape(this.value)" />
     </f:entry>
-    <f:entry title="JDK_1.3.1_HOME" description="${%Enter the location of your Java installation that corresponds to your NWDIs path variable 'JDK_1.3.1_HOME'.}"
-      help="/plugin/Hudson-NWDI-SCM-Plugin/help-jdkHomes.html">
-      <f:textbox name="NWDIPlugin.jdk131Home" value="${descriptor.jdk131Home}" />
+    <f:entry title="JDK_HOME_PATHS" description="${%Enter the locations of the JDKs that are to be used for building your tracks.}"
+      help="/plugin/NWDI-Core-Plugin/help-jdkHomes.html">
+      <f:textbox name="NWDIPlugin.jdkHomePaths" value="${descriptor.jdkHomePaths}"
+        checkUrl="'descriptorByName/NWDIProject/jdkHomePathsCheck?value='+escape(this.value)" />
     </f:entry>
-    <f:entry title="JDK_1.4.2_HOME" description="${%Enter the location of your Java installation that corresponds to your NWDIs path variable 'JDK_1.4.2_HOME'.}"
-      help="/plugin/Hudson-NWDI-SCM-Plugin/help-jdkHomes.html">
-      <f:textbox name="NWDIPlugin.jdk142Home" value="${descriptor.jdk142Home}" />
-    </f:entry>
-    <f:entry title="${%NWDI user}" description="${%Enter the user name to use for authentication against the NWDI.}" help="/plugin/Hudson-NWDI-SCM-Plugin/help-UME.html">
+    <f:entry title="${%NWDI user}" description="${%Enter the user name to use for authentication against the NWDI.}" help="/plugin/NWDI-Core-Plugin/help-UME.html">
       <f:textbox clazz="required" name="NWDIPlugin.user" value="${descriptor.user}"
         checkUrl="'descriptorByName/NWDIProject/userCheck?value='+escape(this.value)" />
     </f:entry>
-    <f:entry title="${%NWDI password}" description="${%Enter the password to use for authentication against the NWDI.}" help="/plugin/Hudson-NWDI-SCM-Plugin/help-UME.html">
+    <f:entry title="${%NWDI password}" description="${%Enter the password to use for authentication against the NWDI.}" help="/plugin/NWDI-Core-Plugin/help-UME.html">
       <f:password clazz="required setting-input" name="NWDIPlugin.password" value="${descriptor.password}"
         checkUrl="'descriptorByName/NWDIProject/passwordCheck?value='+escape(this.value)" />
     </f:entry>

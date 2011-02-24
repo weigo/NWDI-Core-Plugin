@@ -26,7 +26,6 @@ import javax.servlet.ServletException;
 
 import net.sf.json.JSONObject;
 
-import org.arachna.netweaver.dctool.JdkHomeAlias;
 import org.arachna.netweaver.dctool.JdkHomePaths;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
@@ -40,6 +39,12 @@ import org.kohsuke.stapler.StaplerResponse;
  */
 public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopLevelItem {
     /**
+     * Global descriptor/configuraton for NWDIProjects.
+     */
+    @Extension(ordinal = 1000)
+    public static final DescriptorImpl DESCRIPTOR = new DescriptorImpl();
+
+    /**
      * parameter name for project configuration controlling whether the
      * workspace should be clean before building.
      */
@@ -50,12 +55,6 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
      * '.confdef'.
      */
     private static final String PARAMETER_CONF_DEF = "confDef";
-
-    /**
-     * Global descriptor/configuraton for NWDIProjects.
-     */
-    @Extension(ordinal = 1000)
-    public static final DescriptorImpl DESCRIPTOR = new DescriptorImpl();
 
     /**
      * Store the content of the '.confdef' configuration file for a development
@@ -373,8 +372,22 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
                 .error(Messages.NWDIProject_NwdiToolLibFolder_no_proper_installation_folder(DC_SUB_FOLDER));
         }
 
-        protected FormValidation doJdkHomePathsCheck() {
-            return FormValidation.error("");
+        public FormValidation doJdkHomePathsCheck(@QueryParameter final String value) {
+            final JdkHomePathsParser parser = new JdkHomePathsParser(value);
+            final JdkHomePaths paths = parser.parse();
+
+            FormValidation result = FormValidation.ok();
+
+            if (parser.hasInvalidJdkHomeNames()) {
+                result =
+                    FormValidation.error(Messages.NWDIProject_invalid_jdk_homes_specified(parser
+                        .getInvalidJdkHomeNames()));
+            }
+            else if (paths.getAliases().isEmpty()) {
+                result = FormValidation.error("JDK homes angeben...");
+            }
+
+            return result;
         }
 
         /**
@@ -407,21 +420,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
          * @return path mappings for the configured JDK homes.
          */
         JdkHomePaths getConfiguredJdkHomePaths() {
-            final JdkHomePaths paths = new JdkHomePaths();
-
-            final String[] pathDefs = Util.fixNull(this.getJdkHomePaths()).split(",|;");
-
-            for (String pathDef : pathDefs) {
-                final String[] parts = pathDef.split("=");
-
-                final JdkHomeAlias alias = JdkHomeAlias.fromString(Util.fixEmptyAndTrim(Util.fixNull(parts[0])));
-
-                if (alias != null) {
-                    paths.add(alias, Util.fixEmptyAndTrim(Util.fixNull(parts[1])));
-                }
-            }
-
-            return paths;
+            return new JdkHomePathsParser(this.getJdkHomePaths()).parse();
         }
 
         /**

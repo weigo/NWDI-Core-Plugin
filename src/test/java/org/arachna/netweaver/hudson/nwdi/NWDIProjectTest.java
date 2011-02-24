@@ -5,7 +5,6 @@ package org.arachna.netweaver.hudson.nwdi;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
 import hudson.model.Descriptor.FormException;
 import hudson.model.Item;
 import hudson.model.ItemGroup;
@@ -17,6 +16,7 @@ import hudson.search.SearchIndex;
 import hudson.search.Search;
 import hudson.security.ACL;
 import hudson.security.Permission;
+import hudson.util.FormValidation;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,8 +24,6 @@ import java.util.Collection;
 
 import net.sf.json.JSONObject;
 
-import org.arachna.netweaver.dctool.JdkHomeAlias;
-import org.arachna.netweaver.dctool.JdkHomePaths;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,9 +35,6 @@ import org.kohsuke.stapler.StaplerRequest;
  * @author Dirk Weigenand
  */
 public class NWDIProjectTest implements TopLevelItem {
-    private static final String HOME_FOR_JDK1_5_0 = "/opt/jdk1.5.0";
-    private static final String HOME_FOR_JDK1_4_2 = "/opt/jdk1.4.2";
-    private static final String HOME_FOR_JDK1_3_1 = "/opt/jdk1.3.1";
     /**
      * Descriptor under test.
      */
@@ -52,14 +47,13 @@ public class NWDIProjectTest implements TopLevelItem {
     public void setUp() {
         this.descriptor = new NWDIProject.DescriptorImpl() {
             @Override
-            public synchronized void load() {
+            public void load() {
             }
 
             @Override
-            public synchronized void save() {
+            public void save() {
             }
         };
-
     }
 
     /**
@@ -115,49 +109,17 @@ public class NWDIProjectTest implements TopLevelItem {
     }
 
     @Test
-    public void testGetEmptyConfiguredJdkHomePaths() {
-        this.descriptor.setJdkHomePaths("");
-        final JdkHomePaths paths = this.descriptor.getConfiguredJdkHomePaths();
-        assertThat(paths.getAliases(), hasSize(0));
+    public void testDoInvalidJdkHomePathsCheck() {
+        final String invalidPathSpec = "xyz";
+        final FormValidation validationResult = this.descriptor.doJdkHomePathsCheck(invalidPathSpec);
+        assertThat(validationResult.kind, equalTo(FormValidation.Kind.ERROR));
     }
 
     @Test
-    public void testGetConfiguredJdkHomePathsWithJdkOnePath() {
-        this.descriptor.setJdkHomePaths(String.format("%s=%s", JdkHomeAlias.Jdk131Home.toString(), HOME_FOR_JDK1_3_1));
-        final JdkHomePaths paths = this.descriptor.getConfiguredJdkHomePaths();
-        assertThat(paths.getAliases(), hasSize(1));
-        assertThat(HOME_FOR_JDK1_3_1, equalTo(paths.get(JdkHomeAlias.Jdk131Home)));
-    }
-
-    @Test
-    public void testGetConfiguredJdkHomePathsWithJdkOnePathAndLooseFormatting() {
-        this.descriptor
-            .setJdkHomePaths(String.format("%s = %s", JdkHomeAlias.Jdk131Home.toString(), HOME_FOR_JDK1_3_1));
-        final JdkHomePaths paths = this.descriptor.getConfiguredJdkHomePaths();
-        assertThat(paths.getAliases(), hasSize(1));
-        assertThat(HOME_FOR_JDK1_3_1, equalTo(paths.get(JdkHomeAlias.Jdk131Home)));
-    }
-
-    @Test
-    public void testGetConfiguredJdkHomePathsWithSeveralJdks() {
-        this.descriptor.setJdkHomePaths(String.format("%s=%s;%s=%s,%s=%s", JdkHomeAlias.Jdk131Home.toString(),
-            HOME_FOR_JDK1_3_1, JdkHomeAlias.Jdk142Home, HOME_FOR_JDK1_4_2, JdkHomeAlias.Jdk150Home, HOME_FOR_JDK1_5_0));
-        final JdkHomePaths paths = this.descriptor.getConfiguredJdkHomePaths();
-        assertThat(paths.getAliases(), hasSize(3));
-        assertThat(HOME_FOR_JDK1_3_1, equalTo(paths.get(JdkHomeAlias.Jdk131Home)));
-        assertThat(HOME_FOR_JDK1_4_2, equalTo(paths.get(JdkHomeAlias.Jdk142Home)));
-        assertThat(HOME_FOR_JDK1_5_0, equalTo(paths.get(JdkHomeAlias.Jdk150Home)));
-    }
-
-    @Test
-    public void testGetConfiguredJdkHomePathsWithSeveralJdksAndLooseFormatting() {
-        this.descriptor.setJdkHomePaths(String.format("%s= %s;%s=%s , %s = %s ", JdkHomeAlias.Jdk131Home.toString(),
-            HOME_FOR_JDK1_3_1, JdkHomeAlias.Jdk142Home, HOME_FOR_JDK1_4_2, JdkHomeAlias.Jdk150Home, HOME_FOR_JDK1_5_0));
-        final JdkHomePaths paths = this.descriptor.getConfiguredJdkHomePaths();
-        assertThat(paths.getAliases(), hasSize(3));
-        assertThat(HOME_FOR_JDK1_3_1, equalTo(paths.get(JdkHomeAlias.Jdk131Home)));
-        assertThat(HOME_FOR_JDK1_4_2, equalTo(paths.get(JdkHomeAlias.Jdk142Home)));
-        assertThat(HOME_FOR_JDK1_5_0, equalTo(paths.get(JdkHomeAlias.Jdk150Home)));
+    public void testDoEmptyJdkHomePathsCheck() {
+        final String invalidPathSpec = "";
+        final FormValidation validationResult = this.descriptor.doJdkHomePathsCheck(invalidPathSpec);
+        assertThat(validationResult.kind, equalTo(FormValidation.Kind.ERROR));
     }
 
     /**
