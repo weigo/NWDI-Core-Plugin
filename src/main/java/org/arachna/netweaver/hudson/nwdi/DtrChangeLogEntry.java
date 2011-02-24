@@ -13,9 +13,11 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.arachna.netweaver.dc.types.DevelopmentComponent;
@@ -80,37 +82,6 @@ public final class DtrChangeLogEntry extends Entry {
     }
 
     /**
-     * Add the given {@link ActivityResource} as an {@link Item} to this
-     * changelog entry.
-     * 
-     * @param resource
-     *            <code>ActivityResource</code> to add to change log.
-     */
-    private void createAndAddItem(final ActivityResource resource) {
-        String action = "edit";
-
-        if (resource.isDeleted()) {
-            action = "delete";
-        }
-        else if (Integer.valueOf(1).equals(resource.getSequenceNumber())) {
-            action = "add";
-        }
-
-        final DevelopmentComponent dc = resource.getDevelopmentComponent();
-        add(new Item(String.format("%s/%s/comp_/%s", dc.getVendor(), dc.getName(), resource.getPath()), action));
-    }
-
-    /**
-     * Add {@link Item}
-     * 
-     * @param item
-     */
-    void add(final Item item) {
-        item.setParent(this);
-        this.items.add(item);
-    }
-
-    /**
      * Create an instance of a change log entry from the given arguments.
      * 
      * @param principal
@@ -133,6 +104,37 @@ public final class DtrChangeLogEntry extends Entry {
      * default constructor for xstream.
      */
     public DtrChangeLogEntry() {
+    }
+
+    /**
+     * Add {@link Item}
+     * 
+     * @param item
+     */
+    void add(final Item item) {
+        item.setParent(this);
+        this.items.add(item);
+    }
+
+    /**
+     * Add the given {@link ActivityResource} as an {@link Item} to this
+     * changelog entry.
+     * 
+     * @param resource
+     *            <code>ActivityResource</code> to add to change log.
+     */
+    private void createAndAddItem(final ActivityResource resource) {
+        Action action = Action.Edit;
+
+        if (resource.isDeleted()) {
+            action = Action.Delete;
+        }
+        else if (Integer.valueOf(1).equals(resource.getSequenceNumber())) {
+            action = Action.Add;
+        }
+
+        final DevelopmentComponent dc = resource.getDevelopmentComponent();
+        add(new Item(String.format("%s/%s/comp_/%s", dc.getVendor(), dc.getName(), resource.getPath()), action));
     }
 
     /**
@@ -293,7 +295,7 @@ public final class DtrChangeLogEntry extends Entry {
         /**
          * Action (added, edited, removed).
          */
-        private final String action;
+        private final Action action;
 
         /**
          * the change log entry this item belongs to.
@@ -308,7 +310,7 @@ public final class DtrChangeLogEntry extends Entry {
          * @param action
          *            Action (added, edited, removed).
          */
-        Item(final String path, final String action) {
+        Item(final String path, final Action action) {
             this.path = path;
             this.action = action;
         }
@@ -337,7 +339,7 @@ public final class DtrChangeLogEntry extends Entry {
          * 
          * @return the action associated with this item.
          */
-        public String getAction() {
+        public Action getAction() {
             return action;
         }
 
@@ -358,14 +360,80 @@ public final class DtrChangeLogEntry extends Entry {
         public EditType getEditType() {
             EditType editType = EditType.EDIT;
 
-            if (this.action.equalsIgnoreCase("delete")) {
+            if (this.action.equals(Action.Delete)) {
                 editType = EditType.DELETE;
             }
-            else if (action.equalsIgnoreCase("add")) {
+            else if (action.equals(Action.Add)) {
                 editType = EditType.ADD;
             }
 
             return editType;
+        }
+    }
+
+    /**
+     * Actions on resources associated with activities.
+     * 
+     * @author Dirk Weigenand
+     * 
+     */
+    enum Action {
+        /**
+         * action denoting an add operation.
+         */
+        Add("add"),
+        /**
+         * action denoting a delete operation.
+         */
+        Delete("delete"),
+        /**
+         * action denoting an edit operation.
+         */
+        Edit("edit");
+
+        /**
+         * Actions wrt. to resources in activities.
+         */
+        private static final Map<String, Action> ACTIONS = new HashMap<String, Action>();
+
+        static {
+            for (Action action : values()) {
+                ACTIONS.put(action.toString(), action);
+            }
+        }
+
+        /**
+         * operation denoted by an action.
+         */
+        private String name;
+
+        /**
+         * Create an instance of an action using the given name.
+         * 
+         * @param name
+         *            operation denoted by this action.
+         */
+        Action(final String name) {
+            this.name = name;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String toString() {
+            return this.name;
+        }
+
+        /**
+         * Get the action for the given string.
+         * 
+         * @param value
+         *            name of the action.
+         * @return the alias found or <code>null</code>.
+         */
+        public static Action fromString(final String value) {
+            return ACTIONS.get(value);
         }
     }
 }

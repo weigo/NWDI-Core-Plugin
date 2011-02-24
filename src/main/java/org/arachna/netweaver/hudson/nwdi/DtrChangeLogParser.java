@@ -49,10 +49,25 @@ public final class DtrChangeLogParser extends ChangeLogParser {
     }
 
     private static final class InternalDtrChangeLogParser extends DefaultHandler {
+        /**
+         * Textcontainer for text elements.
+         */
         private final StringBuilder text = new StringBuilder();
+
+        /**
+         * changeset being read.
+         */
         private final DtrChangeLogSet changeSet;
+
+        /**
+         * the changelog entry being read.
+         */
         private DtrChangeLogEntry currentChangeLogEntry;
-        private String currentItemAction;
+
+        /**
+         * the Action denoted by the current changelog entry.
+         */
+        private DtrChangeLogEntry.Action currentItemAction;
 
         InternalDtrChangeLogParser(final DtrChangeLogSet changeSet) {
             this.changeSet = changeSet;
@@ -60,6 +75,7 @@ public final class DtrChangeLogParser extends ChangeLogParser {
 
         /*
          * (non-Javadoc)
+         * 
          * @see org.xml.sax.helpers.DefaultHandler#characters(char[], int, int)
          */
         @Override
@@ -69,6 +85,7 @@ public final class DtrChangeLogParser extends ChangeLogParser {
 
         /*
          * (non-Javadoc)
+         * 
          * @see org.xml.sax.helpers.DefaultHandler#endElement(java.lang.String,
          * java.lang.String, java.lang.String)
          */
@@ -100,6 +117,7 @@ public final class DtrChangeLogParser extends ChangeLogParser {
 
         /*
          * (non-Javadoc)
+         * 
          * @see
          * org.xml.sax.helpers.DefaultHandler#startElement(java.lang.String,
          * java.lang.String, java.lang.String, org.xml.sax.Attributes)
@@ -112,10 +130,16 @@ public final class DtrChangeLogParser extends ChangeLogParser {
                 this.currentChangeLogEntry.setVersion(attributes.getValue("version"));
             }
             else if ("item".equals(localName)) {
-                this.currentItemAction = attributes.getValue("action");
+                this.currentItemAction = DtrChangeLogEntry.Action.fromString(attributes.getValue("action"));
             }
         }
 
+        /**
+         * Returns the text contained in the last element and resets the text
+         * buffer.
+         * 
+         * @return text contained in the last element
+         */
         private String getText() {
             final String t = this.text.toString().trim();
             this.text.setLength(0);
