@@ -18,12 +18,11 @@ import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 import org.arachna.netweaver.hudson.nwdi.DevelopmentComponentsReader;
+import org.arachna.xml.XmlReaderHelper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.XMLReaderFactory;
 
 /**
  * @author Dirk Weigenand
@@ -68,11 +67,11 @@ public class ConfDefReaderAndListCompartmentsTest {
     @Before
     public void setUp() throws Exception {
         this.dcFactory = new DevelopmentComponentFactory();
-        final XMLReader xmlReader = XMLReaderFactory.createXMLReader();
-        final ConfDefReader developmentConfigurationReader = new ConfDefReader(xmlReader);
+        final ConfDefReader reader = new ConfDefReader();
+        new XmlReaderHelper(reader)
+            .parse(new InputStreamReader(this.getClass().getResourceAsStream("Example.confdef")));
 
-        this.developmentConfiguration =
-            developmentConfigurationReader.read(this.getClass().getResourceAsStream("Example.confdef"));
+        this.developmentConfiguration = reader.getDevelopmentConfiguration();
 
         final Reader dcToolOutputReader =
             new InputStreamReader(this.getClass().getResourceAsStream("ListDevelopmentComponentsExample.out"));

@@ -14,6 +14,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -21,10 +22,9 @@ import java.util.Set;
 import org.arachna.netweaver.dc.types.BuildVariant;
 import org.arachna.netweaver.dc.types.Compartment;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
+import org.arachna.xml.XmlReaderHelper;
 import org.junit.Test;
 import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.XMLReaderFactory;
 
 /**
  * JUnit-Test for reading '.confdef' configuration files using
@@ -160,9 +160,10 @@ public final class ConfDefReaderTest {
      */
     private DevelopmentConfiguration readDevelopmentConfiguration(final String configurationName) throws IOException,
         SAXException {
-        final XMLReader xmlReader = XMLReaderFactory.createXMLReader();
-        final ConfDefReader developmentConfigurationReader = new ConfDefReader(xmlReader);
+        final ConfDefReader developmentConfigurationReader = new ConfDefReader();
+        new XmlReaderHelper(developmentConfigurationReader).parse(new InputStreamReader(this.getClass()
+            .getResourceAsStream(configurationName)));
 
-        return developmentConfigurationReader.read(this.getClass().getResourceAsStream(configurationName));
+        return developmentConfigurationReader.getDevelopmentConfiguration();
     }
 }
