@@ -3,16 +3,10 @@
  */
 package org.arachna.netweaver.hudson.nwdi.confdef;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
+import org.arachna.xml.AbstractDefaultHandler;
 import org.xml.sax.Attributes;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
 
 /**
  * Reader for <code>.confdef</code> configuration files for development
@@ -67,16 +61,10 @@ public final class ConfDefReader extends AbstractDefaultHandler {
     private CompartmentReader compartmentReader;
 
     /**
-     * Create an instance of a <code>ConfDefReader</code> using the given
-     * {@link XMLReader}.
-     * 
-     * @param xmlReader
-     *            the <code>XMLReader</code> to be used to read the
-     *            <code>.confdef</code> configuration file.
+     * Create an instance of a <code>ConfDefReader</code>.
      */
-    public ConfDefReader(final XMLReader xmlReader) {
-        super(xmlReader, null);
-        this.getXmlReader().setContentHandler(this);
+    public ConfDefReader() {
+        super(null);
     }
 
     /*
@@ -115,49 +103,18 @@ public final class ConfDefReader extends AbstractDefaultHandler {
             this.developmentConfiguration.setCmsUrl(atts.getValue(CMS_URL));
         }
         else if (SC_COMPARTMENTS.equals(localName)) {
-            this.compartmentReader = new CompartmentReader(this.getXmlReader(), this);
+            this.compartmentReader = new CompartmentReader(this);
+            this.compartmentReader.setXmlReader(this.getXmlReader());
             this.getXmlReader().setContentHandler(this.compartmentReader);
         }
     }
 
     /**
-     * Read the development configuration from the given {@link InputStream}.
+     * Return the development configuration read.
      * 
-     * @param config
-     *            the <code>InputStream</code> to read the configuration from.
      * @return the developmentConfiguration just read.
      */
-    public DevelopmentConfiguration read(final InputStream config) {
-        return read(new InputStreamReader(config));
-    }
-
-    /**
-     * Read the development configuration from the given {@link Reader}.
-     * 
-     * @param config
-     *            the <code>Reader</code> to read the configuration from.
-     * @return the developmentConfiguration just read.
-     */
-    public DevelopmentConfiguration read(final Reader config) {
-        final InputSource input = new InputSource(config);
-
-        try {
-            this.getXmlReader().parse(input);
-        }
-        catch (final IOException e) {
-            throw new RuntimeException(e);
-        }
-        catch (final SAXException e) {
-            throw new RuntimeException(e);
-        }
-        finally {
-            try {
-                config.close();
-            }
-            catch (final IOException e) {
-            }
-        }
-
+    public DevelopmentConfiguration getDevelopmentConfiguration() {
         return this.developmentConfiguration;
     }
 }

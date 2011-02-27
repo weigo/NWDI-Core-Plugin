@@ -10,6 +10,7 @@ import java.util.List;
 import org.arachna.netweaver.dc.types.BuildVariant;
 import org.arachna.netweaver.dc.types.Compartment;
 import org.arachna.netweaver.dc.types.CompartmentState;
+import org.arachna.xml.AbstractDefaultHandler;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
@@ -126,14 +127,12 @@ public final class CompartmentReader extends AbstractDefaultHandler {
      * Create an instance of a <code>CompartmentReader</code> using the given
      * {@link XMLReader} and parent <code>AbstractDefaultHandler</code> object.
      * 
-     * @param xmlReader
-     *            the {@link XMLReader} used reading.
      * @param parent
      *            the parent <code>AbstractDefaultHandler</code> to give control
      *            back when finished handling SAX events.
      */
-    public CompartmentReader(final XMLReader xmlReader, final AbstractDefaultHandler parent) {
-        super(xmlReader, parent);
+    public CompartmentReader(final AbstractDefaultHandler parent) {
+        super(parent);
     }
 
     /*
