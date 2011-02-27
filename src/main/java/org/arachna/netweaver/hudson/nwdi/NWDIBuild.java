@@ -27,8 +27,8 @@ import org.arachna.netweaver.dctool.DcToolCommandExecutionResult;
 import org.arachna.netweaver.hudson.dtr.browser.Activity;
 import org.arachna.netweaver.hudson.dtr.browser.ActivityResource;
 import org.arachna.netweaver.hudson.nwdi.confdef.ConfDefReader;
+import org.arachna.xml.XmlReaderHelper;
 import org.xml.sax.SAXException;
-import org.xml.sax.helpers.XMLReaderFactory;
 
 /**
  * A job for building a NWDI development configuration/track.
@@ -94,10 +94,14 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
     public DevelopmentConfiguration getDevelopmentConfiguration() {
         if (this.developmentConfiguration == null) {
             try {
-                final ConfDefReader confdefReader = new ConfDefReader(XMLReaderFactory.createXMLReader());
-                this.developmentConfiguration = confdefReader.read(new StringReader(this.project.getConfDef()));
+                final ConfDefReader confdefReader = new ConfDefReader();
+                new XmlReaderHelper(confdefReader).parse(new StringReader(this.project.getConfDef()));
+                this.developmentConfiguration = confdefReader.getDevelopmentConfiguration();
             }
             catch (final SAXException e) {
+                throw new RuntimeException(e);
+            }
+            catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }

@@ -13,12 +13,10 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import org.arachna.netweaver.hudson.nwdi.DtrChangeLogEntry.Item;
+import org.arachna.xml.AbstractDefaultHandler;
+import org.arachna.xml.XmlReaderHelper;
 import org.xml.sax.Attributes;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.DefaultHandler;
-import org.xml.sax.helpers.XMLReaderFactory;
 
 /**
  * A parser for a DTR change log persisted to XML.
@@ -26,6 +24,9 @@ import org.xml.sax.helpers.XMLReaderFactory;
  * @author Dirk Weigenand
  */
 public final class DtrChangeLogParser extends ChangeLogParser {
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ChangeLogSet<? extends Entry> parse(final AbstractBuild build, final File changelogFile) throws IOException,
         SAXException {
@@ -35,9 +36,7 @@ public final class DtrChangeLogParser extends ChangeLogParser {
 
         try {
             reader = new FileReader(changelogFile);
-            final XMLReader xmlReader = XMLReaderFactory.createXMLReader();
-            xmlReader.setContentHandler(new InternalDtrChangeLogParser(changeSet));
-            xmlReader.parse(new InputSource(reader));
+            new XmlReaderHelper(new InternalDtrChangeLogParser(changeSet)).parse(reader);
         }
         finally {
             if (reader != null) {
@@ -48,11 +47,51 @@ public final class DtrChangeLogParser extends ChangeLogParser {
         return changeSet;
     }
 
-    private static final class InternalDtrChangeLogParser extends DefaultHandler {
+    /**
+     * SAX parser for reading DTR changelog files.
+     * 
+     * @author Dirk Weigenand
+     */
+    private final class InternalDtrChangeLogParser extends AbstractDefaultHandler {
         /**
-         * Textcontainer for text elements.
+         * 'action' element.
          */
-        private final StringBuilder text = new StringBuilder();
+        private static final String ACTION = "action";
+
+        /**
+         * changeset 'version' attribute.
+         */
+        private static final String VERSION = "version";
+
+        /**
+         * 'item' element.
+         */
+        private static final String ITEM = "item";
+
+        /**
+         * 'date' element.
+         */
+        private static final String DATE = "date";
+
+        /**
+         * 'user' element.
+         */
+        private static final String USER = "user";
+
+        /**
+         * 'description' element.
+         */
+        private static final String DESCRIPTION = "description";
+
+        /**
+         * 'comment' element.
+         */
+        private static final String COMMENT = "comment";
+
+        /**
+         * 'changeset' element.
+         */
+        private static final String CHANGESET = "changeset";
 
         /**
          * changeset being read.
@@ -69,18 +108,16 @@ public final class DtrChangeLogParser extends ChangeLogParser {
          */
         private DtrChangeLogEntry.Action currentItemAction;
 
-        InternalDtrChangeLogParser(final DtrChangeLogSet changeSet) {
-            this.changeSet = changeSet;
-        }
-
-        /*
-         * (non-Javadoc)
+        /**
+         * Create an instance of a {@link InternalDtrChangeLogParser} using the
+         * given changeset.
          * 
-         * @see org.xml.sax.helpers.DefaultHandler#characters(char[], int, int)
+         * @param changeSet
+         *            the changeset to add the read entries to.
          */
-        @Override
-        public void characters(final char[] ch, final int start, final int length) throws SAXException {
-            text.append(ch, start, length);
+        InternalDtrChangeLogParser(final DtrChangeLogSet changeSet) {
+            super(null);
+            this.changeSet = changeSet;
         }
 
         /*
@@ -91,23 +128,23 @@ public final class DtrChangeLogParser extends ChangeLogParser {
          */
         @Override
         public void endElement(final String uri, final String localName, final String qName) throws SAXException {
-            if ("changeset".equals(localName)) {
+            if (CHANGESET.equals(localName)) {
                 this.changeSet.add(this.currentChangeLogEntry);
                 this.currentChangeLogEntry = null;
             }
-            else if ("comment".equals(localName)) {
+            else if (COMMENT.equals(localName)) {
                 this.currentChangeLogEntry.setMsg(this.getText());
             }
-            else if ("description".equals(localName)) {
+            else if (DESCRIPTION.equals(localName)) {
                 this.currentChangeLogEntry.setDescription(this.getText());
             }
-            else if ("user".equals(localName)) {
+            else if (USER.equals(localName)) {
                 this.currentChangeLogEntry.setUser(getText());
             }
-            else if ("date".equals(localName)) {
+            else if (DATE.equals(localName)) {
                 this.currentChangeLogEntry.setCheckInTime(getText());
             }
-            else if ("item".equals(localName)) {
+            else if (ITEM.equals(localName)) {
                 this.currentChangeLogEntry.add(new Item(getText(), this.currentItemAction));
                 this.currentItemAction = null;
             }
@@ -125,26 +162,13 @@ public final class DtrChangeLogParser extends ChangeLogParser {
         @Override
         public void startElement(final String uri, final String localName, final String qName,
             final Attributes attributes) throws SAXException {
-            if ("changeset".equals(localName)) {
+            if (CHANGESET.equals(localName)) {
                 this.currentChangeLogEntry = new DtrChangeLogEntry();
-                this.currentChangeLogEntry.setVersion(attributes.getValue("version"));
+                this.currentChangeLogEntry.setVersion(attributes.getValue(VERSION));
             }
-            else if ("item".equals(localName)) {
-                this.currentItemAction = DtrChangeLogEntry.Action.fromString(attributes.getValue("action"));
+            else if (ITEM.equals(localName)) {
+                this.currentItemAction = DtrChangeLogEntry.Action.fromString(attributes.getValue(ACTION));
             }
-        }
-
-        /**
-         * Returns the text contained in the last element and resets the text
-         * buffer.
-         * 
-         * @return text contained in the last element
-         */
-        private String getText() {
-            final String t = this.text.toString().trim();
-            this.text.setLength(0);
-
-            return t;
         }
     }
 }
