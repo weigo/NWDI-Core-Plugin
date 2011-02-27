@@ -4,7 +4,6 @@
 package org.arachna.netweaver.hudson.nwdi.dcupdater;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -14,6 +13,7 @@ import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.DevelopmentComponentType;
 import org.arachna.netweaver.dc.types.PublicPart;
+import org.arachna.xml.XmlReaderHelper;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
@@ -120,16 +120,19 @@ public final class DevelopmentComponentUpdater {
      *            configuration file to be read for updating the component.
      */
     private void updateCurrentComponent(final File config) {
-        final DcDefinitionReader reader = new DcDefinitionReader(this.currentComponent, getXMLReader());
         FileReader configReader = null;
 
         try {
             configReader = new FileReader(config);
-            reader.read(configReader);
+            new XmlReaderHelper(new DcDefinitionReader(this.currentComponent)).parse(configReader);
         }
-        catch (final FileNotFoundException e) {
+        catch (final IOException e) {
             LOGGER.log(Level.SEVERE, "The configuration file for " + this.currentComponent.getVendor() + ":"
                 + this.currentComponent.getName() + " could not be found!", e);
+        }
+        catch (SAXException e) {
+            LOGGER.log(Level.SEVERE, "The configuration file for " + this.currentComponent.getVendor() + ":"
+                + this.currentComponent.getName() + " could not be parsed!", e);
         }
         finally {
             try {
@@ -148,18 +151,19 @@ public final class DevelopmentComponentUpdater {
      * of development component.
      */
     private void readProperties() {
+        AbstractComponentConfigurationReader reader = null;
+
         // TODO: Replace TypeCode with...
         if (DevelopmentComponentType.WebDynpro.equals(this.currentComponent.getType())) {
-            final WebDynproProjectPropertiesReader reader =
-                new WebDynproProjectPropertiesReader(getXMLReader(), this.componentBase);
-            this.currentComponent.addAll(reader.read());
+            reader = new WebDynproProjectPropertiesReader(this.componentBase);
         }
         else if (DevelopmentComponentType.PortalApplicationModule.equals(this.currentComponent.getType())
             || DevelopmentComponentType.PortalApplicationStandalone.equals(this.currentComponent.getType())) {
-            final PortalApplicationConfigurationReader reader =
-                new PortalApplicationConfigurationReader(getXMLReader(), this.componentBase);
-            this.currentComponent.addAll(reader.read());
+            reader = new PortalApplicationConfigurationReader(this.componentBase);
         }
+
+        reader.setXmlReader(getXMLReader());
+        this.currentComponent.addAll(reader.read());
     }
 
     /**

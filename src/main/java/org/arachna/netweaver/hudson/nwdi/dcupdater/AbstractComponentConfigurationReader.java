@@ -12,10 +12,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.arachna.netweaver.dc.types.PublicPartReference;
-import org.arachna.netweaver.hudson.nwdi.confdef.AbstractDefaultHandler;
+import org.arachna.xml.AbstractDefaultHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
 
 /**
  * Base class for reading configuration files of development components apart of
@@ -54,15 +53,12 @@ abstract class AbstractComponentConfigurationReader extends AbstractDefaultHandl
      * Create an instance of an
      * <code>AbstractComponentConfigurationReader</code>.
      * 
-     * @param reader
-     *            the {@link XMLReader} to use parsing the configuration file.
      * @param componentBase
      *            base directory of development component.
      */
-    protected AbstractComponentConfigurationReader(final XMLReader reader, final String componentBase) {
-        super(reader, null);
+    protected AbstractComponentConfigurationReader(final String componentBase) {
+        super(null);
         this.componentBase = componentBase;
-        reader.setContentHandler(this);
     }
 
     /**

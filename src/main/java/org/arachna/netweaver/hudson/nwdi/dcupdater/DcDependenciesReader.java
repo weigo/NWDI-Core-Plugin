@@ -7,10 +7,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.arachna.netweaver.dc.types.PublicPartReference;
-import org.arachna.netweaver.hudson.nwdi.confdef.AbstractDefaultHandler;
+import org.arachna.xml.AbstractDefaultHandler;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
@@ -60,29 +59,41 @@ class DcDependenciesReader extends AbstractDefaultHandler {
      */
     private final Set<PublicPartReference> usedComponents = new HashSet<PublicPartReference>();
 
+    /**
+     * name of referenced development component.
+     */
     private String referencedComponentName;
 
+    /**
+     * vendor name of referenced development component.
+     */
     private String referencedComponentVendor;
 
+    /**
+     * name of public part referenced from other development component.
+     */
     private String referencedComponentPublicPart;
 
+    /**
+     * public part is referenced at runtime.
+     */
     private boolean atRunTime;
 
+    /**
+     * public part is referenced at build time.
+     */
     private boolean atBuildTime;
 
     /**
      * Create an instance of <code>DcDependenciesReader</code> using the given
      * {@link XMLReader} and {@link DefaultHandler}.
      * 
-     * @param xmlReader
-     *            <code>XMLReader</code> to generate SAX events from source
-     *            being read.
-     * @param handler
+     * @param parent
      *            <code>DefaultHandler</code> parent handler to give control
      *            back to after parsing the 'dependencies' section.
      */
-    public DcDependenciesReader(final XMLReader xmlReader, final DefaultHandler handler) {
-        super(xmlReader, handler);
+    public DcDependenciesReader(final DefaultHandler parent) {
+        super(parent);
     }
 
     /*

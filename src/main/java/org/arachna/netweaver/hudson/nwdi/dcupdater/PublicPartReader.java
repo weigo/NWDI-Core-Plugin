@@ -6,13 +6,12 @@ package org.arachna.netweaver.hudson.nwdi.dcupdater;
 import java.util.Stack;
 
 import org.arachna.netweaver.dc.types.PublicPart;
-import org.arachna.netweaver.hudson.nwdi.confdef.AbstractDefaultHandler;
+import org.arachna.xml.AbstractDefaultHandler;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
 
 /**
- * Reader für PublicPart descriptions.
+ * Reader for PublicPart descriptions.
  * 
  * @author Dirk Weigenand
  */
@@ -64,11 +63,9 @@ final class PublicPartReader extends AbstractDefaultHandler {
 
     /**
      * Create an instance of a <code>PublicPartReader</code>.
-     * 
-     * @param xmlReader
      */
-    public PublicPartReader(final XMLReader xmlReader) {
-        super(xmlReader, null);
+    public PublicPartReader() {
+        super();
     }
 
     /*
@@ -98,7 +95,9 @@ final class PublicPartReader extends AbstractDefaultHandler {
     }
 
     /**
-     * @return
+     * Returns the current parent element.
+     * 
+     * @return the current parent element.
      */
     private String getCurrentParent() {
         this.parents.pop();
@@ -127,7 +126,7 @@ final class PublicPartReader extends AbstractDefaultHandler {
      * 
      * @return the public part just read from the '.pp' configuration file.
      */
-    public final PublicPart getPublicPart() {
+    public PublicPart getPublicPart() {
         return this.publicPart;
     }
 }

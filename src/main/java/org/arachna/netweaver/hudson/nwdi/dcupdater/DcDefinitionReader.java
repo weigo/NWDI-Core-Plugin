@@ -3,19 +3,13 @@
  */
 package org.arachna.netweaver.hudson.nwdi.dcupdater;
 
-import java.io.IOException;
-import java.io.Reader;
 import java.util.Stack;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.arachna.netweaver.dc.types.DevelopmentComponentType;
-import org.arachna.netweaver.hudson.nwdi.confdef.AbstractDefaultHandler;
+import org.arachna.xml.AbstractDefaultHandler;
 import org.xml.sax.Attributes;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
 
 /**
  * A Reader for <code>.dcdef</code> configuration files.
@@ -23,25 +17,6 @@ import org.xml.sax.XMLReader;
  * @author Dirk Weigenand
  */
 public class DcDefinitionReader extends AbstractDefaultHandler {
-    /**
-     * Message when an io exception occured reading the configuration for the
-     * development component.
-     */
-    // FIXME: should be read from Properties!
-    private static final String IO_ERROR_MESSAGE = "Fehler beim Lesen der .dcdef für %s:%s;";
-
-    /**
-     * Message when a sax exception occured reading the configuration for the
-     * development component.
-     */
-    // FIXME: should be read from Properties!
-    private static final String PARSE_ERROR_MESSAGE = "Fehler beim Parsen der .dcdef für %s:%s;";
-
-    /**
-     * Logger.
-     */
-    private static final Logger LOGGER = Logger.getLogger(DcDefinitionReader.class.getName());
-
     /**
      * tag name for component name.
      */
@@ -118,11 +93,9 @@ public class DcDefinitionReader extends AbstractDefaultHandler {
      * 
      * @param component
      *            development component to update from definition
-     * @param xmlReader
-     *            reader used to parse definition
      */
-    public DcDefinitionReader(final DevelopmentComponent component, final XMLReader xmlReader) {
-        super(xmlReader, null);
+    public DcDefinitionReader(final DevelopmentComponent component) {
+        super(null);
         this.component = component;
     }
 
@@ -219,31 +192,9 @@ public class DcDefinitionReader extends AbstractDefaultHandler {
         this.parentElements.push(localName);
 
         if (DEPENDENCIES.equals(localName)) {
-            this.usedDependenciesReader = new DcDependenciesReader(this.getXmlReader(), this);
+            this.usedDependenciesReader = new DcDependenciesReader(this);
+            this.usedDependenciesReader.setXmlReader(this.getXmlReader());
             this.getXmlReader().setContentHandler(this.usedDependenciesReader);
-        }
-    }
-
-    /**
-     * Read the <code>.dcdef</code> file via the given {@link Reader}.
-     * 
-     * @param dcDef
-     *            <code>.dcdef</code> configuration file for development
-     *            component.
-     */
-    public void read(final Reader dcDef) {
-        this.getXmlReader().setContentHandler(this);
-
-        try {
-            this.getXmlReader().parse(new InputSource(dcDef));
-        }
-        catch (final IOException e) {
-            LOGGER.log(Level.SEVERE,
-                String.format(IO_ERROR_MESSAGE, this.component.getVendor(), this.component.getName()), e);
-        }
-        catch (final SAXException e) {
-            LOGGER.log(Level.SEVERE,
-                String.format(PARSE_ERROR_MESSAGE, this.component.getVendor(), this.component.getName()), e);
         }
     }
 }

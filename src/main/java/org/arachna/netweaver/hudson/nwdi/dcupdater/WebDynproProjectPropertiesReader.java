@@ -7,7 +7,6 @@ import java.io.File;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
 
 /**
  * Reader for 'ProjectProperties.wdproperties' configuration files.
@@ -36,6 +35,16 @@ final class WebDynproProjectPropertiesReader extends AbstractComponentConfigurat
      */
     private static final String LIBRARY_REFERENCE = "LibraryReference";
 
+    /**
+     * Create an instance of an <code>WebDynproProjectPropertiesReader</code>.
+     * 
+     * @param componentBase
+     *            base directory of development component.
+     */
+    public WebDynproProjectPropertiesReader(final String componentBase) {
+        super(componentBase);
+    }
+
     /*
      * (non-Javadoc)
      * 
@@ -48,18 +57,6 @@ final class WebDynproProjectPropertiesReader extends AbstractComponentConfigurat
         if (LIBRARY_REFERENCE.equals(localName)) {
             this.addPublicPartReference(attributes.getValue(LIBRARY_NAME).replace(PORTAL_PREFIX, ""));
         }
-    }
-
-    /**
-     * Create an instance of an <code>WebDynproProjectPropertiesReader</code>.
-     * 
-     * @param reader
-     *            the {@link XMLReader} to use parsing the configuration file.
-     * @param componentBase
-     *            base directory of development component.
-     */
-    public WebDynproProjectPropertiesReader(final XMLReader reader, final String componentBase) {
-        super(reader, componentBase);
     }
 
     /*

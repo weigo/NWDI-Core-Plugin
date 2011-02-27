@@ -6,13 +6,12 @@ package org.arachna.netweaver.hudson.nwdi.dcupdater;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.arachna.netweaver.dc.types.PublicPart;
-import org.xml.sax.InputSource;
-import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.XMLReaderFactory;
+import org.arachna.xml.XmlReaderHelper;
 
 /**
  * Reader für Public Parts.
@@ -36,23 +35,23 @@ final class PublicPartsReader {
     }
 
     /**
-     * read in public parts.
+     * Read public parts.
      * 
      * @return list of public parts read
      */
     List<PublicPart> read() {
         final List<PublicPart> publicParts = new ArrayList<PublicPart>();
-        XMLReader xmlReader;
-        PublicPartReader reader;
-        PublicPart part;
 
         if (this.publicPartsLocation.exists()) {
+            PublicPartReader reader;
+            PublicPart part;
+            FileReader ppFileReader = null;
+
             for (final File definition : this.publicPartsLocation.listFiles(new PublicPartFileFilter())) {
                 try {
-                    xmlReader = XMLReaderFactory.createXMLReader();
-                    reader = new PublicPartReader(xmlReader);
-                    xmlReader.setContentHandler(reader);
-                    xmlReader.parse(new InputSource(new FileReader(definition)));
+                    reader = new PublicPartReader();
+                    ppFileReader = new FileReader(definition);
+                    new XmlReaderHelper(reader).parse(ppFileReader);
                     part = reader.getPublicPart();
 
                     if (part != null) {
@@ -61,7 +60,18 @@ final class PublicPartsReader {
                 }
                 catch (final Exception e) {
                     // FIXME: fix exception handling.
-                    e.printStackTrace();
+                    throw new RuntimeException(e);
+                }
+                finally {
+                    if (ppFileReader != null) {
+                        try {
+                            ppFileReader.close();
+                        }
+                        catch (IOException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                    }
                 }
             }
         }
@@ -75,6 +85,11 @@ final class PublicPartsReader {
      * @author Dirk Weigenand
      */
     private static final class PublicPartFileFilter implements FileFilter {
+        /**
+         * Accept files ending on '.pp'.
+         * 
+         * {@inheritDoc}
+         */
         public boolean accept(final File pathname) {
             return pathname.isFile() && pathname.getName().endsWith(".pp");
         }

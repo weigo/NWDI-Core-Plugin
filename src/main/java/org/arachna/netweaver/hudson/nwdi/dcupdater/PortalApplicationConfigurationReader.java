@@ -7,7 +7,6 @@ import java.io.File;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
 
 /**
  * Read a portal applications 'portalapp.xml' configuration file and extract
@@ -51,13 +50,11 @@ final class PortalApplicationConfigurationReader extends AbstractComponentConfig
      * using the given <code>XMLReader</code> object as parser for the
      * configuration file.
      * 
-     * @param xmlReader
-     *            the {@link XMLReader} to use parsing the configuration file.
      * @param componentBase
      *            base directory of development component.
      */
-    public PortalApplicationConfigurationReader(final XMLReader xmlReader, final String componentBase) {
-        super(xmlReader, componentBase);
+    public PortalApplicationConfigurationReader(final String componentBase) {
+        super(componentBase);
     }
 
     /*
