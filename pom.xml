@@ -226,7 +226,7 @@
           <configLocation>${project.basedir}/src/main/resources/checkstyle-configuration.xml</configLocation>
         </configuration>
       </plugin>
-      <plugin>
+      <!-- plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>cobertura-maven-plugin</artifactId>
         <version>2.4</version>
@@ -236,10 +236,29 @@
             <format>xml</format>
           </formats>
         </configuration>
-      </plugin>
+      </plugin-->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-report-plugin</artifactId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <version>2.3.1</version>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <!-- report>dependencies</report-->
+              <report>project-team</report>
+              <report>mailing-list</report>
+              <report>cim</report>
+              <report>issue-tracking</report>
+              <report>license</report>
+              <report>scm</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+      <plugin>
+      	<groupId>org.sonatype.maven.plugin</groupId>
+      	<artifactId>emma-maven-plugin</artifactId>
+      	<version>1.2</version>
       </plugin>
     </plugins>
   </reporting>
