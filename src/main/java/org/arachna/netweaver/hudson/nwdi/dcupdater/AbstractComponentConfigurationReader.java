@@ -4,7 +4,7 @@
 package org.arachna.netweaver.hudson.nwdi.dcupdater;
 
 import java.io.File;
-import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 
 import org.arachna.netweaver.dc.types.PublicPartReference;
 import org.arachna.xml.AbstractDefaultHandler;
-import org.xml.sax.InputSource;
+import org.arachna.xml.XmlReaderHelper;
 import org.xml.sax.SAXException;
 
 /**
@@ -57,7 +57,7 @@ abstract class AbstractComponentConfigurationReader extends AbstractDefaultHandl
      *            base directory of development component.
      */
     protected AbstractComponentConfigurationReader(final String componentBase) {
-        super(null);
+        super();
         this.componentBase = componentBase;
     }
 
@@ -66,12 +66,14 @@ abstract class AbstractComponentConfigurationReader extends AbstractDefaultHandl
      */
     public final Set<PublicPartReference> read() {
         this.references.clear();
+        FileReader input = null;
 
         try {
             final File source = new File(this.componentBase + File.separatorChar + this.getConfigurationLocation());
 
             if (source.exists()) {
-                this.getXmlReader().parse(new InputSource(new FileInputStream(source)));
+                input = new FileReader(source);
+                new XmlReaderHelper(this).parse(input);
             }
         }
         catch (final IOException e) {
@@ -81,6 +83,17 @@ abstract class AbstractComponentConfigurationReader extends AbstractDefaultHandl
         catch (final SAXException e) {
             Logger.getLogger(this.getClass().getName()).log(Level.WARNING,
                 String.format(SAX_EXCEPTION_MESSAGE, this.getConfigurationLocation()), e);
+        }
+        finally {
+            if (input != null) {
+                try {
+                    input.close();
+                }
+                catch (IOException e) {
+                    Logger.getLogger(this.getClass().getName()).log(Level.WARNING,
+                        String.format(IO_EXCEPTION_MESSAGE, this.getConfigurationLocation()), e);
+                }
+            }
         }
 
         return this.references;
