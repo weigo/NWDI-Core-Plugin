@@ -26,7 +26,7 @@ public final class UnZip {
     private final File targetDirectory;
 
     /**
-     * name of zip file that should be unzhipped.
+     * name of zip file that should be unzipped.
      */
     private final String zipFileName;
 
