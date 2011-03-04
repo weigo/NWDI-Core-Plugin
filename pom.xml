@@ -140,6 +140,7 @@
         <configuration>
           <source>1.5</source>
           <target>1.5</target>
+          <compilerArgument>-g</compilerArgument>
         </configuration>
         <version>2.3.1</version>
       </plugin>
@@ -244,7 +245,7 @@
         <reportSets>
           <reportSet>
             <reports>
-              <!-- report>dependencies</report-->
+              <!-- report>dependencies</report -->
               <report>project-team</report>
               <report>mailing-list</report>
               <report>cim</report>
