@@ -378,13 +378,13 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
 
             FormValidation result = FormValidation.ok();
 
-            if (parser.hasInvalidJdkHomeNames()) {
+            if (paths.getAliases().isEmpty()) {
+                result = FormValidation.error(Messages.NWDIProject_specify_jdk_homes());
+            }
+            else if (parser.hasInvalidJdkHomeNames()) {
                 result =
                     FormValidation.error(Messages.NWDIProject_invalid_jdk_homes_specified(parser
                         .getInvalidJdkHomeNames()));
-            }
-            else if (paths.getAliases().isEmpty()) {
-                result = FormValidation.error("JDK homes angeben...");
             }
 
             return result;
