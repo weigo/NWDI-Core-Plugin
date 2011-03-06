@@ -10,7 +10,6 @@ import hudson.Util;
 import hudson.model.BuildListener;
 import hudson.model.DependencyGraph;
 import hudson.model.Descriptor.FormException;
-import hudson.model.Item;
 import hudson.model.ItemGroup;
 import hudson.model.TopLevelItem;
 import hudson.model.AbstractBuild;
@@ -26,6 +25,7 @@ import javax.servlet.ServletException;
 
 import net.sf.json.JSONObject;
 
+import org.apache.commons.fileupload.FileItem;
 import org.arachna.netweaver.dctool.JdkHomePaths;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
@@ -49,12 +49,6 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
      * workspace should be clean before building.
      */
     private static final String PARAMETER_CLEAN_COPY = "cleanCopy";
-
-    /**
-     * parameter name for the content of the development configuration file
-     * '.confdef'.
-     */
-    private static final String PARAMETER_CONF_DEF = "confDef";
 
     /**
      * Store the content of the '.confdef' configuration file for a development
@@ -154,10 +148,23 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
     protected void submit(final StaplerRequest req, final StaplerResponse rsp) throws IOException, ServletException,
         FormException {
         final JSONObject json = req.getSubmittedForm();
-        this.confDef = Util.fixNull(json.getString(PARAMETER_CONF_DEF));
+        final String fileKey = json.getString("developmentConfiguration");
+
+        try {
+            final FileItem item = req.getFileItem(fileKey);
+
+            if (item != null) {
+                this.confDef = item.getString();
+            }
+        }
+        catch (ServletException e) {
+            throw new FormException(e, "ServletException");
+        }
+        catch (IOException e) {
+            throw new FormException(e, "IOException");
+        }
         this.cleanCopy = json.getBoolean(PARAMETER_CLEAN_COPY);
 
-        this.setScm(new NWDIScm(this.cleanCopy, this.getDescriptor().getUser(), this.getDescriptor().getPassword()));
         this.save();
 
         super.submit(req, rsp);
@@ -378,13 +385,13 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
 
             FormValidation result = FormValidation.ok();
 
-            if (parser.hasInvalidJdkHomeNames()) {
+            if (paths.getAliases().isEmpty()) {
+                result = FormValidation.error(Messages.NWDIProject_specify_jdk_homes());
+            }
+            else if (parser.hasInvalidJdkHomeNames()) {
                 result =
                     FormValidation.error(Messages.NWDIProject_invalid_jdk_homes_specified(parser
                         .getInvalidJdkHomeNames()));
-            }
-            else if (paths.getAliases().isEmpty()) {
-                result = FormValidation.error("JDK homes angeben...");
             }
 
             return result;
@@ -447,14 +454,6 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
 
     @Override
     protected void buildDependencyGraph(final DependencyGraph graph) {
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void onLoad(final ItemGroup<? extends Item> parent, final String name) throws IOException {
-        super.onLoad(parent, name);
     }
 
     /**

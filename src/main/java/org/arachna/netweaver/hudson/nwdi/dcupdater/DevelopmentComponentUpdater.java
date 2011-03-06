@@ -196,7 +196,6 @@ public final class DevelopmentComponentUpdater {
      * @return the base path of the current component (its '_comp' folder).
      */
     protected String getComponentBaseLocation() {
-        // "%s/DCs/%s/%s/_comp"
         return String.format(LOCATION_TEMPLATE, this.location, this.currentComponent.getVendor(),
             this.currentComponent.getName()).replace('/', File.separatorChar);
     }

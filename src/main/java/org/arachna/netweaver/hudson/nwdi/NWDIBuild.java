@@ -53,6 +53,11 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
     private final DevelopmentComponentFactory dcFactory = new DevelopmentComponentFactory();
 
     /**
+     * development components affected by activities leading to this build.
+     */
+    private transient Collection<DevelopmentComponent> affectedComponents;
+
+    /**
      * Create an instance of <code>NWDIBuild</code> using the given
      * <code>NWDIProject</code>.
      * 
@@ -82,7 +87,7 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
 
     @Override
     public void run() {
-        run(new RunnerImpl(this.getDevelopmentConfiguration(), this.getDevelopmentComponentFactory()));
+        run(new RunnerImpl(this.getDevelopmentConfiguration()));
     }
 
     /**
@@ -107,6 +112,37 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
         }
 
         return this.developmentConfiguration;
+    }
+
+    /**
+     * Calculate build sequence for development components affected by
+     * activities that triggered this build.
+     * 
+     * @return build sequence for development components affected by activities
+     *         that triggered this build.
+     */
+    public Collection<DevelopmentComponent> getAffectedDevelopmentComponents() {
+        if (this.affectedComponents == null) {
+            final NWDIRevisionState revisionState = this.getAction(NWDIRevisionState.class);
+            final Collection<DevelopmentComponent> affectedComponents = new HashSet<DevelopmentComponent>();
+
+            for (final Activity activity : revisionState.getActivities()) {
+                for (final ActivityResource resource : activity.getResources()) {
+                    affectedComponents.add(resource.getDevelopmentComponent());
+                }
+            }
+
+            // update usage relations from public part references.
+            this.dcFactory.updateUsingDCs();
+            final ComponentsNeedingRebuildFinder finder = new ComponentsNeedingRebuildFinder();
+            final DependencySorter dependencySorter =
+                new DependencySorter(this.dcFactory,
+                    finder.calculateDevelopmentComponentsThatNeedRebuilding(affectedComponents));
+
+            this.affectedComponents = dependencySorter.determineBuildSequence();
+        }
+
+        return this.affectedComponents;
     }
 
     /**
@@ -149,12 +185,6 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
      */
     private final class RunnerImpl extends AbstractRunner {
         /**
-         * registry/factory for development components to use throughout the
-         * build.
-         */
-        private final DevelopmentComponentFactory dcFactory;
-
-        /**
          * development configuration to use throughout the build.
          */
         private final DevelopmentConfiguration developmentConfiguration;
@@ -171,12 +201,9 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
          * 
          * @param developmentConfiguration
          *            development configuration to be used in this run.
-         * @param dcFactory
-         *            development component registry to be used in this run.
          */
-        RunnerImpl(final DevelopmentConfiguration developmentConfiguration, final DevelopmentComponentFactory dcFactory) {
+        RunnerImpl(final DevelopmentConfiguration developmentConfiguration) {
             this.developmentConfiguration = developmentConfiguration;
-            this.dcFactory = dcFactory;
         }
 
         /**
@@ -217,7 +244,8 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
          * @throws InterruptedException
          */
         protected Result buildDevelopmentComponents(final PrintStream logger) throws IOException, InterruptedException {
-            final Collection<DevelopmentComponent> affectedComponents = getAffectedDevelopmentComponents();
+            final Collection<DevelopmentComponent> affectedComponents =
+                NWDIBuild.this.getAffectedDevelopmentComponents();
             logger.append(String.format("Building %s development components.\n", affectedComponents.size()));
 
             for (final DevelopmentComponent component : affectedComponents) {
@@ -231,34 +259,6 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
             logger.append("Done building development components.\n");
 
             return result.isExitCodeOk() ? null : Result.FAILURE;
-        }
-
-        /**
-         * Calculate build sequence for development components affected by
-         * activities that triggered this build.
-         * 
-         * @return build sequence for development components affected by
-         *         activities that triggered this build.
-         */
-        protected Collection<DevelopmentComponent> getAffectedDevelopmentComponents() {
-            final NWDIRevisionState revisionState = NWDIBuild.this.getAction(NWDIRevisionState.class);
-            final Collection<DevelopmentComponent> affectedComponents = new HashSet<DevelopmentComponent>();
-
-            for (final Activity activity : revisionState.getActivities()) {
-                for (final ActivityResource resource : activity.getResources()) {
-                    // FIXME: get DCs from DevelopmentComponentFactory.
-                    affectedComponents.add(resource.getDevelopmentComponent());
-                }
-            }
-
-            // update usage relations from public part references.
-            this.dcFactory.updateUsingDCs();
-            final ComponentsNeedingRebuildFinder finder = new ComponentsNeedingRebuildFinder();
-            final DependencySorter dependencySorter =
-                new DependencySorter(this.dcFactory,
-                    finder.calculateDevelopmentComponentsThatNeedRebuilding(affectedComponents));
-
-            return dependencySorter.determineBuildSequence();
         }
 
         /**
