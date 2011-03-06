@@ -87,7 +87,7 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
 
     @Override
     public void run() {
-        run(new RunnerImpl(this.getDevelopmentConfiguration(), this.getDevelopmentComponentFactory()));
+        run(new RunnerImpl(this.getDevelopmentConfiguration()));
     }
 
     /**
@@ -185,12 +185,6 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
      */
     private final class RunnerImpl extends AbstractRunner {
         /**
-         * registry/factory for development components to use throughout the
-         * build.
-         */
-        private final DevelopmentComponentFactory dcFactory;
-
-        /**
          * development configuration to use throughout the build.
          */
         private final DevelopmentConfiguration developmentConfiguration;
@@ -210,9 +204,8 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
          * @param dcFactory
          *            development component registry to be used in this run.
          */
-        RunnerImpl(final DevelopmentConfiguration developmentConfiguration, final DevelopmentComponentFactory dcFactory) {
+        RunnerImpl(final DevelopmentConfiguration developmentConfiguration) {
             this.developmentConfiguration = developmentConfiguration;
-            this.dcFactory = dcFactory;
         }
 
         /**
