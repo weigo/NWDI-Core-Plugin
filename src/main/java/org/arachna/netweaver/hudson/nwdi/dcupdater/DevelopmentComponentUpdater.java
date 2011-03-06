@@ -130,7 +130,7 @@ public final class DevelopmentComponentUpdater {
             LOGGER.log(Level.SEVERE, "The configuration file for " + this.currentComponent.getVendor() + ":"
                 + this.currentComponent.getName() + " could not be found!", e);
         }
-        catch (SAXException e) {
+        catch (final SAXException e) {
             LOGGER.log(Level.SEVERE, "The configuration file for " + this.currentComponent.getVendor() + ":"
                 + this.currentComponent.getName() + " could not be parsed!", e);
         }
@@ -162,8 +162,9 @@ public final class DevelopmentComponentUpdater {
             reader = new PortalApplicationConfigurationReader(this.componentBase);
         }
 
-        reader.setXmlReader(getXMLReader());
-        this.currentComponent.addAll(reader.read());
+        if (reader != null) {
+            this.currentComponent.addAll(reader.read());
+        }
     }
 
     /**
