@@ -201,8 +201,6 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
          * 
          * @param developmentConfiguration
          *            development configuration to be used in this run.
-         * @param dcFactory
-         *            development component registry to be used in this run.
          */
         RunnerImpl(final DevelopmentConfiguration developmentConfiguration) {
             this.developmentConfiguration = developmentConfiguration;
