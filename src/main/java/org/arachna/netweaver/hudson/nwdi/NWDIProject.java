@@ -41,7 +41,6 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
     /**
      * Global descriptor/configuraton for NWDIProjects.
      */
-    @Extension(ordinal = 1000)
     public static final DescriptorImpl DESCRIPTOR = new DescriptorImpl();
 
     /**
@@ -176,6 +175,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
      * 
      * @author Dirk Weigenand
      */
+    @Extension(ordinal = 1000)
     public static class DescriptorImpl extends AbstractProjectDescriptor {
         /**
          * Constant for password request parameter.
