@@ -3,10 +3,13 @@
  */
 package org.arachna.netweaver.hudson.nwdi;
 
+import static hudson.model.Result.FAILURE;
 import hudson.Launcher;
 import hudson.model.Build;
 import hudson.model.BuildListener;
 import hudson.model.Result;
+import hudson.tasks.BuildStep;
+import hudson.tasks.Builder;
 import hudson.tasks.Publisher;
 
 import java.io.File;
@@ -106,7 +109,7 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
             catch (final SAXException e) {
                 throw new RuntimeException(e);
             }
-            catch (IOException e) {
+            catch (final IOException e) {
                 throw new RuntimeException(e);
             }
         }
@@ -223,15 +226,34 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
         protected Result doRun(final BuildListener listener) throws Exception {
             this.reporters.addAll(getProject().getPublishersList().toList());
 
-            if (!preBuild(listener, this.reporters)) {
+            if (!preBuild(listener, project.getBuilders())) {
+                return FAILURE;
+            }
+
+            if (!preBuild(listener, getProject().getPublishers())) {
                 return Result.FAILURE;
             }
 
             final PrintStream logger = listener.getLogger();
 
-            final Result r = buildDevelopmentComponents(logger);
+            Result r = buildDevelopmentComponents(logger);
+
+            if (!Result.FAILURE.equals(r) && build(listener, project.getBuilders())) {
+                r = FAILURE;
+            }
 
             return r;
+        }
+
+        private boolean build(final BuildListener listener, final Collection<Builder> steps) throws IOException,
+            InterruptedException {
+            for (final BuildStep bs : steps) {
+                if (!perform(bs, listener)) {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         /**
