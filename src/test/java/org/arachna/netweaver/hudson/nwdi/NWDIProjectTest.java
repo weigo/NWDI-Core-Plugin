@@ -72,9 +72,14 @@ public class NWDIProjectTest implements TopLevelItem {
      */
     @Test
     public void testDescriptorImplConfigureWithEmptyRequest() throws FormException {
-        final StaplerRequest request = new FakeStaplerRequest(new String[] {}, new String[] {});
-
-        this.descriptor.configure(request, null);
+        // final StaplerRequest request = new FakeStaplerRequest(new String[]
+        // {}, new String[] {});
+        JSONObject json = new JSONObject();
+        json.accumulate("jdkHomePaths", "");
+        json.accumulate("nwdiToolLibFolder", "");
+        json.accumulate("password", "");
+        json.accumulate("user", "");
+        this.descriptor.configure(null, json);
 
         assertThat(this.descriptor.getJdkHomePaths(), equalTo(""));
         assertThat(this.descriptor.getNwdiToolLibFolder(), equalTo(""));
@@ -95,12 +100,12 @@ public class NWDIProjectTest implements TopLevelItem {
         final String user = "user";
         final String password = "secret";
 
-        final StaplerRequest request =
-            new FakeStaplerRequest(new String[] { NWDIProject.DescriptorImpl.JDK_HOME_PATHS,
-                NWDIProject.DescriptorImpl.TOOL_LIB_FOLDER, NWDIProject.DescriptorImpl.USER,
-                NWDIProject.DescriptorImpl.PASSWORD }, new String[] { jdk16, nwdiToolsFolder, user, password });
-
-        this.descriptor.configure(request, null);
+        JSONObject json = new JSONObject();
+        json.accumulate("jdkHomePaths", jdk16);
+        json.accumulate("nwdiToolLibFolder", nwdiToolsFolder);
+        json.accumulate("password", password);
+        json.accumulate("user", user);
+        this.descriptor.configure(null, json);
 
         assertThat(this.descriptor.getJdkHomePaths(), equalTo(jdk16));
         assertThat(this.descriptor.getNwdiToolLibFolder(), equalTo(nwdiToolsFolder));

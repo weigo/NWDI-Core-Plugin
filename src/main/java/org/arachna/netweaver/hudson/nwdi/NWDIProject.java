@@ -10,6 +10,7 @@ import hudson.Util;
 import hudson.model.BuildListener;
 import hudson.model.DependencyGraph;
 import hudson.model.Descriptor.FormException;
+import hudson.model.Item;
 import hudson.model.ItemGroup;
 import hudson.model.TopLevelItem;
 import hudson.model.AbstractBuild;
@@ -39,7 +40,7 @@ import org.kohsuke.stapler.StaplerResponse;
  */
 public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopLevelItem {
     /**
-     * Global descriptor/configuraton for NWDIProjects.
+     * Global descriptor/configuration for NWDIProjects.
      */
     public static final DescriptorImpl DESCRIPTOR = new DescriptorImpl();
 
@@ -105,6 +106,14 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
     @Override
     public Hudson getParent() {
         return Hudson.getInstance();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onLoad(ItemGroup<? extends Item> parent, String name) throws IOException {
+        super.onLoad(parent, name);
     }
 
     /*
@@ -310,12 +319,10 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
          */
         @Override
         public boolean configure(final StaplerRequest req, final JSONObject json) throws FormException {
-            final ParameterHelper helper = new ParameterHelper(req);
-
-            this.jdkHomePaths = helper.getParameter(JDK_HOME_PATHS);
-            this.nwdiToolLibFolder = helper.getParameter(TOOL_LIB_FOLDER);
-            this.user = helper.getParameter(USER);
-            this.password = helper.getParameter(PASSWORD);
+            this.jdkHomePaths = Util.fixNull(json.getString("jdkHomePaths"));
+            this.nwdiToolLibFolder = Util.fixNull(json.getString("nwdiToolLibFolder"));
+            this.user = Util.fixNull(json.getString("user"));
+            this.password = Util.fixNull(json.getString("password"));
 
             save();
 
