@@ -9,11 +9,11 @@ import hudson.Launcher;
 import hudson.Util;
 import hudson.model.BuildListener;
 import hudson.model.DependencyGraph;
-import hudson.model.Descriptor.FormException;
 import hudson.model.Item;
 import hudson.model.ItemGroup;
 import hudson.model.TopLevelItem;
 import hudson.model.AbstractBuild;
+import hudson.model.Descriptor.FormException;
 import hudson.model.Hudson;
 import hudson.model.Project;
 import hudson.scm.SCM;
@@ -449,8 +449,8 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
          * {@inheritDoc}
          */
         @Override
-        public NWDIProject newInstance(final String name) {
-            return new NWDIProject(Hudson.getInstance(), name);
+        public NWDIProject newInstance(final ItemGroup group, final String name) {
+            return new NWDIProject(group, name);
         }
     }
 
