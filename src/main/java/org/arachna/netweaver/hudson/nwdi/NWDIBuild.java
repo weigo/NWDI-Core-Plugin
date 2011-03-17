@@ -238,7 +238,7 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
 
             Result r = buildDevelopmentComponents(logger);
 
-            if (!Result.FAILURE.equals(r) && build(listener, project.getBuilders())) {
+            if (!Result.FAILURE.equals(r) && !build(listener, project.getBuilders())) {
                 r = FAILURE;
             }
 
