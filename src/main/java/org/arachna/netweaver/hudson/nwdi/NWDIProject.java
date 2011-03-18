@@ -42,6 +42,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
     /**
      * Global descriptor/configuration for NWDIProjects.
      */
+    @Extension(ordinal = 1000)
     public static final DescriptorImpl DESCRIPTOR = new DescriptorImpl();
 
     /**
@@ -112,7 +113,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
      * {@inheritDoc}
      */
     @Override
-    public void onLoad(ItemGroup<? extends Item> parent, String name) throws IOException {
+    public void onLoad(final ItemGroup<? extends Item> parent, final String name) throws IOException {
         super.onLoad(parent, name);
     }
 
@@ -126,7 +127,8 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
     public boolean checkout(final AbstractBuild build, final Launcher launcher, final BuildListener listener,
         final File changelogFile) throws IOException, InterruptedException {
         final DtrConfigCreator configCreator =
-            new DtrConfigCreator(getWorkspace(), ((NWDIBuild)build).getDevelopmentConfiguration(), this.getConfDef());
+            new DtrConfigCreator(build.getWorkspace(), ((NWDIBuild)build).getDevelopmentConfiguration(),
+                this.getConfDef());
         configCreator.execute();
 
         return super.checkout(build, launcher, listener, changelogFile);
@@ -162,16 +164,22 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
             final FileItem item = req.getFileItem(fileKey);
 
             if (item != null) {
-                this.confDef = item.getString();
+                final String content = item.getString();
+
+                if (content != null && content.trim().length() > 0) {
+                    this.confDef = content.trim();
+                }
             }
         }
-        catch (ServletException e) {
+        catch (final ServletException e) {
             throw new FormException(e, "ServletException");
         }
-        catch (IOException e) {
+        catch (final IOException e) {
             throw new FormException(e, "IOException");
         }
         this.cleanCopy = json.getBoolean(PARAMETER_CLEAN_COPY);
+
+        this.setScm(new NWDIScm(this.cleanCopy, this.getDescriptor().getUser(), this.getDescriptor().getPassword()));
 
         this.save();
 
@@ -184,7 +192,6 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
      * 
      * @author Dirk Weigenand
      */
-    @Extension(ordinal = 1000)
     public static class DescriptorImpl extends AbstractProjectDescriptor {
         /**
          * Constant for password request parameter.
