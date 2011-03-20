@@ -42,6 +42,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
     /**
      * Global descriptor/configuration for NWDIProjects.
      */
+    @Extension
     public static final DescriptorImpl DESCRIPTOR = new DescriptorImpl();
 
     /**
@@ -112,8 +113,11 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
      * {@inheritDoc}
      */
     @Override
-    public void onLoad(ItemGroup<? extends Item> parent, String name) throws IOException {
+    public void onLoad(final ItemGroup<? extends Item> parent, final String name) throws IOException {
         super.onLoad(parent, name);
+        System.err.println(getScm());
+        // setScm(new NWDIScm(cleanCopy, DESCRIPTOR.getUser(),
+        // DESCRIPTOR.getPassword()));
     }
 
     /*
@@ -126,7 +130,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
     public boolean checkout(final AbstractBuild build, final Launcher launcher, final BuildListener listener,
         final File changelogFile) throws IOException, InterruptedException {
         final DtrConfigCreator configCreator =
-            new DtrConfigCreator(getWorkspace(), ((NWDIBuild)build).getDevelopmentConfiguration(), this.getConfDef());
+            new DtrConfigCreator(getWorkspace(), ((NWDIBuild)build).getDevelopmentConfiguration(), getConfDef());
         configCreator.execute();
 
         return super.checkout(build, launcher, listener, changelogFile);
@@ -146,7 +150,16 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
      */
     @Override
     public SCM getScm() {
-        return new NWDIScm(this.cleanCopy, this.getDescriptor().getUser(), this.getDescriptor().getPassword());
+        return super.getScm();// return new NWDIScm(cleanCopy,
+                              // DESCRIPTOR.getUser(),
+                              // DESCRIPTOR.getPassword());
+    }
+
+    @Override
+    public void setScm(final SCM scm) throws IOException {
+        final boolean useGivenScm = scm != null && NWDIScm.class.equals(scm.getClass());
+
+        super.setScm(useGivenScm ? scm : new NWDIScm(cleanCopy, DESCRIPTOR.getUser(), DESCRIPTOR.getPassword()));
     }
 
     /**
@@ -162,19 +175,25 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
             final FileItem item = req.getFileItem(fileKey);
 
             if (item != null) {
-                this.confDef = item.getString();
+                final String content = item.getString();
+
+                if (content != null && content.trim().length() > 0) {
+                    confDef = content;
+                }
             }
         }
-        catch (ServletException e) {
+        catch (final ServletException e) {
             throw new FormException(e, "ServletException");
         }
-        catch (IOException e) {
+        catch (final IOException e) {
             throw new FormException(e, "IOException");
         }
-        this.cleanCopy = json.getBoolean(PARAMETER_CLEAN_COPY);
 
-        this.save();
+        cleanCopy = json.getBoolean(PARAMETER_CLEAN_COPY);
 
+        setScm(null);
+        // not needed since setting the SCM saves automatically.
+        save();
         super.submit(req, rsp);
     }
 
@@ -184,7 +203,6 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
      * 
      * @author Dirk Weigenand
      */
-    @Extension(ordinal = 1000)
     public static class DescriptorImpl extends AbstractProjectDescriptor {
         /**
          * Constant for password request parameter.
@@ -245,7 +263,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
          * @return the user for authentication against the NWDI
          */
         public String getUser() {
-            return this.user;
+            return user;
         }
 
         /**
@@ -262,7 +280,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
          * @return the password
          */
         public String getPassword() {
-            return this.password;
+            return password;
         }
 
         /**
@@ -296,7 +314,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
          *         tracks.
          */
         public String getJdkHomePaths() {
-            return this.jdkHomePaths;
+            return jdkHomePaths;
         }
 
         /**
@@ -319,10 +337,10 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
          */
         @Override
         public boolean configure(final StaplerRequest req, final JSONObject json) throws FormException {
-            this.jdkHomePaths = Util.fixNull(json.getString("jdkHomePaths"));
-            this.nwdiToolLibFolder = Util.fixNull(json.getString("nwdiToolLibFolder"));
-            this.user = Util.fixNull(json.getString("user"));
-            this.password = Util.fixNull(json.getString("password"));
+            jdkHomePaths = Util.fixNull(json.getString("jdkHomePaths"));
+            nwdiToolLibFolder = Util.fixNull(json.getString("nwdiToolLibFolder"));
+            user = Util.fixNull(json.getString("user"));
+            password = Util.fixNull(json.getString("password"));
 
             save();
 
@@ -434,7 +452,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
          * @return path mappings for the configured JDK homes.
          */
         JdkHomePaths getConfiguredJdkHomePaths() {
-            return new JdkHomePathsParser(this.getJdkHomePaths()).parse();
+            return new JdkHomePathsParser(getJdkHomePaths()).parse();
         }
 
         /**
@@ -479,7 +497,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
      * @return the content of the '.confdef' configuration file.
      */
     public String getConfDef() {
-        return this.confDef;
+        return confDef;
     }
 
     /**
@@ -489,7 +507,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
      *         <code>true</code> yes, leave it as it is otherwise).
      */
     public boolean isCleanCopy() {
-        return this.cleanCopy;
+        return cleanCopy;
     }
 
     /**
