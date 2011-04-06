@@ -3,6 +3,7 @@
  */
 package org.arachna.netweaver.hudson.nwdi;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -13,7 +14,7 @@ import org.arachna.netweaver.dctool.AbstractDCToolCommandBuilder;
 
 /**
  * Builder for 'builddc' commands for DC tool.
- * 
+ *
  * @author Dirk Weigenand
  */
 public final class BuildDevelopmentComponentsCommandBuilder extends AbstractDCToolCommandBuilder {
@@ -28,22 +29,34 @@ public final class BuildDevelopmentComponentsCommandBuilder extends AbstractDCTo
     private final List<DevelopmentComponent> components = new ArrayList<DevelopmentComponent>();
 
     /**
-     * Creates a <code>DevelopmentComponentBuilder</code> instance for the given development components.
-     * 
+     * Logger to use for log messages.
+     */
+    private final PrintStream logger;
+
+    /**
+     * Creates a <code>DevelopmentComponentBuilder</code> instance for the given
+     * development components.
+     *
      * @param config
-     *            development configuration to use for executing dc tool commands.
+     *            development configuration to use for executing dc tool
+     *            commands.
      * @param components
      *            development components to create build dc commands for.
-     * 
+     * @param logger
+     *            Logger to use for log messages.
+     *
      */
-    public BuildDevelopmentComponentsCommandBuilder(final DevelopmentConfiguration config, final Collection<DevelopmentComponent> components) {
+    public BuildDevelopmentComponentsCommandBuilder(final DevelopmentConfiguration config,
+        final Collection<DevelopmentComponent> components, PrintStream logger) {
         super(config);
+        this.logger = logger;
         this.components.addAll(components);
     }
 
     /**
-     * Erzeugt Befehle für das Bauen der Entwicklungskomponenten und führt dann das DC-Tool aus.
-     * 
+     * Erzeugt Befehle für das Bauen der Entwicklungskomponenten und führt
+     * dann das DC-Tool aus.
+     *
      * @return Erzeugte 'builddc' Kommandos.
      */
     @Override
@@ -51,7 +64,15 @@ public final class BuildDevelopmentComponentsCommandBuilder extends AbstractDCTo
         final List<String> commands = new ArrayList<String>();
 
         for (final DevelopmentComponent component : components) {
-            commands.add(String.format(BUILD_DC_COMMAND, component.getCompartment().getName(), component.getName(), component.getVendor()));
+            // FIXME: guard against NPE when compartment is not set!!!
+            if (component.getCompartment() != null) {
+                commands.add(String.format(BUILD_DC_COMMAND, component.getCompartment().getName(), component.getName(),
+                    component.getVendor()));
+            }
+            else {
+                logger.append(String.format("%s/%s has no compartment set!", component.getVendor(),
+                    component.getName()));
+            }
         }
 
         return commands;
