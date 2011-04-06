@@ -44,14 +44,14 @@ import org.kohsuke.stapler.StaplerRequest;
 
 /**
  * Interface to NetWeaver Developer Infrastructure.
- * 
+ *
  * @author Dirk Weigenand
  */
 public class NWDIScm extends SCM {
     /**
      * 1000 milliseconds.
      */
-    private static final int A_THOUSAND_MSECS = 1000;
+    private static final float A_THOUSAND_MSECS = 1000f;
 
     /**
      * Logger.
@@ -75,7 +75,7 @@ public class NWDIScm extends SCM {
 
     /**
      * Create an instance of a <code>NWDIScm</code>.
-     * 
+     *
      * @param cleanCopy
      *            indicate whether only changed development components should be
      *            loaded from the NWDI or all that are contained in the
@@ -91,7 +91,7 @@ public class NWDIScm extends SCM {
 
     /*
      * (non-Javadoc * *
-     * 
+     *
      * @see hudson.scm.SCM#getDescriptor()
      */
     @Override
@@ -101,7 +101,7 @@ public class NWDIScm extends SCM {
 
     /*
      * (non-Javado * *
-     * 
+     *
      * @see hudson.scm.SCM#createChangeLogParser()
      */
     @Override
@@ -111,7 +111,7 @@ public class NWDIScm extends SCM {
 
     /*
      * (non-Javad * *
-     * 
+     *
      * @see hudson.scm.SCM#requiresWorkspaceForPolling()
      */
     @Override
@@ -121,7 +121,7 @@ public class NWDIScm extends SCM {
 
     /*
      * (non-Java * *
-     * 
+     *
      * @see hudson.scm.SCM#checkout(hudson.model.AbstractBuild, hudson.Launcher,
      * hudson.FilePath, hudson.model.BuildListener, java.io.File)
      */
@@ -143,7 +143,6 @@ public class NWDIScm extends SCM {
             new DevelopmentComponentsReader(new StringReader(result.getOutput()), dcFactory, config).read();
             logger.append(String.format("Read %s development components from NWDI.\n", dcFactory.getAll().size()));
 
-            // FIXME: last build or last successful one?
             final NWDIBuild lastSuccessfulBuild = currentBuild.getParent().getLastSuccessfulBuild();
 
             logger.append("Synchronizing development components from NWDI.\n");
@@ -220,7 +219,7 @@ public class NWDIScm extends SCM {
 
     /**
      * Write the change log using the given build, file and list of activities.
-     * 
+     *
      * @param build
      *            the {@link AbstractBuild} to use writing the change log.
      * @param changelogFile
@@ -239,7 +238,7 @@ public class NWDIScm extends SCM {
 
     /**
      * {@link SCMDescriptor} for {@link NWDIProject}.
-     * 
+     *
      * @author Dirk Weigenand
      */
     @Extension
@@ -267,7 +266,7 @@ public class NWDIScm extends SCM {
     /**
      * Get list of activities since last run. If <code>lastRun</code> is
      * <code>null</code> all activities will be calcu *
-     * 
+     *
      * @param browser
      *            the {@link DtrBrowser} to be used getting the activities.
      * @param since
@@ -303,7 +302,7 @@ public class NWDIScm extends SCM {
     /**
      * Returns an instance of {@link DtrBrowser} using the given development
      * configuration and development component factory.
-     * 
+     *
      * @param config
      *            the development configuration to be used to connect to the
      *            DTR.
@@ -319,7 +318,7 @@ public class NWDIScm extends SCM {
     /**
      * Determine the time in seconds passed since the given start time and log
      * it using the message given.
-     * 
+     *
      * @param start
      *            begin of action whose duration should be logged.
      * @param message
@@ -328,7 +327,6 @@ public class NWDIScm extends SCM {
     private void duration(final long start, final String message) {
         final long duration = System.currentTimeMillis() - start;
 
-        LOGGER.log(Level.INFO,
-            String.format("%s took %d.%d sec.\n", message, duration / A_THOUSAND_MSECS, duration % A_THOUSAND_MSECS));
+        LOGGER.log(Level.INFO, String.format("%s took %.2%f sec.\n", message, duration / A_THOUSAND_MSECS));
     }
 }
