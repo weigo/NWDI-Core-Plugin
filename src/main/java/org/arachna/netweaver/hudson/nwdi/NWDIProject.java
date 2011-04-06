@@ -35,7 +35,7 @@ import org.kohsuke.stapler.StaplerResponse;
 
 /**
  * A project for building tracks residing in a NWDI.
- * 
+ *
  * @author Dirk Weigenand
  */
 public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopLevelItem {
@@ -64,7 +64,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
 
     /**
      * Create an instance of a NWDI project.
-     * 
+     *
      * @param parent
      *            the parent <code>ItemGroup</code> in the project configuration
      *            page.
@@ -78,7 +78,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
     /**
      * Create an instance of a NWDI project using the given project name and
      * configuration.
-     * 
+     *
      * @param name
      *            project name
      * @param confDef
@@ -115,11 +115,14 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
     @Override
     public void onLoad(final ItemGroup<? extends Item> parent, final String name) throws IOException {
         super.onLoad(parent, name);
+        System.err.println(getScm());
+        // setScm(new NWDIScm(cleanCopy, DESCRIPTOR.getUser(),
+        // DESCRIPTOR.getPassword()));
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see hudson.model.AbstractProject#checkout(hudson.model.AbstractBuild,
      * hudson.Launcher, hudson.model.BuildListener, java.io.File)
      */
@@ -129,6 +132,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
         final DtrConfigCreator configCreator =
             new DtrConfigCreator(build.getWorkspace(), ((NWDIBuild)build).getDevelopmentConfiguration(),
                 this.getConfDef());
+
         configCreator.execute();
 
         return super.checkout(build, launcher, listener, changelogFile);
@@ -143,12 +147,21 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
 
     /**
      * Returns the SCM to be used by this NWDI project.
-     * 
+     *
      * @return SCM to be used by this NWDI project.
      */
     @Override
     public SCM getScm() {
-        return new NWDIScm(this.cleanCopy, this.getDescriptor().getUser(), this.getDescriptor().getPassword());
+        return super.getScm();// return new NWDIScm(cleanCopy,
+                              // DESCRIPTOR.getUser(),
+                              // DESCRIPTOR.getPassword());
+    }
+
+    @Override
+    public void setScm(final SCM scm) throws IOException {
+        final boolean useGivenScm = scm != null && NWDIScm.class.equals(scm.getClass());
+
+        super.setScm(useGivenScm ? scm : new NWDIScm(cleanCopy, DESCRIPTOR.getUser(), DESCRIPTOR.getPassword()));
     }
 
     /**
@@ -177,19 +190,18 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
         catch (final IOException e) {
             throw new FormException(e, "IOException");
         }
+
         this.cleanCopy = json.getBoolean(PARAMETER_CLEAN_COPY);
-
         this.setScm(new NWDIScm(this.cleanCopy, this.getDescriptor().getUser(), this.getDescriptor().getPassword()));
-
-        this.save();
-
+        // not needed since setting the SCM saves automatically.
+        save();
         super.submit(req, rsp);
     }
 
     /**
      * Descriptor for NWDIProjects. Contains the global configuration commonly
      * used for different NWDI tracks.
-     * 
+     *
      * @author Dirk Weigenand
      */
     public static class DescriptorImpl extends AbstractProjectDescriptor {
@@ -248,16 +260,16 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
 
         /**
          * Returns the user for authentication against the NWDI.
-         * 
+         *
          * @return the user for authentication against the NWDI
          */
         public String getUser() {
-            return this.user;
+            return user;
         }
 
         /**
          * Sets the user for authentication against the NWDI.
-         * 
+         *
          * @param user
          *            the user for authentication against the NWDI.
          */
@@ -269,7 +281,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
          * @return the password
          */
         public String getPassword() {
-            return this.password;
+            return password;
         }
 
         /**
@@ -298,17 +310,17 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
         /**
          * Returns the paths to JDK installations to be used for building
          * tracks.
-         * 
+         *
          * @return the paths to JDK installations to be used for building
          *         tracks.
          */
         public String getJdkHomePaths() {
-            return this.jdkHomePaths;
+            return jdkHomePaths;
         }
 
         /**
          * Set the paths to JDK installations to be used for building tracks.
-         * 
+         *
          * @param jdkHomePaths
          *            the paths to JDK installations to be used for building
          *            tracks.
@@ -319,17 +331,17 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
 
         /*
          * (non-Javadoc)
-         * 
+         *
          * @see
          * hudson.model.Descriptor#configure(org.kohsuke.stapler.StaplerRequest,
          * net.sf.json.JSONObject)
          */
         @Override
         public boolean configure(final StaplerRequest req, final JSONObject json) throws FormException {
-            this.jdkHomePaths = Util.fixNull(json.getString("jdkHomePaths"));
-            this.nwdiToolLibFolder = Util.fixNull(json.getString("nwdiToolLibFolder"));
-            this.user = Util.fixNull(json.getString("user"));
-            this.password = Util.fixNull(json.getString("password"));
+            jdkHomePaths = Util.fixNull(json.getString("jdkHomePaths"));
+            nwdiToolLibFolder = Util.fixNull(json.getString("nwdiToolLibFolder"));
+            user = Util.fixNull(json.getString("user"));
+            password = Util.fixNull(json.getString("password"));
 
             save();
 
@@ -338,7 +350,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
 
         /**
          * Validate the 'NwdiToolLibFolder' parameter.
-         * 
+         *
          * @param value
          *            the form value for the 'NwdiToolLibFolder' field.
          * @return the form validation value.
@@ -377,7 +389,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
         /**
          * Validate that the given <code>FilePath</code> contains a 'dc' sub
          * folder.
-         * 
+         *
          * @param folder
          *            the 'tools' folder of a NWDI tool library installation.
          * @return the validation result <code>FormValidation.ok()</code> when
@@ -413,7 +425,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
 
         /**
          * Validate the 'user' parameter.
-         * 
+         *
          * @param value
          *            the form value for the 'user' field.
          * @return the form validation value.
@@ -425,7 +437,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
 
         /**
          * Validate the 'password' parameter.
-         * 
+         *
          * @param value
          *            the form value for the 'password' field.
          * @return the form validation value.
@@ -437,11 +449,11 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
 
         /**
          * Returns the path mappings for the configured JDK homes.
-         * 
+         *
          * @return path mappings for the configured JDK homes.
          */
         JdkHomePaths getConfiguredJdkHomePaths() {
-            return new JdkHomePathsParser(this.getJdkHomePaths()).parse();
+            return new JdkHomePathsParser(getJdkHomePaths()).parse();
         }
 
         /**
@@ -472,7 +484,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
 
     /**
      * Set the content of the '.confdef' configuration file.
-     * 
+     *
      * @param confDef
      *            content of the '.confdef' configuration file.
      */
@@ -482,26 +494,26 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
 
     /**
      * Return the content of the '.confdef' configuration file.
-     * 
+     *
      * @return the content of the '.confdef' configuration file.
      */
     public String getConfDef() {
-        return this.confDef;
+        return confDef;
     }
 
     /**
      * Return whether the workspace should be cleaned before building.
-     * 
+     *
      * @return whether the workspace should be cleaned before building (
      *         <code>true</code> yes, leave it as it is otherwise).
      */
     public boolean isCleanCopy() {
-        return this.cleanCopy;
+        return cleanCopy;
     }
 
     /**
      * Indicate whether the workspace should be cleaned before building.
-     * 
+     *
      * @param cleanCopy
      *            whether the workspace should be cleaned before building (
      *            <code>true</code> yes, leave it as it is otherwise).

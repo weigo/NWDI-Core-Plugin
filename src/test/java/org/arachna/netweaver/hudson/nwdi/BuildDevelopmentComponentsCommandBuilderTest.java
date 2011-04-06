@@ -6,6 +6,8 @@ package org.arachna.netweaver.hudson.nwdi;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -20,7 +22,7 @@ import org.junit.Test;
 
 /**
  * Unit tests for {@link BuildDevelopmentComponentsCommandBuilder}.
- * 
+ *
  * @author Dirk Weigenand
  */
 public final class BuildDevelopmentComponentsCommandBuilderTest {
@@ -34,7 +36,8 @@ public final class BuildDevelopmentComponentsCommandBuilderTest {
     private DevelopmentComponentFactory dcFactory;
 
     /**
-     * Set up development configuration, compartment and development components to be used in test.
+     * Set up development configuration, compartment and development components
+     * to be used in test.
      */
     @Before
     public void setUp() {
@@ -44,33 +47,37 @@ public final class BuildDevelopmentComponentsCommandBuilderTest {
 
     /**
      * Build and return the build commands.
-     * 
+     *
      * @param components
      *            array of DCs to generate build commands for.
-     * 
+     *
      * @return the generated build commands.
      */
     protected List<String> createBuildCommands(final DevelopmentComponent[] components) {
         final DevelopmentConfiguration config = new DevelopmentConfiguration("DI0_Example_D");
-        final Compartment compartment = new Compartment(EXAMPLE_SC, CompartmentState.Source, "example.com", "", "EXAMPLE_SC");
+        final Compartment compartment =
+            new Compartment(EXAMPLE_SC, CompartmentState.Source, "example.com", "", "EXAMPLE_SC");
         config.add(compartment);
         final Collection<DevelopmentComponent> dCs = Arrays.asList(components);
         compartment.add(dCs);
 
-        return new BuildDevelopmentComponentsCommandBuilder(config, dCs).execute();
+        return new BuildDevelopmentComponentsCommandBuilder(config, dCs, new PrintStream(new ByteArrayOutputStream()))
+            .execute();
     }
 
     /**
-     * Test method for {@link org.arachna.netweaver.dc.analyzer.dctool.BuildDevelopmentComponentsCommandBuilder#execute()} .
+     * Test method for
+     * {@link org.arachna.netweaver.dc.analyzer.dctool.BuildDevelopmentComponentsCommandBuilder#execute()}
+     * .
      */
     @Test
     public void testBuildDcCommandGeneration() {
         final List<String> commands =
-            this.createBuildCommands(new DevelopmentComponent[] { this.dcFactory.get(ExampleDevelopmentComponentFactory.EXAMPLE_COM,
-                ExampleDevelopmentComponentFactory.LIB_JETM) });
+            this.createBuildCommands(new DevelopmentComponent[] { this.dcFactory.get(
+                ExampleDevelopmentComponentFactory.EXAMPLE_COM, ExampleDevelopmentComponentFactory.LIB_JETM) });
         final String[] expected =
-            new String[] { String.format("builddc -s %s -n %s -v %s -o;", EXAMPLE_SC, ExampleDevelopmentComponentFactory.LIB_JETM,
-                ExampleDevelopmentComponentFactory.EXAMPLE_COM) };
+            new String[] { String.format("builddc -s %s -n %s -v %s -o;", EXAMPLE_SC,
+                ExampleDevelopmentComponentFactory.LIB_JETM, ExampleDevelopmentComponentFactory.EXAMPLE_COM) };
         assertThat(commands, hasSize(expected.length));
     }
 }

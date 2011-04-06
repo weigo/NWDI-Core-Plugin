@@ -15,8 +15,6 @@ import org.arachna.netweaver.dc.types.DevelopmentComponentType;
 import org.arachna.netweaver.dc.types.PublicPart;
 import org.arachna.xml.XmlReaderHelper;
 import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.XMLReaderFactory;
 
 /**
  * Update development components with information read from the on disk
@@ -75,11 +73,11 @@ public final class DevelopmentComponentUpdater {
      * .dcdef, Project.wdproperties, etc.)
      */
     public void execute() {
-        for (final DevelopmentComponent component : this.dcFactory.getAll()) {
-            this.currentComponent = component;
+        for (final DevelopmentComponent component : dcFactory.getAll()) {
+            currentComponent = component;
 
-            this.componentBase = getComponentBaseLocation();
-            final File config = this.getDevelopmentComponentConfigurationFile();
+            componentBase = getComponentBaseLocation();
+            final File config = getDevelopmentComponentConfigurationFile();
 
             if (config.exists()) {
                 updateCurrentComponent(config);
@@ -87,29 +85,10 @@ public final class DevelopmentComponentUpdater {
                 readProperties();
             }
             else {
-                LOGGER.log(Level.INFO, this.currentComponent.getName()
-                    + " does not exist in development configuration " + this.location + "!");
+                LOGGER.log(Level.INFO, currentComponent.getName() + " does not exist in development configuration "
+                    + location + "!");
             }
         }
-    }
-
-    /**
-     * Get a {@link XMLReader} object. Throws a <code>RuntimeException</code> if
-     * noone could be created.
-     * 
-     * @return a new <code>XMLReader</code> object.
-     */
-    private XMLReader getXMLReader() {
-        XMLReader reader = null;
-
-        try {
-            reader = XMLReaderFactory.createXMLReader();
-        }
-        catch (final SAXException e) {
-            throw new RuntimeException(e);
-        }
-
-        return reader;
     }
 
     /**
@@ -124,15 +103,15 @@ public final class DevelopmentComponentUpdater {
 
         try {
             configReader = new FileReader(config);
-            new XmlReaderHelper(new DcDefinitionReader(this.currentComponent)).parse(configReader);
+            new XmlReaderHelper(new DcDefinitionReader(currentComponent)).parse(configReader);
         }
         catch (final IOException e) {
-            LOGGER.log(Level.SEVERE, "The configuration file for " + this.currentComponent.getVendor() + ":"
-                + this.currentComponent.getName() + " could not be found!", e);
+            LOGGER.log(Level.SEVERE, "The configuration file for " + currentComponent.getVendor() + ":"
+                + currentComponent.getName() + " could not be found!", e);
         }
         catch (final SAXException e) {
-            LOGGER.log(Level.SEVERE, "The configuration file for " + this.currentComponent.getVendor() + ":"
-                + this.currentComponent.getName() + " could not be parsed!", e);
+            LOGGER.log(Level.SEVERE, "The configuration file for " + currentComponent.getVendor() + ":"
+                + currentComponent.getName() + " could not be parsed!", e);
         }
         finally {
             try {
@@ -154,16 +133,16 @@ public final class DevelopmentComponentUpdater {
         AbstractComponentConfigurationReader reader = null;
 
         // TODO: Replace TypeCode with...
-        if (DevelopmentComponentType.WebDynpro.equals(this.currentComponent.getType())) {
-            reader = new WebDynproProjectPropertiesReader(this.componentBase);
+        if (DevelopmentComponentType.WebDynpro.equals(currentComponent.getType())) {
+            reader = new WebDynproProjectPropertiesReader(componentBase);
         }
-        else if (DevelopmentComponentType.PortalApplicationModule.equals(this.currentComponent.getType())
-            || DevelopmentComponentType.PortalApplicationStandalone.equals(this.currentComponent.getType())) {
-            reader = new PortalApplicationConfigurationReader(this.componentBase);
+        else if (DevelopmentComponentType.PortalApplicationModule.equals(currentComponent.getType())
+            || DevelopmentComponentType.PortalApplicationStandalone.equals(currentComponent.getType())) {
+            reader = new PortalApplicationConfigurationReader(componentBase);
         }
 
         if (reader != null) {
-            this.currentComponent.addAll(reader.read());
+            currentComponent.addAll(reader.read());
         }
     }
 
@@ -172,12 +151,12 @@ public final class DevelopmentComponentUpdater {
      * to it.
      */
     private void readPublicParts() {
-        final PublicPartsReader ppReader = new PublicPartsReader(this.componentBase);
+        final PublicPartsReader ppReader = new PublicPartsReader(componentBase);
 
         // FIXME: DevelopmentComponent should provide an
         // addAll(Collection<PublicPart>) operation.
         for (final PublicPart part : ppReader.read()) {
-            this.currentComponent.add(part);
+            currentComponent.add(part);
         }
     }
 
@@ -187,7 +166,7 @@ public final class DevelopmentComponentUpdater {
      * @return the configuration file object.
      */
     private File getDevelopmentComponentConfigurationFile() {
-        return new File(this.componentBase + File.separatorChar + ".dcdef");
+        return new File(componentBase + File.separatorChar + ".dcdef");
     }
 
     /**
@@ -196,7 +175,7 @@ public final class DevelopmentComponentUpdater {
      * @return the base path of the current component (its '_comp' folder).
      */
     protected String getComponentBaseLocation() {
-        return String.format(LOCATION_TEMPLATE, this.location, this.currentComponent.getVendor(),
-            this.currentComponent.getName()).replace('/', File.separatorChar);
+        return String.format(LOCATION_TEMPLATE, location, currentComponent.getVendor(), currentComponent.getName())
+            .replace('/', File.separatorChar);
     }
 }

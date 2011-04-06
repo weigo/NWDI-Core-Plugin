@@ -46,12 +46,12 @@
   <distributionManagement>
     <repository>
       <id>releases</id>
-      <url>http://localhost:4711/nexus/content/repositories/releases</url>
+      <url>http://sgisbruap126.gisa-halle.de:8080/nexus2/content/repositories/releases</url>
     </repository>
     <snapshotRepository>
       <id>snapshots</id>
       <name>Internal Snapshots</name>
-      <url>http://localhost:4711/nexus/content/repositories/snapshots</url>
+      <url>http://sgisbruap126.gisa-halle.de:8080/nexus2/content/repositories/snapshots</url>
     </snapshotRepository>
   </distributionManagement>
   <dependencies>
