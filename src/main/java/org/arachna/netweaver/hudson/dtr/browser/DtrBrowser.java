@@ -21,203 +21,226 @@ import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 
 /**
  * A browser for the design time repository's web browser interface.
- * 
+ *
  * @author Dirk Weigenand
  */
 public final class DtrBrowser {
-    /**
-     * Error message indicating a communication error with the DTR.
-     */
-    private static final String ERROR_COMMUNICATING_WITH_DTR = "An error occured communicating with the DTR.";
+	/**
+	 * Error message indicating a communication error with the DTR.
+	 */
+	private static final String ERROR_COMMUNICATING_WITH_DTR = "An error occured communicating with the DTR.";
 
-    /**
-     * Error message when extracting activities from DTR failed.
-     */
-    private static final String ERROR_READING_ACTIVITIES = "There was an error reading the list of activities (for %s/%s_%s) from the DTR.";
+	/**
+	 * Error message when extracting activities from DTR failed.
+	 */
+	private static final String ERROR_READING_ACTIVITIES = "There was an error reading the list of activities (URL: %s) from the DTR.";
 
-    /**
-     * query for reading activities for a given compartment.
-     */
-    private static final String ACTIVITY_QUERY = "%s/system-tools/reports/ActivityQuery?wspPath=/%s"
-        + "&user=&closedOnly=on&isnFrom=&isnTo=&nonEmptyOnly=on&folderPath=&command=Show";
-    /**
-     * DtrHttpClient for browsing the DTR.
-     */
-    private final DtrHttpClient dtrHttpClient;
+	/**
+	 * query for reading activities for a given compartment.
+	 */
+	private static final String ACTIVITY_QUERY = "%s/system-tools/reports/ActivityQuery?wspPath=/%s"
+			+ "&user=&closedOnly=on&isnFrom=&isnTo=&nonEmptyOnly=on&folderPath=&command=Show";
+	/**
+	 * DtrHttpClient for browsing the DTR.
+	 */
+	private final DtrHttpClient dtrHttpClient;
 
-    /**
-     * development configuration to use in queries.
-     */
-    private final DevelopmentConfiguration config;
+	/**
+	 * development configuration to use in queries.
+	 */
+	private final DevelopmentConfiguration config;
 
-    /**
-     * registry for {@link DevelopmentComponent} objects.
-     */
-    private DevelopmentComponentFactory dcFactory = new DevelopmentComponentFactory();
+	/**
+	 * registry for {@link DevelopmentComponent} objects.
+	 */
+	private DevelopmentComponentFactory dcFactory = new DevelopmentComponentFactory();
 
-    /**
-     * Create an instance of a <code>DtrBrowser</code>.
-     * 
-     * @param config
-     *            the {@link DevelopmentConfiguration} to use in queries.
-     * @param dcFactory
-     *            registry of {@link DevelopmentComponent} objects.
-     * @param dtrUser
-     *            user for accessing the DTR.
-     * @param password
-     *            password to authenticate the user against the DTR's UME.
-     */
-    public DtrBrowser(final DevelopmentConfiguration config, final DevelopmentComponentFactory dcFactory, final String dtrUser,
-        final String password) {
-        this.config = config;
-        this.dtrHttpClient = new DtrHttpClient(dtrUser, password);
-        this.dcFactory = dcFactory;
-    }
+	/**
+	 * Create an instance of a <code>DtrBrowser</code>.
+	 *
+	 * @param config
+	 *            the {@link DevelopmentConfiguration} to use in queries.
+	 * @param dcFactory
+	 *            registry of {@link DevelopmentComponent} objects.
+	 * @param dtrUser
+	 *            user for accessing the DTR.
+	 * @param password
+	 *            password to authenticate the user against the DTR's UME.
+	 */
+	public DtrBrowser(final DevelopmentConfiguration config,
+			final DevelopmentComponentFactory dcFactory, final String dtrUser,
+			final String password) {
+		this.config = config;
+		this.dtrHttpClient = new DtrHttpClient(dtrUser, password);
+		this.dcFactory = dcFactory;
+	}
 
-    /**
-     * Get list of activities in the given workspace containing the given compartment.
-     * 
-     * @param compartment
-     *            compartment to use for retrieving activities.
-     * @param activityFilter
-     *            filter for NWDI activities.
-     * @return list of retrieved activities (may be empty).
-     */
-    public List<Activity> getActivities(final Compartment compartment, final ActivityFilter activityFilter) {
-        final List<Activity> activities = new ArrayList<Activity>();
-        final ActivityListParser activityListBrowser = new ActivityListParser(activityFilter);
+	/**
+	 * Get list of activities in the given workspace containing the given
+	 * compartment.
+	 *
+	 * @param compartment
+	 *            compartment to use for retrieving activities.
+	 * @param activityFilter
+	 *            filter for NWDI activities.
+	 * @return list of retrieved activities (may be empty).
+	 */
+	public List<Activity> getActivities(final Compartment compartment,
+			final ActivityFilter activityFilter) {
+		final List<Activity> activities = new ArrayList<Activity>();
+		final ActivityListParser activityListBrowser = new ActivityListParser(
+				activityFilter);
+		String queryUrl = null;
 
-        try {
-            final String queryUrl = String.format(ACTIVITY_QUERY, compartment.getDtrUrl(), compartment.getInactiveLocation());
-            activityListBrowser.parse(this.dtrHttpClient.getContent(queryUrl));
-            activities.addAll(activityListBrowser.getActivities());
-        }
-        catch (final ClientProtocolException e) {
-            throw new RuntimeException(ERROR_COMMUNICATING_WITH_DTR, e);
-        }
-        catch (final IOException e) {
-            throw new RuntimeException(String.format(ERROR_READING_ACTIVITIES, config.getWorkspace(), compartment.getVendor(),
-                compartment.getName()), e);
-        }
-        catch (final IllegalStateException ise) {
-            throw new RuntimeException(String.format(ERROR_READING_ACTIVITIES, config.getWorkspace(), compartment.getVendor(),
-                compartment.getName()), ise);
-        }
+		try {
+			queryUrl = String.format(ACTIVITY_QUERY, compartment.getDtrUrl(),
+					compartment.getInactiveLocation());
+			activityListBrowser.parse(this.dtrHttpClient.getContent(queryUrl));
+			activities.addAll(activityListBrowser.getActivities());
+		} catch (final ClientProtocolException e) {
+			throw new RuntimeException(ERROR_COMMUNICATING_WITH_DTR, e);
+		} catch (final IOException e) {
+			throw new RuntimeException(String.format(ERROR_READING_ACTIVITIES,
+					queryUrl), e);
+		} catch (final IllegalStateException ise) {
+			throw new RuntimeException(String.format(ERROR_READING_ACTIVITIES,
+					queryUrl), ise);
+		}
 
-        return activities;
-    }
+		return activities;
+	}
 
-    /**
-     * Extract changed development components from the given list of activities.
-     * 
-     * @param activities
-     *            activities the changed development components shall be extracted from.
-     * @return list of changed development components associated with the given activities.
-     */
-    public Set<DevelopmentComponent> getDevelopmentComponents(final List<Activity> activities) {
-        final DevelopmentComponentCollector collector =
-            new DevelopmentComponentCollector(this.dtrHttpClient, this.config.getCmsUrl(), this.dcFactory);
+	/**
+	 * Extract changed development components from the given list of activities.
+	 *
+	 * @param activities
+	 *            activities the changed development components shall be
+	 *            extracted from.
+	 * @return list of changed development components associated with the given
+	 *         activities.
+	 */
+	public Set<DevelopmentComponent> getDevelopmentComponents(
+			final List<Activity> activities) {
+		final DevelopmentComponentCollector collector = new DevelopmentComponentCollector(
+				this.dtrHttpClient, this.config.getCmsUrl(), this.dcFactory);
 
-        return collector.collect(activities);
-    }
+		return collector.collect(activities);
+	}
 
-    /**
-     * Get a list of changed development components for the given workspace since the given date.
-     * 
-     * @return a list of changed development components
-     */
-    public Set<DevelopmentComponent> getChangedDevelopmentComponents() {
-        return this.getChangedDevelopmentComponents(new ActivityCheckinDateFilter());
-    }
+	/**
+	 * Get a list of changed development components for the given workspace
+	 * since the given date.
+	 *
+	 * @return a list of changed development components
+	 */
+	public Set<DevelopmentComponent> getChangedDevelopmentComponents() {
+		return this
+				.getChangedDevelopmentComponents(new ActivityCheckinDateFilter());
+	}
 
-    /**
-     * Get a list of changed development components for the given workspace since the given date.
-     * 
-     * @param activityFilter
-     *            filter the activities using the given {@link ActivityFilter}.
-     * @return a list of changed development components matched by the given {@link ActivityFilter}.
-     */
-    private Set<DevelopmentComponent> getChangedDevelopmentComponents(final ActivityFilter activityFilter) {
-        final List<Activity> activities = this.getActivities(activityFilter);
-        Collections.sort(activities, new ActivityByCheckInDateComparator());
+	/**
+	 * Get a list of changed development components for the given workspace
+	 * since the given date.
+	 *
+	 * @param activityFilter
+	 *            filter the activities using the given {@link ActivityFilter}.
+	 * @return a list of changed development components matched by the given
+	 *         {@link ActivityFilter}.
+	 */
+	private Set<DevelopmentComponent> getChangedDevelopmentComponents(
+			final ActivityFilter activityFilter) {
+		final List<Activity> activities = this.getActivities(activityFilter);
+		Collections.sort(activities, new ActivityByCheckInDateComparator());
 
-        return this.getDevelopmentComponents(activities);
-    }
+		return this.getDevelopmentComponents(activities);
+	}
 
-    /**
-     * Get a list of activities in the given workspace matching the given {@link ActivityFilter}.
-     * 
-     * @param activityFilter
-     *            an {@link ActivityFilter} for filtering the list of returned activities.
-     * @return a list of activities matching the given {@link ActivityFilter} in the given workspace.
-     */
-    public List<Activity> getActivities(final ActivityFilter activityFilter) {
-        final List<Activity> activities = new ArrayList<Activity>();
+	/**
+	 * Get a list of activities in the given workspace matching the given
+	 * {@link ActivityFilter}.
+	 *
+	 * @param activityFilter
+	 *            an {@link ActivityFilter} for filtering the list of returned
+	 *            activities.
+	 * @return a list of activities matching the given {@link ActivityFilter} in
+	 *         the given workspace.
+	 */
+	public List<Activity> getActivities(final ActivityFilter activityFilter) {
+		final List<Activity> activities = new ArrayList<Activity>();
 
-        for (final Compartment compartment : this.config.getCompartments(CompartmentState.Source)) {
-            activities.addAll(this.getActivities(compartment, activityFilter));
-        }
+		for (final Compartment compartment : this.config
+				.getCompartments(CompartmentState.Source)) {
+			activities.addAll(this.getActivities(compartment, activityFilter));
+		}
 
-        return activities;
-    }
+		return activities;
+	}
 
-    /**
-     * Get a list of all activities in the given workspace.
-     * 
-     * @return a list of all activities in the given workspace.
-     */
-    public List<Activity> getActivities() {
-        final ActivityFilter activityFilter = new ActivityFilter() {
-            public boolean accept(final Activity activity) {
-                return true;
-            }
-        };
+	/**
+	 * Get a list of all activities in the given workspace.
+	 *
+	 * @return a list of all activities in the given workspace.
+	 */
+	public List<Activity> getActivities() {
+		final ActivityFilter activityFilter = new ActivityFilter() {
+			public boolean accept(final Activity activity) {
+				return true;
+			}
+		};
 
-        return this.getActivities(activityFilter);
-    }
+		return this.getActivities(activityFilter);
+	}
 
-    /**
-     * Get a list of activities in the given workspace matching the given {@link ActivityFilter}.
-     * 
-     * @param since
-     *            date after which to look for activities.
-     * @return a list of activities in the given workspace.
-     */
-    public List<Activity> getActivities(final Date since) {
-        return this.getActivities(this.createActivityCheckinDateFilter(since));
-    }
+	/**
+	 * Get a list of activities in the given workspace matching the given
+	 * {@link ActivityFilter}.
+	 *
+	 * @param since
+	 *            date after which to look for activities.
+	 * @return a list of activities in the given workspace.
+	 */
+	public List<Activity> getActivities(final Date since) {
+		return this.getActivities(this.createActivityCheckinDateFilter(since));
+	}
 
-    /**
-     * Get a list of changed development components for the given workspace since the given date.
-     * 
-     * @param since
-     *            date after which to look for activities.
-     * @return a list of changed development components
-     */
-    public Set<DevelopmentComponent> getChangedDevelopmentComponents(final Date since) {
-        return this.getChangedDevelopmentComponents(this.createActivityCheckinDateFilter(since));
-    }
+	/**
+	 * Get a list of changed development components for the given workspace
+	 * since the given date.
+	 *
+	 * @param since
+	 *            date after which to look for activities.
+	 * @return a list of changed development components
+	 */
+	public Set<DevelopmentComponent> getChangedDevelopmentComponents(
+			final Date since) {
+		return this.getChangedDevelopmentComponents(this
+				.createActivityCheckinDateFilter(since));
+	}
 
-    /**
-     * @param since
-     *            start date for activity filtering.
-     * @return the configured filter (with the given start date and the current time).
-     */
-    private ActivityFilter createActivityCheckinDateFilter(final Date since) {
-        return new ActivityCheckinDateFilter(since, Calendar.getInstance().getTime());
-    }
+	/**
+	 * @param since
+	 *            start date for activity filtering.
+	 * @return the configured filter (with the given start date and the current
+	 *         time).
+	 */
+	private ActivityFilter createActivityCheckinDateFilter(final Date since) {
+		return new ActivityCheckinDateFilter(since, Calendar.getInstance()
+				.getTime());
+	}
 
-    /**
-     * Comparator for {@link Activity} by check in date.
-     * 
-     * @author Dirk Weigenand
-     */
-    private static final class ActivityByCheckInDateComparator implements Comparator<Activity> {
-        /**
-         * {@inheritDoc}
-         */
-        public int compare(final Activity activity1, final Activity activity2) {
-            return activity1.getCheckinTime().compareTo(activity2.getCheckinTime());
-        }
-    }
+	/**
+	 * Comparator for {@link Activity} by check in date.
+	 *
+	 * @author Dirk Weigenand
+	 */
+	private static final class ActivityByCheckInDateComparator implements
+			Comparator<Activity> {
+		/**
+		 * {@inheritDoc}
+		 */
+		public int compare(final Activity activity1, final Activity activity2) {
+			return activity1.getCheckinTime().compareTo(
+					activity2.getCheckinTime());
+		}
+	}
 }
