@@ -14,7 +14,7 @@ import org.arachna.netweaver.dctool.AbstractDCToolCommandBuilder;
 /**
  * Builder for DCTool synchronize commands for a development configurations
  * development components.
- * 
+ *
  * @author Dirk Weigenand
  */
 final class SyncDevelopmentComponentsCommandBuilder extends AbstractDCToolCommandBuilder {
@@ -50,7 +50,7 @@ final class SyncDevelopmentComponentsCommandBuilder extends AbstractDCToolComman
 
     /**
      * create a builder for development component listing and syncing commands.
-     * 
+     *
      * @param developmentConfiguration
      *            development configuration to synchronize development
      *            components for.
@@ -65,7 +65,7 @@ final class SyncDevelopmentComponentsCommandBuilder extends AbstractDCToolComman
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.arachna.netweaver.dc.analyzer.dctool.DCToolCommandBuilder#execute ()
      */
@@ -77,22 +77,20 @@ final class SyncDevelopmentComponentsCommandBuilder extends AbstractDCToolComman
             if (compartment.isSourceState()) {
                 if (this.cleanCopy) {
                     commands.add(String.format(UNSYNC_ALL_DCS_COMMAND, compartment.getName()));
-                    // commands.add(String.format(SYNC_ALL_DCS_COMMAND,
-                    // compartment.getName()));
+                    commands.add(String.format(SYNC_ALL_DCS_COMMAND, compartment.getName()));
                 }
-
-                commands.add(String.format(SYNC_ALL_DCS_COMMAND, compartment.getName()));
-                // else {
-                // for (final DevelopmentComponent component :
-                // compartment.getDevelopmentComponents()) {
-                // if (component.isNeedsRebuild()) {
-                // // commands.add(createUnsyncDCCommand(component));
-                // commands.add(createSyncInactiveDCCommand(component));
-                // }
-                // }
-                // }
+                else {
+                    for (final DevelopmentComponent component : compartment.getDevelopmentComponents()) {
+                        if (component.isNeedsRebuild()) {
+                            commands.add(createUnsyncDCCommand(component));
+                            commands.add(createSyncInactiveDCCommand(component));
+                        }
+                    }
+                }
             }
             else {
+                // FIXME: check whether syncing per DC speeds things up (DC tool
+                // does check state of DC?)
                 commands.add(String.format(SYNC_DCS_IN_ARCHIVE_MODE_COMMAND, compartment.getName()));
             }
         }
@@ -102,7 +100,7 @@ final class SyncDevelopmentComponentsCommandBuilder extends AbstractDCToolComman
 
     /**
      * Create command for synchronizing the given DC in inactive state.
-     * 
+     *
      * @param component
      *            DC to synchronize.
      * @return dctool command to synchronize the given DC
@@ -114,7 +112,7 @@ final class SyncDevelopmentComponentsCommandBuilder extends AbstractDCToolComman
 
     /**
      * Create command to unsynchronize the given DC.
-     * 
+     *
      * @param component
      *            DC to unsynchronize.
      * @return dctool command to unsynchronize the given DC
