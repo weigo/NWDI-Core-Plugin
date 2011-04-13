@@ -155,7 +155,7 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
      * @return <code>DevelopmentComponentFactory</code> used as registry for
      *         development components.
      */
-    DevelopmentComponentFactory getDevelopmentComponentFactory() {
+    public DevelopmentComponentFactory getDevelopmentComponentFactory() {
         return this.dcFactory;
     }
 
