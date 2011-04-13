@@ -36,10 +36,10 @@ import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 import org.arachna.netweaver.dctool.DCToolCommandExecutor;
 import org.arachna.netweaver.dctool.DcToolCommandExecutionResult;
 import org.arachna.netweaver.hudson.dtr.browser.Activity;
+import org.arachna.netweaver.hudson.dtr.browser.ActivityResource;
 import org.arachna.netweaver.hudson.dtr.browser.DtrBrowser;
 import org.arachna.netweaver.hudson.nwdi.dcupdater.DevelopmentComponentUpdater;
 import org.arachna.netweaver.hudson.util.FilePathHelper;
-import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
 /**
@@ -81,7 +81,6 @@ public class NWDIScm extends SCM {
      *            loaded from the NWDI or all that are contained in the
      *            indicated CBS workspace
      */
-    @DataBoundConstructor
     public NWDIScm(final boolean cleanCopy, final String dtrUser, final String password) {
         super();
         this.cleanCopy = cleanCopy;
@@ -136,18 +135,15 @@ public class NWDIScm extends SCM {
         final Collection<Activity> activities = new ArrayList<Activity>();
         final DCToolCommandExecutor executor = currentBuild.getDCToolExecutor(launcher);
 
+        long startListDcs = System.currentTimeMillis();
         DcToolCommandExecutionResult result = executor.execute(new ListDcCommandBuilder(config));
 
         if (result.isExitCodeOk()) {
             final DevelopmentComponentFactory dcFactory = currentBuild.getDevelopmentComponentFactory();
             new DevelopmentComponentsReader(new StringReader(result.getOutput()), dcFactory, config).read();
-            logger.append(String.format("Read %s development components from NWDI.\n", dcFactory.getAll().size()));
+            this.duration(logger, startListDcs, String.format("Read %s development components from NWDI", dcFactory.getAll().size()));
 
             final NWDIBuild lastSuccessfulBuild = currentBuild.getParent().getLastSuccessfulBuild();
-
-            logger.append("Synchronizing development components from NWDI.\n");
-            result = executor.execute(new SyncDevelopmentComponentsCommandBuilder(config, this.cleanCopy));
-            logger.append("Done synchronizing development components from NWDI.\n");
 
             if (lastSuccessfulBuild != null) {
                 logger.append(String.format("Getting activities from DTR (since last successful build #%s).\n",
@@ -157,12 +153,17 @@ public class NWDIScm extends SCM {
                 logger.append("Getting all activities from DTR.\n");
             }
 
-            activities.addAll(this.getActivities(this.getDtrBrowser(config, dcFactory),
+            long startGetActivities = System.currentTimeMillis();
+            activities.addAll(this.getActivities(logger, this.getDtrBrowser(config, dcFactory),
                 lastSuccessfulBuild != null ? lastSuccessfulBuild.getAction(NWDIRevisionState.class).getCreationDate()
                     : null));
-            logger.append(String.format("Read %s activities.\n", activities.size()));
+            this.duration(logger, startGetActivities, String.format("Read %s activities", activities.size()));
 
-            // FIXME: doesn't find any DCs at the moment
+            long startSyncDCs = System.currentTimeMillis();
+            logger.append("Synchronizing development components from NWDI.\n");
+            result = executor.execute(new SyncDevelopmentComponentsCommandBuilder(config, this.cleanCopy));
+            this.duration(logger, startSyncDCs, "Done synchronizing development components from NWDI");
+
             final DevelopmentComponentUpdater updater =
                 new DevelopmentComponentUpdater(FilePathHelper.makeAbsolute(currentBuild.getWorkspace().child(".dtc")),
                     dcFactory);
@@ -195,7 +196,7 @@ public class NWDIScm extends SCM {
             .append(String.format("Comparing base line activities with activities accumulated since last build (#%s).",
                 lastBuild.getNumber()));
         final List<Activity> activities =
-            this.getActivities(
+            this.getActivities(logger,
                 this.getDtrBrowser(lastBuild.getDevelopmentConfiguration(), new DevelopmentComponentFactory()),
                 getCreationDate(revisionState));
         logger.append(activities.toString());
@@ -274,7 +275,7 @@ public class NWDIScm extends SCM {
      * @return a list of {@link Activity} objects that were checked in since the
      *         last run or all activities.
      */
-    private List<Activity> getActivities(final DtrBrowser browser, final Date since) {
+    private List<Activity> getActivities(PrintStream logger, final DtrBrowser browser, final Date since) {
         final List<Activity> activities = new ArrayList<Activity>();
         long start = System.currentTimeMillis();
 
@@ -285,16 +286,21 @@ public class NWDIScm extends SCM {
             activities.addAll(browser.getActivities(since));
         }
 
-        this.duration(start, "getActivities");
+        this.duration(logger, start, "Determine activities");
 
         start = System.currentTimeMillis();
         // update activities with their respective resources
         // FIXME: add methods to DtrBrowser that get activities with their
         // respective resources!
-
         browser.getDevelopmentComponents(activities);
 
-        this.duration(start, "getDevelopmentComponents");
+        for (Activity activity : activities) {
+            for (ActivityResource resource : activity.getResources()) {
+                resource.getDevelopmentComponent().setNeedsRebuild(true);
+            }
+        }
+
+        this.duration(logger, start, "Determine affected DCs for activities");
 
         return activities;
     }
@@ -324,9 +330,9 @@ public class NWDIScm extends SCM {
      * @param message
      *            message to log.
      */
-    private void duration(final long start, final String message) {
+    private void duration(PrintStream logger, final long start, final String message) {
         final long duration = System.currentTimeMillis() - start;
 
-        LOGGER.log(Level.INFO, String.format("%s took %.2%f sec.\n", message, duration / A_THOUSAND_MSECS));
+        logger.append(String.format("%s (%f sec).\n", message, duration / A_THOUSAND_MSECS));
     }
 }
