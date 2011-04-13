@@ -152,9 +152,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
      */
     @Override
     public SCM getScm() {
-        return super.getScm();// return new NWDIScm(cleanCopy,
-                              // DESCRIPTOR.getUser(),
-                              // DESCRIPTOR.getPassword());
+        return new NWDIScm(cleanCopy, DESCRIPTOR.getUser(), DESCRIPTOR.getPassword());
     }
 
     @Override
@@ -171,26 +169,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
     protected void submit(final StaplerRequest req, final StaplerResponse rsp) throws IOException, ServletException,
         FormException {
         final JSONObject json = req.getSubmittedForm();
-        final String fileKey = json.getString("developmentConfiguration");
-
-        try {
-            final FileItem item = req.getFileItem(fileKey);
-
-            if (item != null) {
-                final String content = item.getString();
-
-                if (content != null && content.trim().length() > 0) {
-                    this.confDef = content.trim();
-                }
-            }
-        }
-        catch (final ServletException e) {
-            throw new FormException(e, "ServletException");
-        }
-        catch (final IOException e) {
-            throw new FormException(e, "IOException");
-        }
-
+        this.confDef = json.getString("developmentConfiguration");
         this.cleanCopy = json.getBoolean(PARAMETER_CLEAN_COPY);
         this.setScm(new NWDIScm(this.cleanCopy, this.getDescriptor().getUser(), this.getDescriptor().getPassword()));
         // not needed since setting the SCM saves automatically.

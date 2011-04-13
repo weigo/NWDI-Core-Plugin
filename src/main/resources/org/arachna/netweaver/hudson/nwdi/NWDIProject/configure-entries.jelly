@@ -6,7 +6,7 @@
       parameter. -->
     <f:entry title="${%Development Configuration}" description="${%Upload the development configuration file of the track to be built.}"
       field="confDef">
-      <input type="file" name="it.developmentConfiguration" jsonAware="yes" />
+      <textarea class="setting-input  " name="developmentConfiguration" rows="8">${it.confDef}</textarea>
     </f:entry>
     <f:entry title="${%clean copy}" description="${%Delete workspace before building the track.}" field="cleanCopy">
       <f:checkbox default="false" value="${it.cleanCopy}" clazz="required" />
