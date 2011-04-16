@@ -21,6 +21,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
+import org.arachna.ant.AntHelper;
+import org.arachna.ant.ExcludesFactory;
 import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
@@ -30,6 +32,7 @@ import org.arachna.netweaver.dctool.DcToolCommandExecutionResult;
 import org.arachna.netweaver.hudson.dtr.browser.Activity;
 import org.arachna.netweaver.hudson.dtr.browser.ActivityResource;
 import org.arachna.netweaver.hudson.nwdi.confdef.ConfDefReader;
+import org.arachna.netweaver.hudson.util.FilePathHelper;
 import org.arachna.xml.XmlReaderHelper;
 import org.xml.sax.SAXException;
 
@@ -59,6 +62,11 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
      * development components affected by activities leading to this build.
      */
     private transient Collection<DevelopmentComponent> affectedComponents;
+
+    /**
+     * Factory for generating ant excludes based on development component type.
+     */
+    private final transient ExcludesFactory excludesFactory = new ExcludesFactory();
 
     /**
      * Create an instance of <code>NWDIBuild</code> using the given
@@ -157,6 +165,29 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
      */
     public DevelopmentComponentFactory getDevelopmentComponentFactory() {
         return this.dcFactory;
+    }
+
+    /**
+     * Returns a helper object for populating ant task with sources, class path,
+     * includes and excludes.
+     *
+     * @param logger
+     *            the logger to use for reporting message back to the build.
+     */
+    public AntHelper getAntHelper(PrintStream logger) {
+        return new AntHelper(FilePathHelper.makeAbsolute(this.getWorkspace()), this.dcFactory, this.excludesFactory,
+            logger);
+    }
+
+    /**
+     * Returns a factory for generating ant excludes based on development
+     * component type.
+     *
+     * @return a factory for generating ant excludes based on development
+     *         component type.
+     */
+    public ExcludesFactory getExcludesFactory() {
+        return this.excludesFactory;
     }
 
     /**
