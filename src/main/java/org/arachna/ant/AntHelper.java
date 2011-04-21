@@ -133,7 +133,7 @@ public class AntHelper {
                 path.addFileset(fileSet);
             }
             else {
-                this.logger.append(String.format("Referenced DC %s:%s not found in DC factory!", ppRef.getVendor(),
+                this.logger.append(String.format("Referenced DC %s:%s not found in DC factory!\n", ppRef.getVendor(),
                     ppRef.getComponentName()));
             }
         }

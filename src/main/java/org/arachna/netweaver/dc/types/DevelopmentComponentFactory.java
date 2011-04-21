@@ -10,7 +10,7 @@ import java.util.Map;
 
 /**
  * Factory/registry for {@link DevelopmentComponent} objects.
- * 
+ *
  * @author Dirk Weigenand
  */
 public final class DevelopmentComponentFactory {
@@ -21,7 +21,7 @@ public final class DevelopmentComponentFactory {
 
     /**
      * Create and register a {@link DevelopmentComponent}.
-     * 
+     *
      * @param vendor
      *            the vendor of the development component to register.
      * @param name
@@ -42,8 +42,9 @@ public final class DevelopmentComponentFactory {
     }
 
     /**
-     * Create a development component using the given vendor, DC name and public parts and public part references.
-     * 
+     * Create a development component using the given vendor, DC name and public
+     * parts and public part references.
+     *
      * @param vendor
      *            DC vendor
      * @param dcName
@@ -71,37 +72,41 @@ public final class DevelopmentComponentFactory {
 
     /**
      * Create the key for storing a development component in the registry.
-     * 
+     *
      * @param name
      *            name to use as part of the key.
      * @param vendor
      *            vendor to use as part of the key.
-     * @return the concatenation of the given vendor, ':' and the given component name.
+     * @return the concatenation of the given vendor, ':' and the given
+     *         component name.
      */
     private String createComponentKey(final String name, final String vendor) {
         return vendor + ":" + name;
     }
 
     /**
-     * Create and register a development component. If the development component is already registered the existing object will be returned.
-     * 
+     * Create and register a development component. If the development component
+     * is already registered the existing object will be returned.
+     *
      * @param vendor
      *            vendor of development component.
      * @param name
      *            name of development component.
-     * @return a development component with the given vendor, name and type {@link DevelopmentComponentType#unknown}.
+     * @return a development component with the given vendor, name and type
+     *         {@link DevelopmentComponentType#unknown}.
      */
-    public DevelopmentComponent create(final String name, final String vendor) {
-        return this.create(name, vendor, DevelopmentComponentType.unknown);
+    public DevelopmentComponent create(final String vendor, final String name) {
+        return this.create(vendor, name, DevelopmentComponentType.unknown);
     }
 
     /**
      * Return all registered development components.
-     * 
+     *
      * @return a collection of all registered development components.
      */
     public Collection<DevelopmentComponent> getAll() {
-        final Collection<DevelopmentComponent> components = new ArrayList<DevelopmentComponent>(this.componentMap.size());
+        final Collection<DevelopmentComponent> components =
+            new ArrayList<DevelopmentComponent>(this.componentMap.size());
         components.addAll(this.componentMap.values());
 
         return components;
@@ -109,9 +114,10 @@ public final class DevelopmentComponentFactory {
 
     /**
      * Update the using DCs for all registered DCs.
-     * 
-     * For each registered development component the list of public parts it references will be iterated. The respective development
-     * component will be looked up and the currently worked on DC will be added to its using DCs.
+     *
+     * For each registered development component the list of public parts it
+     * references will be iterated. The respective development component will be
+     * looked up and the currently worked on DC will be added to its using DCs.
      */
     public void updateUsingDCs() {
         for (final DevelopmentComponent component : this.componentMap.values()) {
@@ -121,7 +127,7 @@ public final class DevelopmentComponentFactory {
 
     /**
      * Updates the using DCs for the given DC.
-     * 
+     *
      * @param root
      *            development component whose using DCs are to be updated.
      */
@@ -130,7 +136,8 @@ public final class DevelopmentComponentFactory {
             final Collection<PublicPartReference> references = dc.getUsedDevelopmentComponents();
 
             for (final PublicPartReference reference : references) {
-                if (root.getVendor().equals(reference.getVendor()) && root.getName().equals(reference.getComponentName())) {
+                if (root.getVendor().equals(reference.getVendor())
+                    && root.getName().equals(reference.getComponentName())) {
                     root.addUsingDC(dc);
 
                     if (dc.getUsingDevelopmentComponents().size() == 0) {
@@ -142,13 +149,15 @@ public final class DevelopmentComponentFactory {
     }
 
     /**
-     * Return the development component matching the given vendor and component name.
-     * 
+     * Return the development component matching the given vendor and component
+     * name.
+     *
      * @param vendor
      *            vendor of development component.
      * @param name
      *            name of development component.
-     * @return the development component asked for or <code>null</code> if it is not registered.
+     * @return the development component asked for or <code>null</code> if it is
+     *         not registered.
      */
     public DevelopmentComponent get(final String vendor, final String name) {
         return this.componentMap.get(createComponentKey(name, vendor));

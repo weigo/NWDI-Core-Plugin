@@ -23,6 +23,8 @@ import java.util.List;
 
 import org.arachna.ant.AntHelper;
 import org.arachna.ant.ExcludesFactory;
+import org.arachna.netweaver.dc.types.Compartment;
+import org.arachna.netweaver.dc.types.CompartmentState;
 import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
@@ -69,6 +71,18 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
     private final transient ExcludesFactory excludesFactory = new ExcludesFactory();
 
     /**
+     * wipe workspace before building.
+     */
+    private boolean cleanCopy;
+
+    /**
+     * @return the cleanCopy
+     */
+    public boolean isCleanCopy() {
+        return cleanCopy;
+    }
+
+    /**
      * Create an instance of <code>NWDIBuild</code> using the given
      * <code>NWDIProject</code>.
      *
@@ -79,6 +93,7 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
      */
     public NWDIBuild(final NWDIProject project) throws IOException {
         super(project);
+        this.cleanCopy = project.isCleanCopy();
     }
 
     /**
@@ -143,6 +158,20 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
                 }
             }
 
+            // honor the cleanCopy property of NWDIProject
+            for (Compartment compartment : this.getDevelopmentConfiguration().getCompartments(CompartmentState.Source)) {
+                if (this.cleanCopy) {
+                    affectedComponents.addAll(compartment.getDevelopmentComponents());
+                }
+                else {
+                    for (DevelopmentComponent component : compartment.getDevelopmentComponents()) {
+                        if (component.isNeedsRebuild()) {
+                            affectedComponents.add(component);
+                        }
+                    }
+                }
+            }
+
             // update usage relations from public part references.
             this.dcFactory.updateUsingDCs();
             final ComponentsNeedingRebuildFinder finder = new ComponentsNeedingRebuildFinder();
@@ -154,6 +183,27 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
         }
 
         return this.affectedComponents;
+    }
+
+    /**
+     * Calculate build sequence for development components affected by
+     * activities that triggered this build.
+     *
+     * @return build sequence for development components affected by activities
+     *         that triggered this build.
+     */
+    public Collection<DevelopmentComponent> getAffectedDevelopmentComponents(IDevelopmentComponentFilter filter) {
+        Collection<DevelopmentComponent> filteredDCs = new ArrayList<DevelopmentComponent>();
+
+        if (filter != null) {
+            for (DevelopmentComponent component : this.getAffectedDevelopmentComponents()) {
+                if (filter.accept(component)) {
+                    filteredDCs.add(component);
+                }
+            }
+        }
+
+        return filteredDCs;
     }
 
     /**
@@ -305,12 +355,15 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
             for (final DevelopmentComponent component : affectedComponents) {
                 logger.append(component.getName()).append('\n');
             }
+
+            long start = System.currentTimeMillis();
             // TODO: annotate build results with links to build.log files.
             final DCToolCommandExecutor executor = NWDIBuild.this.getDCToolExecutor(this.launcher);
             final DcToolCommandExecutionResult result =
                 executor.execute(new BuildDevelopmentComponentsCommandBuilder(this.developmentConfiguration,
                     affectedComponents, logger));
-            logger.append("Done building development components.\n");
+            logger.append(String.format("Done building development components (%f sec.).\n",
+                (System.currentTimeMillis() - start) / 1000f));
 
             return result.isExitCodeOk() ? null : Result.FAILURE;
         }

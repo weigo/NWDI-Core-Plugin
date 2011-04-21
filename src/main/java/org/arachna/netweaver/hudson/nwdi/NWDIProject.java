@@ -115,9 +115,6 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
     @Override
     public void onLoad(final ItemGroup<? extends Item> parent, final String name) throws IOException {
         super.onLoad(parent, name);
-        System.err.println(getScm());
-        // setScm(new NWDIScm(cleanCopy, DESCRIPTOR.getUser(),
-        // DESCRIPTOR.getPassword()));
     }
 
     /*
@@ -129,6 +126,15 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
     @Override
     public boolean checkout(final AbstractBuild build, final Launcher launcher, final BuildListener listener,
         final File changelogFile) throws IOException, InterruptedException {
+        NWDIBuild nwdiBuild = (NWDIBuild)build;
+
+        if (nwdiBuild.isCleanCopy()) {
+            long start = System.currentTimeMillis();
+            listener.getLogger().append("Wiping workspace...");
+            build.getWorkspace().deleteContents();
+            listener.getLogger().append(String.format(" (%f sec.).", (System.currentTimeMillis() - start) / 1000f));
+        }
+
         final DtrConfigCreator configCreator =
             new DtrConfigCreator(build.getWorkspace(), ((NWDIBuild)build).getDevelopmentConfiguration(),
                 this.getConfDef());

@@ -12,13 +12,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.arachna.netweaver.dctool.JdkHomeAlias;
+
 /**
  * A class representing an NWDI development configuration description, i.e. the
  * name of the development configuration and the compartments contained therein.
- * 
+ *
  * @author Dirk Weigenand
  */
 public final class DevelopmentConfiguration {
+    /**
+     * constant for JDK to be used to build DCs.
+     */
+    protected static final String COM_SAP_JDK_HOME_PATH_KEY = "com.sap.jdk.home_path_key";
+
     /**
      * Location of this development configuration in the file system.
      */
@@ -71,7 +78,7 @@ public final class DevelopmentConfiguration {
 
     /**
      * Create a development configuration with the given name.
-     * 
+     *
      * @param name
      *            name of the development configuration to create.
      */
@@ -87,7 +94,7 @@ public final class DevelopmentConfiguration {
     /**
      * Find the start index of the workspace name in the given development
      * configuration name.
-     * 
+     *
      * @param name
      *            development configuration name.
      * @return the start index of the workspace name in the given development
@@ -102,7 +109,7 @@ public final class DevelopmentConfiguration {
     /**
      * Find the end index of the workspace name in the given development
      * configuration name.
-     * 
+     *
      * @param name
      *            development configuration name.
      * @return the end index of the workspace name in the given development
@@ -116,7 +123,7 @@ public final class DevelopmentConfiguration {
 
     /**
      * Add a compartment to this development configuration.
-     * 
+     *
      * @param compartment
      *            compartment to add.
      */
@@ -130,7 +137,7 @@ public final class DevelopmentConfiguration {
 
     /**
      * Add all given compartments to this development configuration.
-     * 
+     *
      * @param compartments
      *            compartments to add to this development configuration.
      */
@@ -142,7 +149,7 @@ public final class DevelopmentConfiguration {
 
     /**
      * Get the name of this development configuration.
-     * 
+     *
      * @return the name of this development configuration.
      */
     public String getName() {
@@ -151,7 +158,7 @@ public final class DevelopmentConfiguration {
 
     /**
      * Get the compartments contained in this development configuration.
-     * 
+     *
      * @return the compartments
      */
     public Collection<Compartment> getCompartments() {
@@ -160,7 +167,7 @@ public final class DevelopmentConfiguration {
 
     /**
      * Returns the compartments filtered by the given {@link CompartmentState}.
-     * 
+     *
      * @param state
      *            <code>CompartmentState</code> that should be filtered by.
      * @return compartments filtered by the given {@link CompartmentState}.
@@ -179,7 +186,7 @@ public final class DevelopmentConfiguration {
 
     /**
      * Get a compartment by name.
-     * 
+     *
      * @param name
      *            name of compartment
      * @return the compartment found or <code>null</code>.
@@ -190,7 +197,7 @@ public final class DevelopmentConfiguration {
 
     /**
      * Get the description of this development configuration.
-     * 
+     *
      * @return the description
      */
     public String getDescription() {
@@ -199,7 +206,7 @@ public final class DevelopmentConfiguration {
 
     /**
      * Set the description of this development configuration.
-     * 
+     *
      * @param description
      *            the description to set
      */
@@ -209,7 +216,7 @@ public final class DevelopmentConfiguration {
 
     /**
      * Get the short description of this development configuration.
-     * 
+     *
      * @return the caption
      */
     public String getCaption() {
@@ -218,7 +225,7 @@ public final class DevelopmentConfiguration {
 
     /**
      * Set the short description of this development configuration.
-     * 
+     *
      * @param caption
      *            the caption to set
      */
@@ -228,7 +235,7 @@ public final class DevelopmentConfiguration {
 
     /**
      * Get the location in the file system of this development configuration.
-     * 
+     *
      * @return the location
      */
     public String getLocation() {
@@ -237,7 +244,7 @@ public final class DevelopmentConfiguration {
 
     /**
      * Set the location in the file system of this development configuration.
-     * 
+     *
      * @param location
      *            the location to set
      */
@@ -255,7 +262,7 @@ public final class DevelopmentConfiguration {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#hashCode()
      */
     @Override
@@ -265,7 +272,7 @@ public final class DevelopmentConfiguration {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -302,7 +309,7 @@ public final class DevelopmentConfiguration {
 
     /**
      * Return the URL to the CMS server.
-     * 
+     *
      * @return the cmsUrl
      */
     public String getCmsUrl() {
@@ -311,7 +318,7 @@ public final class DevelopmentConfiguration {
 
     /**
      * Set URL to CMS server.
-     * 
+     *
      * @param cmsUrl
      *            the cmsUrl to set
      */
@@ -336,7 +343,7 @@ public final class DevelopmentConfiguration {
 
     /**
      * Return the name of the DTR workspace for this development configuration.
-     * 
+     *
      * @return the name of the DTR workspace for this development configuration.
      */
     public String getWorkspace() {
@@ -347,7 +354,7 @@ public final class DevelopmentConfiguration {
      * Returns the URL for the DTR this development configuration is stored on.
      * The returned string is empty when no compartment in source state is
      * contained in this development configuration.
-     * 
+     *
      * @return URL for the DTR this development configuration is stored on.
      */
     public String getDtrServerUrl() {
@@ -363,4 +370,14 @@ public final class DevelopmentConfiguration {
         return dtrServerUrl;
     }
 
+    public JdkHomeAlias getJdkHomeAlias() {
+        BuildVariant buildVariant = this.getBuildVariant();
+        JdkHomeAlias alias = null;
+
+        if (buildVariant != null) {
+            alias = JdkHomeAlias.fromString(buildVariant.getBuildOption(COM_SAP_JDK_HOME_PATH_KEY));
+        }
+
+        return alias;
+    }
 }

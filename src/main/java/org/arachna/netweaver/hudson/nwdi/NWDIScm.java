@@ -26,8 +26,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import net.sf.json.JSONObject;
 
@@ -52,11 +50,6 @@ public class NWDIScm extends SCM {
      * 1000 milliseconds.
      */
     private static final float A_THOUSAND_MSECS = 1000f;
-
-    /**
-     * Logger.
-     */
-    private static final Logger LOGGER = Logger.getLogger(NWDIScm.class.getName());
 
     /**
      * Get a clean copy of all development components from NWDI.
@@ -88,41 +81,32 @@ public class NWDIScm extends SCM {
         this.password = password;
     }
 
-    /*
-     * (non-Javadoc * *
-     *
-     * @see hudson.scm.SCM#getDescriptor()
+    /**
+     * {@inheritDoc}
      */
     @Override
     public DescriptorImpl getDescriptor() {
         return (DescriptorImpl)super.getDescriptor();
     }
 
-    /*
-     * (non-Javado * *
-     *
-     * @see hudson.scm.SCM#createChangeLogParser()
+    /**
+     * {@inheritDoc}
      */
     @Override
     public ChangeLogParser createChangeLogParser() {
         return new DtrChangeLogParser();
     }
 
-    /*
-     * (non-Javad * *
-     *
-     * @see hudson.scm.SCM#requiresWorkspaceForPolling()
+    /**
+     * {@inheritDoc}
      */
     @Override
     public boolean requiresWorkspaceForPolling() {
         return true;
     }
 
-    /*
-     * (non-Java * *
-     *
-     * @see hudson.scm.SCM#checkout(hudson.model.AbstractBuild, hudson.Launcher,
-     * hudson.FilePath, hudson.model.BuildListener, java.io.File)
+    /**
+     * {@inheritDoc}
      */
     @Override
     public boolean checkout(final AbstractBuild<?, ?> build, final Launcher launcher, final FilePath workspace,
@@ -140,8 +124,10 @@ public class NWDIScm extends SCM {
 
         if (result.isExitCodeOk()) {
             final DevelopmentComponentFactory dcFactory = currentBuild.getDevelopmentComponentFactory();
-            new DevelopmentComponentsReader(new StringReader(result.getOutput()), dcFactory, config).read();
-            this.duration(logger, startListDcs, String.format("Read %s development components from NWDI", dcFactory.getAll().size()));
+            String output = result.getOutput();
+            new DevelopmentComponentsReader(new StringReader(output), dcFactory, config).read();
+            this.duration(logger, startListDcs,
+                String.format("Read %s development components from NWDI", dcFactory.getAll().size()));
 
             final NWDIBuild lastSuccessfulBuild = currentBuild.getParent().getLastSuccessfulBuild();
 
@@ -164,6 +150,15 @@ public class NWDIScm extends SCM {
             result = executor.execute(new SyncDevelopmentComponentsCommandBuilder(config, this.cleanCopy));
             this.duration(logger, startSyncDCs, "Done synchronizing development components from NWDI");
 
+            if (!result.isExitCodeOk()) {
+                output = result.getOutput();
+                // ignore OutOfMemoryError on exit from dctool
+                if (output.contains("java.lang.OutOfMemoryError") && output.contains("java.lang.System.exit")
+                    && output.contains("com.sap.tc.devconf.dctool.startup.DCToolMain.main")) {
+                    result = new DcToolCommandExecutionResult(output, 0);
+                }
+            }
+
             final DevelopmentComponentUpdater updater =
                 new DevelopmentComponentUpdater(FilePathHelper.makeAbsolute(currentBuild.getWorkspace().child(".dtc")),
                     dcFactory);
@@ -176,6 +171,9 @@ public class NWDIScm extends SCM {
         return result.isExitCodeOk();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public SCMRevisionState calcRevisionsFromBuild(final AbstractBuild<?, ?> build, final Launcher launcher,
         final TaskListener listener) throws IOException, InterruptedException {
@@ -186,6 +184,9 @@ public class NWDIScm extends SCM {
         return lastRevision == null ? SCMRevisionState.NONE : lastRevision;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected PollingResult compareRemoteRevisionWith(final AbstractProject<?, ?> project, final Launcher launcher,
         final FilePath path, final TaskListener listener, final SCMRevisionState revisionState) throws IOException,
@@ -252,11 +253,17 @@ public class NWDIScm extends SCM {
             load();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public String getDisplayName() {
             return "NetWeaver Development Infrastructure";
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public SCM newInstance(final StaplerRequest req, final JSONObject formData)
             throws hudson.model.Descriptor.FormException {

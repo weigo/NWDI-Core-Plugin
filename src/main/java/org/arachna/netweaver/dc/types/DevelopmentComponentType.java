@@ -8,7 +8,7 @@ import java.util.Map;
 
 /**
  * Types of development components.
- * 
+ *
  * @author Dirk Weigenand
  */
 public enum DevelopmentComponentType {
@@ -18,63 +18,63 @@ public enum DevelopmentComponentType {
     /**
      * DC of type 'build infrastructure'.
      */
-    BuildInfrastructure("Build Infrastructure"),
+    BuildInfrastructure("Build Infrastructure", true),
     /**
      * DC of type 'build plugin'.
      */
-    BuildPlugin("Build Plugin"),
+    BuildPlugin("Build Plugin", true),
     /**
      * DC of type 'dictionary'.
      */
-    Dictionary("Dictionary"),
+    Dictionary("Dictionary", true),
     /**
      * DC of type 'portal standalone application'.
      */
-    PortalApplicationStandalone("Enterprise Portal", "Portal Application Standalone"),
+    PortalApplicationStandalone("Enterprise Portal", "Portal Application Standalone", true),
     /**
      * DC of type 'portal application module'.
      */
-    PortalApplicationModule("Enterprise Portal", "Portal Application Module"),
+    PortalApplicationModule("Enterprise Portal", "Portal Application Module", true),
     /**
      * DC of type 'external library'.
      */
-    ExternalLibrary("External Library"),
+    ExternalLibrary("External Library", false),
     /**
      * DC of type 'J2EE'.
      */
-    J2EE("J2EE"),
+    J2EE("J2EE", false),
     /**
      * DC of type 'J2EE server component'.
      */
-    J2EEServerComponent("J2EE Server Component"),
+    J2EEServerComponent("J2EE Server Component", false),
     /**
      * DC of type 'J2EE server component', subtype 'library'.
      */
-    J2EEServerComponentLibrary("J2EE Server Component", "Library"),
+    J2EEServerComponentLibrary("J2EE Server Component", "Library", false),
     /**
      * DC of type 'J2EE', subtype 'enterprise application'.
      */
-    J2EEEnterpriseApplication("J2EE", "Enterprise Application"),
+    J2EEEnterpriseApplication("J2EE", "Enterprise Application", false),
     /**
      * DC of type 'J2EE', subtype 'web module'.
      */
-    J2EEWebModule("J2EE", "WebModule"),
+    J2EEWebModule("J2EE", "WebModule", true),
     /**
      * DC of type 'java'.
      */
-    Java("Java"),
+    Java("Java", true),
     /**
      * DC of type 'Web Dynpro'.
      */
-    WebDynpro("Web Dynpro"),
+    WebDynpro("Web Dynpro", true),
     /**
      * marks DC with no known type.
      */
-    unknown("unknown"),
+    unknown("unknown", false),
     /**
      * DC of type 'web services', subtype 'deployable proxy'.
      */
-    WebServicesDeployableProxy("Web Services", "Deployable Proxy");
+    WebServicesDeployableProxy("Web Services", "Deployable Proxy", true);
 
     /**
      * Allowed types of development component.
@@ -98,27 +98,38 @@ public enum DevelopmentComponentType {
     private String subType = "";
 
     /**
+     * Indicate whether development components of this type can contain java
+     * source.
+     */
+    private boolean canContainJavaSources;
+
+    /**
      * Create an instance of a <code>DevelopmentComponentType</code> with the
      * given type. The sub type is empty (non existant).
-     * 
+     *
      * @param type
      *            the type of the development component.
+     * @param canContainJavaSources
+     *            indicate whether DCs of this type co.ntains java sources
      */
-    DevelopmentComponentType(final String type) {
+    DevelopmentComponentType(final String type, boolean canContainJavaSources) {
         this.type = type;
+        this.canContainJavaSources = canContainJavaSources;
     }
 
     /**
      * Create an instance of a <code>DevelopmentComponentType</code> with the
      * given type and sub type.
-     * 
+     *
      * @param type
      *            the type of the development component.
      * @param subType
      *            the sub type of the development component.
+     * @param canContainJavaSources
+     *            indicate whether DCs of this type co.ntains java sources
      */
-    DevelopmentComponentType(final String type, final String subType) {
-        this(type);
+    DevelopmentComponentType(final String type, final String subType, boolean canContainJavaSources) {
+        this(type, canContainJavaSources);
         this.subType = subType;
     }
 
@@ -134,10 +145,21 @@ public enum DevelopmentComponentType {
     }
 
     /**
+     * Returns <code>true</code> when development components of this type can
+     * contain java source, <code>false</code> otherwise.
+     *
+     * @return <code>true</code> when development components of this type can
+     *         contain java source, <code>false</code> otherwise.
+     */
+    public boolean canContainJavaSources() {
+        return canContainJavaSources;
+    }
+
+    /**
      * factory method for creating development component types. If the given
      * arguments do not match any type in this enum a
      * {@link DevelopmentComponentType#unknown} is returned.
-     * 
+     *
      * @param typeName
      *            name of the requested type of development components.
      * @param subTypeName

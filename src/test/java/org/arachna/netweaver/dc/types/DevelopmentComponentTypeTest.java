@@ -1,18 +1,21 @@
 package org.arachna.netweaver.dc.types;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
 /**
- * Unit Tests for {@link org.arachna.netweaver.dc.types.DevelopmentComponentType}
- * 
+ * Unit Tests for
+ * {@link org.arachna.netweaver.dc.types.DevelopmentComponentType}
+ *
  * @author Dirk Weigenand
  */
 public class DevelopmentComponentTypeTest {
 
     /**
-     * Assert that creating a development component type from empty strings returns {@link DevelopmentComponentType#unknown}.
+     * Assert that creating a development component type from empty strings
+     * returns {@link DevelopmentComponentType#unknown}.
      */
     @Test
     public final void testGetUnknownDevelopmentComponentTypeFromEmptyString() {
@@ -20,8 +23,8 @@ public class DevelopmentComponentTypeTest {
     }
 
     /**
-     * Assert that creating a development component type from a mix of empty strings and null values returns
-     * {@link DevelopmentComponentType#unknown}.
+     * Assert that creating a development component type from a mix of empty
+     * strings and null values returns {@link DevelopmentComponentType#unknown}.
      */
     @Test
     public final void testGetUnknownDevelopmentComponentTypeFromNullString() {
@@ -29,8 +32,8 @@ public class DevelopmentComponentTypeTest {
     }
 
     /**
-     * Assert that creating a development component type from a mix of empty strings and null values returns
-     * {@link DevelopmentComponentType#unknown}.
+     * Assert that creating a development component type from a mix of empty
+     * strings and null values returns {@link DevelopmentComponentType#unknown}.
      */
     @Test
     public final void testGetDevelopmentComponentTypeFrom() {
@@ -38,7 +41,8 @@ public class DevelopmentComponentTypeTest {
     }
 
     /**
-     * Assert that creating a development component type from null values returns {@link DevelopmentComponentType#unknown}.
+     * Assert that creating a development component type from null values
+     * returns {@link DevelopmentComponentType#unknown}.
      */
     @Test
     public final void testGetUnknownDevelopmentComponentTypeFromNullComponentTypeAndNullSubTypeString() {
@@ -46,16 +50,18 @@ public class DevelopmentComponentTypeTest {
     }
 
     /**
-     * Assert creating the correct development component type for a deployable WebService proxy.
+     * Assert creating the correct development component type for a deployable
+     * WebService proxy.
      */
     @Test
     public final void testGetWebServicesDeployableProxyFromString() {
         assertEquals(DevelopmentComponentType.WebServicesDeployableProxy,
-                DevelopmentComponentType.fromString("Web Services", "Deployable Proxy"));
+            DevelopmentComponentType.fromString("Web Services", "Deployable Proxy"));
     }
 
     /**
-     * Assert creating the correct development component type for a WebDynpro DC.
+     * Assert creating the correct development component type for a WebDynpro
+     * DC.
      */
 
     @Test
@@ -63,4 +69,8 @@ public class DevelopmentComponentTypeTest {
         assertEquals(DevelopmentComponentType.WebDynpro, DevelopmentComponentType.fromString("Web Dynpro", ""));
     }
 
+    @Test
+    public void testBuildInfraStructureDCsCanContainJavaSources() {
+        assertTrue(DevelopmentComponentType.BuildInfrastructure.canContainJavaSources());
+    }
 }

@@ -29,7 +29,7 @@ import org.junit.Test;
 
 /**
  * JUnit tests for {@link DCToolCommandExecutor}.
- * 
+ *
  * @author Dirk Weigenand
  */
 public class DCToolCommandExecutorTest {
@@ -59,12 +59,15 @@ public class DCToolCommandExecutorTest {
     private DCToolCommandExecutor executor;
 
     /**
-     * Create a temporary directory for the test and set up the objects used for this test.
-     * 
+     * Create a temporary directory for the test and set up the objects used for
+     * this test.
+     *
      * @throws IOException
-     *             when the temporary directory for the test could not be created.
+     *             when the temporary directory for the test could not be
+     *             created.
      * @throws InterruptedException
-     *             when the test was interrupted during file operations on the test scripts
+     *             when the test was interrupted during file operations on the
+     *             test scripts
      */
     @BeforeClass
     public static void setUpBeforeClass() throws IOException, InterruptedException {
@@ -85,7 +88,7 @@ public class DCToolCommandExecutorTest {
 
     /**
      * set up test fixture (executor).
-     * 
+     *
      * @throws IOException
      *             rethrown when creating the DCToolCommandExecutor fails
      */
@@ -97,14 +100,16 @@ public class DCToolCommandExecutorTest {
 
     /**
      * Create an executor object for dctool.
-     * 
+     *
      * @return the newly created {@link DCToolCommandExecutor} object.
      * @throws IOException
-     *             rethrown when creating the TaskListener for the used Launcher fails
+     *             rethrown when creating the TaskListener for the used Launcher
+     *             fails
      */
     private DCToolCommandExecutor createDCToolCommandExecutor() throws IOException {
         final BuildVariant buildVariant = new BuildVariant("default");
-        buildVariant.addBuildOption(DCToolCommandExecutor.COM_SAP_JDK_HOME_PATH_KEY, JdkHomeAlias.Jdk131Home.toString());
+        buildVariant
+            .addBuildOption(DCToolCommandExecutor.COM_SAP_JDK_HOME_PATH_KEY, JdkHomeAlias.Jdk131Home.toString());
 
         final JdkHomePaths paths = new JdkHomePaths();
         paths.add(JdkHomeAlias.Jdk131Home, TEST_DIRECTORY.getAbsolutePath());
@@ -112,7 +117,8 @@ public class DCToolCommandExecutorTest {
 
         final Writer messages = new OutputStreamWriter(System.out);
         final Launcher launcher = new Launcher.LocalLauncher(new StreamTaskListener(messages));
-        final DCToolDescriptor dcToolDescriptor = new DCToolDescriptor("developer", "secret", this.nwdiToolLibDir, "dtr", paths);
+        final DCToolDescriptor dcToolDescriptor =
+            new DCToolDescriptor("developer", "secret", this.nwdiToolLibDir, "dtr", paths);
         final DevelopmentConfiguration config = new DevelopmentConfiguration("Test");
         config.setBuildVariant(buildVariant);
 
@@ -138,7 +144,8 @@ public class DCToolCommandExecutorTest {
     }
 
     /**
-     * Test method for {@link org.arachna.netweaver.dctool.DCToolCommandExecutor#execute(org.arachna.netweaver.dctool.DCToolCommandBuilder)}
+     * Test method for
+     * {@link org.arachna.netweaver.dctool.DCToolCommandExecutor#execute(org.arachna.netweaver.dctool.DCToolCommandBuilder)}
      * .
      */
     @Test
@@ -157,16 +164,8 @@ public class DCToolCommandExecutorTest {
     }
 
     /**
-     * Test method for {@link org.arachna.netweaver.dctool.DCToolCommandExecutor#getJdkPropertyName()} .
-     */
-    @Test
-    public final void testGetJdkPropertyName() {
-        assertThat(this.executor.getJdkPropertyName(), is(equalTo(JdkHomeAlias.Jdk131Home)));
-    }
-
-    /**
      * dummy DCToolCommandBuild used for testing.
-     * 
+     *
      * @author Dirk Weigenand
      */
     private static final class DummyDCToolCommandBuilder implements DCToolCommandBuilder {
