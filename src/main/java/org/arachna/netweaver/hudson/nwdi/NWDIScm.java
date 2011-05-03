@@ -127,7 +127,7 @@ public class NWDIScm extends SCM {
             String output = result.getOutput();
             new DevelopmentComponentsReader(new StringReader(output), dcFactory, config).read();
             this.duration(logger, startListDcs,
-                String.format("Read %s development components from NWDI", dcFactory.getAll().size()));
+                String.format("Read %s development components from NWDI.\n", dcFactory.getAll().size()));
 
             final NWDIBuild lastSuccessfulBuild = currentBuild.getParent().getLastSuccessfulBuild();
 
@@ -143,12 +143,12 @@ public class NWDIScm extends SCM {
             activities.addAll(this.getActivities(logger, this.getDtrBrowser(config, dcFactory),
                 lastSuccessfulBuild != null ? lastSuccessfulBuild.getAction(NWDIRevisionState.class).getCreationDate()
                     : null));
-            this.duration(logger, startGetActivities, String.format("Read %s activities", activities.size()));
+            this.duration(logger, startGetActivities, String.format("Read %s activities.\n", activities.size()));
 
             long startSyncDCs = System.currentTimeMillis();
             logger.append("Synchronizing development components from NWDI.\n");
             result = executor.execute(new SyncDevelopmentComponentsCommandBuilder(config, this.cleanCopy));
-            this.duration(logger, startSyncDCs, "Done synchronizing development components from NWDI");
+            this.duration(logger, startSyncDCs, "Done synchronizing development components from NWDI.\n");
 
             if (!result.isExitCodeOk()) {
                 output = result.getOutput();
@@ -177,7 +177,7 @@ public class NWDIScm extends SCM {
     @Override
     public SCMRevisionState calcRevisionsFromBuild(final AbstractBuild<?, ?> build, final Launcher launcher,
         final TaskListener listener) throws IOException, InterruptedException {
-        listener.getLogger().append(String.format("Calculating revisions from build #%s.", build.getNumber()));
+        listener.getLogger().append(String.format("Calculating revisions from build #%s.\n", build.getNumber()));
 
         final NWDIRevisionState lastRevision = build.getAction(NWDIRevisionState.class);
 
@@ -194,7 +194,7 @@ public class NWDIScm extends SCM {
         final NWDIBuild lastBuild = ((NWDIProject)project).getLastBuild();
         final PrintStream logger = listener.getLogger();
         logger
-            .append(String.format("Comparing base line activities with activities accumulated since last build (#%s).",
+            .append(String.format("Comparing base line activities with activities accumulated since last build (#%s).\n",
                 lastBuild.getNumber()));
         final List<Activity> activities =
             this.getActivities(logger,
@@ -203,7 +203,7 @@ public class NWDIScm extends SCM {
         logger.append(activities.toString());
 
         final Change changeState = activities.isEmpty() ? Change.NONE : Change.SIGNIFICANT;
-        logger.append(String.format("Found changes: %s.", changeState.toString()));
+        logger.append(String.format("Found changes: %s.\n", changeState.toString()));
 
         return new PollingResult(revisionState, new NWDIRevisionState(activities), changeState);
     }

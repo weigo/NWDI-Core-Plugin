@@ -132,7 +132,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
             long start = System.currentTimeMillis();
             listener.getLogger().append("Wiping workspace...");
             build.getWorkspace().deleteContents();
-            listener.getLogger().append(String.format(" (%f sec.).", (System.currentTimeMillis() - start) / 1000f));
+            listener.getLogger().append(String.format(" (%f sec.).\n", (System.currentTimeMillis() - start) / 1000f));
         }
 
         final DtrConfigCreator configCreator =
