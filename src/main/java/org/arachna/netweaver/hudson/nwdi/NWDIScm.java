@@ -127,7 +127,7 @@ public class NWDIScm extends SCM {
             String output = result.getOutput();
             new DevelopmentComponentsReader(new StringReader(output), dcFactory, config).read();
             this.duration(logger, startListDcs,
-                String.format("Read %s development components from NWDI.\n", dcFactory.getAll().size()));
+                String.format("Read %s development components from NWDI", dcFactory.getAll().size()));
 
             final NWDIBuild lastSuccessfulBuild = currentBuild.getParent().getLastSuccessfulBuild();
 
@@ -143,7 +143,7 @@ public class NWDIScm extends SCM {
             activities.addAll(this.getActivities(logger, this.getDtrBrowser(config, dcFactory),
                 lastSuccessfulBuild != null ? lastSuccessfulBuild.getAction(NWDIRevisionState.class).getCreationDate()
                     : null));
-            this.duration(logger, startGetActivities, String.format("Read %s activities.\n", activities.size()));
+            this.duration(logger, startGetActivities, String.format("Read %s activities", activities.size()));
 
             long startSyncDCs = System.currentTimeMillis();
             logger.append("Synchronizing development components from NWDI.\n");

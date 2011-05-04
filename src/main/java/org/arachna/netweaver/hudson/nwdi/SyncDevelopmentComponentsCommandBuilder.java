@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.arachna.netweaver.dc.types.Compartment;
+import org.arachna.netweaver.dc.types.CompartmentState;
 import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 import org.arachna.netweaver.dctool.AbstractDCToolCommandBuilder;
@@ -73,29 +74,55 @@ final class SyncDevelopmentComponentsCommandBuilder extends AbstractDCToolComman
     protected List<String> executeInternal() {
         final List<String> commands = new ArrayList<String>();
 
-        for (final Compartment compartment : this.getDevelopmentConfiguration().getCompartments()) {
-            if (compartment.isSourceState()) {
-                if (this.cleanCopy) {
-                    commands.add(String.format(UNSYNC_ALL_DCS_COMMAND, compartment.getName()));
-                    commands.add(String.format(SYNC_ALL_DCS_COMMAND, compartment.getName()));
-                }
-                else {
-                    for (final DevelopmentComponent component : compartment.getDevelopmentComponents()) {
-                        if (component.isNeedsRebuild()) {
-                            commands.add(createUnsyncDCCommand(component));
-                            commands.add(createSyncInactiveDCCommand(component));
-                        }
-                    }
-                }
-            }
-            else {
-                // FIXME: check whether syncing per DC speeds things up (DC tool
-                // does check state of DC?)
-                commands.add(String.format(SYNC_DCS_IN_ARCHIVE_MODE_COMMAND, compartment.getName()));
-            }
+        synchronizeCompartmentsInArchiveMode(commands);
+
+        if (this.cleanCopy) {
+            synchronizeDCsWithClean(commands);
+        }
+        else {
+            synchronizeDCsNeedingRebuild(commands);
         }
 
         return commands;
+    }
+
+    /**
+     * @param commands
+     */
+    private void synchronizeDCsNeedingRebuild(final List<String> commands) {
+        DevelopmentConfiguration developmentConfiguration = this.getDevelopmentConfiguration();
+
+        for (final Compartment compartment : developmentConfiguration.getCompartments(CompartmentState.Source)) {
+            for (final DevelopmentComponent component : compartment.getDevelopmentComponents()) {
+                if (component.isNeedsRebuild()) {
+                    commands.add(createUnsyncDCCommand(component));
+                    commands.add(createSyncInactiveDCCommand(component));
+                }
+            }
+        }
+    }
+
+    /**
+     * @param commands
+     */
+    private void synchronizeDCsWithClean(final List<String> commands) {
+        DevelopmentConfiguration developmentConfiguration = this.getDevelopmentConfiguration();
+
+        for (final Compartment compartment : developmentConfiguration.getCompartments(CompartmentState.Source)) {
+            commands.add(String.format(UNSYNC_ALL_DCS_COMMAND, compartment.getName()));
+            commands.add(String.format(SYNC_ALL_DCS_COMMAND, compartment.getName()));
+        }
+    }
+
+    /**
+     * @param commands
+     */
+    private void synchronizeCompartmentsInArchiveMode(final List<String> commands) {
+        DevelopmentConfiguration developmentConfiguration = this.getDevelopmentConfiguration();
+
+        for (final Compartment compartment : developmentConfiguration.getCompartments(CompartmentState.Archive)) {
+            commands.add(String.format(SYNC_DCS_IN_ARCHIVE_MODE_COMMAND, compartment.getName()));
+        }
     }
 
     /**
