@@ -365,6 +365,16 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
             logger.append(String.format("Done building development components (%f sec.).\n",
                 (System.currentTimeMillis() - start) / 1000f));
 
+            AntHelper antHelper =
+                new AntHelper(FilePathHelper.makeAbsolute(getWorkspace()),
+                    NWDIBuild.this.getDevelopmentComponentFactory(), new ExcludesFactory(), logger);
+
+            for (final DevelopmentComponent component : affectedComponents) {
+                BuildLogParser parser = new BuildLogParser(antHelper.getBaseLocation(component));
+                parser.parse();
+                component.setSourceFolders(parser.getSourceFolders());
+            }
+
             return result.isExitCodeOk() ? null : Result.FAILURE;
         }
 
