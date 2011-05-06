@@ -22,7 +22,7 @@ final class SyncDevelopmentComponentsCommandBuilder extends AbstractDCToolComman
     /**
      * command for syncing an inactive DC.
      */
-    protected static final String SYNC_INACTIVE_DC_COMMAND = "syncdc -s %s -n %s -v %s -m inactive;";
+    protected static final String SYNC_INACTIVE_DC_COMMAND = "syncdc -s %s -n %s -v %s -m inactive -y;";
 
     /**
      * command for syncing all DCs in archive mode.
@@ -32,7 +32,7 @@ final class SyncDevelopmentComponentsCommandBuilder extends AbstractDCToolComman
     /**
      * command for syncing all DCs in source state.
      */
-    protected static final String SYNC_ALL_DCS_COMMAND = "syncalldcs -s %s -m inactive;";
+    protected static final String SYNC_ALL_DCS_COMMAND = "syncalldcs -s %s -m inactive -y;";
 
     /**
      * unsync one development component of a given compartment and vendor.
@@ -95,7 +95,7 @@ final class SyncDevelopmentComponentsCommandBuilder extends AbstractDCToolComman
         for (final Compartment compartment : developmentConfiguration.getCompartments(CompartmentState.Source)) {
             for (final DevelopmentComponent component : compartment.getDevelopmentComponents()) {
                 if (component.isNeedsRebuild()) {
-                    commands.add(createUnsyncDCCommand(component));
+//                    commands.add(createUnsyncDCCommand(component));
                     commands.add(createSyncInactiveDCCommand(component));
                 }
             }
