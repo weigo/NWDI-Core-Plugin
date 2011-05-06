@@ -90,7 +90,7 @@ public class AntHelper {
                 sourceFolders.add(folder);
             }
             else {
-                this.logger.append(String.format("Source folder %s does not exist in %s/%s!", folder.getName(),
+                this.logger.append(String.format("Source folder %s does not exist in %s/%s!\n", folder.getName(),
                     component.getVendor(), component.getName()));
             }
         }
@@ -106,7 +106,8 @@ public class AntHelper {
      *         directory structure.
      */
     private File getSourceFolderLocation(final String componentBase, final String sourceFolder) {
-        return new File(String.format("%s/%s", componentBase, sourceFolder).replace('/', File.separatorChar));
+        return new File(sourceFolder.replace('/', File.separatorChar));
+//        return new File(String.format("%s/%s", componentBase, sourceFolder).replace('/', File.separatorChar));
     }
 
     /**
@@ -156,7 +157,7 @@ public class AntHelper {
      * @param component
      * @return
      */
-    private String getBaseLocation(DevelopmentComponent component) {
+    public String getBaseLocation(DevelopmentComponent component) {
         return String.format(BASE_PATH_TEMPLATE, this.pathToWorkspace, component.getVendor(), component.getName());
     }
 
