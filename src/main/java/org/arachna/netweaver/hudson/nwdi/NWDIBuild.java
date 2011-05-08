@@ -40,9 +40,9 @@ import org.xml.sax.SAXException;
 
 /**
  * A job for building a NWDI development configuration/track.
- *
+ * 
  * @author Dirk Weigenand
- *
+ * 
  */
 public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
     /**
@@ -76,16 +76,9 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
     private boolean cleanCopy;
 
     /**
-     * @return the cleanCopy
-     */
-    public boolean isCleanCopy() {
-        return cleanCopy;
-    }
-
-    /**
      * Create an instance of <code>NWDIBuild</code> using the given
      * <code>NWDIProject</code>.
-     *
+     * 
      * @param project
      *            parent to use for creating this build.
      * @throws IOException
@@ -93,13 +86,13 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
      */
     public NWDIBuild(final NWDIProject project) throws IOException {
         super(project);
-        this.cleanCopy = project.isCleanCopy();
+        cleanCopy = project.isCleanCopy();
     }
 
     /**
      * Create an instance of <code>NWDIBuild</code> using the given
      * <code>NWDIProject</code> and build directory.
-     *
+     * 
      * @param project
      *            parent to use for creating this build.
      * @param buildDir
@@ -113,42 +106,42 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
 
     @Override
     public void run() {
-        run(new RunnerImpl(this.getDevelopmentConfiguration()));
+        run(new RunnerImpl(getDevelopmentConfiguration()));
     }
 
     /**
      * Returns the {@link DevelopmentConfiguration} used throughout this build.
-     *
+     * 
      * @return the <code>DevelopmentConfiguration</code> used throughout this
      *         build.
      */
     public DevelopmentConfiguration getDevelopmentConfiguration() {
-        if (this.developmentConfiguration == null) {
+        if (developmentConfiguration == null) {
             try {
                 final ConfDefReader confdefReader = new ConfDefReader();
-                new XmlReaderHelper(confdefReader).parse(new StringReader(this.project.getConfDef()));
-                this.developmentConfiguration = confdefReader.getDevelopmentConfiguration();
+                new XmlReaderHelper(confdefReader).parse(new StringReader(project.getConfDef()));
+                developmentConfiguration = confdefReader.getDevelopmentConfiguration();
             }
-            catch (SAXException e) {
+            catch (final SAXException e) {
                 throw new RuntimeException(e);
             }
-            catch (IOException e) {
+            catch (final IOException e) {
                 throw new RuntimeException(e);
             }
         }
 
-        return this.developmentConfiguration;
+        return developmentConfiguration;
     }
 
     /**
      * Calculate build sequence for development components affected by
      * activities that triggered this build.
-     *
+     * 
      * @return build sequence for development components affected by activities
      *         that triggered this build.
      */
     public Collection<DevelopmentComponent> getAffectedDevelopmentComponents() {
-        if (this.affectedComponents == null) {
+        if (affectedComponents == null) {
             final NWDIRevisionState revisionState = this.getAction(NWDIRevisionState.class);
             final Collection<DevelopmentComponent> affectedComponents = new HashSet<DevelopmentComponent>();
 
@@ -159,12 +152,12 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
             }
 
             // honor the cleanCopy property of NWDIProject
-            for (Compartment compartment : this.getDevelopmentConfiguration().getCompartments(CompartmentState.Source)) {
-                if (this.cleanCopy) {
+            for (final Compartment compartment : getDevelopmentConfiguration().getCompartments(CompartmentState.Source)) {
+                if (cleanCopy) {
                     affectedComponents.addAll(compartment.getDevelopmentComponents());
                 }
                 else {
-                    for (DevelopmentComponent component : compartment.getDevelopmentComponents()) {
+                    for (final DevelopmentComponent component : compartment.getDevelopmentComponents()) {
                         if (component.isNeedsRebuild()) {
                             affectedComponents.add(component);
                         }
@@ -173,30 +166,30 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
             }
 
             // update usage relations from public part references.
-            this.dcFactory.updateUsingDCs();
+            dcFactory.updateUsingDCs();
             final ComponentsNeedingRebuildFinder finder = new ComponentsNeedingRebuildFinder();
             final DependencySorter dependencySorter =
-                new DependencySorter(this.dcFactory,
+                new DependencySorter(dcFactory,
                     finder.calculateDevelopmentComponentsThatNeedRebuilding(affectedComponents));
 
             this.affectedComponents = dependencySorter.determineBuildSequence();
         }
 
-        return this.affectedComponents;
+        return affectedComponents;
     }
 
     /**
      * Calculate build sequence for development components affected by
      * activities that triggered this build.
-     *
+     * 
      * @return build sequence for development components affected by activities
      *         that triggered this build.
      */
-    public Collection<DevelopmentComponent> getAffectedDevelopmentComponents(IDevelopmentComponentFilter filter) {
-        Collection<DevelopmentComponent> filteredDCs = new ArrayList<DevelopmentComponent>();
+    public Collection<DevelopmentComponent> getAffectedDevelopmentComponents(final IDevelopmentComponentFilter filter) {
+        final Collection<DevelopmentComponent> filteredDCs = new ArrayList<DevelopmentComponent>();
 
         if (filter != null) {
-            for (DevelopmentComponent component : this.getAffectedDevelopmentComponents()) {
+            for (final DevelopmentComponent component : this.getAffectedDevelopmentComponents()) {
                 if (filter.accept(component)) {
                     filteredDCs.add(component);
                 }
@@ -209,63 +202,69 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
     /**
      * Returns the {@link DevelopmentComponentFactory} used throughout this
      * build.
-     *
+     * 
      * @return <code>DevelopmentComponentFactory</code> used as registry for
      *         development components.
      */
     public DevelopmentComponentFactory getDevelopmentComponentFactory() {
-        return this.dcFactory;
+        return dcFactory;
     }
 
     /**
      * Returns a helper object for populating ant task with sources, class path,
      * includes and excludes.
-     *
+     * 
      * @param logger
      *            the logger to use for reporting message back to the build.
      */
-    public AntHelper getAntHelper(PrintStream logger) {
-        return new AntHelper(FilePathHelper.makeAbsolute(this.getWorkspace()), this.dcFactory, this.excludesFactory,
-            logger);
+    public AntHelper getAntHelper(final PrintStream logger) {
+        return new AntHelper(FilePathHelper.makeAbsolute(getWorkspace()), dcFactory, excludesFactory, logger);
     }
 
     /**
      * Returns a factory for generating ant excludes based on development
      * component type.
-     *
+     * 
      * @return a factory for generating ant excludes based on development
      *         component type.
      */
     public ExcludesFactory getExcludesFactory() {
-        return this.excludesFactory;
+        return excludesFactory;
+    }
+
+    /**
+     * 
+     * @return the cleanCopy
+     */
+    public boolean isCleanCopy() {
+        return cleanCopy;
     }
 
     /**
      * Returns the {@link DCToolCommandExecutor} used throughout this build
      * using the given {@link Launcher}.
-     *
+     * 
      * @param launcher
      *            the launcher to use executing DC tool.
      * @return <code>DCToolCommandExecutor</code> to execute DC tool commands.
      * @throws IOException
      */
     DCToolCommandExecutor getDCToolExecutor(final Launcher launcher) throws IOException {
-        if (this.dcToolExecutor == null) {
-            final NWDIProject.DescriptorImpl descriptor = this.getParent().getDescriptor();
+        if (dcToolExecutor == null) {
+            final NWDIProject.DescriptorImpl descriptor = getParent().getDescriptor();
             final DCToolDescriptor dcToolDescriptor =
                 new DCToolDescriptor(descriptor.getUser(), descriptor.getPassword(), descriptor.getNwdiToolLibFolder(),
-                    this.getWorkspace().child(".dtr").getName(), descriptor.getConfiguredJdkHomePaths());
-            this.dcToolExecutor =
-                new DCToolCommandExecutor(launcher, this.getWorkspace(), dcToolDescriptor,
-                    this.getDevelopmentConfiguration());
+                    getWorkspace().child(".dtr").getName(), descriptor.getConfiguredJdkHomePaths());
+            dcToolExecutor =
+                new DCToolCommandExecutor(launcher, getWorkspace(), dcToolDescriptor, getDevelopmentConfiguration());
         }
 
-        return this.dcToolExecutor;
+        return dcToolExecutor;
     }
 
     /**
      * Runner for this build.
-     *
+     * 
      * @author Dirk Weigenand
      */
     private final class RunnerImpl extends AbstractRunner {
@@ -283,7 +282,7 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
          * Create an instance of <code>RunnerImpl</code> with the given
          * {@link DevelopmentConfiguration} and
          * {@link DevelopmentComponentFactory}.
-         *
+         * 
          * @param developmentConfiguration
          *            development configuration to be used in this run.
          */
@@ -297,7 +296,7 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
          * track in the development configuration stored in this build) so that
          * this information can be used in post build tasks for e.g. quality
          * control or generation of documentation.
-         *
+         * 
          * @param listener
          *            the {@link BuildListener} to use for e.g. reporting.
          * @return the build result {@see Result}.
@@ -306,7 +305,7 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
          */
         @Override
         protected Result doRun(final BuildListener listener) throws Exception {
-            this.reporters.addAll(getProject().getPublishersList().toList());
+            reporters.addAll(getProject().getPublishersList().toList());
 
             if (!preBuild(listener, project.getBuilders())) {
                 return FAILURE;
@@ -340,7 +339,7 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
 
         /**
          * build affected development components.
-         *
+         * 
          * @param logger
          *            logger to log build messages
          * @return build result
@@ -356,11 +355,11 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
                 logger.append(component.getName()).append('\n');
             }
 
-            long start = System.currentTimeMillis();
+            final long start = System.currentTimeMillis();
             // TODO: annotate build results with links to build.log files.
-            final DCToolCommandExecutor executor = NWDIBuild.this.getDCToolExecutor(this.launcher);
+            final DCToolCommandExecutor executor = getDCToolExecutor(launcher);
             final DcToolCommandExecutionResult result =
-                executor.execute(new BuildDevelopmentComponentsCommandBuilder(this.developmentConfiguration,
+                executor.execute(new BuildDevelopmentComponentsCommandBuilder(developmentConfiguration,
                     affectedComponents, logger));
             logger.append(String.format("Done building development components (%f sec.).\n",
                 (System.currentTimeMillis() - start) / 1000f));
@@ -373,7 +372,7 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
          */
         @Override
         protected void post2(final BuildListener listener) throws Exception {
-            if (!performAllBuildSteps(listener, this.reporters, true)) {
+            if (!performAllBuildSteps(listener, reporters, true)) {
                 setResult(Result.FAILURE);
             }
 
