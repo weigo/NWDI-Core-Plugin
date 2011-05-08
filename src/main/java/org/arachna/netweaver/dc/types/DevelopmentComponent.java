@@ -45,6 +45,11 @@ public final class DevelopmentComponent {
     private boolean needsRebuild;
 
     /**
+     * indicates whether this development component is deprecated.
+     */
+    private boolean isDeprecated;
+
+    /**
      * contains the public parts of this development component if any.
      */
     private final Set<PublicPart> publicParts = new HashSet<PublicPart>();
@@ -124,7 +129,7 @@ public final class DevelopmentComponent {
      *            DC references.
      */
     public void add(final PublicPartReference reference) {
-        this.usedComponents.add(reference);
+        usedComponents.add(reference);
     }
 
     /**
@@ -136,7 +141,7 @@ public final class DevelopmentComponent {
      *            this DC references.
      */
     public void addAll(final Set<PublicPartReference> references) {
-        this.usedComponents.addAll(references);
+        usedComponents.addAll(references);
     }
 
     /**
@@ -145,8 +150,8 @@ public final class DevelopmentComponent {
      * @return all public part references to DC this DC uses (depends on).
      */
     public Collection<PublicPartReference> getUsedDevelopmentComponents() {
-        final List<PublicPartReference> references = new ArrayList<PublicPartReference>(this.usedComponents.size());
-        references.addAll(this.usedComponents);
+        final List<PublicPartReference> references = new ArrayList<PublicPartReference>(usedComponents.size());
+        references.addAll(usedComponents);
         Collections.sort(references, new PublicPartReferenceComparator());
 
         return references;
@@ -189,7 +194,7 @@ public final class DevelopmentComponent {
      *            the development component to add to those using this DC.
      */
     public void addUsingDC(final DevelopmentComponent component) {
-        this.usingComponents.add(component);
+        usingComponents.add(component);
     }
 
     /**
@@ -198,8 +203,8 @@ public final class DevelopmentComponent {
      * @return all development components that use this development component.
      */
     public Collection<DevelopmentComponent> getUsingDevelopmentComponents() {
-        final List<DevelopmentComponent> usingDCs = new ArrayList<DevelopmentComponent>(this.usingComponents.size());
-        usingDCs.addAll(this.usingComponents);
+        final List<DevelopmentComponent> usingDCs = new ArrayList<DevelopmentComponent>(usingComponents.size());
+        usingDCs.addAll(usingComponents);
         Collections.sort(usingDCs, new DevelopmentComponentByNameComparator());
 
         return usingDCs;
@@ -212,8 +217,8 @@ public final class DevelopmentComponent {
      * @return the publicParts
      */
     public Collection<PublicPart> getPublicParts() {
-        final List<PublicPart> parts = new ArrayList<PublicPart>(this.publicParts.size());
-        parts.addAll(this.publicParts);
+        final List<PublicPart> parts = new ArrayList<PublicPart>(publicParts.size());
+        parts.addAll(publicParts);
         Collections.sort(parts, new PublicPartByNameComparator());
 
         return parts;
@@ -226,7 +231,7 @@ public final class DevelopmentComponent {
      *            public part to add to this DC
      */
     public void add(final PublicPart publicPart) {
-        this.publicParts.add(publicPart);
+        publicParts.add(publicPart);
     }
 
     /**
@@ -273,6 +278,27 @@ public final class DevelopmentComponent {
         this.needsRebuild = needsRebuild;
     }
 
+    /**
+     * Returns whether this development component is deprecated.
+     * 
+     * @return <code>true</code> if this development component is deprecated,
+     *         <code>false</code> otherwise.
+     */
+    public boolean isDeprecated() {
+        return isDeprecated;
+    }
+
+    /**
+     * Set whether this development component is deprecated.
+     * 
+     * @param isDeprecated
+     *            <code>true</code> if this development component is deprecated,
+     *            <code>false</code> otherwise.
+     */
+    public void setDeprecated(final boolean isDeprecated) {
+        this.isDeprecated = isDeprecated;
+    }
+
     /*
      * (non-Javadoc)
      * 
@@ -282,7 +308,7 @@ public final class DevelopmentComponent {
     public String toString() {
         return String.format(
             "DevelopmentComponent [compartment=%s, vendor=%s, name=%s, publicParts=%s, type=%s, description=%s]",
-            this.compartment, this.vendor, this.name, this.publicParts, this.type, this.description);
+            compartment, vendor, name, publicParts, type, description);
     }
 
     /**
@@ -300,7 +326,7 @@ public final class DevelopmentComponent {
      *            source folder to add to this development component.
      */
     public void addSourceFolder(final String folderName) {
-        this.sourceFolders.add(folderName);
+        sourceFolders.add(folderName);
     }
 
     /*
@@ -310,7 +336,7 @@ public final class DevelopmentComponent {
      */
     @Override
     public int hashCode() {
-        return Arrays.hashCode(new Object[] { this.compartment, this.name, this.type, this.vendor });
+        return Arrays.hashCode(new Object[] { compartment, name, type, vendor });
     }
 
     /*
@@ -333,7 +359,7 @@ public final class DevelopmentComponent {
 
         final DevelopmentComponent other = (DevelopmentComponent)obj;
 
-        return Arrays.equals(new Object[] { this.compartment, this.name, this.type, this.vendor }, new Object[] {
-            other.compartment, other.name, other.type, other.vendor });
+        return Arrays.equals(new Object[] { compartment, name, type, vendor }, new Object[] { other.compartment,
+            other.name, other.type, other.vendor });
     }
 }
