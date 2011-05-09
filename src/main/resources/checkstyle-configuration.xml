@@ -11,6 +11,7 @@
 <module name="Checker">
   <property name="severity" value="warning"/>
   <module name="TreeWalker">
+    <property name="cacheFile" value="target/cachefile"/>
     <module name="AvoidStarImport"/>
     <module name="ConstantName">
       <property name="format" value="^[A-Z](_?[A-Z0-9]+)*$|log"/>
