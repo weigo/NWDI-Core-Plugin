@@ -1,7 +1,7 @@
 /**
  *
  */
-package org.arachna.netweaver.hudson.nwdi;
+package org.arachna.netweaver.dctool;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -10,14 +10,13 @@ import java.util.List;
 
 import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
-import org.arachna.netweaver.dctool.AbstractDCToolCommandBuilder;
 
 /**
  * Builder for 'builddc' commands for DC tool.
  *
  * @author Dirk Weigenand
  */
-public final class BuildDevelopmentComponentsCommandBuilder extends AbstractDCToolCommandBuilder {
+final class BuildDevelopmentComponentsCommandBuilder extends AbstractDCToolCommandBuilder {
     /**
      * command for building a DC.
      */
@@ -70,8 +69,8 @@ public final class BuildDevelopmentComponentsCommandBuilder extends AbstractDCTo
                     component.getVendor()));
             }
             else {
-                logger.append(String.format("%s/%s has no compartment set!", component.getVendor(),
-                    component.getName()));
+                logger
+                    .append(String.format("%s/%s has no compartment set!", component.getVendor(), component.getName()));
             }
         }
 

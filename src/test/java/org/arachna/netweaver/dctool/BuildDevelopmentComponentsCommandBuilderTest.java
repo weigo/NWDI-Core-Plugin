@@ -1,7 +1,7 @@
 /**
  *
  */
-package org.arachna.netweaver.hudson.nwdi;
+package org.arachna.netweaver.dctool;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
@@ -17,6 +17,8 @@ import org.arachna.netweaver.dc.types.CompartmentState;
 import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
+import org.arachna.netweaver.dctool.BuildDevelopmentComponentsCommandBuilder;
+import org.arachna.netweaver.hudson.nwdi.ExampleDevelopmentComponentFactory;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -67,7 +69,7 @@ public final class BuildDevelopmentComponentsCommandBuilderTest {
 
     /**
      * Test method for
-     * {@link org.arachna.netweaver.dc.analyzer.dctool.BuildDevelopmentComponentsCommandBuilder#execute()}
+     * {@link org.arachna.netweaver.dctool.analyzer.dctool.BuildDevelopmentComponentsCommandBuilder#execute()}
      * .
      */
     @Test

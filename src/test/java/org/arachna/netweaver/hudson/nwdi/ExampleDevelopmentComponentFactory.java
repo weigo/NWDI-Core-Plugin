@@ -9,10 +9,10 @@ import org.arachna.netweaver.dc.types.PublicPartReference;
 
 /**
  * Factory for example development components for JUnit tests.
- * 
+ *
  * @author Dirk Weigenand
  */
-final class ExampleDevelopmentComponentFactory {
+public final class ExampleDevelopmentComponentFactory {
 
     /**
      *
@@ -37,12 +37,12 @@ final class ExampleDevelopmentComponentFactory {
     /**
      * example DC.
      */
-    static final String LIB_JETM = "lib/jetm";
+    public static final String LIB_JETM = "lib/jetm";
 
     /**
      * Vendor for example development configuration, compartment and development components.
      */
-    static final String EXAMPLE_COM = "example.com";
+    public static final String EXAMPLE_COM = "example.com";
 
     /**
      * assembly public part.
@@ -68,10 +68,10 @@ final class ExampleDevelopmentComponentFactory {
     /**
      * Create a {@link DevelopmentComponentFactory} as 'object mother' with an example set of development components and their usage
      * relationships.
-     * 
+     *
      * @return a <code>DevelopmentComponentFactory</code> with example development components.
      */
-    static DevelopmentComponentFactory create() {
+    public static DevelopmentComponentFactory create() {
         final DevelopmentComponentFactory dcFactory = new DevelopmentComponentFactory();
         dcFactory.create(EXAMPLE_COM, LIB_JETM, new PublicPart[] { ASSEMBLY, API }, new PublicPartReference[] {});
 

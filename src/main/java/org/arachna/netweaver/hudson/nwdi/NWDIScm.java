@@ -42,7 +42,7 @@ import org.kohsuke.stapler.StaplerRequest;
 
 /**
  * Interface to NetWeaver Developer Infrastructure.
- * 
+ *
  * @author Dirk Weigenand
  */
 public class NWDIScm extends SCM {
@@ -68,7 +68,7 @@ public class NWDIScm extends SCM {
 
     /**
      * Create an instance of a <code>NWDIScm</code>.
-     * 
+     *
      * @param dtrUser
      *            user to authenticate with.
      * @param password
@@ -118,21 +118,14 @@ public class NWDIScm extends SCM {
         final NWDIBuild currentBuild = (NWDIBuild)build;
         final PrintStream logger = listener.getLogger();
         final DevelopmentConfiguration config = currentBuild.getDevelopmentConfiguration();
-        logger.append(String.format("Reading development components for %s from NWDI.\n", config.getName()));
 
         final Collection<Activity> activities = new ArrayList<Activity>();
         final DCToolCommandExecutor executor = currentBuild.getDCToolExecutor(launcher);
 
-        final long startListDcs = System.currentTimeMillis();
-        DcToolCommandExecutionResult result = executor.execute(new ListDcCommandBuilder(config));
+        final DevelopmentComponentFactory dcFactory = currentBuild.getDevelopmentComponentFactory();
+        DcToolCommandExecutionResult result = executor.listDevelopmentComponents(dcFactory);
 
         if (result.isExitCodeOk()) {
-            final DevelopmentComponentFactory dcFactory = currentBuild.getDevelopmentComponentFactory();
-            String output = result.getOutput();
-            new DevelopmentComponentsReader(new StringReader(output), dcFactory, config).read();
-            duration(logger, startListDcs,
-                String.format("Read %s development components from NWDI", dcFactory.getAll().size()));
-
             final NWDIBuild lastSuccessfulBuild = currentBuild.getParent().getLastSuccessfulBuild();
 
             if (lastSuccessfulBuild != null) {
@@ -143,19 +136,14 @@ public class NWDIScm extends SCM {
                 logger.append("Getting all activities from DTR.\n");
             }
 
-            final long startGetActivities = System.currentTimeMillis();
             activities.addAll(getActivities(logger, getDtrBrowser(config, dcFactory),
                 lastSuccessfulBuild != null ? lastSuccessfulBuild.getAction(NWDIRevisionState.class).getCreationDate()
                     : null));
-            duration(logger, startGetActivities, String.format("Read %s activities", activities.size()));
 
-            final long startSyncDCs = System.currentTimeMillis();
-            logger.append("Synchronizing development components from NWDI.\n");
-            result = executor.execute(new SyncDevelopmentComponentsCommandBuilder(config, cleanCopy));
-            duration(logger, startSyncDCs, "Done synchronizing development components from NWDI.\n");
+            result = executor.synchronizeDevelopmentComponents(cleanCopy);
 
             if (!result.isExitCodeOk()) {
-                output = result.getOutput();
+                String output = result.getOutput();
                 // FIXME: make heap used for dctool configurable!
                 // ignore OutOfMemoryError on exit from dctool
                 if (output.contains("java.lang.OutOfMemoryError") && output.contains("java.lang.System.exit")
@@ -215,7 +203,7 @@ public class NWDIScm extends SCM {
 
     /**
      * Get the creation date from the given {@link SCMRevisionState}.
-     * 
+     *
      * @param revisionState
      *            an <code>SCMRevisionState</code> object
      * @return the date/time when the given SCM revision state was computed iff
@@ -235,7 +223,7 @@ public class NWDIScm extends SCM {
 
     /**
      * Write the change log using the given build, file and list of activities.
-     * 
+     *
      * @param build
      *            the {@link AbstractBuild} to use writing the change log.
      * @param changelogFile
@@ -254,7 +242,7 @@ public class NWDIScm extends SCM {
 
     /**
      * {@link SCMDescriptor} for {@link NWDIProject}.
-     * 
+     *
      * @author Dirk Weigenand
      */
     @Extension
@@ -288,7 +276,7 @@ public class NWDIScm extends SCM {
     /**
      * Get list of activities since last run. If <code>lastRun</code> is
      * <code>null</code> all activities will be read.
-     * 
+     *
      * @param logger
      *            the logger to use.
      * @param browser
@@ -301,6 +289,7 @@ public class NWDIScm extends SCM {
     private List<Activity> getActivities(final PrintStream logger, final DtrBrowser browser, final Date since) {
         final List<Activity> activities = new ArrayList<Activity>();
         long start = System.currentTimeMillis();
+        final long startGetActivities = start;
 
         if (since == null) {
             activities.addAll(browser.getActivities());
@@ -324,6 +313,7 @@ public class NWDIScm extends SCM {
         }
 
         duration(logger, start, "Determine affected DCs for activities");
+        duration(logger, startGetActivities, String.format("Read %s activities", activities.size()));
 
         return activities;
     }
@@ -331,7 +321,7 @@ public class NWDIScm extends SCM {
     /**
      * Returns an instance of {@link DtrBrowser} using the given development
      * configuration and development component factory.
-     * 
+     *
      * @param config
      *            the development configuration to be used to connect to the
      *            DTR.
@@ -347,7 +337,7 @@ public class NWDIScm extends SCM {
     /**
      * Determine the time in seconds passed since the given start time and log
      * it using the message given.
-     * 
+     *
      * @param logger
      *            the logger to use.
      * @param start
