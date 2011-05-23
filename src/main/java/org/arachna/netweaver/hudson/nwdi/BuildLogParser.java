@@ -16,8 +16,8 @@ import org.arachna.util.io.FileFinder;
 /**
  * Parser for build.log files. Extracts source folders and folders where class
  * files are generated to from <code>build.log</code> files.
- *
- * @author G526521
+ * 
+ * @author Dirk Weigenand
  */
 class BuildLogParser {
     /**
@@ -52,7 +52,7 @@ class BuildLogParser {
 
     /**
      * Create a BuildLogParser instance with the given project directory.
-     *
+     * 
      * @param projectDirectory
      *            project folder
      */
@@ -68,14 +68,14 @@ class BuildLogParser {
 
         try {
             final String path =
-                String.format("%s/gen/default/logs/build.log", this.projectDirectory).replace('/', File.separatorChar);
+                String.format("%s/gen/default/logs/build.log", projectDirectory).replace('/', File.separatorChar);
             reader = new LineNumberReader(new FileReader(path));
 
             String line;
 
             while ((line = reader.readLine()) != null) {
                 if (line.contains(SOURCE_PATHS)) {
-                    line = readMultipleSourcePaths(reader);
+                    readMultipleSourcePaths(reader);
                 }
                 else if (line.contains(SOURCE_PATH)) {
                     readSingleSourcePath(line);
@@ -114,28 +114,28 @@ class BuildLogParser {
      */
     private void readTestPackages() {
         final String testPackages =
-            normalizeFileName(this.projectDirectory + File.separatorChar + "test" + File.separatorChar + "packages");
+            normalizeFileName(projectDirectory + File.separatorChar + "test" + File.separatorChar + "packages");
 
-        if (this.folderContainsJavaSources(testPackages)) {
-            this.sourceFolders.add(testPackages);
+        if (folderContainsJavaSources(testPackages)) {
+            sourceFolders.add(testPackages);
         }
     }
 
     /**
      * Read the output directory from the given line.
-     *
+     * 
      * @param line
      *            line of build.log to extract output directory from.
      */
     private void readOutputDirectory(final String line) {
         final int index = line.indexOf(OUTPUT_DIR);
-        this.outputFolder = normalizeFileName(line.substring(index + OUTPUT_DIR.length()).trim());
+        outputFolder = normalizeFileName(line.substring(index + OUTPUT_DIR.length()).trim());
     }
 
     /**
      * Extract a source path from the given line and store it into {@see
      * #sourceFolders}.
-     *
+     * 
      * @param line
      *            the build.log line to extract a source path from.
      */
@@ -144,21 +144,20 @@ class BuildLogParser {
         final String folderName = normalizeFileName(line.substring(sourcePathIndex + SOURCE_PATH.length()).trim());
 
         if (folderContainsJavaSources(folderName)) {
-            this.sourceFolders.add(folderName);
+            sourceFolders.add(folderName);
         }
     }
 
     /**
      * Read the source paths from the given reader. Source paths are stored in
      * {@see #sourceFolders}.
-     *
+     * 
      * @param reader
      *            reader to use reading the build.log file.
-     * @return the last line read.
      * @throws IOException
      *             throw any IOException thrown reading the build log.
      */
-    private String readMultipleSourcePaths(final LineNumberReader reader) throws IOException {
+    private void readMultipleSourcePaths(final LineNumberReader reader) throws IOException {
         String line;
         while ((line = reader.readLine()) != null) {
             if (line.contains("class path:")) {
@@ -168,16 +167,15 @@ class BuildLogParser {
             final String folderName = normalizeFileName(line.replace("[echo]", "").trim());
 
             if (folderContainsJavaSources(folderName)) {
-                this.sourceFolders.add(folderName);
+                sourceFolders.add(folderName);
             }
         }
-        return line;
     }
 
     /**
      * Normalize the given file name with respect to the path separator char
      * matching the operating system the program is currently running on.
-     *
+     * 
      * @param fileName
      *            file name to normalize.
      * @return the normalized file name.
@@ -188,10 +186,10 @@ class BuildLogParser {
 
     /**
      * Checks whether the given path contains '.java' source files.
-     *
+     * 
      * @param folderName
      *            folder to check for java source files.
-     *
+     * 
      * @return <code>true</code> if the given path contains java sources,
      *         <code>false</code> otherwise.
      */

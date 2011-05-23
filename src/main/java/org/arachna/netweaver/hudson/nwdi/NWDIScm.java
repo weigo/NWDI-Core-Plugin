@@ -21,7 +21,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -42,7 +41,7 @@ import org.kohsuke.stapler.StaplerRequest;
 
 /**
  * Interface to NetWeaver Developer Infrastructure.
- *
+ * 
  * @author Dirk Weigenand
  */
 public class NWDIScm extends SCM {
@@ -68,7 +67,7 @@ public class NWDIScm extends SCM {
 
     /**
      * Create an instance of a <code>NWDIScm</code>.
-     *
+     * 
      * @param dtrUser
      *            user to authenticate with.
      * @param password
@@ -143,7 +142,7 @@ public class NWDIScm extends SCM {
             result = executor.synchronizeDevelopmentComponents(cleanCopy);
 
             if (!result.isExitCodeOk()) {
-                String output = result.getOutput();
+                final String output = result.getOutput();
                 // FIXME: make heap used for dctool configurable!
                 // ignore OutOfMemoryError on exit from dctool
                 if (output.contains("java.lang.OutOfMemoryError") && output.contains("java.lang.System.exit")
@@ -203,7 +202,7 @@ public class NWDIScm extends SCM {
 
     /**
      * Get the creation date from the given {@link SCMRevisionState}.
-     *
+     * 
      * @param revisionState
      *            an <code>SCMRevisionState</code> object
      * @return the date/time when the given SCM revision state was computed iff
@@ -223,7 +222,7 @@ public class NWDIScm extends SCM {
 
     /**
      * Write the change log using the given build, file and list of activities.
-     *
+     * 
      * @param build
      *            the {@link AbstractBuild} to use writing the change log.
      * @param changelogFile
@@ -242,7 +241,7 @@ public class NWDIScm extends SCM {
 
     /**
      * {@link SCMDescriptor} for {@link NWDIProject}.
-     *
+     * 
      * @author Dirk Weigenand
      */
     @Extension
@@ -276,7 +275,7 @@ public class NWDIScm extends SCM {
     /**
      * Get list of activities since last run. If <code>lastRun</code> is
      * <code>null</code> all activities will be read.
-     *
+     * 
      * @param logger
      *            the logger to use.
      * @param browser
@@ -321,7 +320,7 @@ public class NWDIScm extends SCM {
     /**
      * Returns an instance of {@link DtrBrowser} using the given development
      * configuration and development component factory.
-     *
+     * 
      * @param config
      *            the development configuration to be used to connect to the
      *            DTR.
@@ -337,7 +336,7 @@ public class NWDIScm extends SCM {
     /**
      * Determine the time in seconds passed since the given start time and log
      * it using the message given.
-     *
+     * 
      * @param logger
      *            the logger to use.
      * @param start
