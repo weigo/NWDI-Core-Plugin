@@ -52,7 +52,7 @@ public final class DtrChangeLogParser extends ChangeLogParser {
      * 
      * @author Dirk Weigenand
      */
-    private final class InternalDtrChangeLogParser extends AbstractDefaultHandler {
+    private static final class InternalDtrChangeLogParser extends AbstractDefaultHandler {
         /**
          * 'action' element.
          */
@@ -129,27 +129,27 @@ public final class DtrChangeLogParser extends ChangeLogParser {
         @Override
         public void endElement(final String uri, final String localName, final String qName) throws SAXException {
             if (CHANGESET.equals(localName)) {
-                this.changeSet.add(this.currentChangeLogEntry);
-                this.currentChangeLogEntry = null;
+                changeSet.add(currentChangeLogEntry);
+                currentChangeLogEntry = null;
             }
             else if (COMMENT.equals(localName)) {
-                this.currentChangeLogEntry.setMsg(this.getText());
+                currentChangeLogEntry.setMsg(getText());
             }
             else if (DESCRIPTION.equals(localName)) {
-                this.currentChangeLogEntry.setDescription(this.getText());
+                currentChangeLogEntry.setDescription(getText());
             }
             else if (USER.equals(localName)) {
-                this.currentChangeLogEntry.setUser(getText());
+                currentChangeLogEntry.setUser(getText());
             }
             else if (DATE.equals(localName)) {
-                this.currentChangeLogEntry.setCheckInTime(getText());
+                currentChangeLogEntry.setCheckInTime(getText());
             }
             else if (ITEM.equals(localName)) {
-                this.currentChangeLogEntry.add(new Item(getText(), this.currentItemAction));
-                this.currentItemAction = null;
+                currentChangeLogEntry.add(new Item(getText(), currentItemAction));
+                currentItemAction = null;
             }
 
-            this.getText();
+            getText();
         }
 
         /*
@@ -163,11 +163,11 @@ public final class DtrChangeLogParser extends ChangeLogParser {
         public void startElement(final String uri, final String localName, final String qName,
             final Attributes attributes) throws SAXException {
             if (CHANGESET.equals(localName)) {
-                this.currentChangeLogEntry = new DtrChangeLogEntry();
-                this.currentChangeLogEntry.setVersion(attributes.getValue(VERSION));
+                currentChangeLogEntry = new DtrChangeLogEntry();
+                currentChangeLogEntry.setVersion(attributes.getValue(VERSION));
             }
             else if (ITEM.equals(localName)) {
-                this.currentItemAction = DtrChangeLogEntry.Action.fromString(attributes.getValue(ACTION));
+                currentItemAction = DtrChangeLogEntry.Action.fromString(attributes.getValue(ACTION));
             }
         }
     }
