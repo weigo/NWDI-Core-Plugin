@@ -24,7 +24,7 @@ public final class DevelopmentConfiguration {
     /**
      * constant for JDK to be used to build DCs.
      */
-    static final String COM_SAP_JDK_HOME_PATH_KEY = "com.sap.jdk.home_path_key";
+    public static final String COM_SAP_JDK_HOME_PATH_KEY = "com.sap.jdk.home_path_key";
 
     /**
      * Location of this development configuration in the file system.
