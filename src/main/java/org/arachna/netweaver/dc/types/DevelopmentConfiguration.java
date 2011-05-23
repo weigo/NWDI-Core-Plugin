@@ -17,14 +17,14 @@ import org.arachna.netweaver.dctool.JdkHomeAlias;
 /**
  * A class representing an NWDI development configuration description, i.e. the
  * name of the development configuration and the compartments contained therein.
- *
+ * 
  * @author Dirk Weigenand
  */
 public final class DevelopmentConfiguration {
     /**
      * constant for JDK to be used to build DCs.
      */
-    protected static final String COM_SAP_JDK_HOME_PATH_KEY = "com.sap.jdk.home_path_key";
+    static final String COM_SAP_JDK_HOME_PATH_KEY = "com.sap.jdk.home_path_key";
 
     /**
      * Location of this development configuration in the file system.
@@ -78,7 +78,7 @@ public final class DevelopmentConfiguration {
 
     /**
      * Create a development configuration with the given name.
-     *
+     * 
      * @param name
      *            name of the development configuration to create.
      */
@@ -88,13 +88,13 @@ public final class DevelopmentConfiguration {
         }
 
         this.name = name;
-        this.workspace = name.substring(getBeginIndexOfWorkspace(name), getEndIndexOfWorkspace(name));
+        workspace = name.substring(getBeginIndexOfWorkspace(name), getEndIndexOfWorkspace(name));
     }
 
     /**
      * Find the start index of the workspace name in the given development
      * configuration name.
-     *
+     * 
      * @param name
      *            development configuration name.
      * @return the start index of the workspace name in the given development
@@ -103,13 +103,13 @@ public final class DevelopmentConfiguration {
     private int getBeginIndexOfWorkspace(final String name) {
         final int firstIndexOfUnderScore = name.indexOf('_');
 
-        return (firstIndexOfUnderScore == -1) ? 0 : firstIndexOfUnderScore + 1;
+        return firstIndexOfUnderScore == -1 ? 0 : firstIndexOfUnderScore + 1;
     }
 
     /**
      * Find the end index of the workspace name in the given development
      * configuration name.
-     *
+     * 
      * @param name
      *            development configuration name.
      * @return the end index of the workspace name in the given development
@@ -118,56 +118,56 @@ public final class DevelopmentConfiguration {
     private int getEndIndexOfWorkspace(final String name) {
         final int lastIndexOfUnderScore = name.lastIndexOf('_');
 
-        return (lastIndexOfUnderScore == -1) ? name.length() : lastIndexOfUnderScore;
+        return lastIndexOfUnderScore == -1 ? name.length() : lastIndexOfUnderScore;
     }
 
     /**
      * Add a compartment to this development configuration.
-     *
+     * 
      * @param compartment
      *            compartment to add.
      */
     public void add(final Compartment compartment) {
         if (compartment != null) {
             compartment.setDevelopmentConfiguration(this);
-            this.compartments.add(compartment);
-            this.compartmentMap.put(compartment.getName(), compartment);
+            compartments.add(compartment);
+            compartmentMap.put(compartment.getName(), compartment);
         }
     }
 
     /**
      * Add all given compartments to this development configuration.
-     *
+     * 
      * @param compartments
      *            compartments to add to this development configuration.
      */
     public void addAll(final List<Compartment> compartments) {
         for (final Compartment compartment : compartments) {
-            this.add(compartment);
+            add(compartment);
         }
     }
 
     /**
      * Get the name of this development configuration.
-     *
+     * 
      * @return the name of this development configuration.
      */
     public String getName() {
-        return this.name;
+        return name;
     }
 
     /**
      * Get the compartments contained in this development configuration.
-     *
+     * 
      * @return the compartments
      */
     public Collection<Compartment> getCompartments() {
-        return Collections.unmodifiableCollection(this.compartments);
+        return Collections.unmodifiableCollection(compartments);
     }
 
     /**
      * Returns the compartments filtered by the given {@link CompartmentState}.
-     *
+     * 
      * @param state
      *            <code>CompartmentState</code> that should be filtered by.
      * @return compartments filtered by the given {@link CompartmentState}.
@@ -186,27 +186,27 @@ public final class DevelopmentConfiguration {
 
     /**
      * Get a compartment by name.
-     *
+     * 
      * @param name
      *            name of compartment
      * @return the compartment found or <code>null</code>.
      */
     public Compartment getCompartment(final String name) {
-        return this.compartmentMap.get(name);
+        return compartmentMap.get(name);
     }
 
     /**
      * Get the description of this development configuration.
-     *
+     * 
      * @return the description
      */
     public String getDescription() {
-        return this.description;
+        return description;
     }
 
     /**
      * Set the description of this development configuration.
-     *
+     * 
      * @param description
      *            the description to set
      */
@@ -216,7 +216,7 @@ public final class DevelopmentConfiguration {
 
     /**
      * Get the short description of this development configuration.
-     *
+     * 
      * @return the caption
      */
     public String getCaption() {
@@ -225,7 +225,7 @@ public final class DevelopmentConfiguration {
 
     /**
      * Set the short description of this development configuration.
-     *
+     * 
      * @param caption
      *            the caption to set
      */
@@ -235,7 +235,7 @@ public final class DevelopmentConfiguration {
 
     /**
      * Get the location in the file system of this development configuration.
-     *
+     * 
      * @return the location
      */
     public String getLocation() {
@@ -244,7 +244,7 @@ public final class DevelopmentConfiguration {
 
     /**
      * Set the location in the file system of this development configuration.
-     *
+     * 
      * @param location
      *            the location to set
      */
@@ -257,22 +257,22 @@ public final class DevelopmentConfiguration {
      */
     @Override
     public String toString() {
-        return String.format("DevelopmentConfiguration [name=%s, caption=%s]", this.name, this.caption);
+        return String.format("DevelopmentConfiguration [name=%s, caption=%s]", name, caption);
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see java.lang.Object#hashCode()
      */
     @Override
     public int hashCode() {
-        return this.name.hashCode();
+        return name.hashCode();
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -309,16 +309,16 @@ public final class DevelopmentConfiguration {
 
     /**
      * Return the URL to the CMS server.
-     *
+     * 
      * @return the cmsUrl
      */
     public String getCmsUrl() {
-        return this.cmsUrl;
+        return cmsUrl;
     }
 
     /**
      * Set URL to CMS server.
-     *
+     * 
      * @param cmsUrl
      *            the cmsUrl to set
      */
@@ -330,7 +330,7 @@ public final class DevelopmentConfiguration {
      * @return the buildServer
      */
     public String getBuildServer() {
-        return this.buildServer;
+        return buildServer;
     }
 
     /**
@@ -343,18 +343,18 @@ public final class DevelopmentConfiguration {
 
     /**
      * Return the name of the DTR workspace for this development configuration.
-     *
+     * 
      * @return the name of the DTR workspace for this development configuration.
      */
     public String getWorkspace() {
-        return this.workspace;
+        return workspace;
     }
 
     /**
      * Returns the URL for the DTR this development configuration is stored on.
      * The returned string is empty when no compartment in source state is
      * contained in this development configuration.
-     *
+     * 
      * @return URL for the DTR this development configuration is stored on.
      */
     public String getDtrServerUrl() {
@@ -370,8 +370,18 @@ public final class DevelopmentConfiguration {
         return dtrServerUrl;
     }
 
+    /**
+     * Get the {@link JdkHomeAlias} associated with the {@link BuildVariant} of
+     * this development configuration.
+     * 
+     * @return the JdkHomeAlias associated with the build variant of this
+     *         development configuration iff there is one defined and a {@see
+     *         #COM_SAP_JDK_HOME_PATH_KEY} build option is defined.
+     * 
+     *         Returns <code>null</code> otherwise.
+     */
     public JdkHomeAlias getJdkHomeAlias() {
-        BuildVariant buildVariant = this.getBuildVariant();
+        final BuildVariant buildVariant = getBuildVariant();
         JdkHomeAlias alias = null;
 
         if (buildVariant != null) {
