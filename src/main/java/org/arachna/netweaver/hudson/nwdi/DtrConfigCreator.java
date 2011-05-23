@@ -102,15 +102,15 @@ final class DtrConfigCreator {
      *             when the user canceled the operation.
      */
     FilePath execute() throws IOException, InterruptedException {
-        this.dtrDirectory = createFolder(DOT_DTR);
-        this.dtcDirectory = createFolder(DOT_DTC);
+        dtrDirectory = createFolder(DOT_DTR);
+        dtcDirectory = createFolder(DOT_DTC);
 
         createOrUpdateServersXml();
         createOrUpdateClientsXml();
         createOrUpdateDotConfDef();
         createOrUpdateTrackNameDotSystem();
 
-        return this.dtrDirectory;
+        return dtrDirectory;
     }
 
     /**
@@ -122,9 +122,9 @@ final class DtrConfigCreator {
      *             when the user canceled the operation.
      */
     private void createOrUpdateTrackNameDotSystem() throws IOException, InterruptedException {
-        this.dtrDirectory.child(this.config.getName() + ".system").write(
-            String.format(this.getTemplate("template.system"), this.config.getName(), this.config.getDtrServerUrl(),
-                this.config.getBuildServer()), DEFAULT_ENCODING);
+        dtrDirectory.child(config.getName() + ".system").write(
+            String.format(getTemplate("template.system"), config.getName(), config.getDtrServerUrl(),
+                config.getBuildServer()), DEFAULT_ENCODING);
     }
 
     /**
@@ -136,7 +136,7 @@ final class DtrConfigCreator {
      *             when the user canceled the operation.
      */
     private void createOrUpdateDotConfDef() throws IOException, InterruptedException {
-        this.dtcDirectory.child(".confdef").write(this.confDef, DEFAULT_ENCODING);
+        dtcDirectory.child(".confdef").write(confDef, DEFAULT_ENCODING);
     }
 
     /**
@@ -152,7 +152,7 @@ final class DtrConfigCreator {
      *             when the user canceled the operation.
      */
     private FilePath createFolder(final String folderName) throws IOException, InterruptedException {
-        final FilePath folder = this.workspace.child(folderName);
+        final FilePath folder = workspace.child(folderName);
 
         if (!folder.exists()) {
             folder.mkdirs();
@@ -171,10 +171,9 @@ final class DtrConfigCreator {
      *             when the user canceled the operation.
      */
     private void createOrUpdateClientsXml() throws IOException, InterruptedException {
-        final String path = FilePathHelper.makeAbsolute(this.dtcDirectory);
-        final String content =
-            String.format(this.getTemplate(CLIENTS_XML), this.config.getName(), path.toString(), this.config.getName());
-        this.dtrDirectory.child(CLIENTS_XML).write(content, DEFAULT_ENCODING);
+        final String path = FilePathHelper.makeAbsolute(dtcDirectory);
+        final String content = String.format(getTemplate(CLIENTS_XML), config.getName(), path, config.getName());
+        dtrDirectory.child(CLIENTS_XML).write(content, DEFAULT_ENCODING);
     }
 
     /**
@@ -187,8 +186,8 @@ final class DtrConfigCreator {
      *             when the user canceled the operation.
      */
     private void createOrUpdateServersXml() throws IOException, InterruptedException {
-        this.dtrDirectory.child(SERVERS_XML).write(
-            String.format(this.getTemplate(SERVERS_XML), this.config.getBuildServer()), DEFAULT_ENCODING);
+        dtrDirectory.child(SERVERS_XML).write(String.format(getTemplate(SERVERS_XML), config.getBuildServer()),
+            DEFAULT_ENCODING);
     }
 
     /**
