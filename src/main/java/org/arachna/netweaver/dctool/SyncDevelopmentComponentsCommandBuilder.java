@@ -14,34 +14,34 @@ import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 /**
  * Builder for DCTool synchronize commands for a development configurations
  * development components.
- *
+ * 
  * @author Dirk Weigenand
  */
 final class SyncDevelopmentComponentsCommandBuilder extends AbstractDCToolCommandBuilder {
     /**
      * command for syncing an inactive DC.
      */
-    protected static final String SYNC_INACTIVE_DC_COMMAND = "syncdc -s %s -n %s -v %s -m inactive -y;";
+    private static final String SYNC_INACTIVE_DC_COMMAND = "syncdc -s %s -n %s -v %s -m inactive -y;";
 
     /**
      * command for syncing all DCs in archive mode.
      */
-    protected static final String SYNC_DCS_IN_ARCHIVE_MODE_COMMAND = "syncalldcs -s %s -m archive;";
+    private static final String SYNC_DCS_IN_ARCHIVE_MODE_COMMAND = "syncalldcs -s %s -m archive;";
 
     /**
      * command for syncing all DCs in source state.
      */
-    protected static final String SYNC_ALL_DCS_COMMAND = "syncalldcs -s %s -m inactive -y;";
+    private static final String SYNC_ALL_DCS_COMMAND = "syncalldcs -s %s -m inactive -y;";
 
     /**
      * unsync one development component of a given compartment and vendor.
      */
-    protected static final String UNSYNC_DC_COMMAND = "unsyncdc -s %s -n %s -v %s;";
+    private static final String UNSYNC_DC_COMMAND = "unsyncdc -s %s -n %s -v %s;";
 
     /**
      * unsync all development components of a given compartment.
      */
-    protected static final String UNSYNC_ALL_DCS_COMMAND = "unsyncalldcs -s %s;";
+    private static final String UNSYNC_ALL_DCS_COMMAND = "unsyncalldcs -s %s;";
 
     /**
      * Indicates whether DCs in source state should be unsynced before sync.
@@ -50,7 +50,7 @@ final class SyncDevelopmentComponentsCommandBuilder extends AbstractDCToolComman
 
     /**
      * create a builder for development component listing and syncing commands.
-     *
+     * 
      * @param developmentConfiguration
      *            development configuration to synchronize development
      *            components for.
@@ -65,7 +65,7 @@ final class SyncDevelopmentComponentsCommandBuilder extends AbstractDCToolComman
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see
      * org.arachna.netweaver.dc.analyzer.dctool.DCToolCommandBuilder#execute ()
      */
@@ -75,7 +75,7 @@ final class SyncDevelopmentComponentsCommandBuilder extends AbstractDCToolComman
 
         synchronizeCompartmentsInArchiveMode(commands);
 
-        if (this.cleanCopy) {
+        if (cleanCopy) {
             synchronizeDCsWithClean(commands);
         }
         else {
@@ -89,12 +89,12 @@ final class SyncDevelopmentComponentsCommandBuilder extends AbstractDCToolComman
      * @param commands
      */
     private void synchronizeDCsNeedingRebuild(final List<String> commands) {
-        DevelopmentConfiguration developmentConfiguration = this.getDevelopmentConfiguration();
+        final DevelopmentConfiguration developmentConfiguration = getDevelopmentConfiguration();
 
         for (final Compartment compartment : developmentConfiguration.getCompartments(CompartmentState.Source)) {
             for (final DevelopmentComponent component : compartment.getDevelopmentComponents()) {
                 if (component.isNeedsRebuild()) {
-//                    commands.add(createUnsyncDCCommand(component));
+                    // commands.add(createUnsyncDCCommand(component));
                     commands.add(createSyncInactiveDCCommand(component));
                 }
             }
@@ -105,7 +105,7 @@ final class SyncDevelopmentComponentsCommandBuilder extends AbstractDCToolComman
      * @param commands
      */
     private void synchronizeDCsWithClean(final List<String> commands) {
-        DevelopmentConfiguration developmentConfiguration = this.getDevelopmentConfiguration();
+        final DevelopmentConfiguration developmentConfiguration = getDevelopmentConfiguration();
 
         for (final Compartment compartment : developmentConfiguration.getCompartments(CompartmentState.Source)) {
             commands.add(String.format(UNSYNC_ALL_DCS_COMMAND, compartment.getName()));
@@ -117,7 +117,7 @@ final class SyncDevelopmentComponentsCommandBuilder extends AbstractDCToolComman
      * @param commands
      */
     private void synchronizeCompartmentsInArchiveMode(final List<String> commands) {
-        DevelopmentConfiguration developmentConfiguration = this.getDevelopmentConfiguration();
+        final DevelopmentConfiguration developmentConfiguration = getDevelopmentConfiguration();
 
         for (final Compartment compartment : developmentConfiguration.getCompartments(CompartmentState.Archive)) {
             commands.add(String.format(SYNC_DCS_IN_ARCHIVE_MODE_COMMAND, compartment.getName()));
@@ -126,7 +126,7 @@ final class SyncDevelopmentComponentsCommandBuilder extends AbstractDCToolComman
 
     /**
      * Create command for synchronizing the given DC in inactive state.
-     *
+     * 
      * @param component
      *            DC to synchronize.
      * @return dctool command to synchronize the given DC
@@ -138,7 +138,7 @@ final class SyncDevelopmentComponentsCommandBuilder extends AbstractDCToolComman
 
     /**
      * Create command to unsynchronize the given DC.
-     *
+     * 
      * @param component
      *            DC to unsynchronize.
      * @return dctool command to unsynchronize the given DC
