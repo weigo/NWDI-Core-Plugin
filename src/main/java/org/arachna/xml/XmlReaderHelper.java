@@ -9,7 +9,6 @@ import java.io.Reader;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 /**
@@ -18,6 +17,11 @@ import org.xml.sax.helpers.XMLReaderFactory;
  * @author Dirk Weigenand
  */
 public final class XmlReaderHelper {
+    /**
+     * Constant for sax driver property.
+     */
+    private static final String ORG_XML_SAX_DRIVER = "org.xml.sax.driver";
+
     /**
      * handler to use for handling SAX events.
      */
@@ -47,15 +51,22 @@ public final class XmlReaderHelper {
      */
     public void parse(final Reader input) throws IOException, SAXException {
         final XMLReader xmlReader = createXmlReader();
-        xmlReader.setContentHandler(this.handler);
-        this.handler.setXmlReader(xmlReader);
+        xmlReader.setContentHandler(handler);
+        handler.setXmlReader(xmlReader);
 
         xmlReader.parse(new InputSource(input));
     }
 
     /**
-     * @return
+     * Creates an {@link XMLReader}.
+     * 
+     * Catch errors when the {@see #ORG_XML_SAX_DRIVER} system property is set
+     * to a class that cannot be loaded at runtime. The property will be cleared
+     * in this case and the operation retried.
+     * 
+     * @return a new {@link XMLReader} object
      * @throws SAXException
+     *             when creating the reader fails
      */
     private XMLReader createXmlReader() throws SAXException {
         XMLReader xmlReader = null;
@@ -65,10 +76,10 @@ public final class XmlReaderHelper {
         }
         catch (final RuntimeException re) {
             if (re.getCause() != null && ClassNotFoundException.class.equals(re.getCause().getClass())) {
-                final String saxDriverProperty = System.getProperty("org.xml.sax.driver");
+                final String saxDriverProperty = System.getProperty(ORG_XML_SAX_DRIVER);
 
                 if (saxDriverProperty != null) {
-                    System.getProperty("org.xml.sax.driver", null);
+                    System.setProperty(ORG_XML_SAX_DRIVER, null);
                 }
 
                 xmlReader = XMLReaderFactory.createXMLReader();
