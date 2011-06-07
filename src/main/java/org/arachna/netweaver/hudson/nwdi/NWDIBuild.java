@@ -4,6 +4,7 @@
 package org.arachna.netweaver.hudson.nwdi;
 
 import static hudson.model.Result.FAILURE;
+import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.Build;
 import hudson.model.BuildListener;
@@ -154,7 +155,11 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
             // honor the cleanCopy property of NWDIProject
             for (final Compartment compartment : getDevelopmentConfiguration().getCompartments(CompartmentState.Source)) {
                 if (cleanCopy) {
-                    affectedComponents.addAll(compartment.getDevelopmentComponents());
+                    for (final DevelopmentComponent component : compartment.getDevelopmentComponents()) {
+                        component.setNeedsRebuild(true);
+                        affectedComponents.add(component);
+                    }
+                    // affectedComponents.addAll(compartment.getDevelopmentComponents());
                 }
                 else {
                     for (final DevelopmentComponent component : compartment.getDevelopmentComponents()) {
@@ -291,7 +296,7 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
             reporters.addAll(getProject().getPublishersList().toList());
 
             if (!preBuild(listener, project.getBuilders())) {
-                return FAILURE;
+                return Result.FAILURE;
             }
 
             if (!preBuild(listener, getProject().getPublishers())) {
@@ -341,6 +346,17 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
             // TODO: annotate build results with links to build.log files.
             final DcToolCommandExecutionResult result =
                 getDCToolExecutor(launcher).buildDevelopmentComponents(affectedComponents);
+
+            for (final DevelopmentComponent component : affectedComponents) {
+                FilePath buildXml =
+                    NWDIBuild.this.getWorkspace().child(
+                        String.format(".dtc/DCs/%s/%s/_comp/gen/default/logs/build.xml", component.getVendor(),
+                            component.getName()));
+                String content =
+                    buildXml.readToString().replaceFirst("project name=\"DC Build\"",
+                        String.format("project name=\"%s:%s\"", component.getVendor(), component.getName()));
+                buildXml.write(content, "UTF-8");
+            }
 
             updateSourceCodeLocations(logger);
 
