@@ -141,7 +141,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
         }
 
         final DtrConfigCreator configCreator =
-            new DtrConfigCreator(build.getWorkspace(), ((NWDIBuild)build).getDevelopmentConfiguration(), getConfDef());
+            new DtrConfigCreator(build.getWorkspace(), nwdiBuild.getDevelopmentConfiguration(), getConfDef());
 
         configCreator.execute();
 
