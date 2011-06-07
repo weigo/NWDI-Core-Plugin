@@ -79,7 +79,7 @@ public class AntHelper {
      *            development component to get the existing source folders for.
      * @return source folders that exist in the DCs directory structure.
      */
-    public Collection<File> getExistingSourceFolders(DevelopmentComponent component) {
+    private Collection<File> getExistingSourceFolders(DevelopmentComponent component, SourceDirectoryFilter filter) {
         Collection<File> sourceFolders = new ArrayList<File>();
         String componentBase = this.getBaseLocation(component);
 
@@ -87,7 +87,9 @@ public class AntHelper {
             File folder = this.getSourceFolderLocation(componentBase, sourceFolder);
 
             if (folder.exists()) {
-                sourceFolders.add(folder);
+                if (filter.accept(folder.getAbsolutePath())) {
+                    sourceFolders.add(folder);
+                }
             }
             else {
                 this.logger.append(String.format("Source folder %s does not exist in %s/%s!\n", folder.getName(),
@@ -107,7 +109,8 @@ public class AntHelper {
      */
     private File getSourceFolderLocation(final String componentBase, final String sourceFolder) {
         return new File(sourceFolder.replace('/', File.separatorChar));
-//        return new File(String.format("%s/%s", componentBase, sourceFolder).replace('/', File.separatorChar));
+        // return new File(String.format("%s/%s", componentBase,
+        // sourceFolder).replace('/', File.separatorChar));
     }
 
     /**
@@ -129,7 +132,14 @@ public class AntHelper {
                 FileSet fileSet = new FileSet();
                 // FIXME: use factory and consider type of DC and type of
                 // compartment
-                fileSet.setDir(new File(this.getBaseLocation(referencedDC)));
+                File referencedDcBaseLocation = new File(this.getBaseLocation(referencedDC));
+                if (!referencedDcBaseLocation.exists()) {
+                    this.logger.append(String.format("Referenced DC %s:%s does not exist in file system!\n",
+                        ppRef.getVendor(), ppRef.getComponentName()));
+                    continue;
+                }
+
+                fileSet.setDir(referencedDcBaseLocation);
                 fileSet.appendIncludes(new String[] { "**/*.jar", "**/*.par", "**/*.ear", "**/*.wda" });
                 path.addFileset(fileSet);
             }
@@ -176,9 +186,40 @@ public class AntHelper {
      */
     public Collection<FileSet> createSourceFileSets(DevelopmentComponent component, Collection<String> excludes,
         Collection<String> containsRegexpExcludes) {
+        /**
+         * An accept all source directories filter.
+         */
+        SourceDirectoryFilter filter = new SourceDirectoryFilter() {
+            /**
+             * accept all folderNames given.
+             *
+             * {@inheritDoc}
+             */
+            public boolean accept(String folderName) {
+                return true;
+            }
+        };
+        return createSourceFileSets(component, filter, excludes, containsRegexpExcludes);
+    }
+
+    /**
+     * Creates a collection of source file sets representing the source folders
+     * and the sources to in-/exclude.
+     *
+     * @param component
+     *            development component to create source file sets for.
+     * @param excludes
+     *            set of standard ant exclude expressions for file sets.
+     * @param containsRegexpExcludes
+     *            set of regular expressions that determine the files that
+     *            should be excluded from the source file sets based on their
+     *            content matching one of them
+     */
+    public Collection<FileSet> createSourceFileSets(DevelopmentComponent component, SourceDirectoryFilter filter,
+        Collection<String> excludes, Collection<String> containsRegexpExcludes) {
         Collection<FileSet> sources = new ArrayList<FileSet>();
 
-        for (final File srcFolder : this.getExistingSourceFolders(component)) {
+        for (final File srcFolder : this.getExistingSourceFolders(component, filter)) {
             final FileSet fileSet = new FileSet();
             fileSet.setDir(srcFolder);
             fileSet.setIncludes("**/*.java");
