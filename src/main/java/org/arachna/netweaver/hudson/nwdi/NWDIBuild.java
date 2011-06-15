@@ -216,18 +216,6 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
     }
 
     /**
-     * Returns a helper object for populating ant task with sources, class path,
-     * includes and excludes.
-     *
-     * @param logger
-     *            the logger to use for reporting message back to the build.
-     * @return a helper object for setting up ant tasks.
-     */
-    public AntHelper getAntHelper(final PrintStream logger) {
-        return new AntHelper(FilePathHelper.makeAbsolute(getWorkspace()), dcFactory, excludesFactory, logger);
-    }
-
-    /**
      * Returns a factory for generating ant excludes based on development
      * component type.
      *
@@ -293,6 +281,8 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
          */
         @Override
         protected Result doRun(final BuildListener listener) throws Exception {
+            AntHelper antHelper =
+                new AntHelper(FilePathHelper.makeAbsolute(getWorkspace()), dcFactory, excludesFactory);
             reporters.addAll(getProject().getPublishersList().toList());
 
             if (!preBuild(listener, project.getBuilders())) {
@@ -305,18 +295,22 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
 
             final PrintStream logger = listener.getLogger();
 
-            Result r = buildDevelopmentComponents(logger);
+            Result r = buildDevelopmentComponents(logger, antHelper);
 
-            if (!Result.FAILURE.equals(r) && !build(listener, project.getBuilders())) {
+            if (!Result.FAILURE.equals(r) && !build(listener, project.getBuilders(), antHelper)) {
                 r = FAILURE;
             }
 
             return r;
         }
 
-        private boolean build(final BuildListener listener, final Collection<Builder> steps) throws IOException,
-            InterruptedException {
+        private boolean build(final BuildListener listener, final Collection<Builder> steps, AntHelper antHelper)
+            throws IOException, InterruptedException {
             for (final BuildStep bs : steps) {
+                if (AntTaskBuilder.class.isAssignableFrom(bs.getClass())) {
+                    ((AntTaskBuilder)bs).setAntHelper(antHelper);
+                }
+
                 if (!perform(bs, listener)) {
                     return false;
                 }
@@ -334,7 +328,8 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
          * @throws IOException
          * @throws InterruptedException
          */
-        protected Result buildDevelopmentComponents(final PrintStream logger) throws IOException, InterruptedException {
+        protected Result buildDevelopmentComponents(final PrintStream logger, AntHelper antHelper) throws IOException,
+            InterruptedException {
             final Collection<DevelopmentComponent> affectedComponents =
                 NWDIBuild.this.getAffectedDevelopmentComponents();
             logger.append(String.format("Building %s development components.\n", affectedComponents.size()));
@@ -352,13 +347,15 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
                     NWDIBuild.this.getWorkspace().child(
                         String.format(".dtc/DCs/%s/%s/_comp/gen/default/logs/build.xml", component.getVendor(),
                             component.getName()));
-                String content =
-                    buildXml.readToString().replaceFirst("project name=\"DC Build\"",
-                        String.format("project name=\"%s:%s\"", component.getVendor(), component.getName()));
-                buildXml.write(content, "UTF-8");
+                if (buildXml.exists()) {
+                    String content =
+                        buildXml.readToString().replaceFirst("project name=\"DC Build\"",
+                            String.format("project name=\"%s:%s\"", component.getVendor(), component.getName()));
+                    buildXml.write(content, "UTF-8");
+                }
             }
 
-            updateSourceCodeLocations(logger);
+            updateSourceCodeLocations(logger, antHelper);
 
             return result.isExitCodeOk() ? null : Result.FAILURE;
         }
@@ -375,12 +372,11 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
          * @param logger
          *            Logger to report actions back to build.
          */
-        private void updateSourceCodeLocations(final PrintStream logger) {
-            final AntHelper antHelper = NWDIBuild.this.getAntHelper(logger);
+        private void updateSourceCodeLocations(final PrintStream logger, AntHelper antHelper) {
             Collection<Compartment> compartments =
                 NWDIBuild.this.getDevelopmentConfiguration().getCompartments(CompartmentState.Source);
-            for (Compartment compartment : compartments) {
 
+            for (Compartment compartment : compartments) {
                 for (final DevelopmentComponent component : compartment.getDevelopmentComponents()) {
                     final BuildLogParser parser = new BuildLogParser(antHelper.getBaseLocation(component));
                     parser.parse();
