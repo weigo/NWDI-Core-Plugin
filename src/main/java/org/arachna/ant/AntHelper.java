@@ -4,13 +4,14 @@
 package org.arachna.ant;
 
 import java.io.File;
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
 
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.types.FileSet;
 import org.apache.tools.ant.types.Path;
+import org.apache.tools.ant.types.Reference;
+import org.apache.tools.ant.types.ResourceCollection;
 import org.apache.tools.ant.types.selectors.ContainsRegexpSelector;
 import org.apache.tools.ant.types.selectors.FileSelector;
 import org.apache.tools.ant.types.selectors.NotSelector;
@@ -30,6 +31,8 @@ public class AntHelper {
      */
     private static final String BASE_PATH_TEMPLATE = "%s/.dtc/DCs/%s/%s/_comp/";
 
+    private final Project project = new Project();
+
     /**
      * registry for development components.
      */
@@ -38,12 +41,7 @@ public class AntHelper {
     /**
      * workspace where build takes place.
      */
-    private final String pathToWorkspace;
-
-    /**
-     * Logger.
-     */
-    private final PrintStream logger;
+    private final transient String pathToWorkspace;
 
     /**
      * Factory for generating file set excludes from development component type.
@@ -60,15 +58,12 @@ public class AntHelper {
      * @param excludesFactory
      *            factory for generating file set excludes from development
      *            component type.
-     * @param logger
-     *            logger
      */
     public AntHelper(final String pathToWorkspace, final DevelopmentComponentFactory dcFactory,
-        final ExcludesFactory excludeFactory, final PrintStream logger) {
+        final ExcludesFactory excludeFactory) {
         this.pathToWorkspace = pathToWorkspace;
         this.dcFactory = dcFactory;
         this.excludeFactory = excludeFactory;
-        this.logger = logger;
     }
 
     /**
@@ -86,14 +81,8 @@ public class AntHelper {
         for (String sourceFolder : component.getSourceFolders()) {
             File folder = this.getSourceFolderLocation(componentBase, sourceFolder);
 
-            if (folder.exists()) {
-                if (filter.accept(folder.getAbsolutePath())) {
-                    sourceFolders.add(folder);
-                }
-            }
-            else {
-                this.logger.append(String.format("Source folder %s does not exist in %s/%s!\n", folder.getName(),
-                    component.getVendor(), component.getName()));
+            if (folder.exists() && filter.accept(folder.getAbsolutePath())) {
+                sourceFolders.add(folder);
             }
         }
 
@@ -122,34 +111,67 @@ public class AntHelper {
      * @param component
      *            development component the ant class path shall be created for.
      */
-    public Path createClassPath(Project project, DevelopmentComponent component) {
+    public Path createClassPath(DevelopmentComponent component) {
         Path path = new Path(project);
 
         for (PublicPartReference ppRef : component.getUsedDevelopmentComponents()) {
             DevelopmentComponent referencedDC = this.dcFactory.get(ppRef.getVendor(), ppRef.getComponentName());
 
             if (referencedDC != null) {
-                FileSet fileSet = new FileSet();
                 // FIXME: use factory and consider type of DC and type of
                 // compartment
-                File referencedDcBaseLocation = new File(this.getBaseLocation(referencedDC));
-                if (!referencedDcBaseLocation.exists()) {
-                    this.logger.append(String.format("Referenced DC %s:%s does not exist in file system!\n",
-                        ppRef.getVendor(), ppRef.getComponentName()));
+                File baseDir = new File(this.getBaseLocation(referencedDC, ppRef.getName()));
+
+                if (!baseDir.exists()) {
                     continue;
                 }
 
-                fileSet.setDir(referencedDcBaseLocation);
-                fileSet.appendIncludes(new String[] { "**/*.jar", "**/*.par", "**/*.ear", "**/*.wda" });
-                path.addFileset(fileSet);
-            }
-            else {
-                this.logger.append(String.format("Referenced DC %s:%s not found in DC factory!\n", ppRef.getVendor(),
-                    ppRef.getComponentName()));
+                path.add(this.getOrCreatePath(ppRef, baseDir));
             }
         }
 
         return path;
+    }
+
+    /**
+     * Get an already existing path to the artifacts defined by the given public
+     * part reference and the base directory (of this public part) pointed to by
+     * <code>baseDir</code>.
+     *
+     * @param ppRef
+     *            reference to a development components public part.
+     * @param baseDir
+     *            the base folder where the referenced DC is situated.
+     *
+     * @return a path to the jar files making up the given public part.
+     */
+    Path getOrCreatePath(PublicPartReference ppRef, File baseDir) {
+        String refId = String.format("%s:%s:%s", ppRef.getVendor(), ppRef.getComponentName(), ppRef.getName());
+        Path referencedPath = (Path)this.project.getReference(refId);
+
+        if (referencedPath == null) {
+            referencedPath = new Path(project);
+            FileSet fileSet = new FileSet();
+            fileSet.setDir(baseDir);
+            fileSet.appendIncludes(new String[] { "**/*.jar" });
+            referencedPath.addFileset(fileSet);
+
+            project.addReference(refId, referencedPath);
+        }
+
+        return referencedPath;
+    }
+
+    /**
+     * @param referencedDC
+     * @param name
+     * @return
+     */
+    private String getBaseLocation(DevelopmentComponent referencedDC, String name) {
+        String baseLocation = this.getBaseLocation(referencedDC);
+
+        return name != null ? String.format("%s/gen/default/public/%s/lib/java", baseLocation, name) : String.format(
+            "%s/gen/default/public/lib/java", baseLocation);
     }
 
     /**
@@ -199,6 +221,7 @@ public class AntHelper {
                 return true;
             }
         };
+
         return createSourceFileSets(component, filter, excludes, containsRegexpExcludes);
     }
 
@@ -232,11 +255,19 @@ public class AntHelper {
             FileSelector createContainsRegexpSelectors = this.createContainsRegexpSelectors(containsRegexpExcludes);
 
             for (FileSet sourceFiles : sources) {
+                sourceFiles.setProject(project);
                 sourceFiles.add(createContainsRegexpSelectors);
             }
         }
 
         return sources;
+    }
+
+    /**
+     * @return the project
+     */
+    public Project getProject() {
+        return project;
     }
 
     private FileSelector createContainsRegexpSelectors(Collection<String> containsRegexpExcludes) {
