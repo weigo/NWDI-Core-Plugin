@@ -34,17 +34,17 @@ public final class DCToolCommandExecutor {
     /**
      * constant for environment variable 'JDK_PROPERTY_NAME'.
      */
-    protected static final String JDK_PROPERTY_NAME = "JDK_PROPERTY_NAME";
+    static final String JDK_PROPERTY_NAME = "JDK_PROPERTY_NAME";
 
     /**
      * constant for environment variable 'JAVA_HOME'.
      */
-    protected static final String JAVA_HOME = "JAVA_HOME";
+    static final String JAVA_HOME = "JAVA_HOME";
 
     /**
      * constant for environment variable 'NWDITOOLLIB'.
      */
-    protected static final String NWDITOOLLIB = "NWDITOOLLIB";
+    static final String NWDITOOLLIB = "NWDITOOLLIB";
 
     /**
      * 1000 milliseconds.
