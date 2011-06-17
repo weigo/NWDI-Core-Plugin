@@ -10,8 +10,6 @@ import java.util.Collection;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.types.FileSet;
 import org.apache.tools.ant.types.Path;
-import org.apache.tools.ant.types.Reference;
-import org.apache.tools.ant.types.ResourceCollection;
 import org.apache.tools.ant.types.selectors.ContainsRegexpSelector;
 import org.apache.tools.ant.types.selectors.FileSelector;
 import org.apache.tools.ant.types.selectors.NotSelector;
@@ -167,9 +165,16 @@ public class AntHelper {
      * @param name
      * @return
      */
-    private String getBaseLocation(DevelopmentComponent referencedDC, String name) {
-        String baseLocation = this.getBaseLocation(referencedDC);
+    public String getBaseLocation(DevelopmentComponent referencedDC, String name) {
+        return getPublicPartLocation(this.getBaseLocation(referencedDC), name);
+    }
 
+    /**
+     * @param name
+     * @param baseLocation
+     * @return
+     */
+    private String getPublicPartLocation(String baseLocation, String name) {
         return name != null ? String.format("%s/gen/default/public/%s/lib/java", baseLocation, name) : String.format(
             "%s/gen/default/public/lib/java", baseLocation);
     }
@@ -191,6 +196,20 @@ public class AntHelper {
      */
     public String getBaseLocation(DevelopmentComponent component) {
         return String.format(BASE_PATH_TEMPLATE, this.pathToWorkspace, component.getVendor(), component.getName());
+    }
+
+    /**
+     * Get the location of a development components public part in workspace.
+     *
+     * @param ppRef reference to public part
+     * @return
+     */
+    public String getLocation(PublicPartReference ppRef) {
+        return getPublicPartLocation(this.getBaseLocation(ppRef.getVendor(), ppRef.getComponentName()), ppRef.getName());
+    }
+
+    private String getBaseLocation(String vendor, String name) {
+        return String.format(BASE_PATH_TEMPLATE, this.pathToWorkspace, vendor, name);
     }
 
     /**
@@ -247,7 +266,7 @@ public class AntHelper {
             fileSet.setDir(srcFolder);
             fileSet.setIncludes("**/*.java");
             fileSet.appendExcludes(this.excludeFactory.create(component, excludes));
-
+            fileSet.setProject(project);
             sources.add(fileSet);
         }
 
@@ -255,7 +274,6 @@ public class AntHelper {
             FileSelector createContainsRegexpSelectors = this.createContainsRegexpSelectors(containsRegexpExcludes);
 
             for (FileSet sourceFiles : sources) {
-                sourceFiles.setProject(project);
                 sourceFiles.add(createContainsRegexpSelectors);
             }
         }
