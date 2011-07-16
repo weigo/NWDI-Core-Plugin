@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.arachna.netweaver</groupId>
     <artifactId>NWDI-pom-Plugin</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
   </parent>
 
   <groupId>org.arachna.netweaver</groupId>
