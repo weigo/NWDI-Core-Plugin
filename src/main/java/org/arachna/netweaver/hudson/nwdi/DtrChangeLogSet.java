@@ -17,7 +17,7 @@ import org.kohsuke.stapler.export.ExportedBean;
 
 /**
  * A log of a set of changes in the DTR.
- * 
+ *
  * @author G526521
  */
 @ExportedBean(defaultVisibility = 999)
@@ -25,11 +25,11 @@ public final class DtrChangeLogSet extends ChangeLogSet<DtrChangeLogEntry> {
     /**
      * Entries in the change log.
      */
-    Collection<DtrChangeLogEntry> entries = new ArrayList<DtrChangeLogEntry>();
+    private Collection<DtrChangeLogEntry> entries = new ArrayList<DtrChangeLogEntry>();
 
     /**
      * Creat an instance of a <code>DtrChangeLogSet</code>.
-     * 
+     *
      * @param build
      *            the build for which to create the change log.
      * @param activities
@@ -45,7 +45,7 @@ public final class DtrChangeLogSet extends ChangeLogSet<DtrChangeLogEntry> {
 
     /**
      * Convenience constructor using only the build.
-     * 
+     *
      * @param build
      *            the build for which to create the change log.
      */
