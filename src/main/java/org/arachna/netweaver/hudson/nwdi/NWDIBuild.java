@@ -349,8 +349,10 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
                             component.getName()));
                 if (buildXml.exists()) {
                     String content =
-                        buildXml.readToString().replaceFirst("project name=\"DC Build\"",
-                            String.format("project name=\"%s:%s\"", component.getVendor(), component.getName()));
+                        buildXml.readToString().replaceFirst(
+                            "project name=\"DC Build\"",
+                            String.format("project name=\"%s~%s\"", component.getVendor(),
+                                component.getName().replace('/', '~')));
                     buildXml.write(content, "UTF-8");
                 }
             }
