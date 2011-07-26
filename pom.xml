@@ -10,7 +10,7 @@
   <groupId>org.arachna.netweaver</groupId>
   <artifactId>NWDI-Core-Plugin</artifactId>
   <name>NWDI-Core-Plugin</name>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0</version>
   <packaging>hpi</packaging>
 
   <description>Hudson plugin for interfacing with a NetWeaver Development Infrastructure CBS and DTR. Allows for polling the DTR for
