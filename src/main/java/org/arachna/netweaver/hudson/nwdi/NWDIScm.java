@@ -143,9 +143,14 @@ public class NWDIScm extends SCM {
 
             if (!result.isExitCodeOk()) {
                 final String output = result.getOutput();
+
+                if (output.contains("Unable to sync local path")) {
+                    // some of the affected DCs could not be synchronized. This
+                    // should abort the build.
+                }
                 // FIXME: make heap used for dctool configurable!
                 // ignore OutOfMemoryError on exit from dctool
-                if (output.contains("java.lang.OutOfMemoryError") && output.contains("java.lang.System.exit")
+                else if (output.contains("java.lang.OutOfMemoryError") && output.contains("java.lang.System.exit")
                     && output.contains("com.sap.tc.devconf.dctool.startup.DCToolMain.main")) {
                     result = new DcToolCommandExecutionResult(output, 0);
                 }
