@@ -1,9 +1,10 @@
 /**
  *
  */
-package org.arachna.netweaver.dctool;
+package org.arachna.netweaver.dctool.commands;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.arachna.netweaver.dc.types.Compartment;
@@ -14,7 +15,7 @@ import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
  *
  * @author Dirk Weigenand
  */
-final class ListDcCommandBuilder extends AbstractDCToolCommandBuilder {
+abstract class ListDcCommandBuilder extends AbstractDCToolCommandBuilder {
 
     /**
      * Create an instance of 'listdc' command generator for the given
@@ -35,13 +36,25 @@ final class ListDcCommandBuilder extends AbstractDCToolCommandBuilder {
      */
     @Override
     protected List<String> executeInternal() {
-        final List<String> commands = new ArrayList<String>();
+        final Collection<Compartment> compartments = this.getDevelopmentConfiguration().getCompartments();
+        final List<String> commands = new ArrayList<String>(compartments.size());
 
-
-        for (final Compartment compartment : this.getDevelopmentConfiguration().getCompartments()) {
-            commands.add(String.format("listdcs -s %s;", compartment.getName()));
+        for (final Compartment compartment : compartments) {
+            commands.add(this.getListDcCommand(compartment));
         }
+
+        commands.add(getExitCommand());
 
         return commands;
     }
+
+    /**
+     * Create a listdc command.
+     *
+     * @param compartment
+     *            the compartment to list DCs from.
+     *
+     * @return the create listdc command
+     */
+    abstract String getListDcCommand(Compartment compartment);
 }

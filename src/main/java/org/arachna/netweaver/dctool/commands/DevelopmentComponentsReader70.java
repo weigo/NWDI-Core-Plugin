@@ -1,4 +1,4 @@
-package org.arachna.netweaver.hudson.nwdi;
+package org.arachna.netweaver.dctool.commands;
 
 import java.io.EOFException;
 import java.io.IOException;
@@ -18,7 +18,7 @@ import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
  * 
  * @author Dirk Weigenand
  */
-public final class DevelopmentComponentsReader extends AbstractDcToolOutputReader {
+public final class DevelopmentComponentsReader70 extends AbstractDcToolOutputReader {
     /**
      * regexp for a compartment.
      */
@@ -61,7 +61,7 @@ public final class DevelopmentComponentsReader extends AbstractDcToolOutputReade
      * @param developmentConfiguration
      *            development configuration to use and update.
      */
-    public DevelopmentComponentsReader(final Reader input, final DevelopmentComponentFactory dcFactory,
+    public DevelopmentComponentsReader70(final Reader input, final DevelopmentComponentFactory dcFactory,
         final DevelopmentConfiguration developmentConfiguration) {
         super(input);
         this.dcFactory = dcFactory;

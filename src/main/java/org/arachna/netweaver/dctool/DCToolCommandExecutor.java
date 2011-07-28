@@ -14,6 +14,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.io.StringReader;
 import java.util.Collection;
 import java.util.HashMap;
@@ -23,11 +24,13 @@ import java.util.Map;
 import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
-import org.arachna.netweaver.hudson.nwdi.DevelopmentComponentsReader;
+import org.arachna.netweaver.dctool.commands.CommandFactory;
+import org.arachna.netweaver.dctool.commands.DCToolCommandBuilder;
+import org.arachna.netweaver.dctool.commands.DevelopmentComponentsReader70;
 
 /**
  * Execute a DC Tool.
- * 
+ *
  * @author Dirk Weigenand
  */
 public final class DCToolCommandExecutor {
@@ -77,9 +80,19 @@ public final class DCToolCommandExecutor {
     private final DCToolDescriptor dcToolDescriptor;
 
     /**
+     * Logger.
+     */
+    private final PrintStream logger;
+
+    /**
+     * Factory for creating DC tool commands.
+     */
+    private CommandFactory commandFactory = new CommandFactory();
+
+    /**
      * create DC tool executor with the given command line generator and given
      * command build.
-     * 
+     *
      * @param launcher
      *            the launcher to use executing the DC tool.
      * @param workspace
@@ -96,11 +109,12 @@ public final class DCToolCommandExecutor {
         this.workspace = workspace;
         this.dcToolDescriptor = dcToolDescriptor;
         this.developmentConfiguration = developmentConfiguration;
+        this.logger = launcher.getListener().getLogger();
     }
 
     /**
      * Execute dc tool with the given {@link DCToolCommandBuilder}.
-     * 
+     *
      * @param commandBuilder
      *            builder for dc tool commands
      * @return content of log file created by the executed dc tool.
@@ -121,6 +135,11 @@ public final class DCToolCommandExecutor {
             starter.pwd(workspace);
             starter.envs(createEnvironment());
             starter.cmds(createDcToolCommand(launcher.isUnix(), null));
+
+            commands.addAll(0,
+                this.commandFactory.createLoadConfigCommandBuilder(developmentConfiguration, dcToolDescriptor)
+                    .execute());
+
             starter.stdin(createCommandInputStream(commands));
             final ForkOutputStream tee = new ForkOutputStream(launcher.getListener().getLogger(), result);
             starter.stdout(tee);
@@ -132,7 +151,7 @@ public final class DCToolCommandExecutor {
 
     /**
      * List development components in the development configuration.
-     * 
+     *
      * @return the result of the listdc-command operation.
      * @throws IOException
      *             might be thrown be the {@link ProcStarter} used to execute
@@ -143,14 +162,12 @@ public final class DCToolCommandExecutor {
     public DcToolCommandExecutionResult listDevelopmentComponents(final DevelopmentComponentFactory dcFactory)
         throws IOException, InterruptedException {
         final long startListDcs = System.currentTimeMillis();
-        launcher
-            .getListener()
-            .getLogger()
-            .append(
-                String.format("Reading development components for %s from NWDI.\n", developmentConfiguration.getName()));
-        final DcToolCommandExecutionResult result = execute(new ListDcCommandBuilder(developmentConfiguration));
-        new DevelopmentComponentsReader(new StringReader(result.getOutput()), dcFactory, developmentConfiguration)
-            .read();
+        this.logger.append(String.format("Reading development components for %s from NWDI.\n",
+            developmentConfiguration.getName()));
+        final DcToolCommandExecutionResult result =
+            execute(this.commandFactory.createListDevelopmentComponentsCommandBuilder(developmentConfiguration));
+        this.commandFactory.getListDcCommandResultReader(new StringReader(result.getOutput()), dcFactory,
+            developmentConfiguration).read();
         duration(startListDcs, String.format("Read %s development components from NWDI", dcFactory.getAll().size()));
 
         return result;
@@ -158,7 +175,7 @@ public final class DCToolCommandExecutor {
 
     /**
      * Synchronize development configurations in the development configuration.
-     * 
+     *
      * @param cleanCopy
      *            indicate whether to synchronize all DCs or only DCs marked as
      *            needing a rebuild.
@@ -169,19 +186,19 @@ public final class DCToolCommandExecutor {
      * @throws InterruptedException
      *             when the user canceled the action.
      */
-    public DcToolCommandExecutionResult synchronizeDevelopmentComponents(final boolean cleanCopy) throws IOException,
-        InterruptedException {
+    public DcToolCommandExecutionResult synchronizeDevelopmentComponents() throws IOException, InterruptedException {
         final long startSyncDCs = System.currentTimeMillis();
-        launcher.getListener().getLogger().append("Synchronizing development components from NWDI.\n");
+        this.logger.append("Synchronizing development components from NWDI.\n");
         final DcToolCommandExecutionResult result =
-            execute(new SyncDevelopmentComponentsCommandBuilder(developmentConfiguration, cleanCopy));
+            execute(this.commandFactory.createSyncDevelopmentComponentsCommandBuilder(developmentConfiguration));
         duration(startSyncDCs, "Done synchronizing development components from NWDI.\n");
+
         return result;
     }
 
     /**
      * Build the given development components.
-     * 
+     *
      * @param affectedComponents
      *            development components to build.
      * @return the result of the builddc operation.
@@ -195,8 +212,8 @@ public final class DCToolCommandExecutor {
         final Collection<DevelopmentComponent> affectedComponents) throws IOException, InterruptedException {
         final long start = System.currentTimeMillis();
         final DcToolCommandExecutionResult result =
-            execute(new BuildDevelopmentComponentsCommandBuilder(developmentConfiguration, affectedComponents, launcher
-                .getListener().getLogger()));
+            execute(this.commandFactory.createBuildDevelopmentComponentsCommandBuilder(developmentConfiguration,
+                affectedComponents));
         duration(start, "Done building development components");
 
         return result;
@@ -204,29 +221,24 @@ public final class DCToolCommandExecutor {
 
     /**
      * Create an <code>InputStream</code> containing the given dc tool commands.
-     * 
+     *
      * @param commands
      *            list of dc tool commands
      * @return <code>InputStream</code> containing the given dc tool commands.
      */
     private InputStream createCommandInputStream(final List<String> commands) {
         final StringBuilder cmds = new StringBuilder();
-        cmds.append("exectime -m on;\n");
-        cmds.append(String.format(LOAD_CONFIG_COMMAND, dcToolDescriptor.getUser(), dcToolDescriptor.getPassword(),
-            dcToolDescriptor.getDtrDirectory(), ".dtc"));
 
         for (final String cmd : commands) {
             cmds.append(cmd).append('\n');
         }
-
-        cmds.append("exit;\n");
 
         return new ByteArrayInputStream(cmds.toString().getBytes());
     }
 
     /**
      * Creates the command line for dctool execution.
-     * 
+     *
      * @param isUnix
      *            indicate whether to run on a unixoid OS or Windows.
      * @param commandFile
@@ -249,7 +261,7 @@ public final class DCToolCommandExecutor {
 
     /**
      * Generate the fully qualified command to be used to execute the dc tool.
-     * 
+     *
      * @param isUnix
      *            indicate whether the platform to run on is Unix(oid) or
      *            Windows.
@@ -264,27 +276,25 @@ public final class DCToolCommandExecutor {
 
     /**
      * Generate platform dependent path to dc tool.
-     * 
+     *
      * @return platform dependent path to dc tool.
      */
     protected String getDcToolPath() {
         final File libraryFolder = new File(dcToolDescriptor.getNwdiToolLibrary());
-        final File parent = libraryFolder.getParentFile();
+        // final File parent = libraryFolder.getParentFile();
 
-        return String.format("%s%cdc", parent.getAbsolutePath(), File.separatorChar);
+        return String.format("%s%cdc", libraryFolder.getAbsolutePath(), File.separatorChar);
     }
 
     /**
      * Prepare the environment variables for the launcher.
-     * 
+     *
      * @return the map containing the environment variable name mapping to their
      *         corresponding values.
      */
     protected Map<String, String> createEnvironment() {
         final Map<String, String> environment = new HashMap<String, String>();
-        // FIXME: get NWDITOOLLIB depending on JdkHomeAlias (1.3.1, 1.4.2 use
-        // old DC tool, 1.5.0, 1.6.0, ... use new DC tool)
-        environment.put(NWDITOOLLIB, dcToolDescriptor.getNwdiToolLibrary());
+        environment.put(NWDITOOLLIB, dcToolDescriptor.getNwdiToolLibrary() + File.separatorChar + "lib");
 
         final JdkHomeAlias alias = developmentConfiguration.getJdkHomeAlias();
 
@@ -299,7 +309,7 @@ public final class DCToolCommandExecutor {
     /**
      * Determine the time in seconds passed since the given start time and log
      * it using the message given.
-     * 
+     *
      * @param start
      *            begin of action whose duration should be logged.
      * @param message

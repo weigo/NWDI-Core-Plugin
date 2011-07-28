@@ -16,6 +16,10 @@
       <f:textbox clazz="required" name="NWDIPlugin.nwdiToolLibFolder" value="${descriptor.nwdiToolLibFolder}"
         checkUrl="'descriptorByName/NWDIProject/nwdiToolLibFolderCheck?value='+escape(this.value)" />
     </f:entry>
+    <f:entry title="${%NWDI tool library location}" description="${%Enter the location of your NWDI tool library folder.}" help="/plugin/NWDI-Core-Plugin/help-nwdiToolLibFolder.html">
+      <f:textbox clazz="required" name="NWDIPlugin.nwdiToolLibFolder71" value="${descriptor.nwdiToolLibFolder71}"
+        checkUrl="'descriptorByName/NWDIProject/nwdiToolLibFolder71Check?value='+escape(this.value)" />
+    </f:entry>
     <f:entry title="JDK_HOME_PATHS" description="${%Enter the locations of the JDKs that are to be used for building your tracks.}"
       help="/plugin/NWDI-Core-Plugin/help-jdkHomes.html">
       <f:textbox name="NWDIPlugin.jdkHomePaths" value="${descriptor.jdkHomePaths}"

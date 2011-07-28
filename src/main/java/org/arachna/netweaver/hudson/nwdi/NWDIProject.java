@@ -34,7 +34,7 @@ import org.kohsuke.stapler.StaplerResponse;
 
 /**
  * A project for building tracks residing in a NWDI.
- * 
+ *
  * @author Dirk Weigenand
  */
 public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopLevelItem {
@@ -68,7 +68,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
 
     /**
      * Create an instance of a NWDI project.
-     * 
+     *
      * @param parent
      *            the parent <code>ItemGroup</code> in the project configuration
      *            page.
@@ -82,7 +82,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
     /**
      * Create an instance of a NWDI project using the given project name and
      * configuration.
-     * 
+     *
      * @param name
      *            project name
      * @param confDef
@@ -123,7 +123,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see hudson.model.AbstractProject#checkout(hudson.model.AbstractBuild,
      * hudson.Launcher, hudson.model.BuildListener, java.io.File)
      */
@@ -157,7 +157,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
 
     /**
      * Returns the SCM to be used by this NWDI project.
-     * 
+     *
      * @return SCM to be used by this NWDI project.
      */
     @Override
@@ -190,7 +190,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
     /**
      * Descriptor for NWDIProjects. Contains the global configuration commonly
      * used for different NWDI tracks.
-     * 
+     *
      * @author Dirk Weigenand
      */
     public static class DescriptorImpl extends AbstractProjectDescriptor {
@@ -208,6 +208,11 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
          * Constant for nwdi tool libraries folder request parameter.
          */
         protected static final String TOOL_LIB_FOLDER = "NWDIPlugin.nwdiToolLibFolder";
+
+        /**
+         * Constant for nwdi tool libraries folder request parameter.
+         */
+        protected static final String TOOL_LIB_FOLDER71 = "NWDIPlugin.nwdiToolLibFolder71";
 
         /**
          * Constant for JDK home paths request parameter.
@@ -235,6 +240,11 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
         private String nwdiToolLibFolder;
 
         /**
+         * folder where the NWDI tool library files are stored.
+         */
+        private String nwdiToolLibFolder71;
+
+        /**
          * 'JDK_HOME_PATHS'.
          */
         private String jdkHomePaths;
@@ -249,7 +259,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
 
         /**
          * Returns the user for authentication against the NWDI.
-         * 
+         *
          * @return the user for authentication against the NWDI
          */
         public String getUser() {
@@ -258,7 +268,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
 
         /**
          * Sets the user for authentication against the NWDI.
-         * 
+         *
          * @param user
          *            the user for authentication against the NWDI.
          */
@@ -282,24 +292,47 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
         }
 
         /**
-         * @return the nwdiToolLibFolder
+         * Get the folder of the DI tools for NetWeaver 7.0 and before.
+         *
+         * @return the folder of the DI tools for NetWeaver 7.0 and before.
          */
         public String getNwdiToolLibFolder() {
             return nwdiToolLibFolder;
         }
 
         /**
+         * Set the folder of the DI tools for NetWeaver 7.0 and before.
+         *
          * @param nwdiToolLibFolder
-         *            the nwdiToolLibFolder to set
+         *            the folder of the DI tools for NetWeaver 7.0 and before.
          */
         public void setNwdiToolLibFolder(final String nwdiToolLibFolder) {
             this.nwdiToolLibFolder = nwdiToolLibFolder;
         }
 
         /**
+         * Get the folder of the DI tools for NetWeaver 7.1 and later.
+         *
+         * @return the folder of the DI tools for NetWeaver 7.1 and later.
+         */
+        public String getNwdiToolLibFolder71() {
+            return nwdiToolLibFolder71;
+        }
+
+        /**
+         * Get the folder of the DI tools for NetWeaver 7.1 and later.
+         *
+         * @param nwdiToolLibFolder
+         *            the folder of the DI tools for NetWeaver 7.1 and later.
+         */
+        public void setNwdiToolLibFolder71(final String nwdiToolLibFolder) {
+            this.nwdiToolLibFolder71 = nwdiToolLibFolder;
+        }
+
+        /**
          * Returns the paths to JDK installations to be used for building
          * tracks.
-         * 
+         *
          * @return the paths to JDK installations to be used for building
          *         tracks.
          */
@@ -309,7 +342,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
 
         /**
          * Set the paths to JDK installations to be used for building tracks.
-         * 
+         *
          * @param jdkHomePaths
          *            the paths to JDK installations to be used for building
          *            tracks.
@@ -320,7 +353,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
 
         /*
          * (non-Javadoc)
-         * 
+         *
          * @see
          * hudson.model.Descriptor#configure(org.kohsuke.stapler.StaplerRequest,
          * net.sf.json.JSONObject)
@@ -329,6 +362,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
         public boolean configure(final StaplerRequest req, final JSONObject json) throws FormException {
             jdkHomePaths = Util.fixNull(json.getString("jdkHomePaths"));
             nwdiToolLibFolder = Util.fixNull(json.getString("nwdiToolLibFolder"));
+            nwdiToolLibFolder71 = Util.fixNull(json.getString("nwdiToolLibFolder71"));
             user = Util.fixNull(json.getString("user"));
             password = Util.fixNull(json.getString("password"));
 
@@ -339,12 +373,31 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
 
         /**
          * Validate the 'NwdiToolLibFolder' parameter.
-         * 
+         *
          * @param value
          *            the form value for the 'NwdiToolLibFolder' field.
          * @return the form validation value.
          */
         public FormValidation doNwdiToolLibFolderCheck(@QueryParameter final String value) {
+            return validateNwdiToolLibraryFolder(value);
+        }
+
+        /**
+         * Validate the 'NwdiToolLibFolder' parameter.
+         *
+         * @param value
+         *            the form value for the 'NwdiToolLibFolder' field.
+         * @return the form validation value.
+         */
+        public FormValidation doNwdiToolLibFolder71Check(@QueryParameter final String value) {
+            return validateNwdiToolLibraryFolder(value);
+        }
+
+        /**
+         * @param value
+         * @return
+         */
+        private FormValidation validateNwdiToolLibraryFolder(final String value) {
             FormValidation result = FormValidation.ok();
             final String nwdiToolLibFolder = Util.fixEmptyAndTrim(value);
 
@@ -378,7 +431,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
         /**
          * Validate that the given <code>FilePath</code> contains a 'dc' sub
          * folder.
-         * 
+         *
          * @param folder
          *            the 'tools' folder of a NWDI tool library installation.
          * @return the validation result <code>FormValidation.ok()</code> when
@@ -396,7 +449,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
 
         /**
          * Validate the given JdkHomePath.
-         * 
+         *
          * @param value
          *            path to a JDK.
          * @return the result of the validation.
@@ -421,7 +474,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
 
         /**
          * Validate the 'user' parameter.
-         * 
+         *
          * @param value
          *            the form value for the 'user' field.
          * @return the form validation value.
@@ -433,7 +486,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
 
         /**
          * Validate the 'password' parameter.
-         * 
+         *
          * @param value
          *            the form value for the 'password' field.
          * @return the form validation value.
@@ -445,7 +498,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
 
         /**
          * Returns the path mappings for the configured JDK homes.
-         * 
+         *
          * @return path mappings for the configured JDK homes.
          */
         JdkHomePaths getConfiguredJdkHomePaths() {
@@ -480,7 +533,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
 
     /**
      * Set the content of the '.confdef' configuration file.
-     * 
+     *
      * @param confDef
      *            content of the '.confdef' configuration file.
      */
@@ -490,7 +543,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
 
     /**
      * Return the content of the '.confdef' configuration file.
-     * 
+     *
      * @return the content of the '.confdef' configuration file.
      */
     public String getConfDef() {
@@ -499,7 +552,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
 
     /**
      * Return whether the workspace should be cleaned before building.
-     * 
+     *
      * @return whether the workspace should be cleaned before building (
      *         <code>true</code> yes, leave it as it is otherwise).
      */
@@ -509,7 +562,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
 
     /**
      * Indicate whether the workspace should be cleaned before building.
-     * 
+     *
      * @param cleanCopy
      *            whether the workspace should be cleaned before building (
      *            <code>true</code> yes, leave it as it is otherwise).

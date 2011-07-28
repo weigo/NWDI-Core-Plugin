@@ -32,6 +32,7 @@ import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 import org.arachna.netweaver.dctool.DCToolCommandExecutor;
 import org.arachna.netweaver.dctool.DCToolDescriptor;
 import org.arachna.netweaver.dctool.DcToolCommandExecutionResult;
+import org.arachna.netweaver.dctool.JdkHomeAlias;
 import org.arachna.netweaver.hudson.dtr.browser.Activity;
 import org.arachna.netweaver.hudson.dtr.browser.ActivityResource;
 import org.arachna.netweaver.hudson.nwdi.confdef.ConfDefReader;
@@ -154,18 +155,9 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
 
             // honor the cleanCopy property of NWDIProject
             for (final Compartment compartment : getDevelopmentConfiguration().getCompartments(CompartmentState.Source)) {
-                if (cleanCopy) {
-                    for (final DevelopmentComponent component : compartment.getDevelopmentComponents()) {
-                        component.setNeedsRebuild(true);
+                for (final DevelopmentComponent component : compartment.getDevelopmentComponents()) {
+                    if (component.isNeedsRebuild()) {
                         affectedComponents.add(component);
-                    }
-                    // affectedComponents.addAll(compartment.getDevelopmentComponents());
-                }
-                else {
-                    for (final DevelopmentComponent component : compartment.getDevelopmentComponents()) {
-                        if (component.isNeedsRebuild()) {
-                            affectedComponents.add(component);
-                        }
                     }
                 }
             }
@@ -245,11 +237,24 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
     DCToolCommandExecutor getDCToolExecutor(final Launcher launcher) {
         if (dcToolExecutor == null) {
             final NWDIProject.DescriptorImpl descriptor = getParent().getDescriptor();
+            final DevelopmentConfiguration configuration = getDevelopmentConfiguration();
+            final JdkHomeAlias alias = configuration.getJdkHomeAlias();
+            String nwdiToolLibraryFolder = "";
+
+            if (JdkHomeAlias.Jdk131Home.equals(alias) || JdkHomeAlias.Jdk142Home.equals(alias)) {
+                nwdiToolLibraryFolder = descriptor.getNwdiToolLibFolder();
+            }
+            else if (JdkHomeAlias.Jdk150Home.equals(alias) || JdkHomeAlias.Jdk160Home.equals(alias)) {
+                nwdiToolLibraryFolder = descriptor.getNwdiToolLibFolder71();
+            }
+            else {
+                throw new RuntimeException(String.format("Cannot map JdkHomeAlias '%s' onto a NWDITOOLLIB folder.", alias));
+            }
+
             final DCToolDescriptor dcToolDescriptor =
-                new DCToolDescriptor(descriptor.getUser(), descriptor.getPassword(), descriptor.getNwdiToolLibFolder(),
-                    getWorkspace().child(".dtr").getName(), descriptor.getConfiguredJdkHomePaths());
-            dcToolExecutor =
-                new DCToolCommandExecutor(launcher, getWorkspace(), dcToolDescriptor, getDevelopmentConfiguration());
+                new DCToolDescriptor(descriptor.getUser(), descriptor.getPassword(), nwdiToolLibraryFolder,
+                    descriptor.getConfiguredJdkHomePaths());
+            dcToolExecutor = new DCToolCommandExecutor(launcher, getWorkspace(), dcToolDescriptor, configuration);
         }
 
         return dcToolExecutor;
@@ -345,8 +350,8 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
             for (final DevelopmentComponent component : affectedComponents) {
                 FilePath buildXml =
                     NWDIBuild.this.getWorkspace().child(
-                        String.format(".dtc/DCs/%s/%s/_comp/gen/default/logs/build.xml", component.getVendor(),
-                            component.getName()));
+                        String.format("%s/DCs/%s/%s/_comp/gen/default/logs/build.xml", DCToolDescriptor.DTC_FOLDER,
+                            component.getVendor(), component.getName()));
                 if (buildXml.exists()) {
                     String content =
                         buildXml.readToString().replaceFirst("project name=\"DC Build\"",

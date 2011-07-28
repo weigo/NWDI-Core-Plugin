@@ -17,7 +17,7 @@ import org.arachna.netweaver.dc.types.Compartment;
 import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
-import org.arachna.netweaver.hudson.nwdi.DevelopmentComponentsReader;
+import org.arachna.netweaver.dctool.commands.DevelopmentComponentsReader70;
 import org.arachna.xml.XmlReaderHelper;
 import org.junit.After;
 import org.junit.Before;
@@ -75,8 +75,8 @@ public class ConfDefReaderAndListCompartmentsTest {
 
         final Reader dcToolOutputReader =
             new InputStreamReader(this.getClass().getResourceAsStream("ListDevelopmentComponentsExample.out"));
-        final DevelopmentComponentsReader developmentComponentsReader =
-            new DevelopmentComponentsReader(dcToolOutputReader, this.dcFactory, this.developmentConfiguration);
+        final DevelopmentComponentsReader70 developmentComponentsReader =
+            new DevelopmentComponentsReader70(dcToolOutputReader, this.dcFactory, this.developmentConfiguration);
         developmentComponentsReader.read();
     }
 

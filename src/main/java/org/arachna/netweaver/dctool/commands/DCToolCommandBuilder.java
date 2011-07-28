@@ -1,7 +1,7 @@
 /**
  *
  */
-package org.arachna.netweaver.dctool;
+package org.arachna.netweaver.dctool.commands;
 
 import java.util.List;
 

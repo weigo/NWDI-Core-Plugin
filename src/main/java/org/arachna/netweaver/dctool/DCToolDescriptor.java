@@ -2,10 +2,20 @@ package org.arachna.netweaver.dctool;
 
 /**
  * Container for parameters relevant to DC tool execution.
- * 
+ *
  * @author Dirk Weigenand
  */
 public final class DCToolDescriptor {
+    /**
+     * folder name that contains the DTR configuration files.
+     */
+    public static final String DTR_FOLDER = ".dtr";
+
+    /**
+     * folder name that contains the development configuration.
+     */
+    public static final String DTC_FOLDER = ".dtc";
+
     /**
      * UME user for authentication against the NWDI.
      */
@@ -22,36 +32,28 @@ public final class DCToolDescriptor {
     private final String nwdiToolLibrary;
 
     /**
-     * folder where DTR configurations are stored.
-     */
-    private final String dtrDirectory;
-
-    /**
      * configured JDKs.
      */
     private final JdkHomePaths paths;
 
     /**
      * Create an instance of a <code>DCToolDescriptor</code>.
-     * 
+     *
      * @param user
      *            UME user for authentication against the NWDI.
      * @param password
      *            password to use authenticating the user.
      * @param nwdiToolLibrary
      *            path to NWDI tool library folder.
-     * @param dtrDirectory
-     *            folder where DTR configurations are stored.
      * @param paths
      *            configured JDKs.
      */
     public DCToolDescriptor(final String user, final String password, final String nwdiToolLibrary,
-        final String dtrDirectory, final JdkHomePaths paths) {
+        final JdkHomePaths paths) {
         super();
         this.user = user;
         this.password = password;
         this.nwdiToolLibrary = nwdiToolLibrary;
-        this.dtrDirectory = dtrDirectory;
         this.paths = paths;
     }
 
@@ -81,12 +83,5 @@ public final class DCToolDescriptor {
      */
     public JdkHomePaths getPaths() {
         return paths;
-    }
-
-    /**
-     * @return the dtrDirectory
-     */
-    public String getDtrDirectory() {
-        return dtrDirectory;
     }
 }

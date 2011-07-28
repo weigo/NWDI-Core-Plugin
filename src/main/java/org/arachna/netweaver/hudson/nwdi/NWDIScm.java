@@ -28,6 +28,9 @@ import java.util.List;
 
 import net.sf.json.JSONObject;
 
+import org.arachna.netweaver.dc.types.Compartment;
+import org.arachna.netweaver.dc.types.CompartmentState;
+import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 import org.arachna.netweaver.dctool.DCToolCommandExecutor;
@@ -41,7 +44,7 @@ import org.kohsuke.stapler.StaplerRequest;
 
 /**
  * Interface to NetWeaver Developer Infrastructure.
- * 
+ *
  * @author Dirk Weigenand
  */
 public class NWDIScm extends SCM {
@@ -67,7 +70,7 @@ public class NWDIScm extends SCM {
 
     /**
      * Create an instance of a <code>NWDIScm</code>.
-     * 
+     *
      * @param dtrUser
      *            user to authenticate with.
      * @param password
@@ -139,7 +142,15 @@ public class NWDIScm extends SCM {
                 lastSuccessfulBuild != null ? lastSuccessfulBuild.getAction(NWDIRevisionState.class).getCreationDate()
                     : null));
 
-            result = executor.synchronizeDevelopmentComponents(cleanCopy);
+            if (cleanCopy) {
+                for (final Compartment compartment : config.getCompartments(CompartmentState.Source)) {
+                    for (final DevelopmentComponent component : compartment.getDevelopmentComponents()) {
+                        component.setNeedsRebuild(true);
+                    }
+                }
+            }
+
+            result = executor.synchronizeDevelopmentComponents();
 
             if (!result.isExitCodeOk()) {
                 final String output = result.getOutput();
@@ -202,7 +213,7 @@ public class NWDIScm extends SCM {
 
     /**
      * Get the creation date from the given {@link SCMRevisionState}.
-     * 
+     *
      * @param revisionState
      *            an <code>SCMRevisionState</code> object
      * @return the date/time when the given SCM revision state was computed iff
@@ -222,7 +233,7 @@ public class NWDIScm extends SCM {
 
     /**
      * Write the change log using the given build, file and list of activities.
-     * 
+     *
      * @param build
      *            the {@link AbstractBuild} to use writing the change log.
      * @param changelogFile
@@ -241,7 +252,7 @@ public class NWDIScm extends SCM {
 
     /**
      * {@link SCMDescriptor} for {@link NWDIProject}.
-     * 
+     *
      * @author Dirk Weigenand
      */
     @Extension
@@ -275,7 +286,7 @@ public class NWDIScm extends SCM {
     /**
      * Get list of activities since last run. If <code>lastRun</code> is
      * <code>null</code> all activities will be read.
-     * 
+     *
      * @param logger
      *            the logger to use.
      * @param browser
@@ -320,7 +331,7 @@ public class NWDIScm extends SCM {
     /**
      * Returns an instance of {@link DtrBrowser} using the given development
      * configuration and development component factory.
-     * 
+     *
      * @param config
      *            the development configuration to be used to connect to the
      *            DTR.
@@ -336,7 +347,7 @@ public class NWDIScm extends SCM {
     /**
      * Determine the time in seconds passed since the given start time and log
      * it using the message given.
-     * 
+     *
      * @param logger
      *            the logger to use.
      * @param start

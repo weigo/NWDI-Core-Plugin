@@ -1,7 +1,7 @@
 /**
  *
  */
-package org.arachna.netweaver.hudson.nwdi;
+package org.arachna.netweaver.dctool.commands;
 
 import java.io.EOFException;
 import java.io.IOException;
@@ -12,10 +12,10 @@ import java.util.regex.Pattern;
 
 /**
  * base class for readers of dctool output.
- * 
- * @author G526521
+ *
+ * @author Dirk Weigenand
  */
-abstract class AbstractDcToolOutputReader {
+public abstract class AbstractDcToolOutputReader {
     /**
      * line number reader for reading the DCTool output.
      */
@@ -24,7 +24,7 @@ abstract class AbstractDcToolOutputReader {
     /**
      * Create an instance of an <code>DcToolOutputReader</code> using the given
      * {@link Reader} containing the output of the DC tool.
-     * 
+     *
      * @param dcToolOutput
      *            reader for output of DC tool.
      */
@@ -34,7 +34,7 @@ abstract class AbstractDcToolOutputReader {
 
     /**
      * Reads a line trying to match the given pattern.
-     * 
+     *
      * @param pattern
      *            the pattern to use in matching the line
      * @return If the pattern matches the first group will be extracted and
@@ -62,7 +62,7 @@ abstract class AbstractDcToolOutputReader {
 
     /**
      * read a line using the internal line number reader.
-     * 
+     *
      * @return the line just read
      * @throws IOException
      *             if an I/O error occurs.
@@ -73,11 +73,13 @@ abstract class AbstractDcToolOutputReader {
 
     /**
      * Close the internal reader.
-     * 
+     *
      * @throws IOException
      *             if an I/O error occurs.
      */
     protected final void close() throws IOException {
         this.reader.close();
     }
+
+    public abstract void read() throws IOException;
 }
