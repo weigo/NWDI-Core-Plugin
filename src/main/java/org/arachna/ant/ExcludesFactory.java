@@ -27,7 +27,10 @@ public class ExcludesFactory {
      * from development component types to standard ant file set excludes.
      */
     public ExcludesFactory() {
-        this.excludesMapping.put(DevelopmentComponentType.WebDynpro, Arrays.asList(new String[] { "**/wdp/*.java" }));
+        this.excludesMapping.put(
+            DevelopmentComponentType.WebDynpro,
+            Arrays.asList(new String[] { "**/wdp/*.java", "**/*Interface.java", "**/*InterfaceCfg.java",
+                "**/*InterfaceView.java" }));
     }
 
     /**

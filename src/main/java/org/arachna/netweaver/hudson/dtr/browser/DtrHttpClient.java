@@ -11,19 +11,20 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.SingleClientConnManager;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 
 /**
  * Dtr client using the <code>http</code> protocol.
- * 
+ *
  * @author Dirk Weigenand
  */
 final class DtrHttpClient {
     /**
      * HTTP client to use for requests.
      */
-    private final DefaultHttpClient httpClient = new DefaultHttpClient();
+    private final DefaultHttpClient httpClient = new DefaultHttpClient(new SingleClientConnManager());
 
     /**
      * Context to use for conversations.
@@ -32,7 +33,7 @@ final class DtrHttpClient {
 
     /**
      * Create an instance of a <code>DtrHttpClient</code>.
-     * 
+     *
      * @param dtrUser
      *            user for accessing the DTR.
      * @param password
@@ -42,12 +43,13 @@ final class DtrHttpClient {
         validateArgument(dtrUser, "DTR user");
         validateArgument(password, "password");
 
-        this.httpClient.getCredentialsProvider().setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(dtrUser, password));
+        this.httpClient.getCredentialsProvider().setCredentials(AuthScope.ANY,
+            new UsernamePasswordCredentials(dtrUser, password));
     }
 
     /**
      * Validate the given String argument.
-     * 
+     *
      * @param arg
      *            argument to validate.
      * @param argumentDescription
@@ -55,13 +57,14 @@ final class DtrHttpClient {
      */
     private void validateArgument(final String arg, final String argumentDescription) {
         if (arg == null || arg.trim().length() == 0) {
-            throw new IllegalArgumentException(String.format("The argument '%s' must not be null or empty!", argumentDescription));
+            throw new IllegalArgumentException(String.format("The argument '%s' must not be null or empty!",
+                argumentDescription));
         }
     }
 
     /**
      * Get the content of the page returned by the given query.
-     * 
+     *
      * @param queryUrl
      *            url for querying activities for a given compartment.
      * @return the content of the page returned by the given query.
@@ -73,5 +76,12 @@ final class DtrHttpClient {
         final HttpResponse response = this.httpClient.execute(httpget, this.localContext);
 
         return response.getEntity().getContent();
+    }
+
+    /**
+     * Shut down the underlying {@link DefaultHTTPClient}'s connection manager.
+     */
+    public void close() {
+        this.httpClient.getConnectionManager().shutdown();
     }
 }

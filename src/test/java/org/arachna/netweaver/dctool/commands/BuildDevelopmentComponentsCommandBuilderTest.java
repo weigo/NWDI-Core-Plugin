@@ -1,13 +1,11 @@
 /**
  *
  */
-package org.arachna.netweaver.dctool;
+package org.arachna.netweaver.dctool.commands;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -17,7 +15,6 @@ import org.arachna.netweaver.dc.types.CompartmentState;
 import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
-import org.arachna.netweaver.dctool.BuildDevelopmentComponentsCommandBuilder;
 import org.arachna.netweaver.hudson.nwdi.ExampleDevelopmentComponentFactory;
 import org.junit.Before;
 import org.junit.Test;
@@ -63,13 +60,12 @@ public final class BuildDevelopmentComponentsCommandBuilderTest {
         final Collection<DevelopmentComponent> dCs = Arrays.asList(components);
         compartment.add(dCs);
 
-        return new BuildDevelopmentComponentsCommandBuilder(config, dCs, new PrintStream(new ByteArrayOutputStream()))
-            .execute();
+        return new BuildDevelopmentComponentsCommandBuilderV70(config, dCs).execute();
     }
 
     /**
      * Test method for
-     * {@link org.arachna.netweaver.dctool.analyzer.dctool.BuildDevelopmentComponentsCommandBuilder#execute()}
+     * {@link org.arachna.netweaver.dctool.commands.analyzer.dctool.BuildDevelopmentComponentsCommandBuilder#execute()}
      * .
      */
     @Test

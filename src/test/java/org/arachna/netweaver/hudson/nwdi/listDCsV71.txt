@@ -1,0 +1,7 @@
+DCs im aktiven oder inaktiven Teil
+Abruf/Aktualisierung der DC-Metadaten f³r Compartment 'example.com_LIBJEE_1'. Dieser Vorgang kann etwas lõnger dauern ...
+#       DC-Name                                 DC-Vendor       Compartment
+1       itext1.2                                itext.org       example.com_LIBJEE_1
+2       jfreechart                              jfree.org       example.com_LIBJEE_1
+3       jee/commons                             apache.org      example.com_LIBJEE_1
+4       jee/itext2                              itext.org       example.com_LIBJEE_1
