@@ -4,6 +4,8 @@
 package org.arachna.netweaver.dctool.commands;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.arachna.netweaver.dc.types.Compartment;
@@ -14,7 +16,7 @@ import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 /**
  * Builder for DCTool synchronize commands for a development configurations
  * development components.
- *
+ * 
  * @author Dirk Weigenand
  */
 final class SyncDevelopmentComponentsCommandBuilderV71 extends AbstractDCToolCommandBuilder {
@@ -29,13 +31,18 @@ final class SyncDevelopmentComponentsCommandBuilderV71 extends AbstractDCToolCom
     private static final String SYNC_DCS_IN_ARCHIVE_MODE_COMMAND = "syncalldcs -c %s -m archive";
 
     /**
+     * command for syncing all DCs in incative mode.
+     */
+    private static final String SYNC_DCS_IN_INACTIVE_MODE_COMMAND = "syncalldcs -c %s -m inactive";
+
+    /**
      * unsync one development component of a given compartment and vendor.
      */
     private static final String UNSYNC_DC_COMMAND = "unsyncdc -c %s -n %s -v %s";
 
     /**
      * create a builder for development component listing and syncing commands.
-     *
+     * 
      * @param developmentConfiguration
      *            development configuration to synchronize development
      *            components for.
@@ -48,7 +55,7 @@ final class SyncDevelopmentComponentsCommandBuilderV71 extends AbstractDCToolCom
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see
      * org.arachna.netweaver.dc.analyzer.dctool.DCToolCommandBuilder#execute ()
      */
@@ -56,8 +63,9 @@ final class SyncDevelopmentComponentsCommandBuilderV71 extends AbstractDCToolCom
     protected List<String> executeInternal() {
         final List<String> commands = new ArrayList<String>();
 
-        synchronizeCompartmentsInArchiveMode(commands);
+        commands.add("tracefile synchronization.trace");
         synchronizeDCsNeedingRebuild(commands);
+        synchronizeCompartmentsInArchiveMode(commands);
 
         return commands;
     }
@@ -69,11 +77,24 @@ final class SyncDevelopmentComponentsCommandBuilderV71 extends AbstractDCToolCom
         final DevelopmentConfiguration developmentConfiguration = getDevelopmentConfiguration();
 
         for (final Compartment compartment : developmentConfiguration.getCompartments(CompartmentState.Source)) {
-            for (final DevelopmentComponent component : compartment.getDevelopmentComponents()) {
+            int cnt = 0;
+            List<String> cmds = new LinkedList<String>();
+            Collection<DevelopmentComponent> components = compartment.getDevelopmentComponents();
+
+            for (final DevelopmentComponent component : components) {
+                cnt++;
+
                 if (component.isNeedsRebuild()) {
-                    commands.add(createUnsyncDCCommand(component));
-                    commands.add(createSyncInactiveDCCommand(component));
+                    cmds.add(createUnsyncDCCommand(component));
+                    cmds.add(createSyncInactiveDCCommand(component));
                 }
+            }
+
+            if (components.size() == cnt) {
+                commands.add(createSyncInactiveDCsCommand(compartment));
+            }
+            else {
+                commands.addAll(cmds);
             }
         }
     }
@@ -89,9 +110,13 @@ final class SyncDevelopmentComponentsCommandBuilderV71 extends AbstractDCToolCom
         }
     }
 
+    private String createSyncInactiveDCsCommand(Compartment compartment) {
+        return String.format(SYNC_DCS_IN_INACTIVE_MODE_COMMAND, compartment.getName());
+    }
+
     /**
      * Create command for synchronizing the given DC in inactive state.
-     *
+     * 
      * @param component
      *            DC to synchronize.
      * @return dctool command to synchronize the given DC
@@ -103,7 +128,7 @@ final class SyncDevelopmentComponentsCommandBuilderV71 extends AbstractDCToolCom
 
     /**
      * Create command to unsynchronize the given DC.
-     *
+     * 
      * @param component
      *            DC to unsynchronize.
      * @return dctool command to unsynchronize the given DC
