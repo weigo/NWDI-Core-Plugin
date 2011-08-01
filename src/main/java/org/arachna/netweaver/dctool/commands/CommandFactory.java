@@ -14,18 +14,18 @@ import org.arachna.netweaver.dctool.JdkHomeAlias;
 
 /**
  * Factory for creation of DC tool commands.
- *
+ * 
  * Encapsulates knowledge which command to create depending on the build variant
  * used in a development configuration. This influences the DC tool version to
  * be used.
- *
+ * 
  * @author g526521
  */
 public final class CommandFactory {
     /**
      * Creates a DC tool command builder for building synchronizing development
      * components commands.
-     *
+     * 
      * @param configuration
      *            development configuration to synchronize.
      * @return
@@ -35,10 +35,14 @@ public final class CommandFactory {
         DCToolCommandBuilder builder = null;
 
         if (JdkHomeAlias.Jdk131Home.equals(alias) || JdkHomeAlias.Jdk142Home.equals(alias)) {
-            builder = new SyncDevelopmentComponentsCommandBuilderV70(configuration);
+            builder =
+                new SyncDevelopmentComponentsCommandBuilder(configuration,
+                    SyncDcCommandTemplate.SyncDcCommandTemplateV70);
         }
         else if (JdkHomeAlias.Jdk150Home.equals(alias) || JdkHomeAlias.Jdk160Home.equals(alias)) {
-            builder = new SyncDevelopmentComponentsCommandBuilderV71(configuration);
+            builder =
+                new SyncDevelopmentComponentsCommandBuilder(configuration,
+                    SyncDcCommandTemplate.SyncDcCommandTemplateV71);
         }
         else {
             throw new RuntimeException("Cannot map configuration.getJdkHomeAlias() onto a DCToolCommandBuilder.");
@@ -50,7 +54,7 @@ public final class CommandFactory {
     /**
      * Creates a DC tool command builder for building build development
      * components commands.
-     *
+     * 
      * @param configuration
      *            development configuration to synchronize.
      * @param affectedComponents
@@ -79,7 +83,7 @@ public final class CommandFactory {
     /**
      * Creates a DC tool command builder for building build development
      * components commands.
-     *
+     * 
      * @param configuration
      *            development configuration to list contained DCs for.
      * @return
@@ -104,7 +108,7 @@ public final class CommandFactory {
     /**
      * Creates a DC tool command builder for building build development
      * components commands.
-     *
+     * 
      * @param configuration
      *            development configuration to list contained DCs for.
      * @return

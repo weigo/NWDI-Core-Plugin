@@ -4,6 +4,8 @@
 package org.arachna.netweaver.dctool.commands;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.arachna.netweaver.dc.types.Compartment;
@@ -14,26 +16,35 @@ import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 /**
  * Builder for DCTool synchronize commands for a development configurations
  * development components.
- *
+ * 
  * @author Dirk Weigenand
  */
-abstract class SyncDevelopmentComponentsCommandBuilder extends AbstractDCToolCommandBuilder {
+final class SyncDevelopmentComponentsCommandBuilder extends AbstractDCToolCommandBuilder {
+    /**
+     * Provides templates for the various sync/unsync dc commands.
+     */
+    private SyncDcCommandTemplate templateProvider;
+
     /**
      * create a builder for development component listing and syncing commands.
-     *
+     * 
      * @param developmentConfiguration
      *            development configuration to synchronize development
      *            components for.
+     * @param templateProvider
+     *            provider of templates for dc tool command generation
      * @param cleanCopy
      *            indicate whether a clean copy of the workspace is needed.
      */
-    SyncDevelopmentComponentsCommandBuilder(final DevelopmentConfiguration developmentConfiguration) {
+    SyncDevelopmentComponentsCommandBuilder(final DevelopmentConfiguration developmentConfiguration,
+        SyncDcCommandTemplate templateProvider) {
         super(developmentConfiguration);
+        this.templateProvider = templateProvider;
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see
      * org.arachna.netweaver.dc.analyzer.dctool.DCToolCommandBuilder#execute ()
      */
@@ -42,8 +53,7 @@ abstract class SyncDevelopmentComponentsCommandBuilder extends AbstractDCToolCom
         final List<String> commands = new ArrayList<String>();
 
         synchronizeCompartmentsInArchiveMode(commands);
-        synchronizeDCsNeedingRebuild(commands);
-
+        commands.addAll(synchronizeDCsNeedingRebuild());
         commands.add(getExitCommand());
 
         return commands;
@@ -52,8 +62,9 @@ abstract class SyncDevelopmentComponentsCommandBuilder extends AbstractDCToolCom
     /**
      * @param commands
      */
-    private void synchronizeDCsNeedingRebuild(final List<String> commands) {
+    protected Collection<String> synchronizeDCsNeedingRebuild() {
         final DevelopmentConfiguration developmentConfiguration = getDevelopmentConfiguration();
+        final Collection<String> commands = new LinkedList<String>();
 
         for (final Compartment compartment : developmentConfiguration.getCompartments(CompartmentState.Source)) {
             for (final DevelopmentComponent component : compartment.getDevelopmentComponents()) {
@@ -63,12 +74,14 @@ abstract class SyncDevelopmentComponentsCommandBuilder extends AbstractDCToolCom
                 }
             }
         }
+
+        return commands;
     }
 
     /**
      * @param commands
      */
-    private void synchronizeCompartmentsInArchiveMode(final List<String> commands) {
+    protected void synchronizeCompartmentsInArchiveMode(final List<String> commands) {
         final DevelopmentConfiguration developmentConfiguration = getDevelopmentConfiguration();
 
         for (final Compartment compartment : developmentConfiguration.getCompartments(CompartmentState.Archive)) {
@@ -78,28 +91,44 @@ abstract class SyncDevelopmentComponentsCommandBuilder extends AbstractDCToolCom
 
     /**
      * Create a syncalldcs command for the given compartment.
-     *
+     * 
      * @param compartment
      *            compartment to create syncalldcs command for
      * @return the created syncalldcs command
      */
-    protected abstract String createSyncDcsInArchiveModeCommand(final Compartment compartment);
+    protected String createSyncDcsInArchiveModeCommand(Compartment compartment) {
+        return String.format(this.templateProvider.getSyncAllDcsInArchiveModeTemplate(), compartment.getName());
+    }
 
     /**
      * Create command for synchronizing the given DC in inactive state.
-     *
+     * 
      * @param component
      *            DC to synchronize.
      * @return dctool command to synchronize the given DC
      */
-    protected abstract String createSyncInactiveDCCommand(final DevelopmentComponent component);
+    protected String createSyncInactiveDCCommand(final DevelopmentComponent component) {
+        return String.format(this.templateProvider.getSyncInactiveDcTemplate(), component.getCompartment().getName(),
+            component.getName(), component.getVendor());
+    }
 
     /**
      * Create command to unsynchronize the given DC.
-     *
+     * 
      * @param component
      *            DC to unsynchronize.
      * @return dctool command to unsynchronize the given DC
      */
-    protected abstract String createUnsyncDCCommand(final DevelopmentComponent component);
+    protected String createUnsyncDCCommand(final DevelopmentComponent component) {
+        return String.format(this.templateProvider.getUnsyncDcTemplate(), component.getCompartment().getName(),
+            component.getName(), component.getVendor());
+    }
+
+    /**
+     * Return the 'exit' command to use.
+     */
+    @Override
+    protected String getExitCommand() {
+        return this.templateProvider.getExitTemplate();
+    }
 }
