@@ -52,8 +52,8 @@ final class SyncDevelopmentComponentsCommandBuilder extends AbstractDCToolComman
     protected List<String> executeInternal() {
         final List<String> commands = new ArrayList<String>();
 
-        synchronizeCompartmentsInArchiveMode(commands);
         commands.addAll(synchronizeDCsNeedingRebuild());
+        commands.addAll(synchronizeCompartmentsInArchiveMode());
         commands.add(getExitCommand());
 
         return commands;
@@ -81,12 +81,16 @@ final class SyncDevelopmentComponentsCommandBuilder extends AbstractDCToolComman
     /**
      * @param commands
      */
-    protected void synchronizeCompartmentsInArchiveMode(final List<String> commands) {
+    protected Collection<String> synchronizeCompartmentsInArchiveMode() {
         final DevelopmentConfiguration developmentConfiguration = getDevelopmentConfiguration();
+        final Collection<Compartment> compartments = developmentConfiguration.getCompartments(CompartmentState.Archive);
+        final Collection<String> commands = new ArrayList<String>(compartments.size());
 
-        for (final Compartment compartment : developmentConfiguration.getCompartments(CompartmentState.Archive)) {
+        for (final Compartment compartment : compartments) {
             commands.add(createSyncDcsInArchiveModeCommand(compartment));
         }
+
+        return commands;
     }
 
     /**

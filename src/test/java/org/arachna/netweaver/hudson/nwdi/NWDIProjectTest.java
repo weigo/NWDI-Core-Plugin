@@ -77,6 +77,7 @@ public class NWDIProjectTest implements TopLevelItem {
         JSONObject json = new JSONObject();
         json.accumulate("jdkHomePaths", "");
         json.accumulate("nwdiToolLibFolder", "");
+        json.accumulate("nwdiToolLibFolder71", "");
         json.accumulate("password", "");
         json.accumulate("user", "");
         this.descriptor.configure(null, json);
@@ -103,6 +104,7 @@ public class NWDIProjectTest implements TopLevelItem {
         JSONObject json = new JSONObject();
         json.accumulate("jdkHomePaths", jdk16);
         json.accumulate("nwdiToolLibFolder", nwdiToolsFolder);
+        json.accumulate("nwdiToolLibFolder71", nwdiToolsFolder);
         json.accumulate("password", password);
         json.accumulate("user", user);
         this.descriptor.configure(null, json);

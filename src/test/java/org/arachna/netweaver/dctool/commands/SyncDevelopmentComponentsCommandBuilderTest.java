@@ -66,7 +66,49 @@ public class SyncDevelopmentComponentsCommandBuilderTest {
 
     /**
      * Test method for
-     * {@link org.arachna.netweaver.dctool.commands.SyncDevelopmentComponentsCommandBuilder#synchronizeDCsNeedingRebuild()}
+     * {@link org.arachna.netweaver.dctool.commands.SyncDevelopmentComponentsCommandBuilder#executeInternal()}
+     * .
+     */
+    @Test
+    public final void testExecuteInternalV70() {
+        builder = new SyncDevelopmentComponentsCommandBuilder(config, SyncDcCommandTemplate.SyncDcCommandTemplateV70);
+        compartment.setState(CompartmentState.Source);
+        component.setNeedsRebuild(true);
+        config.add(new Compartment("example.com_EXAMPLE_SC_2", CompartmentState.Archive, VENDOR, "", "EXAMPLE_SC_2"));
+
+        String commands[] = builder.executeInternal().toArray(new String[0]);
+        assertThat(commands.length, is(equalTo(4)));
+        assertThat(commands[0], is(equalTo("unsyncdc -s example.com_EXAMPLE_SC_1 -n dc/example1 -v example.com;")));
+        assertThat(commands[1],
+            is(equalTo("syncdc -s example.com_EXAMPLE_SC_1 -n dc/example1 -v example.com -m inactive -y;")));
+        assertThat(commands[2], is(equalTo("syncalldcs -s example.com_EXAMPLE_SC_2 -m archive;")));
+        assertThat(commands[3], is(equalTo("exit;")));
+    }
+
+    /**
+     * Test method for
+     * {@link org.arachna.netweaver.dctool.commands.SyncDevelopmentComponentsCommandBuilder#executeInternal()}
+     * .
+     */
+    @Test
+    public final void testExecuteInternalV71() {
+        builder = new SyncDevelopmentComponentsCommandBuilder(config, SyncDcCommandTemplate.SyncDcCommandTemplateV71);
+        compartment.setState(CompartmentState.Source);
+        component.setNeedsRebuild(true);
+        config.add(new Compartment("example.com_EXAMPLE_SC_2", CompartmentState.Archive, VENDOR, "", "EXAMPLE_SC_2"));
+
+        String commands[] = builder.executeInternal().toArray(new String[0]);
+        assertThat(commands.length, is(equalTo(4)));
+        assertThat(commands[0], is(equalTo("unsyncdc -c example.com_EXAMPLE_SC_1 -n dc/example1 -v example.com")));
+        assertThat(commands[1],
+            is(equalTo("syncdc -c example.com_EXAMPLE_SC_1 -n dc/example1 -v example.com -m inactive -f")));
+        assertThat(commands[2], is(equalTo("syncalldcs -c example.com_EXAMPLE_SC_2 -m archive")));
+        assertThat(commands[3], is(equalTo("exit")));
+    }
+
+    /**
+     * Test method for
+     * {@link org.arachna.netweaver.dctool.commands.SyncDevelopmentComponentsCommandBuilder#synchronizeDCsNeedingRebuild70()}
      * .
      */
     @Test
@@ -74,16 +116,35 @@ public class SyncDevelopmentComponentsCommandBuilderTest {
         builder = new SyncDevelopmentComponentsCommandBuilder(config, SyncDcCommandTemplate.SyncDcCommandTemplateV70);
         compartment.setState(CompartmentState.Source);
         component.setNeedsRebuild(true);
-        Collection<String> commands = builder.synchronizeDCsNeedingRebuild();
-        assertThat(commands, hasSize(2));
-        assertThat(commands,
-            hasItem("syncdc -s example.com_EXAMPLE_SC_1 -n dc/example1 -v example.com -m inactive -y;"));
-        assertThat(commands, hasItem("unsyncdc -s example.com_EXAMPLE_SC_1 -n dc/example1 -v example.com;"));
+        String commands[] = builder.synchronizeDCsNeedingRebuild().toArray(new String[0]);
+        assertThat(commands.length, is(equalTo(2)));
+        assertThat(commands[0], is(equalTo("unsyncdc -s example.com_EXAMPLE_SC_1 -n dc/example1 -v example.com;")));
+        assertThat(commands[1],
+            is(equalTo("syncdc -s example.com_EXAMPLE_SC_1 -n dc/example1 -v example.com -m inactive -y;")));
     }
 
     /**
      * Test method for
-     * {@link org.arachna.netweaver.dctool.commands.SyncDevelopmentComponentsCommandBuilder#synchronizeDCsNeedingRebuild()}
+     * {@link org.arachna.netweaver.dctool.commands.SyncDevelopmentComponentsCommandBuilder#synchronizeDCsNeedingRebuild70()}
+     * .
+     */
+    @Test
+    public final void testSynchronizeDCsNeedingRebuildWithOneDCNeedingRebuildAndOneUnTouchedV70() {
+        builder = new SyncDevelopmentComponentsCommandBuilder(config, SyncDcCommandTemplate.SyncDcCommandTemplateV70);
+        compartment.setState(CompartmentState.Source);
+        component.setNeedsRebuild(true);
+        compartment.add(new DevelopmentComponent("dc/example2", VENDOR));
+
+        String commands[] = builder.synchronizeDCsNeedingRebuild().toArray(new String[0]);
+        assertThat(commands.length, is(equalTo(2)));
+        assertThat(commands[0], is(equalTo("unsyncdc -s example.com_EXAMPLE_SC_1 -n dc/example1 -v example.com;")));
+        assertThat(commands[1],
+            is(equalTo("syncdc -s example.com_EXAMPLE_SC_1 -n dc/example1 -v example.com -m inactive -y;")));
+    }
+
+    /**
+     * Test method for
+     * {@link org.arachna.netweaver.dctool.commands.SyncDevelopmentComponentsCommandBuilder#synchronizeDCsNeedingRebuild71()}
      * .
      */
     @Test
@@ -91,20 +152,43 @@ public class SyncDevelopmentComponentsCommandBuilderTest {
         builder = new SyncDevelopmentComponentsCommandBuilder(config, SyncDcCommandTemplate.SyncDcCommandTemplateV71);
         compartment.setState(CompartmentState.Source);
         component.setNeedsRebuild(true);
-        Collection<String> commands = builder.synchronizeDCsNeedingRebuild();
-        assertThat(commands, hasSize(2));
-        assertThat(commands, hasItem("syncdc -c example.com_EXAMPLE_SC_1 -n dc/example1 -v example.com -m inactive -f"));
-        assertThat(commands, hasItem("unsyncdc -c example.com_EXAMPLE_SC_1 -n dc/example1 -v example.com"));
+        String commands[] = builder.synchronizeDCsNeedingRebuild().toArray(new String[0]);
+        assertThat(commands.length, is(equalTo(2)));
+        assertThat(commands[0], is(equalTo("unsyncdc -c example.com_EXAMPLE_SC_1 -n dc/example1 -v example.com")));
+        assertThat(commands[1],
+            is(equalTo("syncdc -c example.com_EXAMPLE_SC_1 -n dc/example1 -v example.com -m inactive -f")));
     }
 
     /**
      * Test method for
-     * {@link org.arachna.netweaver.dctool.commands.SyncDevelopmentComponentsCommandBuilder#synchronizeCompartmentsInArchiveMode(java.util.List)}
+     * {@link org.arachna.netweaver.dctool.commands.SyncDevelopmentComponentsCommandBuilder#synchronizeCompartmentsInArchiveMode70(java.util.List)}
      * .
      */
     @Test
-    public final void testSynchronizeCompartmentsInArchiveMode() {
-        fail("Not yet implemented"); // TODO
+    public final void testSynchronizeCompartmentsInArchiveModeV70() {
+        builder = new SyncDevelopmentComponentsCommandBuilder(config, SyncDcCommandTemplate.SyncDcCommandTemplateV70);
+        compartment.setState(CompartmentState.Archive);
+        config.add(new Compartment("example.com_EXAMPLE_SC_2", CompartmentState.Archive, VENDOR, "", "EXAMPLE_SC_2"));
+        Collection<String> commands = builder.synchronizeCompartmentsInArchiveMode();
+        assertThat(commands, hasSize(2));
+        assertThat(commands, hasItem("syncalldcs -s example.com_EXAMPLE_SC_1 -m archive;"));
+        assertThat(commands, hasItem("syncalldcs -s example.com_EXAMPLE_SC_2 -m archive;"));
+    }
+
+    /**
+     * Test method for
+     * {@link org.arachna.netweaver.dctool.commands.SyncDevelopmentComponentsCommandBuilder#synchronizeCompartmentsInArchiveMode71()}
+     * .
+     */
+    @Test
+    public final void testSynchronizeCompartmentsInArchiveModeV71() {
+        builder = new SyncDevelopmentComponentsCommandBuilder(config, SyncDcCommandTemplate.SyncDcCommandTemplateV71);
+        compartment.setState(CompartmentState.Archive);
+        config.add(new Compartment("example.com_EXAMPLE_SC_2", CompartmentState.Archive, VENDOR, "", "EXAMPLE_SC_2"));
+        Collection<String> commands = builder.synchronizeCompartmentsInArchiveMode();
+        assertThat(commands, hasSize(2));
+        assertThat(commands, hasItem("syncalldcs -c example.com_EXAMPLE_SC_1 -m archive"));
+        assertThat(commands, hasItem("syncalldcs -c example.com_EXAMPLE_SC_2 -m archive"));
     }
 
     /**

@@ -41,7 +41,6 @@ public final class BuildDevelopmentComponentsCommandBuilderTest {
     @Before
     public void setUp() {
         this.dcFactory = ExampleDevelopmentComponentFactory.create();
-
     }
 
     /**
@@ -75,7 +74,7 @@ public final class BuildDevelopmentComponentsCommandBuilderTest {
                 ExampleDevelopmentComponentFactory.EXAMPLE_COM, ExampleDevelopmentComponentFactory.LIB_JETM) });
         final String[] expected =
             new String[] { String.format("builddc -s %s -n %s -v %s -o;", EXAMPLE_SC,
-                ExampleDevelopmentComponentFactory.LIB_JETM, ExampleDevelopmentComponentFactory.EXAMPLE_COM) };
+                ExampleDevelopmentComponentFactory.LIB_JETM, ExampleDevelopmentComponentFactory.EXAMPLE_COM), "exit;" };
         assertThat(commands, hasSize(expected.length));
     }
 }
