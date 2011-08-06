@@ -5,11 +5,11 @@ package org.arachna.netweaver.hudson.nwdi;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import hudson.model.Descriptor.FormException;
 import hudson.model.Item;
 import hudson.model.ItemGroup;
 import hudson.model.TopLevelItem;
 import hudson.model.TopLevelItemDescriptor;
+import hudson.model.Descriptor.FormException;
 import hudson.model.Hudson;
 import hudson.model.Job;
 import hudson.search.SearchIndex;
@@ -45,7 +45,7 @@ public class NWDIProjectTest implements TopLevelItem {
      */
     @Before
     public void setUp() {
-        this.descriptor = new NWDIProject.DescriptorImpl() {
+        descriptor = new NWDIProject.DescriptorImpl() {
             @Override
             public void load() {
             }
@@ -61,7 +61,7 @@ public class NWDIProjectTest implements TopLevelItem {
      */
     @After
     public void tearDown() {
-        this.descriptor = null;
+        descriptor = null;
     }
 
     /**
@@ -74,18 +74,19 @@ public class NWDIProjectTest implements TopLevelItem {
     public void testDescriptorImplConfigureWithEmptyRequest() throws FormException {
         // final StaplerRequest request = new FakeStaplerRequest(new String[]
         // {}, new String[] {});
-        JSONObject json = new JSONObject();
+        final JSONObject json = new JSONObject();
         json.accumulate("jdkHomePaths", "");
         json.accumulate("nwdiToolLibFolder", "");
         json.accumulate("nwdiToolLibFolder71", "");
         json.accumulate("password", "");
         json.accumulate("user", "");
-        this.descriptor.configure(null, json);
+        descriptor.configure(null, json);
 
-        assertThat(this.descriptor.getJdkHomePaths(), equalTo(""));
-        assertThat(this.descriptor.getNwdiToolLibFolder(), equalTo(""));
-        assertThat(this.descriptor.getUser(), equalTo(""));
-        assertThat(this.descriptor.getPassword(), equalTo(""));
+        assertThat(descriptor.getJdkHomePaths(), equalTo(""));
+        assertThat(descriptor.getNwdiToolLibFolder(), equalTo(""));
+        assertThat(descriptor.getNwdiToolLibFolder71(), equalTo(""));
+        assertThat(descriptor.getUser(), equalTo(""));
+        assertThat(descriptor.getPassword(), equalTo(""));
     }
 
     /**
@@ -101,31 +102,32 @@ public class NWDIProjectTest implements TopLevelItem {
         final String user = "user";
         final String password = "secret";
 
-        JSONObject json = new JSONObject();
+        final JSONObject json = new JSONObject();
         json.accumulate("jdkHomePaths", jdk16);
         json.accumulate("nwdiToolLibFolder", nwdiToolsFolder);
         json.accumulate("nwdiToolLibFolder71", nwdiToolsFolder);
         json.accumulate("password", password);
         json.accumulate("user", user);
-        this.descriptor.configure(null, json);
+        descriptor.configure(null, json);
 
-        assertThat(this.descriptor.getJdkHomePaths(), equalTo(jdk16));
-        assertThat(this.descriptor.getNwdiToolLibFolder(), equalTo(nwdiToolsFolder));
-        assertThat(this.descriptor.getUser(), equalTo(user));
-        assertThat(this.descriptor.getPassword(), equalTo(password));
+        assertThat(descriptor.getJdkHomePaths(), equalTo(jdk16));
+        assertThat(descriptor.getNwdiToolLibFolder(), equalTo(nwdiToolsFolder));
+        assertThat(descriptor.getNwdiToolLibFolder71(), equalTo(nwdiToolsFolder));
+        assertThat(descriptor.getUser(), equalTo(user));
+        assertThat(descriptor.getPassword(), equalTo(password));
     }
 
     @Test
     public void testDoInvalidJdkHomePathsCheck() {
         final String invalidPathSpec = "xyz";
-        final FormValidation validationResult = this.descriptor.doJdkHomePathsCheck(invalidPathSpec);
+        final FormValidation validationResult = descriptor.doJdkHomePathsCheck(invalidPathSpec);
         assertThat(validationResult.kind, equalTo(FormValidation.Kind.ERROR));
     }
 
     @Test
     public void testDoEmptyJdkHomePathsCheck() {
         final String invalidPathSpec = "";
-        final FormValidation validationResult = this.descriptor.doJdkHomePathsCheck(invalidPathSpec);
+        final FormValidation validationResult = descriptor.doJdkHomePathsCheck(invalidPathSpec);
         assertThat(validationResult.kind, equalTo(FormValidation.Kind.ERROR));
     }
 
