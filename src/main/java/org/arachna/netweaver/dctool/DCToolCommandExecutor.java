@@ -26,7 +26,6 @@ import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 import org.arachna.netweaver.dctool.commands.CommandFactory;
 import org.arachna.netweaver.dctool.commands.DCToolCommandBuilder;
-import org.arachna.netweaver.dctool.commands.DevelopmentComponentsReader70;
 
 /**
  * Execute a DC Tool.
@@ -53,11 +52,6 @@ public final class DCToolCommandExecutor {
      * 1000 milliseconds.
      */
     private static final float A_THOUSAND_MSECS = 1000f;
-
-    /**
-     * constant for 'loadconfig' command.
-     */
-    private static final String LOAD_CONFIG_COMMAND = "loadconfig -u %s -p %s -c \"%s\" -r \"%s\";\n";
 
     /**
      * {@link DevelopmentConfiguration} the development configuration to use.

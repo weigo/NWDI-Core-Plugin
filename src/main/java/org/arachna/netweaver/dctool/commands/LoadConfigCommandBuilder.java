@@ -10,28 +10,34 @@ import org.arachna.netweaver.dctool.DCToolDescriptor;
 
 /**
  * Command builder for DC toll loadconfig commands.
- *
+ * 
  * @author Dirk Weigenand
  */
-abstract class LoadConfigCommandBuilder extends AbstractDCToolCommandBuilder implements DCToolCommandBuilder {
+class LoadConfigCommandBuilder implements DCToolCommandBuilder {
     /**
      * descriptor for DC tool configuration.
      */
     private final DCToolDescriptor dcToolDescriptor;
 
     /**
-     * @param developmentConfiguration
+     * Template for the different versions of NetWeaver dctool.
      */
-    public LoadConfigCommandBuilder(DCToolDescriptor dcToolDescriptor) {
-        super(null);
+    private LoadConfigTemplate template;
+
+    /**
+     * 
+     * @param dcToolDescriptor
+     * @param template
+     */
+    public LoadConfigCommandBuilder(final DCToolDescriptor dcToolDescriptor, final LoadConfigTemplate template) {
         this.dcToolDescriptor = dcToolDescriptor;
+        this.template = template;
     }
 
     /**
      * {@inheritDoc}
      */
-    @Override
-    protected final List<String> executeInternal() {
+    public final List<String> execute() {
         List<String> commands = new ArrayList<String>();
 
         commands.add(getTimingCommand());
@@ -48,16 +54,21 @@ abstract class LoadConfigCommandBuilder extends AbstractDCToolCommandBuilder imp
     }
 
     /**
-     * Get the command to enable timing of dc tool commands.
-     *
-     * @return command to enable timing of dc tool commands.
-     */
-    protected abstract String getTimingCommand();
-
-    /**
      * Get the command for loading a development configuration.
-     *
+     * 
      * @return command for loading a development configuration.
      */
-    protected abstract String getLoadConfigCommand();
+    private String getLoadConfigCommand() {
+        return String.format(this.template.getLoadConfigCommand(), getDcToolDescriptor().getUser(),
+            getDcToolDescriptor().getPassword(), DCToolDescriptor.DTR_FOLDER, DCToolDescriptor.DTC_FOLDER);
+    }
+
+    /**
+     * Get the command to enable timing of dc tool commands.
+     * 
+     * @return command to enable timing of dc tool commands.
+     */
+    private String getTimingCommand() {
+        return this.template.getTimingCommand();
+    }
 }

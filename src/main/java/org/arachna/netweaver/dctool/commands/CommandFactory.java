@@ -119,10 +119,10 @@ public final class CommandFactory {
         DCToolCommandBuilder builder = null;
 
         if (JdkHomeAlias.Jdk131Home.equals(alias) || JdkHomeAlias.Jdk142Home.equals(alias)) {
-            builder = new LoadConfigCommandBuilderV70(dcToolDescriptor);
+            builder = new LoadConfigCommandBuilder(dcToolDescriptor, LoadConfigTemplate.V70);
         }
         else if (JdkHomeAlias.Jdk150Home.equals(alias) || JdkHomeAlias.Jdk160Home.equals(alias)) {
-            builder = new LoadConfigCommandBuilderV71(dcToolDescriptor);
+            builder = new LoadConfigCommandBuilder(dcToolDescriptor, LoadConfigTemplate.V71);
         }
         else {
             throw new RuntimeException("Cannot map configuration.getJdkHomeAlias() onto a DCToolCommandBuilder.");
