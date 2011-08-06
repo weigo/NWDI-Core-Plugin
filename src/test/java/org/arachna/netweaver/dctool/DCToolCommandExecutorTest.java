@@ -27,7 +27,7 @@ import org.junit.Test;
 
 /**
  * JUnit tests for {@link DCToolCommandExecutor}.
- *
+ * 
  * @author Dirk Weigenand
  */
 public class DCToolCommandExecutorTest {
@@ -59,7 +59,7 @@ public class DCToolCommandExecutorTest {
     /**
      * Create a temporary directory for the test and set up the objects used for
      * this test.
-     *
+     * 
      * @throws IOException
      *             when the temporary directory for the test could not be
      *             created.
@@ -86,19 +86,19 @@ public class DCToolCommandExecutorTest {
 
     /**
      * set up test fixture (executor).
-     *
+     * 
      * @throws IOException
      *             rethrown when creating the DCToolCommandExecutor fails
      */
     @Before
     public void setUp() throws IOException {
-        nwdiToolLibDir = String.format("%s%clib", TEST_DIRECTORY.getAbsolutePath(), File.separatorChar);
+        nwdiToolLibDir = String.format("%s%c", TEST_DIRECTORY.getAbsolutePath(), File.separatorChar);
         executor = createDCToolCommandExecutor();
     }
 
     /**
      * Create an executor object for dctool.
-     *
+     * 
      * @return the newly created {@link DCToolCommandExecutor} object.
      * @throws IOException
      *             rethrown when creating the TaskListener for the used Launcher
@@ -162,7 +162,7 @@ public class DCToolCommandExecutorTest {
 
     /**
      * dummy DCToolCommandBuild used for testing.
-     *
+     * 
      * @author Dirk Weigenand
      */
     private static final class DummyDCToolCommandBuilder implements DCToolCommandBuilder {
