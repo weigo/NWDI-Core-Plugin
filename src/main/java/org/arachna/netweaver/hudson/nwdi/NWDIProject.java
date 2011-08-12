@@ -21,6 +21,8 @@ import hudson.util.FormValidation;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 
@@ -34,10 +36,11 @@ import org.kohsuke.stapler.StaplerResponse;
 
 /**
  * A project for building tracks residing in a NWDI.
- *
+ * 
  * @author Dirk Weigenand
  */
 public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopLevelItem {
+    private static final Logger LOGGER = Logger.getLogger(NWDIProject.class.getName());
     /**
      * Constant for a 1000 milliseconds.
      */
@@ -68,7 +71,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
 
     /**
      * Create an instance of a NWDI project.
-     *
+     * 
      * @param parent
      *            the parent <code>ItemGroup</code> in the project configuration
      *            page.
@@ -82,7 +85,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
     /**
      * Create an instance of a NWDI project using the given project name and
      * configuration.
-     *
+     * 
      * @param name
      *            project name
      * @param confDef
@@ -123,7 +126,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see hudson.model.AbstractProject#checkout(hudson.model.AbstractBuild,
      * hudson.Launcher, hudson.model.BuildListener, java.io.File)
      */
@@ -157,7 +160,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
 
     /**
      * Returns the SCM to be used by this NWDI project.
-     *
+     * 
      * @return SCM to be used by this NWDI project.
      */
     @Override
@@ -190,7 +193,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
     /**
      * Descriptor for NWDIProjects. Contains the global configuration commonly
      * used for different NWDI tracks.
-     *
+     * 
      * @author Dirk Weigenand
      */
     public static class DescriptorImpl extends AbstractProjectDescriptor {
@@ -259,7 +262,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
 
         /**
          * Returns the user for authentication against the NWDI.
-         *
+         * 
          * @return the user for authentication against the NWDI
          */
         public String getUser() {
@@ -268,7 +271,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
 
         /**
          * Sets the user for authentication against the NWDI.
-         *
+         * 
          * @param user
          *            the user for authentication against the NWDI.
          */
@@ -293,7 +296,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
 
         /**
          * Get the folder of the DI tools for NetWeaver 7.0 and before.
-         *
+         * 
          * @return the folder of the DI tools for NetWeaver 7.0 and before.
          */
         public String getNwdiToolLibFolder() {
@@ -302,7 +305,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
 
         /**
          * Set the folder of the DI tools for NetWeaver 7.0 and before.
-         *
+         * 
          * @param nwdiToolLibFolder
          *            the folder of the DI tools for NetWeaver 7.0 and before.
          */
@@ -312,7 +315,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
 
         /**
          * Get the folder of the DI tools for NetWeaver 7.1 and later.
-         *
+         * 
          * @return the folder of the DI tools for NetWeaver 7.1 and later.
          */
         public String getNwdiToolLibFolder71() {
@@ -321,7 +324,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
 
         /**
          * Get the folder of the DI tools for NetWeaver 7.1 and later.
-         *
+         * 
          * @param nwdiToolLibFolder
          *            the folder of the DI tools for NetWeaver 7.1 and later.
          */
@@ -332,7 +335,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
         /**
          * Returns the paths to JDK installations to be used for building
          * tracks.
-         *
+         * 
          * @return the paths to JDK installations to be used for building
          *         tracks.
          */
@@ -342,7 +345,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
 
         /**
          * Set the paths to JDK installations to be used for building tracks.
-         *
+         * 
          * @param jdkHomePaths
          *            the paths to JDK installations to be used for building
          *            tracks.
@@ -353,7 +356,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
 
         /*
          * (non-Javadoc)
-         *
+         * 
          * @see
          * hudson.model.Descriptor#configure(org.kohsuke.stapler.StaplerRequest,
          * net.sf.json.JSONObject)
@@ -373,7 +376,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
 
         /**
          * Validate the 'NwdiToolLibFolder' parameter.
-         *
+         * 
          * @param value
          *            the form value for the 'NwdiToolLibFolder' field.
          * @return the form validation value.
@@ -384,7 +387,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
 
         /**
          * Validate the 'NwdiToolLibFolder' parameter.
-         *
+         * 
          * @param value
          *            the form value for the 'NwdiToolLibFolder' field.
          * @return the form validation value.
@@ -409,12 +412,11 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
 
                 try {
                     if (!folder.exists()) {
-                        result = FormValidation.error(Messages.NWDIProject_NwdiToolLibFolder_nonexistant());
+                        result = FormValidation.error(Messages.NWDIProject_NwdiToolLibFolder_nonexistant(value));
                     }
                     else {
                         // look for a 'dc' sub folder in the tools folder
-                        // (getParent()).
-                        result = validateDcToolFolder(folder.getParent());
+                        result = validateDcToolFolder(folder);
                     }
                 }
                 catch (final IOException e) {
@@ -431,7 +433,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
         /**
          * Validate that the given <code>FilePath</code> contains a 'dc' sub
          * folder.
-         *
+         * 
          * @param folder
          *            the 'tools' folder of a NWDI tool library installation.
          * @return the validation result <code>FormValidation.ok()</code> when
@@ -449,7 +451,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
 
         /**
          * Validate the given JdkHomePath.
-         *
+         * 
          * @param value
          *            path to a JDK.
          * @return the result of the validation.
@@ -474,7 +476,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
 
         /**
          * Validate the 'user' parameter.
-         *
+         * 
          * @param value
          *            the form value for the 'user' field.
          * @return the form validation value.
@@ -486,7 +488,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
 
         /**
          * Validate the 'password' parameter.
-         *
+         * 
          * @param value
          *            the form value for the 'password' field.
          * @return the form validation value.
@@ -498,7 +500,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
 
         /**
          * Returns the path mappings for the configured JDK homes.
-         *
+         * 
          * @return path mappings for the configured JDK homes.
          */
         JdkHomePaths getConfiguredJdkHomePaths() {
@@ -533,7 +535,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
 
     /**
      * Set the content of the '.confdef' configuration file.
-     *
+     * 
      * @param confDef
      *            content of the '.confdef' configuration file.
      */
@@ -543,7 +545,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
 
     /**
      * Return the content of the '.confdef' configuration file.
-     *
+     * 
      * @return the content of the '.confdef' configuration file.
      */
     public String getConfDef() {
@@ -552,7 +554,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
 
     /**
      * Return whether the workspace should be cleaned before building.
-     *
+     * 
      * @return whether the workspace should be cleaned before building (
      *         <code>true</code> yes, leave it as it is otherwise).
      */
@@ -562,7 +564,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
 
     /**
      * Indicate whether the workspace should be cleaned before building.
-     *
+     * 
      * @param cleanCopy
      *            whether the workspace should be cleaned before building (
      *            <code>true</code> yes, leave it as it is otherwise).
