@@ -12,11 +12,11 @@
   <f:section title="${%NetWeaver developer infrastructure}">
     <!-- optional @help points to the help document HTML. /plugin/NWDI-Core-Plugin is mapped to our webapp/ directory, so this is a convenient
       way to serve static resources. -->
-    <f:entry title="${%NWDI tool library location}" description="${%Enter the location of your NWDI tool library folder.}" help="/plugin/NWDI-Core-Plugin/help-nwdiToolLibFolder.html">
+    <f:entry title="${%NWDI tool library location} (7.0.x)" description="${%Enter the location of your NWDI tool library folder.}" help="/plugin/NWDI-Core-Plugin/help-nwdiToolLibFolder.html">
       <f:textbox clazz="required" name="NWDIPlugin.nwdiToolLibFolder" value="${descriptor.nwdiToolLibFolder}"
         checkUrl="'descriptorByName/NWDIProject/nwdiToolLibFolderCheck?value='+escape(this.value)" />
     </f:entry>
-    <f:entry title="${%NWDI tool library location}" description="${%Enter the location of your NWDI tool library folder.}" help="/plugin/NWDI-Core-Plugin/help-nwdiToolLibFolder.html">
+    <f:entry title="${%NWDI tool library location} (7.1+)" description="${%Enter the location of your NWDI tool library folder.}" help="/plugin/NWDI-Core-Plugin/help-nwdiToolLibFolder.html">
       <f:textbox clazz="required" name="NWDIPlugin.nwdiToolLibFolder71" value="${descriptor.nwdiToolLibFolder71}"
         checkUrl="'descriptorByName/NWDIProject/nwdiToolLibFolder71Check?value='+escape(this.value)" />
     </f:entry>
