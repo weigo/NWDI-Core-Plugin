@@ -42,9 +42,9 @@ import org.xml.sax.SAXException;
 
 /**
  * A job for building a NWDI development configuration/track.
- *
+ * 
  * @author Dirk Weigenand
- *
+ * 
  */
 public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
     /**
@@ -80,7 +80,7 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
     /**
      * Create an instance of <code>NWDIBuild</code> using the given
      * <code>NWDIProject</code>.
-     *
+     * 
      * @param project
      *            parent to use for creating this build.
      * @throws IOException
@@ -94,7 +94,7 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
     /**
      * Create an instance of <code>NWDIBuild</code> using the given
      * <code>NWDIProject</code> and build directory.
-     *
+     * 
      * @param project
      *            parent to use for creating this build.
      * @param buildDir
@@ -113,7 +113,7 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
 
     /**
      * Returns the {@link DevelopmentConfiguration} used throughout this build.
-     *
+     * 
      * @return the <code>DevelopmentConfiguration</code> used throughout this
      *         build.
      */
@@ -138,7 +138,7 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
     /**
      * Calculate build sequence for development components affected by
      * activities that triggered this build.
-     *
+     * 
      * @return build sequence for development components affected by activities
      *         that triggered this build.
      */
@@ -149,7 +149,12 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
 
             for (final Activity activity : revisionState.getActivities()) {
                 for (final ActivityResource resource : activity.getResources()) {
-                    affectedComponents.add(resource.getDevelopmentComponent());
+                    DevelopmentComponent component = resource.getDevelopmentComponent();
+
+                    // ignore DCs without compartment: those were probably deleted.
+                    if (component.getCompartment() != null) {
+                        affectedComponents.add(component);
+                    }
                 }
             }
 
@@ -178,7 +183,7 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
     /**
      * Calculate build sequence for development components affected by
      * activities that triggered this build.
-     *
+     * 
      * @return build sequence for development components affected by activities
      *         that triggered this build.
      */
@@ -199,7 +204,7 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
     /**
      * Returns the {@link DevelopmentComponentFactory} used throughout this
      * build.
-     *
+     * 
      * @return <code>DevelopmentComponentFactory</code> used as registry for
      *         development components.
      */
@@ -210,7 +215,7 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
     /**
      * Returns a factory for generating ant excludes based on development
      * component type.
-     *
+     * 
      * @return a factory for generating ant excludes based on development
      *         component type.
      */
@@ -219,7 +224,7 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
     }
 
     /**
-     *
+     * 
      * @return the cleanCopy
      */
     public boolean isCleanCopy() {
@@ -229,7 +234,7 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
     /**
      * Returns the {@link DCToolCommandExecutor} used throughout this build
      * using the given {@link Launcher}.
-     *
+     * 
      * @param launcher
      *            the launcher to use executing DC tool.
      * @return <code>DCToolCommandExecutor</code> to execute DC tool commands.
@@ -248,7 +253,8 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
                 nwdiToolLibraryFolder = descriptor.getNwdiToolLibFolder71();
             }
             else {
-                throw new RuntimeException(String.format("Cannot map JdkHomeAlias '%s' onto a NWDITOOLLIB folder.", alias));
+                throw new RuntimeException(String.format("Cannot map JdkHomeAlias '%s' onto a NWDITOOLLIB folder.",
+                    alias));
             }
 
             final DCToolDescriptor dcToolDescriptor =
@@ -262,7 +268,7 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
 
     /**
      * Runner for this build.
-     *
+     * 
      * @author Dirk Weigenand
      */
     private final class RunnerImpl extends AbstractRunner {
@@ -277,7 +283,7 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
          * track in the development configuration stored in this build) so that
          * this information can be used in post build tasks for e.g. quality
          * control or generation of documentation.
-         *
+         * 
          * @param listener
          *            the {@link BuildListener} to use for e.g. reporting.
          * @return the build result {@see Result}.
@@ -326,7 +332,7 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
 
         /**
          * build affected development components.
-         *
+         * 
          * @param logger
          *            logger to log build messages
          * @return build result
@@ -370,12 +376,12 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
         /**
          * Update all development components with the location of their various
          * source folders.
-         *
+         * 
          * This is necessary since f.e. WebDynpro DCs have <code>gen_ddic</code>
          * and <code>gen_wdp</code> that are not listed in <code>.dcdef</code>
          * but are created when the component is built. Those folders have to be
          * considered too when running analysis plugins.
-         *
+         * 
          * @param logger
          *            Logger to report actions back to build.
          */
