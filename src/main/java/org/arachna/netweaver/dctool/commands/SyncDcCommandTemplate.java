@@ -3,6 +3,14 @@
  */
 package org.arachna.netweaver.dctool.commands;
 
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.LineNumberReader;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.arachna.netweaver.dc.types.Compartment;
+
 /**
  * Templates for syncing/unsyncing single/all DCs from a compartment.
  * 
@@ -10,8 +18,9 @@ package org.arachna.netweaver.dctool.commands;
  */
 public enum SyncDcCommandTemplate {
     SyncDcCommandTemplateV70("syncdc -s %s -n %s -v %s -m inactive -y;", "syncalldcs -s %s -m archive;",
-        "unsyncdc -s %s -n %s -v %s;", "exit;"), SyncDcCommandTemplateV71("syncdc -c %s -n %s -v %s -m inactive -f",
-        "syncalldcs -c %s -m archive", "unsyncdc -c %s -n %s -v %s", "exit");
+        "unsyncdc -s %s -n %s -v %s;", "exit;", "SoftwareComponents70"), SyncDcCommandTemplateV71(
+        "syncdc -c %s -n %s -v %s -m inactive -f", "syncalldcs -c %s -m archive", "unsyncdc -c %s -n %s -v %s", "exit",
+        "SoftwareComponents73");
 
     /**
      * template to use for creating a 'syncdc' in inactive state command.
@@ -34,6 +43,11 @@ public enum SyncDcCommandTemplate {
     private String exitTemplate;
 
     /**
+     * 
+     */
+    private Set<String> excludeSCs = new HashSet<String>();
+
+    /**
      * Create an instance of a command template provider using the given
      * templates.
      * 
@@ -49,12 +63,20 @@ public enum SyncDcCommandTemplate {
      * @param exit
      *            template for generating an 'exit' command.
      */
-    SyncDcCommandTemplate(String syncInactiveDcTemplate, String syncAllDcsInArchiveModeTemplate,
-        String unsyncDcTemplate, String exitTemplate) {
+    SyncDcCommandTemplate(final String syncInactiveDcTemplate, final String syncAllDcsInArchiveModeTemplate,
+        final String unsyncDcTemplate, final String exitTemplate, final String compartmentDirectory) {
         this.syncInactiveDcTemplate = syncInactiveDcTemplate;
         this.syncAllDcsInArchiveModeTemplate = syncAllDcsInArchiveModeTemplate;
         this.unsyncDcTemplate = unsyncDcTemplate;
         this.exitTemplate = exitTemplate;
+
+        try {
+            this.excludeSCs.addAll(new CompartmentsReader().read("/org/arachna/netweaver/dctool/commands/"
+                + compartmentDirectory));
+        }
+        catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -95,5 +117,31 @@ public enum SyncDcCommandTemplate {
      */
     String getExitTemplate() {
         return exitTemplate;
+    }
+
+    /**
+     * Returns whether the given compartment should be excluded from
+     * synchronization.
+     * 
+     * @param compartment
+     * @return
+     */
+    public boolean shouldCompartmentBeExcludedFromSynchronization(Compartment compartment) {
+        return this.excludeSCs.contains(compartment.getName());
+    }
+
+    private static final class CompartmentsReader {
+        Set<String> read(String compartmentDirectory) throws IOException {
+            Set<String> compartments = new HashSet<String>();
+
+            LineNumberReader reader =
+                new LineNumberReader(new InputStreamReader(this.getClass().getResourceAsStream(compartmentDirectory)));
+            String compartment;
+            while ((compartment = reader.readLine()) != null) {
+                compartments.add(String.format("sap.com_%s_1", compartment.trim()));
+            }
+
+            return compartments;
+        }
     }
 }

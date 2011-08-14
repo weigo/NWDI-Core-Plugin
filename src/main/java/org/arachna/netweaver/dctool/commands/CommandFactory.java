@@ -19,7 +19,7 @@ import org.arachna.netweaver.dctool.JdkHomeAlias;
  * used in a development configuration. This influences the DC tool version to
  * be used.
  * 
- * @author g526521
+ * @author Dirk Weigenand
  */
 public final class CommandFactory {
     /**
@@ -28,21 +28,25 @@ public final class CommandFactory {
      * 
      * @param configuration
      *            development configuration to synchronize.
-     * @return
+     * @param cleanCopy
+     *            indicate that the current build should operate on a fresh copy
+     *            from the DTR.
+     * @return a command builder for creating 'syncdc' commands.
      */
-    public DCToolCommandBuilder createSyncDevelopmentComponentsCommandBuilder(DevelopmentConfiguration configuration) {
-        JdkHomeAlias alias = configuration.getJdkHomeAlias();
+    public DCToolCommandBuilder createSyncDevelopmentComponentsCommandBuilder(
+        final DevelopmentConfiguration configuration, final boolean cleanCopy) {
+        final JdkHomeAlias alias = configuration.getJdkHomeAlias();
         DCToolCommandBuilder builder = null;
 
         if (JdkHomeAlias.Jdk131Home.equals(alias) || JdkHomeAlias.Jdk142Home.equals(alias)) {
             builder =
                 new SyncDevelopmentComponentsCommandBuilder(configuration,
-                    SyncDcCommandTemplate.SyncDcCommandTemplateV70);
+                    SyncDcCommandTemplate.SyncDcCommandTemplateV70, cleanCopy);
         }
         else if (JdkHomeAlias.Jdk150Home.equals(alias) || JdkHomeAlias.Jdk160Home.equals(alias)) {
             builder =
                 new SyncDevelopmentComponentsCommandBuilder(configuration,
-                    SyncDcCommandTemplate.SyncDcCommandTemplateV71);
+                    SyncDcCommandTemplate.SyncDcCommandTemplateV71, cleanCopy);
         }
         else {
             throw new RuntimeException("Cannot map configuration.getJdkHomeAlias() onto a DCToolCommandBuilder.");
@@ -59,12 +63,11 @@ public final class CommandFactory {
      *            development configuration to synchronize.
      * @param affectedComponents
      *            collections of development components to build.
-     * @param logger
-     * @return
+     * @return a command builder for creating 'builddc' commands.
      */
-    public DCToolCommandBuilder createBuildDevelopmentComponentsCommandBuilder(DevelopmentConfiguration configuration,
-        Collection<DevelopmentComponent> affectedComponents) {
-        JdkHomeAlias alias = configuration.getJdkHomeAlias();
+    public DCToolCommandBuilder createBuildDevelopmentComponentsCommandBuilder(
+        final DevelopmentConfiguration configuration, final Collection<DevelopmentComponent> affectedComponents) {
+        final JdkHomeAlias alias = configuration.getJdkHomeAlias();
         DCToolCommandBuilder builder = null;
 
         if (JdkHomeAlias.Jdk131Home.equals(alias) || JdkHomeAlias.Jdk142Home.equals(alias)) {
@@ -86,10 +89,11 @@ public final class CommandFactory {
      * 
      * @param configuration
      *            development configuration to list contained DCs for.
-     * @return
+     * @return a command builder for creating 'listdc' commands.
      */
-    public DCToolCommandBuilder createListDevelopmentComponentsCommandBuilder(DevelopmentConfiguration configuration) {
-        JdkHomeAlias alias = configuration.getJdkHomeAlias();
+    public DCToolCommandBuilder createListDevelopmentComponentsCommandBuilder(
+        final DevelopmentConfiguration configuration) {
+        final JdkHomeAlias alias = configuration.getJdkHomeAlias();
         DCToolCommandBuilder builder = null;
 
         if (JdkHomeAlias.Jdk131Home.equals(alias) || JdkHomeAlias.Jdk142Home.equals(alias)) {
@@ -113,9 +117,9 @@ public final class CommandFactory {
      *            development configuration to list contained DCs for.
      * @return
      */
-    public DCToolCommandBuilder createLoadConfigCommandBuilder(DevelopmentConfiguration configuration,
-        DCToolDescriptor dcToolDescriptor) {
-        JdkHomeAlias alias = configuration.getJdkHomeAlias();
+    public DCToolCommandBuilder createLoadConfigCommandBuilder(final DevelopmentConfiguration configuration,
+        final DCToolDescriptor dcToolDescriptor) {
+        final JdkHomeAlias alias = configuration.getJdkHomeAlias();
         DCToolCommandBuilder builder = null;
 
         if (JdkHomeAlias.Jdk131Home.equals(alias) || JdkHomeAlias.Jdk142Home.equals(alias)) {
@@ -131,9 +135,9 @@ public final class CommandFactory {
         return builder;
     }
 
-    public AbstractDcToolOutputReader getListDcCommandResultReader(Reader output,
-        DevelopmentComponentFactory dcFactory, DevelopmentConfiguration configuration) {
-        JdkHomeAlias alias = configuration.getJdkHomeAlias();
+    public AbstractDcToolOutputReader getListDcCommandResultReader(final Reader output,
+        final DevelopmentComponentFactory dcFactory, final DevelopmentConfiguration configuration) {
+        final JdkHomeAlias alias = configuration.getJdkHomeAlias();
         AbstractDcToolOutputReader reader = null;
 
         if (JdkHomeAlias.Jdk131Home.equals(alias) || JdkHomeAlias.Jdk142Home.equals(alias)) {
