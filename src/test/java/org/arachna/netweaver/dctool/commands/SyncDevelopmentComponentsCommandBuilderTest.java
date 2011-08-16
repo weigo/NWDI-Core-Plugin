@@ -9,12 +9,15 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertThat;
 
+import java.io.IOException;
 import java.util.Collection;
+import java.util.LinkedList;
 
 import org.arachna.netweaver.dc.types.Compartment;
 import org.arachna.netweaver.dc.types.CompartmentState;
 import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
+import org.arachna.netweaver.dctool.commands.SyncDcCommandTemplate.CompartmentsReader;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -167,15 +170,18 @@ public class SyncDevelopmentComponentsCommandBuilderTest {
      * Test method for
      * {@link org.arachna.netweaver.dctool.commands.SyncDevelopmentComponentsCommandBuilder#synchronizeCompartmentsInArchiveMode70(java.util.List)}
      * .
+     * 
+     * @throws IOException
      */
     @Test
-    public final void testSynchronizeCompartmentsInArchiveModeV70InCleanCopyMode() {
+    public final void testSynchronizeCompartmentsInArchiveModeV70InCleanCopyMode() throws IOException {
         builder =
             new SyncDevelopmentComponentsCommandBuilder(config, SyncDcCommandTemplate.SyncDcCommandTemplateV70, true);
         compartment.setState(CompartmentState.Archive);
         config.add(new Compartment("example.com_EXAMPLE_SC_2", CompartmentState.Archive, VENDOR, "", "EXAMPLE_SC_2"));
+        addSapCompartments("SoftWareComponents70");
         final Collection<String> commands = builder.synchronizeCompartmentsInArchiveMode();
-        assertThat(commands, hasSize(2));
+        assertThat(commands, hasSize(config.getCompartments().size()));
         assertThat(commands, hasItem("syncalldcs -s example.com_EXAMPLE_SC_1 -m archive;"));
         assertThat(commands, hasItem("syncalldcs -s example.com_EXAMPLE_SC_2 -m archive;"));
     }
@@ -184,15 +190,18 @@ public class SyncDevelopmentComponentsCommandBuilderTest {
      * Test method for
      * {@link org.arachna.netweaver.dctool.commands.SyncDevelopmentComponentsCommandBuilder#synchronizeCompartmentsInArchiveMode71()}
      * .
+     * 
+     * @throws IOException
      */
     @Test
-    public final void testSynchronizeCompartmentsInArchiveModeV71InCleanCopyMode() {
+    public final void testSynchronizeCompartmentsInArchiveModeV71InCleanCopyMode() throws IOException {
         builder =
             new SyncDevelopmentComponentsCommandBuilder(config, SyncDcCommandTemplate.SyncDcCommandTemplateV71, true);
         compartment.setState(CompartmentState.Archive);
         config.add(new Compartment("example.com_EXAMPLE_SC_2", CompartmentState.Archive, VENDOR, "", "EXAMPLE_SC_2"));
+        addSapCompartments("SoftWareComponents73");
         final Collection<String> commands = builder.synchronizeCompartmentsInArchiveMode();
-        assertThat(commands, hasSize(2));
+        assertThat(commands, hasSize(config.getCompartments().size()));
         assertThat(commands, hasItem("syncalldcs -c example.com_EXAMPLE_SC_1 -m archive"));
         assertThat(commands, hasItem("syncalldcs -c example.com_EXAMPLE_SC_2 -m archive"));
     }
@@ -204,14 +213,18 @@ public class SyncDevelopmentComponentsCommandBuilderTest {
      * 
      * Standard mode means that no fresh checkout of the workspace was
      * requested. This should ignore the standard compartments provided by SAP.
+     * 
+     * @throws IOException
      */
     @Test
-    public final void testSynchronizeCompartmentsInArchiveModeV70InStandardMode() {
+    public final void testSynchronizeCompartmentsInArchiveModeV70InStandardMode() throws IOException {
         builder =
             new SyncDevelopmentComponentsCommandBuilder(config, SyncDcCommandTemplate.SyncDcCommandTemplateV70, false);
         compartment.setState(CompartmentState.Archive);
         config.add(new Compartment("example.com_EXAMPLE_SC_2", CompartmentState.Archive, VENDOR, "", "EXAMPLE_SC_2"));
-        config.add(new Compartment("sap.com_SAP_BUILDT_1", CompartmentState.Archive, "sap.com", "", "SAP_BUILDT_1"));
+
+        addSapCompartments("SoftWareComponents70");
+
         final Collection<String> commands = builder.synchronizeCompartmentsInArchiveMode();
         assertThat(commands, hasSize(2));
         assertThat(commands, hasItem("syncalldcs -s example.com_EXAMPLE_SC_1 -m archive;"));
@@ -219,17 +232,34 @@ public class SyncDevelopmentComponentsCommandBuilderTest {
     }
 
     /**
+     * @param compartmentDirectory
+     * @throws IOException
+     */
+    private void addSapCompartments(String compartmentDirectory) throws IOException {
+        Collection<String> compartments = new LinkedList<String>();
+        compartments.addAll(new CompartmentsReader().read("/org/arachna/netweaver/dctool/commands/"
+            + compartmentDirectory));
+
+        for (String compartment : compartments) {
+            config.add(new Compartment(compartment, CompartmentState.Archive, "sap.com", "", compartment));
+        }
+    }
+
+    /**
      * Test method for
      * {@link org.arachna.netweaver.dctool.commands.SyncDevelopmentComponentsCommandBuilder#synchronizeCompartmentsInArchiveMode71()}
      * . Standard mode means that no fresh checkout of the workspace was
      * requested. This should ignore the standard compartments provided by SAP.
+     * @throws IOException 
      */
     @Test
-    public final void testSynchronizeCompartmentsInArchiveModeV71InStandardMode() {
+    public final void testSynchronizeCompartmentsInArchiveModeV71InStandardMode() throws IOException {
         builder =
             new SyncDevelopmentComponentsCommandBuilder(config, SyncDcCommandTemplate.SyncDcCommandTemplateV71, false);
         compartment.setState(CompartmentState.Archive);
         config.add(new Compartment("example.com_EXAMPLE_SC_2", CompartmentState.Archive, VENDOR, "", "EXAMPLE_SC_2"));
+        addSapCompartments("SoftWareComponents73");
+        
         final Collection<String> commands = builder.synchronizeCompartmentsInArchiveMode();
         assertThat(commands, hasSize(2));
         assertThat(commands, hasItem("syncalldcs -c example.com_EXAMPLE_SC_1 -m archive"));
