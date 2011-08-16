@@ -130,7 +130,7 @@ public enum SyncDcCommandTemplate {
         return this.excludeSCs.contains(compartment.getName());
     }
 
-    private static final class CompartmentsReader {
+    static final class CompartmentsReader {
         Set<String> read(String compartmentDirectory) throws IOException {
             Set<String> compartments = new HashSet<String>();
 
