@@ -102,10 +102,7 @@ final class SyncDevelopmentComponentsCommandBuilder extends AbstractDCToolComman
         final Collection<String> commands = new ArrayList<String>(compartments.size());
 
         for (final Compartment compartment : compartments) {
-            if (cleanCopy) {
-                commands.add(createSyncDcsInArchiveModeCommand(compartment));
-            }
-            else if (!templateProvider.shouldCompartmentBeExcludedFromSynchronization(compartment)) {
+            if (cleanCopy ||!templateProvider.shouldCompartmentBeExcludedFromSynchronization(compartment)) {
                 commands.add(createSyncDcsInArchiveModeCommand(compartment));
             }
         }
