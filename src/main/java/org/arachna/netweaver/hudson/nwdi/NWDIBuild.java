@@ -151,7 +151,8 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
                 for (final ActivityResource resource : activity.getResources()) {
                     DevelopmentComponent component = resource.getDevelopmentComponent();
 
-                    // ignore DCs without compartment: those were probably deleted.
+                    // ignore DCs without compartment: those were probably
+                    // deleted.
                     if (component.getCompartment() != null) {
                         affectedComponents.add(component);
                     }
@@ -292,8 +293,7 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
          */
         @Override
         protected Result doRun(final BuildListener listener) throws Exception {
-            AntHelper antHelper =
-                new AntHelper(FilePathHelper.makeAbsolute(getWorkspace()), dcFactory, excludesFactory);
+            AntHelper antHelper = new AntHelper(FilePathHelper.makeAbsolute(getWorkspace()), dcFactory);
             reporters.addAll(getProject().getPublishersList().toList());
 
             if (!preBuild(listener, project.getBuilders())) {
@@ -318,6 +318,7 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
         private boolean build(final BuildListener listener, final Collection<Builder> steps, AntHelper antHelper)
             throws IOException, InterruptedException {
             for (final BuildStep bs : steps) {
+
                 if (AntTaskBuilder.class.isAssignableFrom(bs.getClass())) {
                     ((AntTaskBuilder)bs).setAntHelper(antHelper);
                 }
