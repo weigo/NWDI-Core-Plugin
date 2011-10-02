@@ -179,7 +179,7 @@ public class SyncDevelopmentComponentsCommandBuilderTest {
             new SyncDevelopmentComponentsCommandBuilder(config, SyncDcCommandTemplate.SyncDcCommandTemplateV70, true);
         compartment.setState(CompartmentState.Archive);
         config.add(new Compartment("example.com_EXAMPLE_SC_2", CompartmentState.Archive, VENDOR, "", "EXAMPLE_SC_2"));
-        addSapCompartments("SoftWareComponents70");
+        addSapCompartments("SoftwareComponents70");
         final Collection<String> commands = builder.synchronizeCompartmentsInArchiveMode();
         assertThat(commands, hasSize(config.getCompartments().size()));
         assertThat(commands, hasItem("syncalldcs -s example.com_EXAMPLE_SC_1 -m archive;"));
@@ -199,7 +199,7 @@ public class SyncDevelopmentComponentsCommandBuilderTest {
             new SyncDevelopmentComponentsCommandBuilder(config, SyncDcCommandTemplate.SyncDcCommandTemplateV71, true);
         compartment.setState(CompartmentState.Archive);
         config.add(new Compartment("example.com_EXAMPLE_SC_2", CompartmentState.Archive, VENDOR, "", "EXAMPLE_SC_2"));
-        addSapCompartments("SoftWareComponents73");
+        addSapCompartments("SoftwareComponents73");
         final Collection<String> commands = builder.synchronizeCompartmentsInArchiveMode();
         assertThat(commands, hasSize(config.getCompartments().size()));
         assertThat(commands, hasItem("syncalldcs -c example.com_EXAMPLE_SC_1 -m archive"));
@@ -223,7 +223,7 @@ public class SyncDevelopmentComponentsCommandBuilderTest {
         compartment.setState(CompartmentState.Archive);
         config.add(new Compartment("example.com_EXAMPLE_SC_2", CompartmentState.Archive, VENDOR, "", "EXAMPLE_SC_2"));
 
-        addSapCompartments("SoftWareComponents70");
+        addSapCompartments("SoftwareComponents70");
 
         final Collection<String> commands = builder.synchronizeCompartmentsInArchiveMode();
         assertThat(commands, hasSize(2));
@@ -235,12 +235,12 @@ public class SyncDevelopmentComponentsCommandBuilderTest {
      * @param compartmentDirectory
      * @throws IOException
      */
-    private void addSapCompartments(String compartmentDirectory) throws IOException {
-        Collection<String> compartments = new LinkedList<String>();
+    private void addSapCompartments(final String compartmentDirectory) throws IOException {
+        final Collection<String> compartments = new LinkedList<String>();
         compartments.addAll(new CompartmentsReader().read("/org/arachna/netweaver/dctool/commands/"
             + compartmentDirectory));
 
-        for (String compartment : compartments) {
+        for (final String compartment : compartments) {
             config.add(new Compartment(compartment, CompartmentState.Archive, "sap.com", "", compartment));
         }
     }
@@ -250,7 +250,8 @@ public class SyncDevelopmentComponentsCommandBuilderTest {
      * {@link org.arachna.netweaver.dctool.commands.SyncDevelopmentComponentsCommandBuilder#synchronizeCompartmentsInArchiveMode71()}
      * . Standard mode means that no fresh checkout of the workspace was
      * requested. This should ignore the standard compartments provided by SAP.
-     * @throws IOException 
+     * 
+     * @throws IOException
      */
     @Test
     public final void testSynchronizeCompartmentsInArchiveModeV71InStandardMode() throws IOException {
@@ -258,8 +259,8 @@ public class SyncDevelopmentComponentsCommandBuilderTest {
             new SyncDevelopmentComponentsCommandBuilder(config, SyncDcCommandTemplate.SyncDcCommandTemplateV71, false);
         compartment.setState(CompartmentState.Archive);
         config.add(new Compartment("example.com_EXAMPLE_SC_2", CompartmentState.Archive, VENDOR, "", "EXAMPLE_SC_2"));
-        addSapCompartments("SoftWareComponents73");
-        
+        addSapCompartments("SoftwareComponents73");
+
         final Collection<String> commands = builder.synchronizeCompartmentsInArchiveMode();
         assertThat(commands, hasSize(2));
         assertThat(commands, hasItem("syncalldcs -c example.com_EXAMPLE_SC_1 -m archive"));

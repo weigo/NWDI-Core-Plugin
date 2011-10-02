@@ -4,6 +4,7 @@
 package org.arachna.netweaver.dctool.commands;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.util.HashSet;
@@ -45,7 +46,7 @@ public enum SyncDcCommandTemplate {
     /**
      * 
      */
-    private Set<String> excludeSCs = new HashSet<String>();
+    private final Set<String> excludeSCs = new HashSet<String>();
 
     /**
      * Create an instance of a command template provider using the given
@@ -71,10 +72,10 @@ public enum SyncDcCommandTemplate {
         this.exitTemplate = exitTemplate;
 
         try {
-            this.excludeSCs.addAll(new CompartmentsReader().read("/org/arachna/netweaver/dctool/commands/"
+            excludeSCs.addAll(new CompartmentsReader().read("/org/arachna/netweaver/dctool/commands/"
                 + compartmentDirectory));
         }
-        catch (IOException e) {
+        catch (final IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -126,16 +127,21 @@ public enum SyncDcCommandTemplate {
      * @param compartment
      * @return
      */
-    public boolean shouldCompartmentBeExcludedFromSynchronization(Compartment compartment) {
-        return this.excludeSCs.contains(compartment.getName());
+    public boolean shouldCompartmentBeExcludedFromSynchronization(final Compartment compartment) {
+        return excludeSCs.contains(compartment.getName());
     }
 
     static final class CompartmentsReader {
-        Set<String> read(String compartmentDirectory) throws IOException {
-            Set<String> compartments = new HashSet<String>();
+        Set<String> read(final String compartmentDirectory) throws IOException {
+            final Set<String> compartments = new HashSet<String>();
 
-            LineNumberReader reader =
-                new LineNumberReader(new InputStreamReader(this.getClass().getResourceAsStream(compartmentDirectory)));
+            final InputStream resource = this.getClass().getResourceAsStream(compartmentDirectory);
+
+            if (resource == null) {
+                throw new IllegalStateException(String.format("Resource %s not found!", compartmentDirectory));
+            }
+
+            final LineNumberReader reader = new LineNumberReader(new InputStreamReader(resource));
             String compartment;
             while ((compartment = reader.readLine()) != null) {
                 compartments.add(String.format("sap.com_%s_1", compartment.trim()));
