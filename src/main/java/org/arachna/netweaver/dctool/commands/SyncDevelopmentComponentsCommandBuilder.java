@@ -105,11 +105,6 @@ final class SyncDevelopmentComponentsCommandBuilder extends AbstractDCToolComman
             if (cleanCopy || !templateProvider.shouldCompartmentBeExcludedFromSynchronization(compartment)) {
                 commands.add(createSyncDcsInArchiveModeCommand(compartment));
             }
-            // else if
-            // (!templateProvider.shouldCompartmentBeExcludedFromSynchronization(compartment))
-            // {
-            // commands.add(createSyncDcsInArchiveModeCommand(compartment));
-            // }
         }
 
         return commands;
