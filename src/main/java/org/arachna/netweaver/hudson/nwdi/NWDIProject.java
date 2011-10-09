@@ -21,8 +21,6 @@ import hudson.util.FormValidation;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 
@@ -40,17 +38,10 @@ import org.kohsuke.stapler.StaplerResponse;
  * @author Dirk Weigenand
  */
 public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopLevelItem {
-    private static final Logger LOGGER = Logger.getLogger(NWDIProject.class.getName());
     /**
      * Constant for a 1000 milliseconds.
      */
     private static final float THOUSAND_MILLI_SECONDS = 1000f;
-
-    /**
-     * Global descriptor/configuration for NWDIProjects.
-     */
-    @Extension(ordinal = 1000)
-    public static final DescriptorImpl DESCRIPTOR = new DescriptorImpl();
 
     /**
      * parameter name for project configuration controlling whether the
@@ -155,7 +146,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
      * {@inheritDoc}
      */
     public DescriptorImpl getDescriptor() {
-        return DESCRIPTOR;
+        return NWDIProject.DescriptorImpl.DESCRIPTOR;
     }
 
     /**
@@ -165,14 +156,15 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
      */
     @Override
     public SCM getScm() {
-        return new NWDIScm(cleanCopy, DESCRIPTOR.getUser(), DESCRIPTOR.getPassword());
+        return new NWDIScm(cleanCopy, DescriptorImpl.DESCRIPTOR.getUser(), DescriptorImpl.DESCRIPTOR.getPassword());
     }
 
     @Override
     public void setScm(final SCM scm) throws IOException {
         final boolean useGivenScm = scm != null && NWDIScm.class.equals(scm.getClass());
 
-        super.setScm(useGivenScm ? scm : new NWDIScm(cleanCopy, DESCRIPTOR.getUser(), DESCRIPTOR.getPassword()));
+        super.setScm(useGivenScm ? scm : new NWDIScm(cleanCopy, DescriptorImpl.DESCRIPTOR.getUser(),
+            DescriptorImpl.DESCRIPTOR.getPassword()));
     }
 
     /**
@@ -196,7 +188,13 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
      * 
      * @author Dirk Weigenand
      */
+    @Extension
     public static class DescriptorImpl extends AbstractProjectDescriptor {
+        /**
+         * Global descriptor/configuration for NWDIProjects.
+         */
+        public static final DescriptorImpl DESCRIPTOR = new DescriptorImpl();
+
         /**
          * Constant for password request parameter.
          */
@@ -329,7 +327,7 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
          *            the folder of the DI tools for NetWeaver 7.1 and later.
          */
         public void setNwdiToolLibFolder71(final String nwdiToolLibFolder) {
-            this.nwdiToolLibFolder71 = nwdiToolLibFolder;
+            nwdiToolLibFolder71 = nwdiToolLibFolder;
         }
 
         /**
