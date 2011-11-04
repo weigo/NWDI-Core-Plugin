@@ -76,15 +76,29 @@ final class SyncDevelopmentComponentsCommandBuilder extends AbstractDCToolComman
         final Collection<String> commands = new LinkedList<String>();
 
         for (final Compartment compartment : developmentConfiguration.getCompartments(CompartmentState.Source)) {
-            for (final DevelopmentComponent component : compartment.getDevelopmentComponents()) {
-                if (component.isNeedsRebuild()) {
-                    commands.add(createUnsyncDCCommand(component));
-                    commands.add(createSyncInactiveDCCommand(component));
+            if (cleanCopy) {
+                commands.add(createSyncDcsInInActiveModeCommand(compartment));
+            }
+            else {
+                for (final DevelopmentComponent component : compartment.getDevelopmentComponents()) {
+                    if (component.isNeedsRebuild()) {
+                        commands.add(createUnsyncDCCommand(component));
+                        commands.add(createSyncInactiveDCCommand(component));
+                    }
                 }
             }
         }
 
         return commands;
+    }
+
+    /**
+     * Create command for synchronizing DCs in archive mode.
+     * 
+     * @return command for synchronizing DCs in inactive mode.
+     */
+    protected String createSyncDcsInInActiveModeCommand(Compartment compartment) {
+        return String.format(templateProvider.getSyncAllDcsInInactiveModeTemplate(), compartment.getName());
     }
 
     /**
