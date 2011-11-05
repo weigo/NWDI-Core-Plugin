@@ -5,28 +5,13 @@ package org.arachna.netweaver.hudson.nwdi;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import hudson.model.Item;
-import hudson.model.ItemGroup;
-import hudson.model.TopLevelItem;
-import hudson.model.TopLevelItemDescriptor;
 import hudson.model.Descriptor.FormException;
-import hudson.model.Hudson;
-import hudson.model.Job;
-import hudson.search.SearchIndex;
-import hudson.search.Search;
-import hudson.security.ACL;
-import hudson.security.Permission;
 import hudson.util.FormValidation;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Collection;
-
 import net.sf.json.JSONObject;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.jvnet.hudson.test.HudsonTestCase;
 import org.kohsuke.stapler.StaplerRequest;
 
 /**
@@ -34,34 +19,48 @@ import org.kohsuke.stapler.StaplerRequest;
  * 
  * @author Dirk Weigenand
  */
-public class NWDIProjectTest implements TopLevelItem {
+public class NWDIProjectTest extends HudsonTestCase {
     /**
-     * Descriptor under test.
+     * form property for NWDI user.
+     */
+    private static final String USER = "user";
+
+    /**
+     * form property for password.
+     */
+    private static final String PASSWORD = "password";
+
+    /**
+     * form property for path to NWDI tool library for NetWeaver 7.1+.
+     */
+    private static final String NWDITOOLLIB71 = "nwdiToolLibFolder71";
+
+    /**
+     * form property for path to NWDI tool library for NetWeaver 7.0.x.
+     */
+    private static final String NWDITOOLLIB = "nwdiToolLibFolder";
+
+    /**
+     * form property for the paths to the JDKs to be used.
+     */
+    private static final String JDK_HOME_PATHS = "jdkHomePaths";
+
+    /**
+     * A sample NWDI project, necessary for getting to the descriptor.
+     */
+    private NWDIProject project;
+
+    /**
+     * The descriptor under test.
      */
     private NWDIProject.DescriptorImpl descriptor;
 
-    /**
-     * Initialize empty descriptor.
-     */
+    @Override
     @Before
-    public void setUp() {
-        descriptor = new NWDIProject.DescriptorImpl() {
-            @Override
-            public void load() {
-            }
-
-            @Override
-            public void save() {
-            }
-        };
-    }
-
-    /**
-     * Reset descriptor.
-     */
-    @After
-    public void tearDown() {
-        descriptor = null;
+    public void setUp() throws Exception {
+        super.setUp();
+        project = hudson.createProject(NWDIProject.class, "nwdi");
+        descriptor = project.getDescriptor();
     }
 
     /**
@@ -72,14 +71,12 @@ public class NWDIProjectTest implements TopLevelItem {
      */
     @Test
     public void testDescriptorImplConfigureWithEmptyRequest() throws FormException {
-        // final StaplerRequest request = new FakeStaplerRequest(new String[]
-        // {}, new String[] {});
         final JSONObject json = new JSONObject();
-        json.accumulate("jdkHomePaths", "");
-        json.accumulate("nwdiToolLibFolder", "");
-        json.accumulate("nwdiToolLibFolder71", "");
-        json.accumulate("password", "");
-        json.accumulate("user", "");
+        json.accumulate(JDK_HOME_PATHS, "");
+        json.accumulate(NWDITOOLLIB, "");
+        json.accumulate(NWDITOOLLIB71, "");
+        json.accumulate(PASSWORD, "");
+        json.accumulate(USER, "");
         descriptor.configure(null, json);
 
         assertThat(descriptor.getJdkHomePaths(), equalTo(""));
@@ -98,15 +95,15 @@ public class NWDIProjectTest implements TopLevelItem {
     public void testDescriptorImplConfigureWithParameters() throws FormException {
         final String jdk16 = "/opt/jdk1.6";
         final String nwdiToolsFolder = "/opt/nwdi/lib";
-        final String user = "user";
+        final String user = USER;
         final String password = "secret";
 
         final JSONObject json = new JSONObject();
-        json.accumulate("jdkHomePaths", jdk16);
-        json.accumulate("nwdiToolLibFolder", nwdiToolsFolder);
-        json.accumulate("nwdiToolLibFolder71", nwdiToolsFolder);
-        json.accumulate("password", password);
-        json.accumulate("user", user);
+        json.accumulate(JDK_HOME_PATHS, jdk16);
+        json.accumulate(NWDITOOLLIB, nwdiToolsFolder);
+        json.accumulate(NWDITOOLLIB71, nwdiToolsFolder);
+        json.accumulate(PASSWORD, password);
+        json.accumulate(USER, user);
         descriptor.configure(null, json);
 
         assertThat(descriptor.getJdkHomePaths(), equalTo(jdk16));
@@ -127,197 +124,5 @@ public class NWDIProjectTest implements TopLevelItem {
         final String invalidPathSpec = "";
         final FormValidation validationResult = descriptor.doJdkHomePathsCheck(invalidPathSpec);
         assertThat(validationResult.kind, equalTo(FormValidation.Kind.ERROR));
-    }
-
-    /**
-     * Empty implementation. Throws {@link UnsupportedOperationException}.
-     * {@inheritDoc}
-     */
-    public Collection<? extends Job> getAllJobs() {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * Empty implementation. Throws {@link UnsupportedOperationException}.
-     * {@inheritDoc}
-     */
-    public String getName() {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * Empty implementation. Throws {@link UnsupportedOperationException}.
-     * {@inheritDoc}
-     */
-    public String getFullName() {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * Empty implementation. Throws {@link UnsupportedOperationException}.
-     * {@inheritDoc}
-     */
-    public String getDisplayName() {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * Empty implementation. Throws {@link UnsupportedOperationException}.
-     * {@inheritDoc}
-     */
-    public String getFullDisplayName() {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * Empty implementation. Throws {@link UnsupportedOperationException}.
-     * {@inheritDoc}
-     */
-    public String getUrl() {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * Empty implementation. Throws {@link UnsupportedOperationException}.
-     * {@inheritDoc}
-     */
-    public String getShortUrl() {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * Empty implementation. Throws {@link UnsupportedOperationException}.
-     * {@inheritDoc}
-     */
-    public String getAbsoluteUrl() {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * Empty implementation. Throws {@link UnsupportedOperationException}.
-     * {@inheritDoc}
-     */
-    public void onLoad(final ItemGroup<? extends Item> parent, final String name) throws IOException {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * Empty implementation. Throws {@link UnsupportedOperationException}.
-     * {@inheritDoc}
-     */
-    public void onCopiedFrom(final Item src) {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * Empty implementation. Throws {@link UnsupportedOperationException}.
-     * {@inheritDoc}
-     */
-    public void onCreatedFromScratch() {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * Empty implementation. Throws {@link UnsupportedOperationException}.
-     * {@inheritDoc}
-     */
-    public void save() throws IOException {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * Empty implementation. Throws {@link UnsupportedOperationException}.
-     * {@inheritDoc}
-     */
-    public void delete() throws IOException, InterruptedException {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * Empty implementation. Throws {@link UnsupportedOperationException}.
-     * {@inheritDoc}
-     */
-    public File getRootDir() {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * Empty implementation. Throws {@link UnsupportedOperationException}.
-     * {@inheritDoc}
-     */
-    public Search getSearch() {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * Empty implementation. Throws {@link UnsupportedOperationException}.
-     * {@inheritDoc}
-     */
-    public String getSearchName() {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * Empty implementation. Throws {@link UnsupportedOperationException}.
-     * {@inheritDoc}
-     */
-    public String getSearchUrl() {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * Empty implementation. Throws {@link UnsupportedOperationException}.
-     * {@inheritDoc}
-     */
-    public SearchIndex getSearchIndex() {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * Empty implementation. Throws {@link UnsupportedOperationException}.
-     * {@inheritDoc}
-     */
-    public ACL getACL() {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * Empty implementation. Throws {@link UnsupportedOperationException}.
-     * {@inheritDoc}
-     */
-    public void checkPermission(final Permission permission) {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * Empty implementation. Throws {@link UnsupportedOperationException}.
-     * {@inheritDoc}
-     */
-    public boolean hasPermission(final Permission permission) {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * Empty implementation. Throws {@link UnsupportedOperationException}.
-     * {@inheritDoc}
-     */
-    public Hudson getParent() {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * Empty implementation. Throws {@link UnsupportedOperationException}.
-     * {@inheritDoc}
-     */
-    public TopLevelItemDescriptor getDescriptor() {
-        throw new UnsupportedOperationException();
-    }
-
-    public String getRelativeNameFrom(final Item item) {
-        throw new UnsupportedOperationException();
-    }
-
-    public String getRelativeNameFrom(final ItemGroup group) {
-        throw new UnsupportedOperationException();
     }
 }
