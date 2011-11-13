@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<development-configuration caption="$configuration.getCaption()" description="$configuration.getDescription()" location="$configuration.getLocation()" name="$configuration.getName()">
+  <build-variant name="$configuration.getBuildVariant().getName()">
+  #foreach ($name in $configuration.getBuildVariant().getBuildOptionNames())
+  <option name="$name" value="$configuration.getBuildVariant().getBuildOption($name)" />
+  #end
+</build-variant>
+#foreach ($compartment in $configuration.getCompartments())
+#set($state = 'yes')
+#if ($compartment.isSourceState())
+#set($state = 'no')
+#end
+  <compartment archive-state="$state" caption="$compartment.getCaption()" name="$compartment.getName()" sc-name="$compartment.getSoftwareComponent()" vendor="$compartment.getVendor()">
+    <used-compartments>
+#foreach($usedCompartment in $compartment.getUsedCompartments())
+#set($state = 'yes')
+#if ($usedCompartment.isSourceState())
+#set($state = 'no')
+#end
+      <used-compartment archive-state="$state" caption="$usedCompartment.getCaption()" name="$usedCompartment.getName()" sc-name="$usedCompartment.getSoftwareComponent()" vendor="$usedCompartment.getVendor()" />
+#end
+    </used-compartments>
+    <development-components>
+#foreach($dc in $compartment.getDevelopmentComponents())
+      <development-component name="$dc.getName()" type="$dc.getType()" vendor="$dc.getVendor()">
+        <description>$dc.getDescription()</description>
+        <dependencies>
+#foreach($dep in $dc.getUsedDevelopmentComponents())
+          <dependency name="$dep.getComponentName()" pp-ref="$dep.getName()" vendor="$dep.getVendor()">
+#if ($dep.isAtBuildTime())
+            <at-build-time />
+#end
+#if($dep.isAtRunTime())
+            <at-run-time />
+#end
+          </dependency>
+#end
+        </dependencies>
+#foreach($pp in $dc.getPublicParts())
+        <public-parts>
+          <public-part caption="$pp.getCaption()" name="$pp.getPublicPart()">
+            <description>$pp.getDescription()</description>
+          </public-part>
+#end
+        </public-parts>
+#end
+      </development-component>
+    </development-components>
+  </compartment>
+#end
+</development-configuration>
