@@ -19,9 +19,9 @@ import org.arachna.netweaver.dc.types.Compartment;
  */
 public enum SyncDcCommandTemplate {
     SyncDcCommandTemplateV70("syncdc -s %s -n %s -v %s -m inactive -y;", "syncalldcs -s %s -m archive;",
-        "unsyncdc -s %s -n %s -v %s;", "exit;", "SoftwareComponents70"), SyncDcCommandTemplateV71(
-        "syncdc -c %s -n %s -v %s -m inactive -f", "syncalldcs -c %s -m archive", "unsyncdc -c %s -n %s -v %s", "exit",
-        "SoftwareComponents73");
+        "syncalldcs -s %s -m inactive;", "unsyncdc -s %s -n %s -v %s;", "exit;", "SoftwareComponents70"), SyncDcCommandTemplateV71(
+        "syncdc -c %s -n %s -v %s -m inactive -f", "syncalldcs -c %s -m archive", "syncalldcs -c %s -m inactive",
+        "unsyncdc -c %s -n %s -v %s", "exit", "SoftwareComponents73");
 
     /**
      * template to use for creating a 'syncdc' in inactive state command.
@@ -29,9 +29,14 @@ public enum SyncDcCommandTemplate {
     private String syncInactiveDcTemplate;
 
     /**
-     * template to use for creating a 'syncalldcs' in active state command.
+     * template to use for creating a 'syncalldcs' in archive state command.
      */
     private String syncAllDcsInArchiveModeTemplate;
+
+    /**
+     * template to use for creating a 'syncalldcs' in inactive state command.
+     */
+    private String syncAllDcsInInactiveModeTemplate;
 
     /**
      * template to use for creating a 'unsyncdc' in active state command.
@@ -65,9 +70,11 @@ public enum SyncDcCommandTemplate {
      *            template for generating an 'exit' command.
      */
     SyncDcCommandTemplate(final String syncInactiveDcTemplate, final String syncAllDcsInArchiveModeTemplate,
-        final String unsyncDcTemplate, final String exitTemplate, final String compartmentDirectory) {
+        final String syncAllDcsInInactiveModeTemplate, final String unsyncDcTemplate, final String exitTemplate,
+        final String compartmentDirectory) {
         this.syncInactiveDcTemplate = syncInactiveDcTemplate;
         this.syncAllDcsInArchiveModeTemplate = syncAllDcsInArchiveModeTemplate;
+        this.syncAllDcsInInactiveModeTemplate = syncAllDcsInInactiveModeTemplate;
         this.unsyncDcTemplate = unsyncDcTemplate;
         this.exitTemplate = exitTemplate;
 
@@ -100,6 +107,10 @@ public enum SyncDcCommandTemplate {
      */
     String getSyncAllDcsInArchiveModeTemplate() {
         return syncAllDcsInArchiveModeTemplate;
+    }
+
+    String getSyncAllDcsInInactiveModeTemplate() {
+        return syncAllDcsInInactiveModeTemplate;
     }
 
     /**

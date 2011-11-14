@@ -9,11 +9,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.tools.ant.types.Path;
-import org.apache.tools.ant.types.selectors.ContainsRegexpSelector;
-import org.apache.tools.ant.types.selectors.FileSelector;
-import org.apache.tools.ant.types.selectors.NotSelector;
-import org.apache.tools.ant.types.selectors.OrSelector;
 import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.PublicPartReference;
@@ -67,15 +62,17 @@ public class AntHelper {
      * 
      * @param component
      *            development component to get the existing source folders for.
+     * @param filter
+     *            determines which source folders should be included in the
+     *            resulting collection of source folders
      * @return source folders that exist in the DCs directory structure.
      */
     private Collection<File> getExistingSourceFolders(final DevelopmentComponent component,
         final SourceDirectoryFilter filter) {
         final Collection<File> sourceFolders = new ArrayList<File>();
-        final String componentBase = this.getBaseLocation(component);
 
         for (final String sourceFolder : component.getSourceFolders()) {
-            final File folder = new File(sourceFolder);/* getSourceFolderLocation(componentBase, sourceFolder); */
+            final File folder = new File(sourceFolder);
 
             if (folder.exists() && filter.accept(folder.getAbsolutePath())) {
                 sourceFolders.add(folder);
@@ -86,34 +83,22 @@ public class AntHelper {
     }
 
     /**
-     * Get a file object pointing to the given source folders location in the
-     * development components directory structure.
+     * Create a set of paths using the public part references of the given
+     * development component.
      * 
-     * @return the file object representing the source folder in the DCs
-     *         directory structure.
-     */
-    private File getSourceFolderLocation(final String componentBase, final String sourceFolder) {
-        return new File(String.format("%s/%s", componentBase, sourceFolder));
-    }
-
-    /**
-     * Create a {@link Path} representing the class path that is referenced by
-     * the given development component via its used DCs and their public parts.
-     * 
-     * @param project
-     *            the ant project the class path shall be created with.
      * @param component
      *            development component the ant class path shall be created for.
+     * 
+     * @return set of paths built from the public part references of the given
+     *         development component
      */
     public Set<String> createClassPath(final DevelopmentComponent component) {
         Set<String> paths = new HashSet<String>();
 
         for (final PublicPartReference ppRef : component.getUsedDevelopmentComponents()) {
-            final DevelopmentComponent referencedDC = dcFactory.get(ppRef.getVendor(), ppRef.getComponentName());
+            DevelopmentComponent referencedDC = dcFactory.get(ppRef.getVendor(), ppRef.getComponentName());
 
             if (referencedDC != null) {
-                // FIXME: use factory and consider type of DC and type of
-                // compartment
                 final File baseDir = new File(this.getBaseLocation(referencedDC, ppRef.getName()));
 
                 if (!baseDir.exists()) {
@@ -183,12 +168,22 @@ public class AntHelper {
      * 
      * @param ppRef
      *            reference to public part
-     * @return
+     * @return the location of the files comprising the given public part
+     *         reference
      */
     public String getLocation(final PublicPartReference ppRef) {
         return getPublicPartLocation(this.getBaseLocation(ppRef.getVendor(), ppRef.getComponentName()), ppRef.getName());
     }
 
+    /**
+     * Calculate the base path using the given vendor and component name.
+     * 
+     * @param vendor
+     *            the vendor of the given component
+     * @param name
+     *            the name of the component
+     * @return base path using the given vendor and component name.
+     */
     private String getBaseLocation(final String vendor, final String name) {
         return String.format(BASE_PATH_TEMPLATE, pathToWorkspace, vendor, name);
     }
@@ -201,10 +196,10 @@ public class AntHelper {
      *            development component to create source file sets for.
      * @param excludes
      *            set of standard ant exclude expressions for file sets.
-     * @param set
-     *            of regular expressions that determine the files that should be
-     *            excluded from the source file sets based on their content
-     *            matching one of them
+     * @param containsRegexpExcludes
+     *            set of regular expressions that determine the files that
+     *            should be excluded from the source file sets based on their
+     *            content matching one of the given expressions
      */
     public Collection<String> createSourceFileSets(final DevelopmentComponent component,
         final Collection<String> excludes, final Collection<String> containsRegexpExcludes) {
@@ -226,17 +221,13 @@ public class AntHelper {
     }
 
     /**
-     * Creates a collection of source file sets representing the source folders
-     * and the sources to in-/exclude.
+     * Creates a collection of source folders.
      * 
      * @param component
      *            development component to create source file sets for.
-     * @param excludes
-     *            set of standard ant exclude expressions for file sets.
-     * @param containsRegexpExcludes
-     *            set of regular expressions that determine the files that
-     *            should be excluded from the source file sets based on their
-     *            content matching one of them
+     * @param filter
+     *            a filter that determines which of the source folders should be
+     *            added to the result list
      */
     public Collection<String> createSourceFileSets(final DevelopmentComponent component,
         final SourceDirectoryFilter filter) {
@@ -247,17 +238,5 @@ public class AntHelper {
         }
 
         return sources;
-    }
-
-    private FileSelector createContainsRegexpSelectors(final Collection<String> containsRegexpExcludes) {
-        final OrSelector or = new OrSelector();
-
-        for (final String containsRegexp : containsRegexpExcludes) {
-            final ContainsRegexpSelector selector = new ContainsRegexpSelector();
-            selector.setExpression(containsRegexp);
-            or.add(selector);
-        }
-
-        return new NotSelector(or);
     }
 }
