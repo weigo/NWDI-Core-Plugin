@@ -18,10 +18,17 @@ import org.arachna.netweaver.dc.types.Compartment;
  * @author Dirk Weigenand
  */
 public enum SyncDcCommandTemplate {
+    /**
+     * Template for NW 7.0.
+     */
     SyncDcCommandTemplateV70("syncdc -s %s -n %s -v %s -m inactive -y;", "syncalldcs -s %s -m archive;",
-        "syncalldcs -s %s -m inactive;", "unsyncdc -s %s -n %s -v %s;", "exit;", "SoftwareComponents70"), SyncDcCommandTemplateV71(
-        "syncdc -c %s -n %s -v %s -m inactive -f", "syncalldcs -c %s -m archive", "syncalldcs -c %s -m inactive",
-        "unsyncdc -c %s -n %s -v %s", "exit", "SoftwareComponents73");
+        "syncalldcs -s %s -m inactive;", "unsyncdc -s %s -n %s -v %s;", "exit;", "SoftwareComponents70"),
+
+    /**
+     * Template for NW 7.1+.
+     */
+    SyncDcCommandTemplateV71("syncdc -c %s -n %s -v %s -m inactive -f", "syncalldcs -c %s -m archive",
+        "syncalldcs -c %s -m inactive", "unsyncdc -c %s -n %s -v %s", "exit", "SoftwareComponents73");
 
     /**
      * template to use for creating a 'syncdc' in inactive state command.
@@ -63,11 +70,16 @@ public enum SyncDcCommandTemplate {
      * @param syncAllDcsInArchiveModeTemplate
      *            template to use for creating a 'syncalldcs' in active state
      *            command.
+     * @param syncAllDcsInInactiveModeTemplate
+     *            template for creating a 'syncalldcs' in archive mode command.
      * @param unsyncDcTemplate
      *            template to use for creating a 'unsyncdc' in active state
      *            command.
-     * @param exit
+     * @param exitTemplate
      *            template for generating an 'exit' command.
+     * @param compartmentDirectory
+     *            the 'compartment directory' containing software components
+     *            supplied for the respective NW version.
      */
     SyncDcCommandTemplate(final String syncInactiveDcTemplate, final String syncAllDcsInArchiveModeTemplate,
         final String syncAllDcsInInactiveModeTemplate, final String unsyncDcTemplate, final String exitTemplate,
@@ -109,6 +121,13 @@ public enum SyncDcCommandTemplate {
         return syncAllDcsInArchiveModeTemplate;
     }
 
+    /**
+     * Returns the template to create a 'syncalldcs' command for synchronizing
+     * DCs in inactive mode.
+     * 
+     * @return template to create a 'syncalldcs' command for synchronizing DCs
+     *         in inactive mode.
+     */
     String getSyncAllDcsInInactiveModeTemplate() {
         return syncAllDcsInInactiveModeTemplate;
     }
@@ -125,6 +144,8 @@ public enum SyncDcCommandTemplate {
     }
 
     /**
+     * Return the template for creating exit commands.
+     * 
      * @return the exitTemplate
      */
     String getExitTemplate() {
@@ -136,13 +157,31 @@ public enum SyncDcCommandTemplate {
      * synchronization.
      * 
      * @param compartment
-     * @return
+     *            the compartment that should be checked for exclusion
+     * @return whether the given compartment should be excluded from
+     *         synchronization
      */
     public boolean shouldCompartmentBeExcludedFromSynchronization(final Compartment compartment) {
         return excludeSCs.contains(compartment.getName());
     }
 
+    /**
+     * Reader for the compartments delivered by SAP to exclude from
+     * synchronization.
+     * 
+     * @author Dirk Weigenand
+     */
     static final class CompartmentsReader {
+        /**
+         * Set of compartments delivered for a certain version of NW.
+         * 
+         * @param compartmentDirectory
+         *            the file containing compartments delivered for a given NW
+         *            version
+         * @return Set of compartments delivered for a certain version of NW.
+         * @throws IOException
+         *             when the given directory could not be found.
+         */
         Set<String> read(final String compartmentDirectory) throws IOException {
             final Set<String> compartments = new HashSet<String>();
 

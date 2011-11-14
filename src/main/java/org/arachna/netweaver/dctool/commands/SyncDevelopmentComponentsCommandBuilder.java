@@ -95,9 +95,12 @@ final class SyncDevelopmentComponentsCommandBuilder extends AbstractDCToolComman
     /**
      * Create command for synchronizing DCs in archive mode.
      * 
+     * @param compartment
+     *            the compartment whose components should be synchronized in
+     *            archive mode
      * @return command for synchronizing DCs in inactive mode.
      */
-    protected String createSyncDcsInInActiveModeCommand(Compartment compartment) {
+    protected String createSyncDcsInInActiveModeCommand(final Compartment compartment) {
         return String.format(templateProvider.getSyncAllDcsInInactiveModeTemplate(), compartment.getName());
     }
 
@@ -113,7 +116,7 @@ final class SyncDevelopmentComponentsCommandBuilder extends AbstractDCToolComman
     protected Collection<String> synchronizeCompartmentsInArchiveMode() {
         final DevelopmentConfiguration developmentConfiguration = getDevelopmentConfiguration();
         final Collection<Compartment> compartments = developmentConfiguration.getCompartments(CompartmentState.Archive);
-        final Collection<String> commands = new ArrayList<String>(compartments.size());
+        final Collection<String> commands = new LinkedList<String>();
 
         for (final Compartment compartment : compartments) {
             if (cleanCopy || !templateProvider.shouldCompartmentBeExcludedFromSynchronization(compartment)) {
@@ -161,6 +164,8 @@ final class SyncDevelopmentComponentsCommandBuilder extends AbstractDCToolComman
 
     /**
      * Return the 'exit' command to use.
+     * 
+     * @return returns the exit command to use.
      */
     @Override
     protected String getExitCommand() {
