@@ -20,9 +20,7 @@ import org.arachna.netweaver.dc.types.BuildVariant;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 import org.arachna.netweaver.dctool.commands.DCToolCommandBuilder;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
@@ -44,7 +42,7 @@ public class DCToolCommandExecutorTest {
     /**
      * The folder used for testing.
      */
-    private static File TEST_DIRECTORY;
+    private File testDirectory;
 
     /**
      * Folder where the NWDI tool libraries are found.
@@ -62,37 +60,31 @@ public class DCToolCommandExecutorTest {
      * 
      * @throws IOException
      *             when the temporary directory for the test could not be
-     *             created.
+     *             created or creating the DCToolCommandExecutor fails.
      * @throws InterruptedException
      *             when the test was interrupted during file operations on the
      *             test scripts
+     * 
+     * @throws IOException
+     *             rethrown when creating the DCToolCommandExecutor fails
+     * @throws InterruptedException
      */
-    @BeforeClass
-    public static void setUpBeforeClass() throws IOException, InterruptedException {
-        TEST_DIRECTORY = Util.createTempDir();
+    @Before
+    public void setUp() throws IOException, InterruptedException {
+        testDirectory = Util.createTempDir();
 
-        if (TEST_DIRECTORY == null || !TEST_DIRECTORY.exists()) {
-            fail("Could not create " + TEST_DIRECTORY.getAbsolutePath());
+        if (testDirectory == null || !testDirectory.exists()) {
+            fail("Could not create " + testDirectory.getAbsolutePath());
         }
 
-        final FilePath testFolder = new FilePath(TEST_DIRECTORY);
-        final FilePath dctoolSh = testFolder.child("lib/dc/dctool.sh");
+        final FilePath testFolder = new FilePath(testDirectory);
+        final FilePath dctoolSh = testFolder.child("dc/dctool.sh");
         dctoolSh.write("#!/bin/sh\necho TEST > dtool.out", UTF_8);
         dctoolSh.chmod(Integer.parseInt("0700", OCTAL));
 
         final FilePath dctoolBat = testFolder.child("dc/dctool.bat");
         dctoolBat.write("@echo on\n\recho TEST > dtool.out\n\r", UTF_8);
-    }
-
-    /**
-     * set up test fixture (executor).
-     * 
-     * @throws IOException
-     *             rethrown when creating the DCToolCommandExecutor fails
-     */
-    @Before
-    public void setUp() throws IOException {
-        nwdiToolLibDir = String.format("%s%c", TEST_DIRECTORY.getAbsolutePath(), File.separatorChar);
+        nwdiToolLibDir = String.format("%s%c", testDirectory.getAbsolutePath(), File.separatorChar);
         executor = createDCToolCommandExecutor();
     }
 
@@ -110,8 +102,8 @@ public class DCToolCommandExecutorTest {
             JdkHomeAlias.Jdk131Home.toString());
 
         final JdkHomePaths paths = new JdkHomePaths();
-        paths.add(JdkHomeAlias.Jdk131Home, TEST_DIRECTORY.getAbsolutePath());
-        paths.add(JdkHomeAlias.Jdk142Home, TEST_DIRECTORY.getAbsolutePath());
+        paths.add(JdkHomeAlias.Jdk131Home, testDirectory.getAbsolutePath());
+        paths.add(JdkHomeAlias.Jdk142Home, testDirectory.getAbsolutePath());
 
         final Writer messages = new OutputStreamWriter(System.out);
         final Launcher launcher = new Launcher.LocalLauncher(new StreamTaskListener(messages));
@@ -119,25 +111,19 @@ public class DCToolCommandExecutorTest {
         final DevelopmentConfiguration config = new DevelopmentConfiguration("Test");
         config.setBuildVariant(buildVariant);
 
-        return new DCToolCommandExecutor(launcher, new FilePath(TEST_DIRECTORY), dcToolDescriptor, config);
-    }
-
-    /**
-     * @throws IOException
-     *             when removing the test directory failed.
-     */
-    @AfterClass
-    public static void tearDownAfterClass() throws IOException {
-        Util.deleteRecursive(TEST_DIRECTORY);
-        TEST_DIRECTORY = null;
+        return new DCToolCommandExecutor(launcher, new FilePath(testDirectory), dcToolDescriptor, config);
     }
 
     /**
      * Clean up fixture.
+     * 
+     * @throws IOException
      */
     @After
-    public void tearDown() {
+    public void tearDown() throws IOException {
         executor = null;
+        Util.deleteRecursive(testDirectory);
+        testDirectory = null;
     }
 
     /**
