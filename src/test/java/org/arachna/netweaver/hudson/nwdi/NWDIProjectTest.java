@@ -81,6 +81,7 @@ public class NWDIProjectTest extends HudsonTestCase {
 
         assertThat(descriptor.getJdkHomePaths(), equalTo(""));
         assertThat(descriptor.getNwdiToolLibFolder(), equalTo(""));
+        assertThat(descriptor.getNwdiToolLibFolder71(), equalTo(""));
         assertThat(descriptor.getUser(), equalTo(""));
         assertThat(descriptor.getPassword(), equalTo(""));
     }
@@ -108,6 +109,7 @@ public class NWDIProjectTest extends HudsonTestCase {
 
         assertThat(descriptor.getJdkHomePaths(), equalTo(jdk16));
         assertThat(descriptor.getNwdiToolLibFolder(), equalTo(nwdiToolsFolder));
+        assertThat(descriptor.getNwdiToolLibFolder71(), equalTo(nwdiToolsFolder));
         assertThat(descriptor.getUser(), equalTo(user));
         assertThat(descriptor.getPassword(), equalTo(password));
     }

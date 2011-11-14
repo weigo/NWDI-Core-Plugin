@@ -92,7 +92,7 @@ public class DCToolCommandExecutorTest {
      */
     @Before
     public void setUp() throws IOException {
-        nwdiToolLibDir = String.format("%s%clib", TEST_DIRECTORY.getAbsolutePath(), File.separatorChar);
+        nwdiToolLibDir = String.format("%s%c", TEST_DIRECTORY.getAbsolutePath(), File.separatorChar);
         executor = createDCToolCommandExecutor();
     }
 
