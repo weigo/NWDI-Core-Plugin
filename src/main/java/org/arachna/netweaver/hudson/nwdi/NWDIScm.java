@@ -87,13 +87,13 @@ public class NWDIScm extends SCM {
         this.password = password;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public DescriptorImpl getDescriptor() {
-        return (DescriptorImpl)super.getDescriptor();
-    }
+    // /**
+    // * {@inheritDoc}
+    // */
+    // @Override
+    // public DescriptorImpl getDescriptor() {
+    // return (DescriptorImpl)super.getDescriptor();
+    // }
 
     /**
      * {@inheritDoc}
@@ -129,6 +129,7 @@ public class NWDIScm extends SCM {
 
         if (result.isExitCodeOk()) {
             final NWDIBuild lastSuccessfulBuild = currentBuild.getParent().getLastSuccessfulBuild();
+            boolean cleanCopy = currentBuild.getPreviousBuild() == null || this.cleanCopy;
 
             if (lastSuccessfulBuild != null) {
                 logger.append(String.format("Getting activities from DTR (since last successful build #%s).\n",
@@ -142,7 +143,6 @@ public class NWDIScm extends SCM {
                 lastSuccessfulBuild != null ? lastSuccessfulBuild.getAction(NWDIRevisionState.class).getCreationDate()
                     : null));
 
-            // FIXME: should move to syncds CommandBuilder!
             if (cleanCopy) {
                 for (final Compartment compartment : config.getCompartments(CompartmentState.Source)) {
                     for (final DevelopmentComponent component : compartment.getDevelopmentComponents()) {
@@ -152,26 +152,8 @@ public class NWDIScm extends SCM {
             }
 
             result = executor.synchronizeDevelopmentComponents(cleanCopy);
-
-            if (!result.isExitCodeOk()) {
-                final String output = result.getOutput();
-
-                if (output.contains("Unable to sync local path")) {
-                    // some of the affected DCs could not be synchronized. This
-                    // should abort the build.
-                }
-                // FIXME: make heap used for dctool configurable!
-                // ignore OutOfMemoryError on exit from dctool
-                else if (output.contains("java.lang.OutOfMemoryError") && output.contains("java.lang.System.exit")
-                    && output.contains("com.sap.tc.devconf.dctool.startup.DCToolMain.main")) {
-                    result = new DcToolCommandExecutionResult(output, 0);
-                }
-            }
-
-            final DevelopmentComponentUpdater updater =
-                new DevelopmentComponentUpdater(FilePathHelper.makeAbsolute(currentBuild.getWorkspace().child(".dtc")),
-                    dcFactory);
-            updater.execute();
+            new DevelopmentComponentUpdater(FilePathHelper.makeAbsolute(currentBuild.getWorkspace().child(".dtc")),
+                dcFactory).execute();
         }
 
         build.addAction(new NWDIRevisionState(activities));
