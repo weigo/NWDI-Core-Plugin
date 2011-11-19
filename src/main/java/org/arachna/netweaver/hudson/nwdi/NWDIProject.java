@@ -7,20 +7,35 @@ import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.Util;
+import hudson.model.Action;
 import hudson.model.BuildListener;
+import hudson.model.BuildableItemWithBuildWrappers;
 import hudson.model.DependencyGraph;
 import hudson.model.Item;
 import hudson.model.ItemGroup;
+import hudson.model.SCMedItem;
+import hudson.model.Saveable;
 import hudson.model.TopLevelItem;
 import hudson.model.AbstractBuild;
+import hudson.model.AbstractProject;
+import hudson.model.Descriptor;
 import hudson.model.Descriptor.FormException;
 import hudson.model.Hudson;
-import hudson.model.Project;
 import hudson.scm.SCM;
+import hudson.tasks.BuildStep;
+import hudson.tasks.BuildStepDescriptor;
+import hudson.tasks.BuildWrapper;
+import hudson.tasks.BuildWrappers;
+import hudson.tasks.Builder;
+import hudson.tasks.Publisher;
+import hudson.triggers.Trigger;
+import hudson.util.DescribableList;
 import hudson.util.FormValidation;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 
@@ -37,7 +52,8 @@ import org.kohsuke.stapler.StaplerResponse;
  * 
  * @author Dirk Weigenand
  */
-public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopLevelItem {
+public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> implements SCMedItem, Saveable,
+    BuildableItemWithBuildWrappers, TopLevelItem {
     /**
      * Constant for a 1000 milliseconds.
      */
@@ -59,6 +75,24 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
      * clean workspace before building when <code>true</code>.
      */
     private boolean cleanCopy;
+
+    /**
+     * List of active {@link Builder}s configured for this project.
+     */
+    private DescribableList<Builder, Descriptor<Builder>> builders = new DescribableList<Builder, Descriptor<Builder>>(
+        this);
+
+    /**
+     * List of active {@link Publisher}s configured for this project.
+     */
+    private DescribableList<Publisher, Descriptor<Publisher>> publishers =
+        new DescribableList<Publisher, Descriptor<Publisher>>(this);
+
+    /**
+     * List of active {@link BuildWrapper}s configured for this project.
+     */
+    private DescribableList<BuildWrapper, Descriptor<BuildWrapper>> buildWrappers =
+        new DescribableList<BuildWrapper, Descriptor<BuildWrapper>>(this);
 
     /**
      * Create an instance of a NWDI project.
@@ -113,6 +147,9 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
     @Override
     public void onLoad(final ItemGroup<? extends Item> parent, final String name) throws IOException {
         super.onLoad(parent, name);
+        builders.setOwner(this);
+        publishers.setOwner(this);
+        buildWrappers.setOwner(this);
     }
 
     /*
@@ -167,6 +204,10 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
             DescriptorImpl.DESCRIPTOR.getPassword()));
     }
 
+    public AbstractProject<?, ?> asProject() {
+        return this;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -177,9 +218,54 @@ public class NWDIProject extends Project<NWDIProject, NWDIBuild> implements TopL
         confDef = json.getString("developmentConfiguration");
         cleanCopy = json.getBoolean(PARAMETER_CLEAN_COPY);
         setScm(new NWDIScm(cleanCopy, getDescriptor().getUser(), getDescriptor().getPassword()));
+
+        buildWrappers.rebuild(req, json, BuildWrappers.getFor(this));
+        builders.rebuildHetero(req, json, Builder.all(), "builder");
+        publishers.rebuild(req, json, BuildStepDescriptor.filter(Publisher.all(), this.getClass()));
+
         // not needed since setting the SCM saves automatically.
         save();
         super.submit(req, rsp);
+    }
+
+    public List<Builder> getBuilders() {
+        return builders.toList();
+    }
+
+    public Map<Descriptor<Publisher>, Publisher> getPublishers() {
+        return publishers.toMap();
+    }
+
+    public DescribableList<Builder, Descriptor<Builder>> getBuildersList() {
+        return builders;
+    }
+
+    public DescribableList<Publisher, Descriptor<Publisher>> getPublishersList() {
+        return publishers;
+    }
+
+    public Map<Descriptor<BuildWrapper>, BuildWrapper> getBuildWrappers() {
+        return buildWrappers.toMap();
+    }
+
+    public DescribableList<BuildWrapper, Descriptor<BuildWrapper>> getBuildWrappersList() {
+        return buildWrappers;
+    }
+
+    @Override
+    protected List<Action> createTransientActions() {
+        List<Action> r = super.createTransientActions();
+
+        for (BuildStep step : getBuildersList())
+            r.addAll(step.getProjectActions(this));
+        for (BuildStep step : getPublishersList())
+            r.addAll(step.getProjectActions(this));
+        for (BuildWrapper step : getBuildWrappers().values())
+            r.addAll(step.getProjectActions(this));
+        for (Trigger trigger : getTriggers().values())
+            r.addAll(trigger.getProjectActions());
+
+        return r;
     }
 
     /**

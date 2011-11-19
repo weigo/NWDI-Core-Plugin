@@ -6,9 +6,9 @@ package org.arachna.netweaver.hudson.nwdi;
 import static hudson.model.Result.FAILURE;
 import hudson.FilePath;
 import hudson.Launcher;
-import hudson.model.Build;
 import hudson.model.BuildListener;
 import hudson.model.Result;
+import hudson.model.AbstractBuild;
 import hudson.tasks.BuildStep;
 import hudson.tasks.Builder;
 import hudson.tasks.Publisher;
@@ -44,9 +44,8 @@ import org.xml.sax.SAXException;
  * A job for building a NWDI development configuration/track.
  * 
  * @author Dirk Weigenand
- * 
  */
-public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
+public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
     /**
      * Executor for DC tool commands used throughout.
      */
