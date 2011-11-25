@@ -378,12 +378,14 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
          * source folders.
          * 
          * This is necessary since f.e. WebDynpro DCs have <code>gen_ddic</code>
-         * and <code>gen_wdp</code> that are not listed in <code>.dcdef</code>
-         * but are created when the component is built. Those folders have to be
-         * considered too when running analysis plugins.
+         * and <code>gen_wdp</code> folders that are not listed in
+         * <code>.dcdef</code> but are created when the component is built.
+         * Those folders have to be considered too when running analysis
+         * plugins.
          * 
          * @param logger
          *            Logger to report actions back to build.
+         * @param antHelper
          */
         private void updateSourceCodeLocations(final PrintStream logger, AntHelper antHelper) {
             Collection<Compartment> compartments =
@@ -394,6 +396,7 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
                     final BuildLogParser parser = new BuildLogParser(antHelper.getBaseLocation(component));
                     parser.parse();
                     component.setSourceFolders(parser.getSourceFolders());
+                    component.setOutputFolder(parser.getOutputFolder());
                 }
             }
         }
