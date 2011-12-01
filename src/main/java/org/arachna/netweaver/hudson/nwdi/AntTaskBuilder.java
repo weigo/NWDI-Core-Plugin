@@ -3,8 +3,15 @@
  */
 package org.arachna.netweaver.hudson.nwdi;
 
+import hudson.Launcher;
+import hudson.model.BuildListener;
+import hudson.model.AbstractBuild;
 import hudson.tasks.Builder;
+import hudson.tasks.Ant;
+import hudson.tasks.Ant.AntInstallation;
+import hudson.tools.ToolInstallation;
 
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.Reader;
@@ -21,7 +28,57 @@ import org.arachna.velocity.VelocityLogChute;
  * @author Dirk Weigenand
  */
 public abstract class AntTaskBuilder extends Builder {
+    /**
+     * AntHelper to use for build file generation.
+     */
     private transient AntHelper antHelper;
+
+    /**
+     * Execute an Ant build using the ant-plugin.
+     * 
+     * @param build
+     *            the build the ant build is executed for
+     * @param launcher
+     *            launcher to launch the ant subprocess with
+     * @param listener
+     *            the build listener
+     * @param defaultTarget
+     *            the default target to call in the ant build
+     * @param buildFileName
+     *            the name of the build file that shall be executed
+     * @param antOpts
+     *            options for the ant process (ANT_OPTS environment variable)
+     * @return returns <code>true</code> when the ant build returned
+     *         successfully, <code>false</code> otherwise
+     */
+    protected final boolean execute(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener,
+        String defaultTarget, String buildFileName, String antOpts) {
+        boolean result = false;
+        AntInstallation.DescriptorImpl descriptor =
+            (AntInstallation.DescriptorImpl)ToolInstallation.all().get(AntInstallation.DescriptorImpl.class);
+        AntInstallation[] installations = descriptor.getInstallations();
+
+        if (installations != null && installations.length > 0) {
+            Ant ant = new Ant(defaultTarget, installations[0].getName(), antOpts, buildFileName, getAntProperties());
+
+            try {
+                result = ant.perform(build, launcher, listener);
+            }
+            catch (InterruptedException e) {
+                result = false;
+                e.printStackTrace(listener.getLogger());
+            }
+            catch (IOException e) {
+                result = false;
+                e.printStackTrace(listener.getLogger());
+            }
+        }
+        else {
+            result = false;
+        }
+
+        return result;
+    }
 
     /**
      * Helper object to inject for setting up an Ant tasks {@link FileSet}s and
@@ -36,9 +93,9 @@ public abstract class AntTaskBuilder extends Builder {
     }
 
     /**
-     * Returns the
+     * Returns the <code>AntHelper</code> object to use for this build step.
      * 
-     * @return
+     * @return <code>AntHelper</code> object to use for this build step
      */
     protected final AntHelper getAntHelper() {
         return this.antHelper;
