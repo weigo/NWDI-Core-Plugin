@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -24,6 +25,7 @@ import java.util.List;
 
 import org.arachna.ant.AntHelper;
 import org.arachna.ant.ExcludesFactory;
+import org.arachna.netweaver.dc.config.DevelopmentConfigurationXmlWriter;
 import org.arachna.netweaver.dc.types.Compartment;
 import org.arachna.netweaver.dc.types.CompartmentState;
 import org.arachna.netweaver.dc.types.DevelopmentComponent;
@@ -259,7 +261,7 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
 
             final DCToolDescriptor dcToolDescriptor =
                 new DCToolDescriptor(descriptor.getUser(), descriptor.getPassword(), nwdiToolLibraryFolder,
-                    descriptor.getConfiguredJdkHomePaths());
+                    descriptor.getConfiguredJdkHomePaths(), descriptor.getJdkOpts());
             dcToolExecutor = new DCToolCommandExecutor(launcher, getWorkspace(), dcToolDescriptor, configuration);
         }
 
@@ -369,6 +371,12 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
             }
 
             updateSourceCodeLocations(logger, antHelper);
+            FilePath devConfXml = NWDIBuild.this.getWorkspace().child("DevelopmentConfiguration.xml");
+            StringWriter content = new StringWriter();
+            DevelopmentConfigurationXmlWriter xmlWriter =
+                new DevelopmentConfigurationXmlWriter(NWDIBuild.this.getDevelopmentConfiguration(), logger);
+            xmlWriter.write(content);
+            devConfXml.write(content.toString(), "UTF-8");
 
             return result.isExitCodeOk() ? null : Result.FAILURE;
         }

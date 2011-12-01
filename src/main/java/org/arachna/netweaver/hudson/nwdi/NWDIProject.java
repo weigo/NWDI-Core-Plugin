@@ -337,6 +337,11 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
         private String jdkHomePaths;
 
         /**
+         * Options that should be passed to the JDK executing the DC tool.
+         */
+        private String jdkOpts;
+
+        /**
          * Create descriptor for NWDI-Projects and load global configuration
          * data.
          */
@@ -438,6 +443,21 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
             this.jdkHomePaths = jdkHomePaths;
         }
 
+        /**
+         * @return the jdkOpts
+         */
+        String getJdkOpts() {
+            return jdkOpts;
+        }
+
+        /**
+         * @param jdkOpts
+         *            the jdkOpts to set
+         */
+        void setJdkOpts(String jdkOpts) {
+            this.jdkOpts = jdkOpts;
+        }
+
         /*
          * (non-Javadoc)
          * 
@@ -452,6 +472,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
             nwdiToolLibFolder71 = Util.fixNull(json.getString("nwdiToolLibFolder71"));
             user = Util.fixNull(json.getString("user"));
             password = Util.fixNull(json.getString("password"));
+            jdkOpts = Util.fixNull(json.getString("jdkOpts"));
 
             save();
 
@@ -478,6 +499,28 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
          */
         public FormValidation doNwdiToolLibFolder71Check(@QueryParameter final String value) {
             return validateNwdiToolLibraryFolder(value);
+        }
+
+        /**
+         * Verify the given values for options that should be passed to the JDK
+         * executing the dctool.
+         * 
+         * @param value
+         *            verify that all options passed to the JDK start with -X.
+         * @return
+         */
+        public FormValidation doJdkOptsCheck(@QueryParameter final String value) {
+            String[] jdkOpts = value == null ? new String[0] : value.split(" ");
+            FormValidation result = FormValidation.ok();
+
+            for (String option : jdkOpts) {
+                if (!option.startsWith("-X")) {
+                    result = FormValidation.error(Messages.NWDIProject_invalid_jdk_option(option));
+                    break;
+                }
+            }
+
+            return result;
         }
 
         /**
