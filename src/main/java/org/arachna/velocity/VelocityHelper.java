@@ -49,5 +49,4 @@ public final class VelocityHelper {
     public VelocityEngine getVelocityEngine() {
         return this.engine;
     }
-
 }

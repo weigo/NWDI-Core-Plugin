@@ -15,12 +15,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.Reader;
-import java.util.Properties;
 
 import org.apache.tools.ant.types.FileSet;
 import org.apache.velocity.app.VelocityEngine;
 import org.arachna.ant.AntHelper;
-import org.arachna.velocity.VelocityLogChute;
+import org.arachna.velocity.VelocityHelper;
 
 /**
  * Base class {@link Builder}s using an Ant task.
@@ -109,21 +108,7 @@ public abstract class AntTaskBuilder extends Builder {
      * @return the new VelocityEngine.
      */
     protected VelocityEngine getVelocityEngine(final PrintStream logger) {
-        VelocityEngine engine = null;
-
-        try {
-            engine = new VelocityEngine();
-            Properties properties = new Properties();
-            properties.load(this.getClass().getResourceAsStream(
-                "/org/arachna/netweaver/hudson/nwdi/velocity.properties"));
-            engine.setProperty(VelocityEngine.RUNTIME_LOG_LOGSYSTEM, new VelocityLogChute(logger));
-            engine.init(properties);
-        }
-        catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
-        return engine;
+        return new VelocityHelper(logger).getVelocityEngine();
     }
 
     /**
