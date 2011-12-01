@@ -152,8 +152,21 @@ public class NWDIScm extends SCM {
             }
 
             result = executor.synchronizeDevelopmentComponents(cleanCopy);
-            new DevelopmentComponentUpdater(FilePathHelper.makeAbsolute(currentBuild.getWorkspace().child(".dtc")),
-                dcFactory).execute();
+
+            if (!result.isExitCodeOk()) {
+                final String output = result.getOutput();
+
+                // FIXME: make heap used for dctool configurable!
+                // ignore OutOfMemoryError on exit from dctool
+                if (output.contains("java.lang.OutOfMemoryError") && output.contains("java.lang.System.exit")
+                    && output.contains("com.sap.tc.devconf.dctool.startup.DCToolMain.main")) {
+                    result = new DcToolCommandExecutionResult(output, 0);
+                }
+            }
+            else {
+                new DevelopmentComponentUpdater(FilePathHelper.makeAbsolute(currentBuild.getWorkspace().child(".dtc")),
+                    dcFactory).execute();
+            }
         }
 
         build.addAction(new NWDIRevisionState(activities));
