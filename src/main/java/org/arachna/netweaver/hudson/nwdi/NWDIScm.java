@@ -163,7 +163,8 @@ public class NWDIScm extends SCM {
                     result = new DcToolCommandExecutionResult(output, 0);
                 }
             }
-            else {
+
+            if (result.isExitCodeOk()) {
                 new DevelopmentComponentUpdater(FilePathHelper.makeAbsolute(currentBuild.getWorkspace().child(".dtc")),
                     dcFactory).execute();
             }
