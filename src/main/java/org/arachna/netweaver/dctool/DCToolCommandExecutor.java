@@ -276,7 +276,6 @@ public final class DCToolCommandExecutor {
     protected String getDcToolPath() {
         final File libraryFolder = new File(dcToolDescriptor.getNwdiToolLibrary());
         // final File parent = libraryFolder.getParentFile();
-
         return String.format("%s%cdc", libraryFolder.getAbsolutePath(), File.separatorChar);
     }
 
@@ -296,6 +295,8 @@ public final class DCToolCommandExecutor {
             environment.put(JAVA_HOME, dcToolDescriptor.getPaths().get(alias));
             environment.put(JDK_PROPERTY_NAME, alias.toString());
         }
+
+        environment.put("JAVA_OPTS", dcToolDescriptor.getJdkOpts());
 
         return environment;
     }
