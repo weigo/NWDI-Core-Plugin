@@ -77,6 +77,7 @@ public class NWDIProjectTest extends HudsonTestCase {
         json.accumulate(NWDITOOLLIB71, "");
         json.accumulate(PASSWORD, "");
         json.accumulate(USER, "");
+        json.accumulate("jdkOpts", "");
         descriptor.configure(null, json);
 
         assertThat(descriptor.getJdkHomePaths(), equalTo(""));
@@ -84,6 +85,7 @@ public class NWDIProjectTest extends HudsonTestCase {
         assertThat(descriptor.getNwdiToolLibFolder71(), equalTo(""));
         assertThat(descriptor.getUser(), equalTo(""));
         assertThat(descriptor.getPassword(), equalTo(""));
+        assertThat(descriptor.getJdkOpts(), equalTo(""));
     }
 
     /**
@@ -98,6 +100,7 @@ public class NWDIProjectTest extends HudsonTestCase {
         final String nwdiToolsFolder = "/opt/nwdi/lib";
         final String user = USER;
         final String password = "secret";
+        final String jdkOpts = "-Xmx1024m";
 
         final JSONObject json = new JSONObject();
         json.accumulate(JDK_HOME_PATHS, jdk16);
@@ -105,6 +108,7 @@ public class NWDIProjectTest extends HudsonTestCase {
         json.accumulate(NWDITOOLLIB71, nwdiToolsFolder);
         json.accumulate(PASSWORD, password);
         json.accumulate(USER, user);
+        json.accumulate("jdkOpts", jdkOpts);
         descriptor.configure(null, json);
 
         assertThat(descriptor.getJdkHomePaths(), equalTo(jdk16));
@@ -112,6 +116,7 @@ public class NWDIProjectTest extends HudsonTestCase {
         assertThat(descriptor.getNwdiToolLibFolder71(), equalTo(nwdiToolsFolder));
         assertThat(descriptor.getUser(), equalTo(user));
         assertThat(descriptor.getPassword(), equalTo(password));
+        assertThat(descriptor.getJdkOpts(), equalTo(jdkOpts));
     }
 
     @Test
@@ -127,4 +132,12 @@ public class NWDIProjectTest extends HudsonTestCase {
         final FormValidation validationResult = descriptor.doJdkHomePathsCheck(invalidPathSpec);
         assertThat(validationResult.kind, equalTo(FormValidation.Kind.ERROR));
     }
+
+    @Test
+    public void testDoIllegalJdkOptCheck() {
+        final String invalidJdkOptSpec = "Xmx1024m";
+        final FormValidation validationResult = descriptor.doJdkOptsCheck(invalidJdkOptSpec);
+        assertThat(validationResult.kind, equalTo(FormValidation.Kind.ERROR));
+    }
+
 }
