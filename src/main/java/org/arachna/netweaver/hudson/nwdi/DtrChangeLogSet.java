@@ -20,14 +20,14 @@ import org.kohsuke.stapler.export.ExportedBean;
 /**
  * A log of a set of changes in the DTR.
  * 
- * @author G526521
+ * @author Dirk Weigenand
  */
 @ExportedBean(defaultVisibility = 999)
 public final class DtrChangeLogSet extends ChangeLogSet<DtrChangeLogEntry> {
     /**
      * Entries in the change log.
      */
-    private List<DtrChangeLogEntry> entries = new ArrayList<DtrChangeLogEntry>();
+    private final List<DtrChangeLogEntry> entries = new ArrayList<DtrChangeLogEntry>();
 
     /**
      * Creat an instance of a <code>DtrChangeLogSet</code>.
@@ -58,33 +58,57 @@ public final class DtrChangeLogSet extends ChangeLogSet<DtrChangeLogEntry> {
     @Exported
     @Override
     public boolean isEmptySet() {
-        return this.entries.isEmpty();
+        return entries.isEmpty();
     }
 
+    /**
+     * Return an {@link Iterator} over the change log entries of this change log
+     * set. {@inheritDoc}
+     */
     public Iterator<DtrChangeLogEntry> iterator() {
-        return this.entries.iterator();
+        return entries.iterator();
     }
 
+    /**
+     * Add all change log entries to this change log set.
+     * 
+     * @param entries
+     *            change log entries to add to this change log set.
+     */
     void add(final List<DtrChangeLogEntry> entries) {
         for (final DtrChangeLogEntry entry : entries) {
             this.add(entry);
         }
     }
 
+    /**
+     * Add the given change log entry to this change log set.
+     * 
+     * @param entry
+     *            change log entry to add.
+     */
     public void add(final DtrChangeLogEntry entry) {
         entry.setParent(this);
-        this.entries.add(entry);
+        entries.add(entry);
     }
 
+    /**
+     * Sort the change log entries by their check in time.
+     */
     void sort() {
-        Collections.sort(this.entries, new DtrChangeLogEntryComparator());
+        Collections.sort(entries, new DtrChangeLogEntryComparator());
     }
 
+    /**
+     * {@link Comparator} for change log entries by check in time.
+     * 
+     * @author Dirk Weigenand
+     */
     private final class DtrChangeLogEntryComparator implements Comparator<DtrChangeLogEntry> {
         /**
          * {@inheritDoc}
          */
-        public int compare(DtrChangeLogEntry entry1, DtrChangeLogEntry entry2) {
+        public int compare(final DtrChangeLogEntry entry1, final DtrChangeLogEntry entry2) {
             return entry1.getCheckInTime().compareTo(entry2.getCheckInTime());
         }
     }
