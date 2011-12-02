@@ -62,18 +62,20 @@ public final class DtrChangeLogSet extends ChangeLogSet<DtrChangeLogEntry> {
     }
 
     /**
-     * Return an {@link Iterator} over the change log entries of this change log
-     * set. {@inheritDoc}
+     * Return an {@link Iterator} for the change log entries contained in this
+     * change log set.
+     * 
+     * {@inheritDoc}
      */
     public Iterator<DtrChangeLogEntry> iterator() {
         return entries.iterator();
     }
 
     /**
-     * Add all change log entries to this change log set.
+     * Add all given change log entries to this change log set.
      * 
      * @param entries
-     *            change log entries to add to this change log set.
+     *            change log entries to add to this change log set
      */
     void add(final List<DtrChangeLogEntry> entries) {
         for (final DtrChangeLogEntry entry : entries) {
@@ -85,7 +87,7 @@ public final class DtrChangeLogSet extends ChangeLogSet<DtrChangeLogEntry> {
      * Add the given change log entry to this change log set.
      * 
      * @param entry
-     *            change log entry to add.
+     *            change log entry to add to this change log set.
      */
     public void add(final DtrChangeLogEntry entry) {
         entry.setParent(this);
@@ -93,14 +95,14 @@ public final class DtrChangeLogSet extends ChangeLogSet<DtrChangeLogEntry> {
     }
 
     /**
-     * Sort the change log entries by their check in time.
+     * Sort the change log entries by check in time.
      */
     void sort() {
         Collections.sort(entries, new DtrChangeLogEntryComparator());
     }
 
     /**
-     * {@link Comparator} for change log entries by check in time.
+     * Comparator for change log entries.
      * 
      * @author Dirk Weigenand
      */
