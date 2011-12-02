@@ -16,7 +16,6 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.Reader;
 
-import org.apache.tools.ant.types.FileSet;
 import org.apache.velocity.app.VelocityEngine;
 import org.arachna.ant.AntHelper;
 import org.arachna.velocity.VelocityHelper;
@@ -50,44 +49,38 @@ public abstract class AntTaskBuilder extends Builder {
      * @return returns <code>true</code> when the ant build returned
      *         successfully, <code>false</code> otherwise
      */
-    protected final boolean execute(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener,
-        String defaultTarget, String buildFileName, String antOpts) {
+    protected final boolean execute(final AbstractBuild<?, ?> build, final Launcher launcher,
+        final BuildListener listener, final String defaultTarget, final String buildFileName, final String antOpts) {
         boolean result = false;
-        AntInstallation.DescriptorImpl descriptor =
-            (AntInstallation.DescriptorImpl)ToolInstallation.all().get(AntInstallation.DescriptorImpl.class);
-        AntInstallation[] installations = descriptor.getInstallations();
+        final AntInstallation.DescriptorImpl descriptor =
+            ToolInstallation.all().get(AntInstallation.DescriptorImpl.class);
+        final AntInstallation[] installations = descriptor.getInstallations();
 
         if (installations != null && installations.length > 0) {
-            Ant ant = new Ant(defaultTarget, installations[0].getName(), antOpts, buildFileName, getAntProperties());
+            final Ant ant =
+                new Ant(defaultTarget, installations[0].getName(), antOpts, buildFileName, getAntProperties());
 
             try {
                 result = ant.perform(build, launcher, listener);
             }
-            catch (InterruptedException e) {
-                result = false;
+            catch (final InterruptedException e) {
                 e.printStackTrace(listener.getLogger());
             }
-            catch (IOException e) {
-                result = false;
+            catch (final IOException e) {
                 e.printStackTrace(listener.getLogger());
             }
-        }
-        else {
-            result = false;
         }
 
         return result;
     }
 
     /**
-     * Helper object to inject for setting up an Ant tasks {@link FileSet}s and
-     * class path.
+     * Helper object to inject for setting up an Ant tasks.
      * 
      * @param antHelper
-     *            Helper object to inject for setting up an Ant tasks
-     *            {@link FileSet}s and class path.
+     *            Helper object to inject for setting up an Ant tasks.
      */
-    public final void setAntHelper(AntHelper antHelper) {
+    public final void setAntHelper(final AntHelper antHelper) {
         this.antHelper = antHelper;
     }
 
@@ -97,7 +90,7 @@ public abstract class AntTaskBuilder extends Builder {
      * @return <code>AntHelper</code> object to use for this build step
      */
     protected final AntHelper getAntHelper() {
-        return this.antHelper;
+        return antHelper;
     }
 
     /**
@@ -114,9 +107,11 @@ public abstract class AntTaskBuilder extends Builder {
     /**
      * Get the {@link Reader} for the velocity template.
      * 
+     * @param pathToResourceInClassPath
+     *            path to velocity template in classpath.
      * @return the reader for the velocity template.
      */
-    protected final Reader getTemplateReader(String pathToResourceInClassPath) {
+    protected final Reader getTemplateReader(final String pathToResourceInClassPath) {
         return new InputStreamReader(this.getClass().getResourceAsStream(pathToResourceInClassPath));
     }
 
