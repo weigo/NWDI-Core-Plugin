@@ -7,6 +7,11 @@ package org.arachna.netweaver.dctool;
  */
 public final class DCToolDescriptor {
     /**
+     * default options that should be passed to JDK executing the dctool.
+     */
+    private static final String DEFAULT_JDK_OPTS = "-Xmx256m -Xss20m";
+
+    /**
      * folder name that contains the DTR configuration files.
      */
     public static final String DTR_FOLDER = ".dtr";
@@ -16,11 +21,6 @@ public final class DCToolDescriptor {
      */
     public static final String DTC_FOLDER = ".dtc";
 
-    /**
-     * default options that should be passed to JDK executing the dctool.
-     */
-    private static final String DEFAULT_JDK_OPTS = "-Xmx256m -Xss20m";
-    
     /**
      * UME user for authentication against the NWDI.
      */
