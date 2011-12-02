@@ -75,7 +75,8 @@ public class DevelopmentConfigurationXmlWriterTest extends XMLTestCase {
         compartment.add(usedCompartment);
         config.add(compartment);
 
-        final DevelopmentComponent component = new DevelopmentComponent("example/dc", "example.org");
+        component = new DevelopmentComponent("example/dc", "example.org");
+
         final PublicPartReference publicPartReference =
             new PublicPartReference("sap.com", "com.sap.exception", "default");
         component.add(publicPartReference);
