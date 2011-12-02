@@ -3,6 +3,8 @@
  */
 package org.arachna.netweaver.dc.types;
 
+import hudson.Util;
+
 /**
  * Public part of a development component.
  * 
@@ -35,9 +37,9 @@ public class PublicPart {
      *            description of public part.
      */
     public PublicPart(final String name, final String caption, final String description) {
-        this.publicPart = name;
-        this.caption = caption;
-        this.description = description;
+        this.publicPart = Util.fixNull(name);
+        this.caption = Util.fixNull(caption);
+        this.description = Util.fixNull(description);
     }
 
     /**
