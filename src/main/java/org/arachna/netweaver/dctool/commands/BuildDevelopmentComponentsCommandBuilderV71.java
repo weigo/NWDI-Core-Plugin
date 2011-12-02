@@ -17,7 +17,7 @@ final class BuildDevelopmentComponentsCommandBuilderV71 extends BuildDevelopment
     /**
      * command for building a DC.
      */
-    private static final String BUILD_DC_COMMAND = "builddc -c %s -n %s -v %s -o";
+    private static final String BUILD_DC_COMMAND = "builddc -c %s -n %s -v %s";
 
     /**
      * Creates a <code>DevelopmentComponentBuilder</code> instance for the given

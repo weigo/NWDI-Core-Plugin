@@ -8,6 +8,8 @@ import hudson.scm.ChangeLogSet;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
@@ -17,7 +19,7 @@ import org.kohsuke.stapler.export.ExportedBean;
 
 /**
  * A log of a set of changes in the DTR.
- *
+ * 
  * @author G526521
  */
 @ExportedBean(defaultVisibility = 999)
@@ -25,11 +27,11 @@ public final class DtrChangeLogSet extends ChangeLogSet<DtrChangeLogEntry> {
     /**
      * Entries in the change log.
      */
-    private Collection<DtrChangeLogEntry> entries = new ArrayList<DtrChangeLogEntry>();
+    private List<DtrChangeLogEntry> entries = new ArrayList<DtrChangeLogEntry>();
 
     /**
      * Creat an instance of a <code>DtrChangeLogSet</code>.
-     *
+     * 
      * @param build
      *            the build for which to create the change log.
      * @param activities
@@ -45,7 +47,7 @@ public final class DtrChangeLogSet extends ChangeLogSet<DtrChangeLogEntry> {
 
     /**
      * Convenience constructor using only the build.
-     *
+     * 
      * @param build
      *            the build for which to create the change log.
      */
@@ -74,4 +76,16 @@ public final class DtrChangeLogSet extends ChangeLogSet<DtrChangeLogEntry> {
         this.entries.add(entry);
     }
 
+    void sort() {
+        Collections.sort(this.entries, new DtrChangeLogEntryComparator());
+    }
+
+    private final class DtrChangeLogEntryComparator implements Comparator<DtrChangeLogEntry> {
+        /**
+         * {@inheritDoc}
+         */
+        public int compare(DtrChangeLogEntry entry1, DtrChangeLogEntry entry2) {
+            return entry1.getCheckInTime().compareTo(entry2.getCheckInTime());
+        }
+    }
 }

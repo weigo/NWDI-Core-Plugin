@@ -6,6 +6,7 @@ package org.arachna.netweaver.dc.config;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.io.Reader;
 import java.io.Writer;
 
@@ -16,6 +17,7 @@ import org.apache.velocity.exception.MethodInvocationException;
 import org.apache.velocity.exception.ParseErrorException;
 import org.apache.velocity.exception.ResourceNotFoundException;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
+import org.arachna.velocity.VelocityHelper;
 
 /**
  * Writer for persisting a {@link DevelopmentConfiguration} to XML.
@@ -27,12 +29,17 @@ public final class DevelopmentConfigurationXmlWriter {
      * name of velocity template used to export a development configuration to
      * XML.
      */
-    private static final String VELOCITY_TEMPLATE = "DevelopmentConfiguration.vtl";
+    private static final String VELOCITY_TEMPLATE = "/org/arachna/netweaver/dc/config/DevelopmentConfiguration.vtl";
 
     /**
      * development configuration that shall be persisted as XML.
      */
     private final DevelopmentConfiguration configuration;
+
+    /**
+     * Logger.
+     */
+    private final PrintStream logger;
 
     /**
      * Create an instance of a <code>DevelopmentConfigurationXmlWriter</code>
@@ -41,8 +48,9 @@ public final class DevelopmentConfigurationXmlWriter {
      * @param configuration
      *            the development configuration to persist to XML.
      */
-    public DevelopmentConfigurationXmlWriter(final DevelopmentConfiguration configuration) {
+    public DevelopmentConfigurationXmlWriter(final DevelopmentConfiguration configuration, final PrintStream logger) {
         this.configuration = configuration;
+        this.logger = logger;
     }
 
     /**
@@ -59,7 +67,7 @@ public final class DevelopmentConfigurationXmlWriter {
      */
     public void write(final Writer writer) throws ParseErrorException, MethodInvocationException,
         ResourceNotFoundException, IOException {
-        final VelocityEngine engine = new VelocityEngine();
+        final VelocityEngine engine = new VelocityHelper(this.logger).getVelocityEngine();
         final Context context = new VelocityContext();
         context.put("configuration", configuration);
         engine.evaluate(context, writer, "", getTemplateReader());

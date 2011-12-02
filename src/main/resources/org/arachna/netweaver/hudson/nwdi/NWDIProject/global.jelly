@@ -33,5 +33,9 @@
       <f:password clazz="required setting-input" name="NWDIPlugin.password" value="${descriptor.password}"
         checkUrl="'descriptorByName/NWDIProject/passwordCheck?value='+escape(this.value)" />
     </f:entry>
+    <f:entry title="JDK_OPTS" description="${%Enter the options that should be passed to the JDK executing the dctool.}" help="/plugin/NWDI-Core-Plugin/help-UME.html">
+      <f:textbox  name="NWDIPlugin.jdkOpts" value="${descriptor.jdkOpts}"
+        checkUrl="'descriptorByName/NWDIProject/jdkOptsCheck?value='+escape(this.value)" />
+    </f:entry>
   </f:section>
 </j:jelly>

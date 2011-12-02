@@ -86,7 +86,7 @@ public class DevelopmentConfigurationXmlWriterTest extends XMLTestCase {
         publicPart = new PublicPart("api", "API public Part", "description");
         component.add(publicPart);
         compartment.add(component);
-        writer = new DevelopmentConfigurationXmlWriter(config);
+        writer = new DevelopmentConfigurationXmlWriter(config, System.err);
     }
 
     /**

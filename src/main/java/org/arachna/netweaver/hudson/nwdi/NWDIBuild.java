@@ -6,9 +6,9 @@ package org.arachna.netweaver.hudson.nwdi;
 import static hudson.model.Result.FAILURE;
 import hudson.FilePath;
 import hudson.Launcher;
-import hudson.model.Build;
 import hudson.model.BuildListener;
 import hudson.model.Result;
+import hudson.model.AbstractBuild;
 import hudson.tasks.BuildStep;
 import hudson.tasks.Builder;
 import hudson.tasks.Publisher;
@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -24,6 +25,7 @@ import java.util.List;
 
 import org.arachna.ant.AntHelper;
 import org.arachna.ant.ExcludesFactory;
+import org.arachna.netweaver.dc.config.DevelopmentConfigurationXmlWriter;
 import org.arachna.netweaver.dc.types.Compartment;
 import org.arachna.netweaver.dc.types.CompartmentState;
 import org.arachna.netweaver.dc.types.DevelopmentComponent;
@@ -44,9 +46,8 @@ import org.xml.sax.SAXException;
  * A job for building a NWDI development configuration/track.
  * 
  * @author Dirk Weigenand
- * 
  */
-public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
+public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
     /**
      * Executor for DC tool commands used throughout.
      */
@@ -260,7 +261,7 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
 
             final DCToolDescriptor dcToolDescriptor =
                 new DCToolDescriptor(descriptor.getUser(), descriptor.getPassword(), nwdiToolLibraryFolder,
-                    descriptor.getConfiguredJdkHomePaths());
+                    descriptor.getConfiguredJdkHomePaths(), descriptor.getJdkOpts());
             dcToolExecutor = new DCToolCommandExecutor(launcher, getWorkspace(), dcToolDescriptor, configuration);
         }
 
@@ -370,6 +371,12 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
             }
 
             updateSourceCodeLocations(logger, antHelper);
+            FilePath devConfXml = NWDIBuild.this.getWorkspace().child("DevelopmentConfiguration.xml");
+            StringWriter content = new StringWriter();
+            DevelopmentConfigurationXmlWriter xmlWriter =
+                new DevelopmentConfigurationXmlWriter(NWDIBuild.this.getDevelopmentConfiguration(), logger);
+            xmlWriter.write(content);
+            devConfXml.write(content.toString(), "UTF-8");
 
             return result.isExitCodeOk() ? null : Result.FAILURE;
         }
@@ -379,12 +386,14 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
          * source folders.
          * 
          * This is necessary since f.e. WebDynpro DCs have <code>gen_ddic</code>
-         * and <code>gen_wdp</code> that are not listed in <code>.dcdef</code>
-         * but are created when the component is built. Those folders have to be
-         * considered too when running analysis plugins.
+         * and <code>gen_wdp</code> folders that are not listed in
+         * <code>.dcdef</code> but are created when the component is built.
+         * Those folders have to be considered too when running analysis
+         * plugins.
          * 
          * @param logger
          *            Logger to report actions back to build.
+         * @param antHelper
          */
         private void updateSourceCodeLocations(final PrintStream logger, AntHelper antHelper) {
             Collection<Compartment> compartments =
@@ -395,6 +404,7 @@ public final class NWDIBuild extends Build<NWDIProject, NWDIBuild> {
                     final BuildLogParser parser = new BuildLogParser(antHelper.getBaseLocation(component));
                     parser.parse();
                     component.setSourceFolders(parser.getSourceFolders());
+                    component.setOutputFolder(parser.getOutputFolder());
                 }
             }
         }

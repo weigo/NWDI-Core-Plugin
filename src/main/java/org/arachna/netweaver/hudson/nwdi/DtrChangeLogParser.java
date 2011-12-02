@@ -54,6 +54,11 @@ public final class DtrChangeLogParser extends ChangeLogParser {
      */
     private static final class InternalDtrChangeLogParser extends AbstractDefaultHandler {
         /**
+         * root element of a dtr changelog.
+         */
+        private static final String CHANGELOG = "changelog";
+
+        /**
          * 'action' element.
          */
         private static final String ACTION = "action";
@@ -147,6 +152,9 @@ public final class DtrChangeLogParser extends ChangeLogParser {
             else if (ITEM.equals(localName)) {
                 currentChangeLogEntry.add(new Item(getText(), currentItemAction));
                 currentItemAction = null;
+            }
+            else if (CHANGELOG.equals(localName)) {
+                changeSet.sort();
             }
 
             getText();
