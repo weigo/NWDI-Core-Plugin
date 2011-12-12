@@ -6,9 +6,8 @@ package org.arachna.netweaver.dc.config;
 import java.io.IOException;
 import java.io.StringWriter;
 
-import org.apache.velocity.exception.MethodInvocationException;
-import org.apache.velocity.exception.ParseErrorException;
-import org.apache.velocity.exception.ResourceNotFoundException;
+import javax.xml.stream.XMLStreamException;
+
 import org.arachna.netweaver.dc.types.BuildVariant;
 import org.arachna.netweaver.dc.types.Compartment;
 import org.arachna.netweaver.dc.types.CompartmentState;
@@ -45,14 +44,23 @@ public class DevelopmentConfigurationXmlWriterTest extends XMLTestCase {
     private Compartment compartment;
 
     /**
-     * 
+     * an example used compartment.
      */
     private Compartment usedCompartment;
 
+    /**
+     * An example development component.
+     */
     private DevelopmentComponent component;
 
+    /**
+     * An example reference to a public part (of an used DC).
+     */
     private PublicPartReference publicPartReference;
 
+    /**
+     * An example public part.
+     */
     private PublicPart publicPart;
 
     /**
@@ -86,7 +94,7 @@ public class DevelopmentConfigurationXmlWriterTest extends XMLTestCase {
         publicPart = new PublicPart("api", "API public Part", "description");
         component.add(publicPart);
         compartment.add(component);
-        writer = new DevelopmentConfigurationXmlWriter(config, System.err);
+        writer = new DevelopmentConfigurationXmlWriter(config);
     }
 
     /**
@@ -102,308 +110,192 @@ public class DevelopmentConfigurationXmlWriterTest extends XMLTestCase {
      * Test method for
      * {@link org.arachna.netweaver.dc.config.DevelopmentConfigurationXmlWriter#write(java.io.Writer)}
      * .
-     * 
-     * @throws IOException
-     * @throws ResourceNotFoundException
-     * @throws MethodInvocationException
-     * @throws ParseErrorException
-     * @throws SAXException
-     * @throws XpathException
      */
     @Test
-    public final void testPersistedConfigurationName() throws ParseErrorException, MethodInvocationException,
-        ResourceNotFoundException, IOException, XpathException, SAXException {
-        final String target = writeDevelopmentConfiguration();
-        this.assertXpathEvaluatesTo(config.getName(), "/development-configuration/@name", target.toString());
+    public final void testPersistedConfigurationName() {
+        this.assertXpathEvaluatesTo(config.getName(), "/development-configuration/@name");
     }
 
     /**
      * Test method for
      * {@link org.arachna.netweaver.dc.config.DevelopmentConfigurationXmlWriter#write(java.io.Writer)}
      * .
-     * 
-     * @throws IOException
-     * @throws ResourceNotFoundException
-     * @throws MethodInvocationException
-     * @throws ParseErrorException
-     * @throws SAXException
-     * @throws XpathException
      */
     @Test
-    public final void testPersistedConfigurationCaption() throws ParseErrorException, MethodInvocationException,
-        ResourceNotFoundException, IOException, XpathException, SAXException {
-        this.assertXpathEvaluatesTo(config.getCaption(), "/development-configuration/@caption",
-            writeDevelopmentConfiguration());
+    public final void testPersistedConfigurationCaption() {
+        this.assertXpathEvaluatesTo(config.getCaption(), "/development-configuration/@caption");
     }
 
     /**
      * Test method for
      * {@link org.arachna.netweaver.dc.config.DevelopmentConfigurationXmlWriter#write(java.io.Writer)}
      * .
-     * 
-     * @throws IOException
-     * @throws ResourceNotFoundException
-     * @throws MethodInvocationException
-     * @throws ParseErrorException
-     * @throws SAXException
-     * @throws XpathException
      */
     @Test
-    public final void testPersistedConfigurationDescription() throws ParseErrorException, MethodInvocationException,
-        ResourceNotFoundException, IOException, XpathException, SAXException {
-        this.assertXpathEvaluatesTo(config.getDescription(), "/development-configuration/@description",
-            writeDevelopmentConfiguration());
+    public final void testPersistedConfigurationDescription() {
+        this.assertXpathEvaluatesTo(config.getDescription(), "/development-configuration/@description");
     }
 
     /**
      * Test method for
      * {@link org.arachna.netweaver.dc.config.DevelopmentConfigurationXmlWriter#write(java.io.Writer)}
      * .
-     * 
-     * @throws IOException
-     * @throws ResourceNotFoundException
-     * @throws MethodInvocationException
-     * @throws ParseErrorException
-     * @throws SAXException
-     * @throws XpathException
      */
     @Test
-    public final void testPersistedConfigurationBuildVariant() throws ParseErrorException, MethodInvocationException,
-        ResourceNotFoundException, IOException, XpathException, SAXException {
-        final String target = writeDevelopmentConfiguration();
+    public final void testPersistedConfigurationBuildVariant() {
         final String key = config.getBuildVariant().getBuildOptionNames().iterator().next();
-        final String content = target.toString();
         final String baseXpath = "/development-configuration/build-variant/option[1]/%s";
-        this.assertXpathEvaluatesTo(key, String.format(baseXpath, "@name"), content);
-        this.assertXpathEvaluatesTo(config.getBuildVariant().getBuildOption(key), String.format(baseXpath, "@value"),
-            content);
+        this.assertXpathEvaluatesTo(key, String.format(baseXpath, "@name"));
+        this.assertXpathEvaluatesTo(config.getBuildVariant().getBuildOption(key), String.format(baseXpath, "@value"));
     }
 
     /**
      * Test method for
      * {@link org.arachna.netweaver.dc.config.DevelopmentConfigurationXmlWriter#write(java.io.Writer)}
      * .
-     * 
-     * @throws IOException
-     * @throws ResourceNotFoundException
-     * @throws MethodInvocationException
-     * @throws ParseErrorException
-     * @throws SAXException
-     * @throws XpathException
      */
     @Test
-    public final void testPersistedConfigurationCompartmentName() throws ParseErrorException,
-        MethodInvocationException, ResourceNotFoundException, IOException, XpathException, SAXException {
-        this.assertXpathEvaluatesTo(compartment.getName(), "/development-configuration/compartment[1]/@name",
-            writeDevelopmentConfiguration());
+    public final void testPersistedConfigurationCompartmentName() {
+        this.assertXpathEvaluatesTo(compartment.getName(), "/development-configuration/compartment[1]/@name");
     }
 
     /**
      * Test method for
      * {@link org.arachna.netweaver.dc.config.DevelopmentConfigurationXmlWriter#write(java.io.Writer)}
      * .
-     * 
-     * @throws IOException
-     * @throws ResourceNotFoundException
-     * @throws MethodInvocationException
-     * @throws ParseErrorException
-     * @throws SAXException
-     * @throws XpathException
      */
     @Test
-    public final void testPersistedConfigurationCompartmentInSourceState() throws ParseErrorException,
-        MethodInvocationException, ResourceNotFoundException, IOException, XpathException, SAXException {
-        this.assertXpathEvaluatesTo("no", "/development-configuration/compartment[1]/@archive-state",
-            writeDevelopmentConfiguration());
+    public final void testPersistedConfigurationCompartmentInSourceState() {
+        this.assertXpathEvaluatesTo("no", "/development-configuration/compartment[1]/@archive-state");
     }
 
     /**
      * Test method for
      * {@link org.arachna.netweaver.dc.config.DevelopmentConfigurationXmlWriter#write(java.io.Writer)}
      * .
-     * 
-     * @throws IOException
-     * @throws ResourceNotFoundException
-     * @throws MethodInvocationException
-     * @throws ParseErrorException
-     * @throws SAXException
-     * @throws XpathException
      */
     @Test
-    public final void testPersistedConfigurationCompartmentInArchiveState() throws ParseErrorException,
-        MethodInvocationException, ResourceNotFoundException, IOException, XpathException, SAXException {
+    public final void testPersistedConfigurationCompartmentInArchiveState() {
         compartment.setState(CompartmentState.Archive);
-        this.assertXpathEvaluatesTo("yes", "/development-configuration/compartment[1]/@archive-state",
-            writeDevelopmentConfiguration());
+        this.assertXpathEvaluatesTo("yes", "/development-configuration/compartment[1]/@archive-state");
     }
 
     /**
      * Test method for
      * {@link org.arachna.netweaver.dc.config.DevelopmentConfigurationXmlWriter#write(java.io.Writer)}
      * .
-     * 
-     * @throws IOException
-     * @throws ResourceNotFoundException
-     * @throws MethodInvocationException
-     * @throws ParseErrorException
-     * @throws SAXException
-     * @throws XpathException
      */
     @Test
-    public final void testPersistedConfigurationCompartmentScName() throws ParseErrorException,
-        MethodInvocationException, ResourceNotFoundException, IOException, XpathException, SAXException {
+    public final void testPersistedConfigurationCompartmentScName() {
         this.assertXpathEvaluatesTo(compartment.getSoftwareComponent(),
-            "/development-configuration/compartment[1]/@sc-name", writeDevelopmentConfiguration());
+            "/development-configuration/compartment[1]/@sc-name");
     }
 
     /**
      * Test method for
      * {@link org.arachna.netweaver.dc.config.DevelopmentConfigurationXmlWriter#write(java.io.Writer)}
      * .
-     * 
-     * @throws IOException
-     * @throws ResourceNotFoundException
-     * @throws MethodInvocationException
-     * @throws ParseErrorException
-     * @throws SAXException
-     * @throws XpathException
      */
     @Test
-    public final void testPersistedConfigurationCompartmentVendor() throws ParseErrorException,
-        MethodInvocationException, ResourceNotFoundException, IOException, XpathException, SAXException {
-        this.assertXpathEvaluatesTo(compartment.getVendor(), "/development-configuration/compartment[1]/@vendor",
-            writeDevelopmentConfiguration());
+    public final void testPersistedConfigurationCompartmentVendor() {
+        this.assertXpathEvaluatesTo(compartment.getVendor(), "/development-configuration/compartment[1]/@vendor");
     }
 
     /**
      * Test method for
      * {@link org.arachna.netweaver.dc.config.DevelopmentConfigurationXmlWriter#write(java.io.Writer)}
      * .
-     * 
-     * @throws IOException
-     * @throws ResourceNotFoundException
-     * @throws MethodInvocationException
-     * @throws ParseErrorException
-     * @throws SAXException
-     * @throws XpathException
      */
     @Test
-    public final void testPersistedConfigurationUsedCompartmentInArchiveState() throws ParseErrorException,
-        MethodInvocationException, ResourceNotFoundException, IOException, XpathException, SAXException {
+    public final void testPersistedConfigurationUsedCompartmentInArchiveState() {
         this.assertXpathEvaluatesTo("yes",
-            "/development-configuration/compartment[1]/used-compartments/used-compartment[1]/@archive-state",
-            writeDevelopmentConfiguration());
+            "/development-configuration/compartment[1]/used-compartments/used-compartment[1]/@archive-state");
     }
 
     /**
      * Test method for
      * {@link org.arachna.netweaver.dc.config.DevelopmentConfigurationXmlWriter#write(java.io.Writer)}
      * .
-     * 
-     * @throws IOException
-     * @throws ResourceNotFoundException
-     * @throws MethodInvocationException
-     * @throws ParseErrorException
-     * @throws SAXException
-     * @throws XpathException
      */
     @Test
-    public final void testPersistedConfigurationUsedCompartmentInSourceState() throws ParseErrorException,
-        MethodInvocationException, ResourceNotFoundException, IOException, XpathException, SAXException {
+    public final void testPersistedConfigurationUsedCompartmentInSourceState() {
         usedCompartment.setState(CompartmentState.Source);
         this.assertXpathEvaluatesTo("no",
-            "/development-configuration/compartment[1]/used-compartments/used-compartment[1]/@archive-state",
-            writeDevelopmentConfiguration());
+            "/development-configuration/compartment[1]/used-compartments/used-compartment[1]/@archive-state");
     }
 
     /**
      * Test method for
      * {@link org.arachna.netweaver.dc.config.DevelopmentConfigurationXmlWriter#write(java.io.Writer)}
      * .
-     * 
-     * @throws IOException
-     * @throws ResourceNotFoundException
-     * @throws MethodInvocationException
-     * @throws ParseErrorException
-     * @throws SAXException
-     * @throws XpathException
      */
     @Test
-    public final void testPersistedConfigurationUsedCompartmentScName() throws ParseErrorException,
-        MethodInvocationException, ResourceNotFoundException, IOException, XpathException, SAXException {
+    public final void testPersistedConfigurationUsedCompartmentScName() {
         this.assertXpathEvaluatesTo(usedCompartment.getSoftwareComponent(),
-            "/development-configuration/compartment[1]/used-compartments/used-compartment[1]/@sc-name",
-            writeDevelopmentConfiguration());
+            "/development-configuration/compartment[1]/used-compartments/used-compartment[1]/@sc-name");
     }
 
     /**
      * Test method for
      * {@link org.arachna.netweaver.dc.config.DevelopmentConfigurationXmlWriter#write(java.io.Writer)}
      * .
-     * 
-     * @throws IOException
-     * @throws ResourceNotFoundException
-     * @throws MethodInvocationException
-     * @throws ParseErrorException
-     * @throws SAXException
-     * @throws XpathException
      */
     @Test
-    public final void testPersistedConfigurationUsedCompartmentVendor() throws ParseErrorException,
-        MethodInvocationException, ResourceNotFoundException, IOException, XpathException, SAXException {
+    public final void testPersistedConfigurationUsedCompartmentVendor() {
         this.assertXpathEvaluatesTo(usedCompartment.getVendor(),
-            "/development-configuration/compartment[1]/used-compartments/used-compartment[1]/@vendor",
-            writeDevelopmentConfiguration());
+            "/development-configuration/compartment[1]/used-compartments/used-compartment[1]/@vendor");
     }
 
     /**
      * Test method for
      * {@link org.arachna.netweaver.dc.config.DevelopmentConfigurationXmlWriter#write(java.io.Writer)}
      * .
-     * 
-     * @throws IOException
-     * @throws ResourceNotFoundException
-     * @throws MethodInvocationException
-     * @throws ParseErrorException
-     * @throws SAXException
-     * @throws XpathException
      */
     @Test
-    public final void testPersistedConfigurationUsedCompartmentName() throws ParseErrorException,
-        MethodInvocationException, ResourceNotFoundException, IOException, XpathException, SAXException {
+    public final void testPersistedConfigurationUsedCompartmentName() {
         this.assertXpathEvaluatesTo(usedCompartment.getName(),
-            "/development-configuration/compartment[1]/used-compartments/used-compartment[1]/@name",
-            writeDevelopmentConfiguration());
+            "/development-configuration/compartment[1]/used-compartments/used-compartment[1]/@name");
     }
 
     /**
      * Test method for
      * {@link org.arachna.netweaver.dc.config.DevelopmentConfigurationXmlWriter#write(java.io.Writer)}
      * .
-     * 
-     * @throws IOException
-     * @throws ResourceNotFoundException
-     * @throws MethodInvocationException
-     * @throws ParseErrorException
-     * @throws SAXException
-     * @throws XpathException
      */
     @Test
-    public final void testPersistedConfigurationDevelopmentComponentName() throws ParseErrorException,
-        MethodInvocationException, ResourceNotFoundException, IOException, XpathException, SAXException {
-        System.err.println(writeDevelopmentConfiguration());
+    public final void testPersistedConfigurationDevelopmentComponentName() {
         this.assertXpathEvaluatesTo(component.getName(),
-            "/development-configuration/compartment[1]/development-components/development-component[1]/@name",
-            writeDevelopmentConfiguration());
+            "/development-configuration/compartment[1]/development-components/development-component[1]/@name");
+    }
+
+    private void assertXpathEvaluatesTo(String expected, String xPath) {
+        try {
+            this.assertXpathEvaluatesTo(expected, xPath, writeDevelopmentConfiguration());
+        }
+        catch (XpathException e) {
+            fail(e.getMessage());
+        }
+        catch (SAXException e) {
+            fail(e.getMessage());
+        }
+        catch (IOException e) {
+            fail(e.getMessage());
+        }
+        catch (XMLStreamException e) {
+            fail(e.getMessage());
+        }
     }
 
     /**
      * @return
      * @throws IOException
+     * @throws XMLStreamException
      */
-    protected String writeDevelopmentConfiguration() throws IOException {
+    protected String writeDevelopmentConfiguration() throws IOException, XMLStreamException {
         final StringWriter target = new StringWriter();
         writer.write(target);
+
+        System.err.println(target.toString());
 
         return target.toString();
     }
