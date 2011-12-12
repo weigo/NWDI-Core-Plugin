@@ -13,6 +13,7 @@ import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.DevelopmentComponentType;
 import org.arachna.netweaver.dc.types.PublicPart;
+import org.arachna.netweaver.dc.types.PublicPartReference;
 import org.arachna.xml.XmlReaderHelper;
 import org.xml.sax.SAXException;
 
@@ -142,8 +143,29 @@ public final class DevelopmentComponentUpdater {
         }
 
         if (reader != null) {
-            currentComponent.addAll(reader.read());
+            for (PublicPartReference newPpRef : reader.read()) {
+                if (!hasRuntimeReferenceTo(currentComponent, newPpRef)) {
+                    currentComponent.add(newPpRef);
+                }
+            }
         }
+    }
+
+    /**
+     * @param vendor
+     * @param libraryReference
+     */
+    private boolean hasRuntimeReferenceTo(DevelopmentComponent component, final PublicPartReference newPpRef) {
+        boolean result = false;
+
+        for (PublicPartReference ref : component.getUsedDevelopmentComponents()) {
+            if (ref.isAtRunTime() && ref.getVendor().equals(newPpRef.getVendor())
+                && ref.getComponentName().equals(newPpRef.getComponentName())) {
+                result = true;
+            }
+        }
+
+        return result;
     }
 
     /**
