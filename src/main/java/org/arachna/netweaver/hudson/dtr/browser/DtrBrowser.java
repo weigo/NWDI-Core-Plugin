@@ -87,7 +87,7 @@ public final class DtrBrowser {
      */
     public List<Activity> getActivities(final Compartment compartment, final ActivityFilter activityFilter) {
         final List<Activity> activities = new ArrayList<Activity>();
-        final ActivityListParser activityListBrowser = new ActivityListParser(activityFilter);
+        final ActivityListParser activityListBrowser = new ActivityListParser(compartment, activityFilter);
         String queryUrl = null;
 
         try {
