@@ -4,16 +4,14 @@
 package org.arachna.netweaver.dc.config;
 
 import java.io.IOException;
-import java.io.Reader;
+import java.io.InputStream;
 
 import org.arachna.netweaver.dc.types.BuildVariant;
 import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 import org.arachna.xml.AbstractDefaultHandler;
 import org.xml.sax.Attributes;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
 
 /**
  * Reader für Entwicklungskonfigurationen.
@@ -87,12 +85,9 @@ public class DevelopmentConfigurationReader extends AbstractDefaultHandler {
      * @param developmentComponentFactory
      *            Factory zum Registrieren der Entwicklungskomponenten
      */
-    public DevelopmentConfigurationReader(final XMLReader xmlReader,
-        final DevelopmentComponentFactory developmentComponentFactory) {
+    public DevelopmentConfigurationReader(final DevelopmentComponentFactory developmentComponentFactory) {
         super();
-        setXmlReader(xmlReader);
         this.developmentComponentFactory = developmentComponentFactory;
-        getXmlReader().setContentHandler(this);
     }
 
     /*
@@ -151,9 +146,7 @@ public class DevelopmentConfigurationReader extends AbstractDefaultHandler {
      *             any <code>IOexception</code> that is throw in the underlying
      *             code.
      */
-    public final DevelopmentConfiguration read(final Reader input) throws IOException, SAXException {
-        getXmlReader().parse(new InputSource(input));
-
+    public final DevelopmentConfiguration getDevelopmentConfiguration() {
         return currentConfiguration;
     }
 }

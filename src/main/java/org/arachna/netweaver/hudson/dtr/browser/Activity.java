@@ -10,6 +10,8 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.arachna.netweaver.dc.types.Compartment;
+
 /**
  * Represents an activity in the DTR.
  * 
@@ -32,12 +34,14 @@ public final class Activity {
     private final Principal principal;
 
     /**
-     * short description of activity as given by principal that created this activity.
+     * short description of activity as given by principal that created this
+     * activity.
      */
     private final String comment;
 
     /**
-     * long description of activity as given by principal that created this activity.
+     * long description of activity as given by principal that created this
+     * activity.
      */
     private String description;
 
@@ -52,19 +56,30 @@ public final class Activity {
     private final Set<ActivityResource> resources = new HashSet<ActivityResource>();
 
     /**
-     * Create an instance of an <code>Activity</code> using the principal that created it, its description and checkin date. Also contains
-     * the relative URL where the content of the activity can be browsed.
+     * compartment this activity belongs to.
+     */
+    private final Compartment compartment;
+
+    /**
+     * Create an instance of an <code>Activity</code> using the principal that
+     * created it, its description and checkin date. Also contains the relative
+     * URL where the content of the activity can be browsed.
      * 
+     * @param compartment
+     *            compartment this activity belongs to.
      * @param activityUrl
      *            relative URL where the content of the activity can be browsed.
      * @param principal
      *            user that created the activity.
      * @param comment
-     *            the short description of the activity as was given by the user creating it.
+     *            the short description of the activity as was given by the user
+     *            creating it.
      * @param checkinTime
      *            time the activity was checked into the DTR.
      */
-    Activity(final String activityUrl, final Principal principal, final String comment, final Date checkinTime) {
+    Activity(final Compartment compartment, final String activityUrl, final Principal principal, final String comment,
+        final Date checkinTime) {
+        this.compartment = compartment;
         this.activityUrl = activityUrl;
         this.principal = principal;
         this.comment = comment;
@@ -142,26 +157,30 @@ public final class Activity {
     }
 
     /**
-     * Returns the path part of the activity url (i.e. the string after '&path=').
+     * Returns the path part of the activity url (i.e. the string after
+     * '&path=').
      * 
      * @return the path part of the activity url
      */
     public String getActivityPath() {
-        return this.getActivityUrl().substring(this.getActivityUrl().indexOf(PATH_REQUEST_ATTRIBUTE) + PATH_REQUEST_ATTRIBUTE.length());
+        return this.getActivityUrl().substring(
+            this.getActivityUrl().indexOf(PATH_REQUEST_ATTRIBUTE) + PATH_REQUEST_ATTRIBUTE.length());
     }
 
     /*
      * (non-Javadoc)
+     * 
      * @see java.lang.Object#toString()
      */
     @Override
     public String toString() {
-        return "Activity [checkinTime=" + this.checkinTime + ", principal=" + this.principal + ",\ndescription=" + this.description
-            + ",\nactivityUrl=" + this.activityUrl + "]";
+        return "Activity [checkinTime=" + this.checkinTime + ", principal=" + this.principal + ",\ndescription="
+            + this.description + ",\nactivityUrl=" + this.activityUrl + "]";
     }
 
     /**
-     * Add the given resource to this activity's resources. If the given resource is <code>null</code> it is ignored.
+     * Add the given resource to this activity's resources. If the given
+     * resource is <code>null</code> it is ignored.
      * 
      * @param resource
      *            resource to add to this activity's resources.
@@ -169,6 +188,7 @@ public final class Activity {
     void add(final ActivityResource resource) {
         if (resource != null) {
             this.resources.add(resource);
+            this.compartment.add(resource.getDevelopmentComponent());
         }
     }
 
@@ -181,8 +201,18 @@ public final class Activity {
         return Collections.unmodifiableCollection(this.resources);
     }
 
+    /**
+     * Returns the compartment this activity belongs to.
+     * 
+     * @return the compartment
+     */
+    Compartment getCompartment() {
+        return compartment;
+    }
+
     /*
      * (non-Javadoc)
+     * 
      * @see java.lang.Object#hashCode()
      */
     @Override
@@ -192,6 +222,7 @@ public final class Activity {
 
     /*
      * (non-Javadoc)
+     * 
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override

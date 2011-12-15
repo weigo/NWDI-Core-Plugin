@@ -6,6 +6,8 @@ package org.arachna.netweaver.dc.config;
 import java.io.IOException;
 import java.io.StringWriter;
 
+import javax.xml.stream.XMLStreamException;
+
 import org.arachna.netweaver.dc.types.BuildVariant;
 import org.arachna.netweaver.dc.types.Compartment;
 import org.arachna.netweaver.dc.types.CompartmentState;
@@ -42,14 +44,24 @@ public class DevelopmentConfigurationXmlWriterTest extends XMLTestCase {
     private Compartment compartment;
 
     /**
-     * 
+     * an example used compartment.
      */
     private Compartment usedCompartment;
 
     /**
-     * development component used in writing the development configuration.
+     * An example development component.
      */
     private DevelopmentComponent component;
+
+    /**
+     * An example reference to a public part (of an used DC).
+     */
+    private PublicPartReference publicPartReference;
+
+    /**
+     * An example public part.
+     */
+    private PublicPart publicPart;
 
     /**
      * {@inheritDoc}
@@ -76,15 +88,13 @@ public class DevelopmentConfigurationXmlWriterTest extends XMLTestCase {
         config.add(compartment);
 
         component = new DevelopmentComponent("example/dc", "example.org");
-
-        final PublicPartReference publicPartReference =
-            new PublicPartReference("sap.com", "com.sap.exception", "default");
+        publicPartReference = new PublicPartReference("sap.com", "com.sap.exception", "default");
         component.add(publicPartReference);
 
-        final PublicPart publicPart = new PublicPart("api", "API public Part", "description");
+        publicPart = new PublicPart("api", "API public Part", "description");
         component.add(publicPart);
         compartment.add(component);
-        writer = new DevelopmentConfigurationXmlWriter(config, System.err);
+        writer = new DevelopmentConfigurationXmlWriter(config);
     }
 
     /**
@@ -218,7 +228,6 @@ public class DevelopmentConfigurationXmlWriterTest extends XMLTestCase {
      * Test method for
      * {@link org.arachna.netweaver.dc.config.DevelopmentConfigurationXmlWriter#write(java.io.Writer)}
      * .
-     * 
      */
     @Test
     public final void testPersistedConfigurationUsedCompartmentScName() {
@@ -259,28 +268,34 @@ public class DevelopmentConfigurationXmlWriterTest extends XMLTestCase {
             "/development-configuration/compartment[1]/development-components/development-component[1]/@name");
     }
 
-    private void assertXpathEvaluatesTo(final String expected, final String xPath) {
+    private void assertXpathEvaluatesTo(String expected, String xPath) {
         try {
             this.assertXpathEvaluatesTo(expected, xPath, writeDevelopmentConfiguration());
         }
-        catch (final XpathException e) {
-            fail(e.getLocalizedMessage());
+        catch (XpathException e) {
+            fail(e.getMessage());
         }
-        catch (final SAXException e) {
-            fail(e.getLocalizedMessage());
+        catch (SAXException e) {
+            fail(e.getMessage());
         }
-        catch (final IOException e) {
-            fail(e.getLocalizedMessage());
+        catch (IOException e) {
+            fail(e.getMessage());
+        }
+        catch (XMLStreamException e) {
+            fail(e.getMessage());
         }
     }
 
     /**
      * @return
      * @throws IOException
+     * @throws XMLStreamException
      */
-    protected String writeDevelopmentConfiguration() throws IOException {
+    protected String writeDevelopmentConfiguration() throws IOException, XMLStreamException {
         final StringWriter target = new StringWriter();
         writer.write(target);
+
+        System.err.println(target.toString());
 
         return target.toString();
     }

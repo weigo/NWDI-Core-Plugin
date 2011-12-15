@@ -129,6 +129,7 @@ final class DevelopmentComponentCollector {
                 detailParser.parse(this.dtrHttpClient.getContent(String.format(RESOURCE_DETAIL_QUERY_TEMPLATE,
                     this.dtrUrl, resource.getId())));
                 components.add(resource.getDevelopmentComponent());
+                activity.getCompartment().add(resource.getDevelopmentComponent());
             }
         }
         catch (final ClientProtocolException e) {

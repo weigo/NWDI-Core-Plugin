@@ -13,6 +13,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import org.arachna.netweaver.dc.types.Compartment;
+import org.arachna.netweaver.dc.types.CompartmentState;
 import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.junit.After;
 import org.junit.Before;
@@ -21,9 +23,9 @@ import org.junit.Test;
 /**
  * JUnit tests for {@link ResourceDetailsParser}.
  * 
- * @author G526521
+ * @author Dirk Weigenand
  */
-public class ResourceDetailsParserTest {
+public final class ResourceDetailsParserTest {
     /**
      * {@link ActivityResource} that shall be updated from the
      * resourceDetailsPage.
@@ -41,7 +43,8 @@ public class ResourceDetailsParserTest {
     @Before
     public void setUp() throws Exception {
         this.resource =
-            new ActivityResource(new Activity("", new Principal(""), "", Calendar.getInstance().getTime()),
+            new ActivityResource(new Activity(new Compartment("EXAMPLE_SC1", CompartmentState.Source, "example.com",
+                "", "example.com_EXAMPLE_SC1"), "", new Principal(""), "", Calendar.getInstance().getTime()),
                 new DevelopmentComponent("", ""), "", "");
         this.parser = new ResourceDetailsParser(this.resource);
     }
@@ -68,7 +71,7 @@ public class ResourceDetailsParserTest {
      * .
      */
     @Test
-    public final void testParseDeleteStateIsFalse() {
+    public void testParseDeleteStateIsFalse() {
         this.parser.parse(this.getResourceDetailsPage("ResourceDetails1.html"));
 
         assertThat(this.resource.isDeleted(), is(Boolean.FALSE));
@@ -80,7 +83,7 @@ public class ResourceDetailsParserTest {
      * .
      */
     @Test
-    public final void testParseDeleteStateIsTrue() {
+    public void testParseDeleteStateIsTrue() {
         this.parser.parse(this.getResourceDetailsPage("ResourceDetails2.html"));
 
         assertThat(this.resource.isDeleted(), is(Boolean.TRUE));
@@ -94,7 +97,7 @@ public class ResourceDetailsParserTest {
      * @throws ParseException
      */
     @Test
-    public final void testParseCreationDate() throws ParseException {
+    public void testParseCreationDate() throws ParseException {
         this.parser.parse(this.getResourceDetailsPage("ResourceDetails1.html"));
 
         final SimpleDateFormat format = new SimpleDateFormat(ActivityListParser.ACTIVITY_DATE_FORMAT);
@@ -108,7 +111,7 @@ public class ResourceDetailsParserTest {
      * .
      */
     @Test
-    public final void testParseLastModified() throws ParseException {
+    public void testParseLastModified() throws ParseException {
         this.parser.parse(this.getResourceDetailsPage("ResourceDetails1.html"));
         final SimpleDateFormat format = new SimpleDateFormat(ActivityListParser.ACTIVITY_DATE_FORMAT);
         final Date lastModified = format.parse("12.01.2011 12:02:33 GMT");
@@ -122,7 +125,7 @@ public class ResourceDetailsParserTest {
      * .
      */
     @Test
-    public final void testParseSequenceNumber() {
+    public void testParseSequenceNumber() {
         this.parser.parse(this.getResourceDetailsPage("ResourceDetails1.html"));
 
         assertThat(this.resource.getSequenceNumber(), is(equalTo(Integer.valueOf(1))));

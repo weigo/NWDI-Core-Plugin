@@ -9,6 +9,8 @@ import static org.hamcrest.Matchers.is;
 
 import java.util.Calendar;
 
+import org.arachna.netweaver.dc.types.Compartment;
+import org.arachna.netweaver.dc.types.CompartmentState;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,7 +36,9 @@ public class ActivityDetailParserTest {
      */
     @Before
     public void setUp() throws Exception {
-        this.activity = new Activity(null, null, null, Calendar.getInstance().getTime());
+        this.activity =
+            new Activity(new Compartment("EXAMPLE_SC1", CompartmentState.Source, "example.com", "",
+                "example.com_EXAMPLE_SC1"), null, null, null, Calendar.getInstance().getTime());
         this.parser = new ActivityDetailParser(activity);
         this.parser.parse(this.getClass().getResourceAsStream("ResourceDetails.htm"));
     }

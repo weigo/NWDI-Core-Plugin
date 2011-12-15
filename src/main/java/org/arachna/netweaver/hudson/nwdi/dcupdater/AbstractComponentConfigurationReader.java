@@ -25,6 +25,12 @@ import org.xml.sax.SAXException;
 abstract class AbstractComponentConfigurationReader extends AbstractDefaultHandler implements
     ComponentConfigurationReader {
     /**
+     * Factory for public part references from references read from WebDynpro
+     * project properties or portal applications config files.
+     */
+    private PublicPartReferenceFactory ppRefFactory = new PublicPartReferenceFactory();
+
+    /**
      * message for IO errors.
      */
     private static final String IO_EXCEPTION_MESSAGE = "There was a problem reading %s.";
@@ -33,11 +39,6 @@ abstract class AbstractComponentConfigurationReader extends AbstractDefaultHandl
      * message regarding SAX parse(r) errors.
      */
     private static final String SAX_EXCEPTION_MESSAGE = "There was a problem parsing %s.";
-
-    /**
-     * String dividing vendor from component name.
-     */
-    private static final String FORWARD_SLASH = "/";
 
     /**
      * public part references.
@@ -100,33 +101,6 @@ abstract class AbstractComponentConfigurationReader extends AbstractDefaultHandl
     }
 
     /**
-     * Get the index where the vendor prefix ends.
-     * 
-     * @param reference
-     *            public part reference read from configuration file.
-     * @return index where the vendor prefix ends.
-     */
-    private int getVendorSeparationIndex(final String reference) {
-        final int tildeIndex = reference.indexOf("~");
-        final int slashIndex = reference.indexOf(FORWARD_SLASH);
-        final boolean slashIsVendorSeparatorCharacter =
-            slashIndex > -1 && slashIndex == reference.lastIndexOf(FORWARD_SLASH);
-        int index = -1;
-
-        if (slashIsVendorSeparatorCharacter) {
-            index = slashIndex;
-        }
-        else if (tildeIndex == -1 || slashIndex == -1) {
-            index = Math.max(tildeIndex, slashIndex);
-        }
-        else {
-            index = Math.min(tildeIndex, slashIndex);
-        }
-
-        return index;
-    }
-
-    /**
      * Create a {@link PublicPartReference} and add it to the internal
      * collection of public part references read from the configuration file.
      * 
@@ -134,14 +108,9 @@ abstract class AbstractComponentConfigurationReader extends AbstractDefaultHandl
      *            public part references read from the configuration file.
      */
     protected final void addPublicPartReference(final String reference) {
-        final int index = getVendorSeparationIndex(reference);
+        final PublicPartReference ppReference = ppRefFactory.create(reference);
 
-        if (index > -1) {
-            // FIXME: references without vendor aren't handled correctly (i.e.:)
-            final String vendor = reference.substring(0, index);
-            final String libraryReference = reference.substring(index + 1).replace('~', '/');
-            final PublicPartReference ppReference = new PublicPartReference(vendor, libraryReference);
-            ppReference.setAtRunTime(true);
+        if (ppReference != null) {
             this.references.add(ppReference);
         }
     }

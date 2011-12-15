@@ -20,6 +20,7 @@ import hudson.scm.SCM;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,6 +29,7 @@ import java.util.List;
 
 import net.sf.json.JSONObject;
 
+import org.arachna.netweaver.dc.config.DevelopmentConfigurationReader;
 import org.arachna.netweaver.dc.types.Compartment;
 import org.arachna.netweaver.dc.types.CompartmentState;
 import org.arachna.netweaver.dc.types.DevelopmentComponent;
@@ -40,7 +42,9 @@ import org.arachna.netweaver.hudson.dtr.browser.ActivityResource;
 import org.arachna.netweaver.hudson.dtr.browser.DtrBrowser;
 import org.arachna.netweaver.hudson.nwdi.dcupdater.DevelopmentComponentUpdater;
 import org.arachna.netweaver.hudson.util.FilePathHelper;
+import org.arachna.xml.XmlReaderHelper;
 import org.kohsuke.stapler.StaplerRequest;
+import org.xml.sax.SAXException;
 
 /**
  * Interface to NetWeaver Developer Infrastructure.
@@ -125,7 +129,7 @@ public class NWDIScm extends SCM {
         final DCToolCommandExecutor executor = currentBuild.getDCToolExecutor(launcher);
 
         final DevelopmentComponentFactory dcFactory = currentBuild.getDevelopmentComponentFactory();
-        DcToolCommandExecutionResult result = executor.listDevelopmentComponents(dcFactory);
+        DcToolCommandExecutionResult result = readOrListDevelopmentComponents(workspace, config, executor, dcFactory);
 
         if (result.isExitCodeOk()) {
             final NWDIBuild lastSuccessfulBuild = currentBuild.getParent().getLastSuccessfulBuild();
@@ -174,6 +178,44 @@ public class NWDIScm extends SCM {
         writeChangeLog(build, changelogFile, activities);
 
         return result.isExitCodeOk();
+    }
+
+    /**
+     * @param workspace
+     * @param config
+     * @param executor
+     * @param dcFactory
+     * @return
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    private DcToolCommandExecutionResult readOrListDevelopmentComponents(FilePath workspace,
+        DevelopmentConfiguration config, final DCToolCommandExecutor executor,
+        final DevelopmentComponentFactory dcFactory) throws IOException, InterruptedException {
+        FilePath devConfFile = workspace.child("DevelopmentConfiguration.xml");
+        DcToolCommandExecutionResult result = new DcToolCommandExecutionResult("", 0);
+
+        if (!devConfFile.exists()) {
+            result = executor.listDevelopmentComponents(dcFactory);
+        }
+        else {
+            DevelopmentConfigurationReader configurationReader = new DevelopmentConfigurationReader(dcFactory);
+
+            try {
+                new XmlReaderHelper(configurationReader).parse(new InputStreamReader(devConfFile.read()));
+                DevelopmentConfiguration savedConfig = configurationReader.getDevelopmentConfiguration();
+
+                for (Compartment compartment : savedConfig.getCompartments()) {
+                    Compartment original = config.getCompartment(compartment.getName());
+                    original.add(compartment.getDevelopmentComponents());
+                }
+            }
+            catch (SAXException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        return result;
     }
 
     /**

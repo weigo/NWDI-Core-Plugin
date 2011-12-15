@@ -23,6 +23,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
+import javax.xml.stream.XMLStreamException;
+
 import org.arachna.ant.AntHelper;
 import org.arachna.ant.ExcludesFactory;
 import org.arachna.netweaver.dc.config.DevelopmentConfigurationXmlWriter;
@@ -371,14 +373,30 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
             }
 
             updateSourceCodeLocations(logger, antHelper);
-            FilePath devConfXml = NWDIBuild.this.getWorkspace().child("DevelopmentConfiguration.xml");
-            StringWriter content = new StringWriter();
-            DevelopmentConfigurationXmlWriter xmlWriter =
-                new DevelopmentConfigurationXmlWriter(NWDIBuild.this.getDevelopmentConfiguration(), logger);
-            xmlWriter.write(content);
-            devConfXml.write(content.toString(), "UTF-8");
+
+            writeDevelopmentConfiguration(logger);
 
             return result.isExitCodeOk() ? null : Result.FAILURE;
+        }
+
+        /**
+         * @param logger
+         * @throws IOException
+         * @throws InterruptedException
+         */
+        private void writeDevelopmentConfiguration(final PrintStream logger) throws IOException, InterruptedException {
+            try {
+                FilePath devConfXml = NWDIBuild.this.getWorkspace().child("DevelopmentConfiguration.xml");
+                StringWriter content = new StringWriter();
+                DevelopmentConfigurationXmlWriter xmlWriter =
+                    new DevelopmentConfigurationXmlWriter(NWDIBuild.this.getDevelopmentConfiguration());
+                xmlWriter.write(content);
+
+                devConfXml.write(content.toString(), "UTF-8");
+            }
+            catch (XMLStreamException e) {
+                e.printStackTrace(logger);
+            }
         }
 
         /**

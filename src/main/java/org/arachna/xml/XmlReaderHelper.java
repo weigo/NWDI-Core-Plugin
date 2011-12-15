@@ -36,7 +36,6 @@ public final class XmlReaderHelper {
      */
     public XmlReaderHelper(final AbstractDefaultHandler handler) {
         this.handler = handler;
-
     }
 
     /**
