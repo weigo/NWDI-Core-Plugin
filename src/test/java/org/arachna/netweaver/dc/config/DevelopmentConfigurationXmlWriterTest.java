@@ -15,6 +15,7 @@ import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 import org.arachna.netweaver.dc.types.PublicPart;
 import org.arachna.netweaver.dc.types.PublicPartReference;
+import org.arachna.netweaver.dc.types.PublicPartType;
 import org.custommonkey.xmlunit.XMLTestCase;
 import org.custommonkey.xmlunit.exceptions.XpathException;
 import org.junit.After;
@@ -91,7 +92,7 @@ public class DevelopmentConfigurationXmlWriterTest extends XMLTestCase {
         publicPartReference = new PublicPartReference("sap.com", "com.sap.exception", "default");
         component.add(publicPartReference);
 
-        publicPart = new PublicPart("api", "API public Part", "description");
+        publicPart = new PublicPart("api", "API public Part", "description", PublicPartType.COMPILE);
         component.add(publicPart);
         compartment.add(component);
         writer = new DevelopmentConfigurationXmlWriter(config);

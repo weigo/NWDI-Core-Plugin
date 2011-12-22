@@ -27,6 +27,11 @@ public class PublicPart {
     private String caption = "";
 
     /**
+     * The type of this public part.
+     */
+    private PublicPartType type;
+
+    /**
      * Create a new public part object.
      * 
      * @param name
@@ -35,11 +40,19 @@ public class PublicPart {
      *            caption of public part.
      * @param description
      *            description of public part.
+     * @param type
+     *            the type of this public part.
      */
-    public PublicPart(final String name, final String caption, final String description) {
+    public PublicPart(final String name, final String caption, final String description, final PublicPartType type) {
         this.publicPart = Util.fixNull(name);
         this.caption = Util.fixNull(caption);
         this.description = Util.fixNull(description);
+
+        if (type == null) {
+            throw new IllegalArgumentException("The type of this public part must not be null!");
+        }
+
+        this.type = type;
     }
 
     /**
@@ -79,7 +92,8 @@ public class PublicPart {
      */
     @Override
     public String toString() {
-        return String.format("PublicPart [publicPart=%s, description=%s]", publicPart, description);
+        return String.format("PublicPart [publicPart=%s, caption=%s, type=%s, description=%s]", publicPart, caption,
+            type, description);
     }
 
     /*
@@ -93,6 +107,8 @@ public class PublicPart {
         int result = 1;
         result = prime * result + ((description == null) ? 0 : description.hashCode());
         result = prime * result + ((publicPart == null) ? 0 : publicPart.hashCode());
+        result = prime * result + ((type == null) ? 0 : type.toString().hashCode());
+
         return result;
     }
 
@@ -106,13 +122,17 @@ public class PublicPart {
         if (this == obj) {
             return true;
         }
+        
         if (obj == null) {
             return false;
         }
+        
         if (getClass() != obj.getClass()) {
             return false;
         }
+        
         final PublicPart other = (PublicPart)obj;
+        
         if (description == null) {
             if (other.description != null) {
                 return false;
@@ -121,6 +141,7 @@ public class PublicPart {
         else if (!description.equals(other.description)) {
             return false;
         }
+        
         if (publicPart == null) {
             if (other.publicPart != null) {
                 return false;
@@ -148,4 +169,12 @@ public class PublicPart {
         this.caption = caption;
     }
 
+    /**
+     * Returns the type of this public part.
+     * 
+     * @return the type of this public part
+     */
+    public PublicPartType getType() {
+        return type;
+    }
 }

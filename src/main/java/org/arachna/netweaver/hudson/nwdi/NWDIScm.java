@@ -238,16 +238,18 @@ public class NWDIScm extends SCM {
     protected PollingResult compareRemoteRevisionWith(final AbstractProject<?, ?> project, final Launcher launcher,
         final FilePath path, final TaskListener listener, final SCMRevisionState revisionState) throws IOException,
         InterruptedException {
+        // Use last build to determine new activities (last successful build
+        // might lead to constantly failing build without new activities).
         final NWDIBuild lastBuild = ((NWDIProject)project).getLastBuild();
         final PrintStream logger = listener.getLogger();
         logger.append(String.format(
             "Comparing base line activities with activities accumulated since last build (#%s).\n",
             lastBuild.getNumber()));
+
         final List<Activity> activities =
             getActivities(logger,
                 getDtrBrowser(lastBuild.getDevelopmentConfiguration(), new DevelopmentComponentFactory()),
                 getCreationDate(revisionState));
-        logger.append(activities.toString());
 
         final Change changeState = activities.isEmpty() ? Change.NONE : Change.SIGNIFICANT;
         logger.append(String.format("Found changes: %s.\n", changeState.toString()));
@@ -347,12 +349,12 @@ public class NWDIScm extends SCM {
 
         if (since == null) {
             activities.addAll(browser.getActivities());
+            duration(logger, start, "Determine activities");
         }
         else {
             activities.addAll(browser.getActivities(since));
+            duration(logger, start, String.format("Determine activities since %1$tF %<tT", since));
         }
-
-        duration(logger, start, "Determine activities");
 
         start = System.currentTimeMillis();
         // update activities with their respective resources

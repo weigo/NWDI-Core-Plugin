@@ -12,6 +12,7 @@ import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.DevelopmentComponentType;
 import org.arachna.netweaver.dc.types.PublicPart;
 import org.arachna.netweaver.dc.types.PublicPartReference;
+import org.arachna.netweaver.dc.types.PublicPartType;
 import org.arachna.xml.AbstractDefaultHandler;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -235,7 +236,15 @@ public class DevelopmentComponentReader extends AbstractDefaultHandler {
             reference.setAtRunTime(true);
         }
         else if (PUBLIC_PART.equals(localName)) {
-            publicPart = new PublicPart(attributes.getValue(NAME), attributes.getValue(CAPTION), "");
+            String type = attributes.getValue("type");
+
+            if (type == null) {
+                type = PublicPartType.COMPILE.toString();
+            }
+
+            publicPart =
+                new PublicPart(attributes.getValue(NAME), attributes.getValue(CAPTION), "",
+                    PublicPartType.fromString(type));
         }
     }
 

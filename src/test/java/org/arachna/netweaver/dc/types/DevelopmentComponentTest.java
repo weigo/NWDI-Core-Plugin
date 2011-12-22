@@ -54,8 +54,8 @@ public class DevelopmentComponentTest {
      */
     @Test
     public void testGetPublicPartsReturnedAreSorted() {
-        final PublicPart part1 = new PublicPart("API", null, null);
-        final PublicPart part2 = new PublicPart("ASSEMBLY", null, null);
+        final PublicPart part1 = new PublicPart("API", null, null, PublicPartType.COMPILE);
+        final PublicPart part2 = new PublicPart("ASSEMBLY", null, null, PublicPartType.COMPILE);
         this.component.add(part1);
         this.component.add(part2);
         final Iterator<PublicPart> publicParts = this.component.getPublicParts().iterator();
@@ -68,7 +68,7 @@ public class DevelopmentComponentTest {
      */
     @Test
     public void testGetPublicPartsReturnedAreNotEmpty() {
-        final PublicPart part1 = new PublicPart("API", null, null);
+        final PublicPart part1 = new PublicPart("API", null, null, PublicPartType.COMPILE);
         this.component.add(part1);
         assertThat(1, is(equalTo(this.component.getPublicParts().size())));
     }

@@ -12,8 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * @author G526521
- *
+ * @author Dirk Weigenand
  */
 public class ExcludeDataDictionarySourceDirectoryFilterTest {
     private SourceDirectoryFilter filter;

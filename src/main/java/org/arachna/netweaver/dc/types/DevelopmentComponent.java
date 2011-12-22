@@ -230,6 +230,14 @@ public final class DevelopmentComponent {
         return parts;
     }
 
+    public void setPublicParts(final Collection<PublicPart> publicParts) {
+        this.publicParts.clear();
+
+        if (publicParts != null) {
+            this.publicParts.addAll(publicParts);
+        }
+    }
+
     /**
      * Add a public part to this DC.
      * 

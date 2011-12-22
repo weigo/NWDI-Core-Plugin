@@ -3,6 +3,8 @@
  */
 package org.arachna.ant;
 
+import hudson.Util;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -11,7 +13,9 @@ import java.util.Set;
 
 import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
+import org.arachna.netweaver.dc.types.PublicPart;
 import org.arachna.netweaver.dc.types.PublicPartReference;
+import org.arachna.netweaver.dc.types.PublicPartType;
 
 /**
  * Helper for building ant projects/tasks.
@@ -102,10 +106,16 @@ public class AntHelper {
                 final File baseDir = new File(this.getBaseLocation(referencedDC, ppRef.getName()));
 
                 if (!baseDir.exists()) {
+                    System.err.println(String.format("createClassPath: cannot find %s for %s~%s:%s!",
+                        baseDir.getAbsolutePath(), referencedDC.getVendor(), referencedDC.getName(), ppRef.getName()));
                     continue;
                 }
 
                 paths.add(baseDir.getAbsolutePath());
+            }
+            else {
+                System.err.println(String.format("createClassPath: cannot find DC %s:%s!", ppRef.getVendor(),
+                    ppRef.getComponentName()));
             }
         }
 
@@ -118,7 +128,18 @@ public class AntHelper {
      * @return
      */
     public String getBaseLocation(final DevelopmentComponent referencedDC, final String name) {
-        return getPublicPartLocation(this.getBaseLocation(referencedDC), name);
+        String ppName = name;
+
+        if (Util.fixEmpty(ppName) == null) {
+            for (PublicPart pp : referencedDC.getPublicParts()) {
+                if (PublicPartType.COMPILE.equals(pp.getType())) {
+                    ppName = pp.getPublicPart();
+                    break;
+                }
+            }
+        }
+
+        return getPublicPartLocation(this.getBaseLocation(referencedDC), ppName);
     }
 
     /**
@@ -126,9 +147,9 @@ public class AntHelper {
      * @param baseLocation
      * @return
      */
-    private String getPublicPartLocation(final String baseLocation, final String name) {
-        return name != null ? String.format("%s/gen/default/public/%s/lib/java", baseLocation, name) : String.format(
-            "%s/gen/default/public/lib/java", baseLocation);
+    String getPublicPartLocation(final String baseLocation, final String name) {
+        return Util.fixEmpty(name) != null ? String.format("%s/gen/default/public/%s/lib/java", baseLocation, name)
+            : String.format("%s/gen/default", baseLocation);
     }
 
     /**
@@ -194,15 +215,8 @@ public class AntHelper {
      * 
      * @param component
      *            development component to create source file sets for.
-     * @param excludes
-     *            set of standard ant exclude expressions for file sets.
-     * @param containsRegexpExcludes
-     *            set of regular expressions that determine the files that
-     *            should be excluded from the source file sets based on their
-     *            content matching one of the given expressions
      */
-    public Collection<String> createSourceFileSets(final DevelopmentComponent component,
-        final Collection<String> excludes, final Collection<String> containsRegexpExcludes) {
+    public Collection<String> createSourceFileSets(final DevelopmentComponent component) {
         /**
          * An accept all source directories filter.
          */

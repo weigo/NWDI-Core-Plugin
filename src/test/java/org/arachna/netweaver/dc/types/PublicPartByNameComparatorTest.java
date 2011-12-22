@@ -25,12 +25,12 @@ public class PublicPartByNameComparatorTest {
     /**
      * a public part called 'API'.
      */
-    private final PublicPart part1 = new PublicPart("API", null, null);
+    private final PublicPart part1 = new PublicPart("API", null, null, PublicPartType.COMPILE);
 
     /**
      * a public part called 'ASSEMBLY'.
      */
-    private final PublicPart part2 = new PublicPart("ASSEMBLY", null, null);
+    private final PublicPart part2 = new PublicPart("ASSEMBLY", null, null, PublicPartType.ASSEMBLY);
 
     /**
      * @throws java.lang.Exception

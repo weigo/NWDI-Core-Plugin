@@ -15,9 +15,10 @@ import hudson.tasks.Publisher;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.StringReader;
-import java.io.StringWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -387,12 +388,11 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
         private void writeDevelopmentConfiguration(final PrintStream logger) throws IOException, InterruptedException {
             try {
                 FilePath devConfXml = NWDIBuild.this.getWorkspace().child("DevelopmentConfiguration.xml");
-                StringWriter content = new StringWriter();
+                Writer content = new OutputStreamWriter(devConfXml.write());
                 DevelopmentConfigurationXmlWriter xmlWriter =
                     new DevelopmentConfigurationXmlWriter(NWDIBuild.this.getDevelopmentConfiguration());
                 xmlWriter.write(content);
-
-                devConfXml.write(content.toString(), "UTF-8");
+                content.close();
             }
             catch (XMLStreamException e) {
                 e.printStackTrace(logger);

@@ -6,6 +6,7 @@ package org.arachna.netweaver.hudson.nwdi.dcupdater;
 import java.util.Stack;
 
 import org.arachna.netweaver.dc.types.PublicPart;
+import org.arachna.netweaver.dc.types.PublicPartType;
 import org.arachna.xml.AbstractDefaultHandler;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -16,6 +17,11 @@ import org.xml.sax.SAXException;
  * @author Dirk Weigenand
  */
 final class PublicPartReader extends AbstractDefaultHandler {
+    /**
+     * element 'purpose' of a public part definition.
+     */
+    private static final String PURPOSE = "purpose";
+
     /**
      * element 'caption'.
      */
@@ -61,6 +67,8 @@ final class PublicPartReader extends AbstractDefaultHandler {
      */
     private PublicPart publicPart;
 
+    private String purpose;
+
     /**
      * Create an instance of a <code>PublicPartReader</code>.
      */
@@ -88,9 +96,13 @@ final class PublicPartReader extends AbstractDefaultHandler {
             else if (CAPTION.equals(localName)) {
                 this.caption = this.getText();
             }
+            else if (PURPOSE.equals(localName)) {
+                this.purpose = this.getText();
+            }
         }
         else if (PUBLIC_PART.equals(localName)) {
-            this.publicPart = new PublicPart(this.publicPartName, this.caption, this.description);
+            this.publicPart =
+                new PublicPart(this.publicPartName, this.caption, this.description, PublicPartType.fromString(purpose));
         }
     }
 

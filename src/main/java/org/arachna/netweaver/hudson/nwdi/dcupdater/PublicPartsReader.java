@@ -14,7 +14,7 @@ import org.arachna.netweaver.dc.types.PublicPart;
 import org.arachna.xml.XmlReaderHelper;
 
 /**
- * Reader für Public Parts.
+ * Reader for Public Parts.
  * 
  * @author Dirk Weigenand
  */

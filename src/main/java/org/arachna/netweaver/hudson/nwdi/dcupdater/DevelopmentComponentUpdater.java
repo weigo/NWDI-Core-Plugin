@@ -12,7 +12,6 @@ import java.util.logging.Logger;
 import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.DevelopmentComponentType;
-import org.arachna.netweaver.dc.types.PublicPart;
 import org.arachna.netweaver.dc.types.PublicPartReference;
 import org.arachna.xml.XmlReaderHelper;
 import org.xml.sax.SAXException;
@@ -173,13 +172,7 @@ public final class DevelopmentComponentUpdater {
      * to it.
      */
     private void readPublicParts() {
-        final PublicPartsReader ppReader = new PublicPartsReader(componentBase);
-
-        // FIXME: DevelopmentComponent should provide an
-        // addAll(Collection<PublicPart>) operation.
-        for (final PublicPart part : ppReader.read()) {
-            currentComponent.add(part);
-        }
+        this.currentComponent.setPublicParts(new PublicPartsReader(componentBase).read());
     }
 
     /**

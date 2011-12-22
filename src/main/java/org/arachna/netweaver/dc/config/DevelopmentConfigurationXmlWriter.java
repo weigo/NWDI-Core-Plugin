@@ -148,6 +148,7 @@ public final class DevelopmentConfigurationXmlWriter {
         output.writeStartElement("public-part");
         output.writeAttribute("caption", pp.getCaption());
         output.writeAttribute("name", pp.getPublicPart());
+        output.writeAttribute("type", pp.getType().toString());
         output.writeStartElement("description");
         output.writeCharacters(pp.getDescription());
         output.writeEndElement();
