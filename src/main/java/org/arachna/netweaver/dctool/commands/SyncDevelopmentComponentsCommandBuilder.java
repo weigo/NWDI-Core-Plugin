@@ -118,13 +118,29 @@ final class SyncDevelopmentComponentsCommandBuilder extends AbstractDCToolComman
         final Collection<Compartment> compartments = developmentConfiguration.getCompartments(CompartmentState.Archive);
         final Collection<String> commands = new LinkedList<String>();
 
-        for (final Compartment compartment : compartments) {
-            if (cleanCopy || !templateProvider.shouldCompartmentBeExcludedFromSynchronization(compartment)) {
-                commands.add(createSyncDcsInArchiveModeCommand(compartment));
+        if (cleanCopy) {
+            commands.add(this.createSyncAllDcsInArchiveModeCommand());
+        }
+        else {
+            for (final Compartment compartment : compartments) {
+                if (!templateProvider.shouldCompartmentBeExcludedFromSynchronization(compartment)) {
+                    commands.add(createSyncDcsInArchiveModeCommand(compartment));
+                }
             }
         }
 
         return commands;
+    }
+
+    /**
+     * Create an syncalldcs in archive command for a whole development
+     * configuration.
+     * 
+     * @return syncalldcs in archive command for a whole development
+     *         configuration.
+     */
+    private String createSyncAllDcsInArchiveModeCommand() {
+        return this.templateProvider.getSyncAllDcsInArchiveModeTemplate();
     }
 
     /**
@@ -135,7 +151,8 @@ final class SyncDevelopmentComponentsCommandBuilder extends AbstractDCToolComman
      * @return the created syncalldcs command
      */
     protected String createSyncDcsInArchiveModeCommand(final Compartment compartment) {
-        return String.format(templateProvider.getSyncAllDcsInArchiveModeTemplate(), compartment.getName());
+        return String.format(templateProvider.getSyncAllDcsForGivenCompartmentInArchiveModeTemplate(),
+            compartment.getName());
     }
 
     /**

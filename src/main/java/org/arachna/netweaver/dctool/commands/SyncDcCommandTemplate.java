@@ -22,13 +22,15 @@ public enum SyncDcCommandTemplate {
      * Template for NW 7.0.
      */
     SyncDcCommandTemplateV70("syncdc -s %s -n %s -v %s -m inactive -y;", "syncalldcs -s %s -m archive;",
-        "syncalldcs -s %s -m inactive;", "unsyncdc -s %s -n %s -v %s;", "exit;", "SoftwareComponents70"),
+        "syncalldcs -m archive;", "syncalldcs -s %s -m inactive;", "unsyncdc -s %s -n %s -v %s;", "exit;",
+        "SoftwareComponents70"),
 
     /**
      * Template for NW 7.1+.
      */
     SyncDcCommandTemplateV71("syncdc -c %s -n %s -v %s -m inactive -f", "syncalldcs -c %s -m archive",
-        "syncalldcs -c %s -m inactive", "unsyncdc -c %s -n %s -v %s", "exit", "SoftwareComponents73");
+        "syncalldcs -m archive", "syncalldcs -c %s -m inactive", "unsyncdc -c %s -n %s -v %s", "exit",
+        "SoftwareComponents73");
 
     /**
      * template to use for creating a 'syncdc' in inactive state command.
@@ -38,7 +40,13 @@ public enum SyncDcCommandTemplate {
     /**
      * template to use for creating a 'syncalldcs' in archive state command.
      */
-    private String syncAllDcsInArchiveModeTemplate;
+    private String syncAllDcsForGivenCompartmentInArchiveModeTemplate;
+
+    /**
+     * Template for synchronizing all DCs of a development configuration in
+     * archive mode.
+     */
+    private final String syncAllDcsInArchiveModeTemplate;
 
     /**
      * template to use for creating a 'syncalldcs' in inactive state command.
@@ -67,9 +75,12 @@ public enum SyncDcCommandTemplate {
      * @param syncInactiveDcTemplate
      *            template to use for creating a 'syncdc' in inactive state
      *            command.
+     * @param syncAllDcsForGivenCompartmentInArchiveModeTemplate
+     *            template to use for creating a 'syncalldcs' in active state
+     *            command for a given compartment.
      * @param syncAllDcsInArchiveModeTemplate
      *            template to use for creating a 'syncalldcs' in active state
-     *            command.
+     *            command for a whole development configuration.
      * @param syncAllDcsInInactiveModeTemplate
      *            template for creating a 'syncalldcs' in archive mode command.
      * @param unsyncDcTemplate
@@ -80,11 +91,14 @@ public enum SyncDcCommandTemplate {
      * @param compartmentDirectory
      *            the 'compartment directory' containing software components
      *            supplied for the respective NW version.
+     * @param syncAllDcsInArchiveModeTemplate
      */
-    SyncDcCommandTemplate(final String syncInactiveDcTemplate, final String syncAllDcsInArchiveModeTemplate,
+    SyncDcCommandTemplate(final String syncInactiveDcTemplate,
+        final String syncAllDcsForGivenCompartmentInArchiveModeTemplate, final String syncAllDcsInArchiveModeTemplate,
         final String syncAllDcsInInactiveModeTemplate, final String unsyncDcTemplate, final String exitTemplate,
         final String compartmentDirectory) {
         this.syncInactiveDcTemplate = syncInactiveDcTemplate;
+        this.syncAllDcsForGivenCompartmentInArchiveModeTemplate = syncAllDcsForGivenCompartmentInArchiveModeTemplate;
         this.syncAllDcsInArchiveModeTemplate = syncAllDcsInArchiveModeTemplate;
         this.syncAllDcsInInactiveModeTemplate = syncAllDcsInInactiveModeTemplate;
         this.unsyncDcTemplate = unsyncDcTemplate;
@@ -112,12 +126,19 @@ public enum SyncDcCommandTemplate {
 
     /**
      * Returns template to use for creating a 'syncalldcs' in active state
-     * command.
+     * command for a given compartment.
      * 
      * @return template to use for creating a 'syncalldcs' in active state
-     *         command.
+     *         command for a given compartment.
      */
-    String getSyncAllDcsInArchiveModeTemplate() {
+    String getSyncAllDcsForGivenCompartmentInArchiveModeTemplate() {
+        return syncAllDcsForGivenCompartmentInArchiveModeTemplate;
+    }
+
+    /**
+     * @return the syncAllDcsInArchiveModeTemplate
+     */
+    public String getSyncAllDcsInArchiveModeTemplate() {
         return syncAllDcsInArchiveModeTemplate;
     }
 

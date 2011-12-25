@@ -181,9 +181,8 @@ public class SyncDevelopmentComponentsCommandBuilderTest {
         config.add(new Compartment("example.com_EXAMPLE_SC_2", CompartmentState.Archive, VENDOR, "", "EXAMPLE_SC_2"));
         addSapCompartments("SoftwareComponents70");
         final Collection<String> commands = builder.synchronizeCompartmentsInArchiveMode();
-        assertThat(commands, hasSize(config.getCompartments().size()));
-        assertThat(commands, hasItem("syncalldcs -s example.com_EXAMPLE_SC_1 -m archive;"));
-        assertThat(commands, hasItem("syncalldcs -s example.com_EXAMPLE_SC_2 -m archive;"));
+        assertThat(commands, hasSize(1));
+        assertThat(commands, hasItem("syncalldcs -m archive;"));
     }
 
     /**
@@ -201,9 +200,8 @@ public class SyncDevelopmentComponentsCommandBuilderTest {
         config.add(new Compartment("example.com_EXAMPLE_SC_2", CompartmentState.Archive, VENDOR, "", "EXAMPLE_SC_2"));
         addSapCompartments("SoftwareComponents73");
         final Collection<String> commands = builder.synchronizeCompartmentsInArchiveMode();
-        assertThat(commands, hasSize(config.getCompartments().size()));
-        assertThat(commands, hasItem("syncalldcs -c example.com_EXAMPLE_SC_1 -m archive"));
-        assertThat(commands, hasItem("syncalldcs -c example.com_EXAMPLE_SC_2 -m archive"));
+        assertThat(commands, hasSize(1));
+        assertThat(commands, hasItem("syncalldcs -m archive"));
     }
 
     /**
