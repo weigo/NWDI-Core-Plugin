@@ -365,7 +365,7 @@ public final class DevelopmentComponent {
      */
     @Override
     public int hashCode() {
-        return Arrays.hashCode(new Object[] { compartment, name, type, vendor });
+        return Arrays.hashCode(new Object[] { name, type, vendor });
     }
 
     /*
@@ -388,8 +388,8 @@ public final class DevelopmentComponent {
 
         final DevelopmentComponent other = (DevelopmentComponent)obj;
 
-        return Arrays.equals(new Object[] { compartment, name, type, vendor }, new Object[] { other.compartment,
-            other.name, other.type, other.vendor });
+        return Arrays
+            .equals(new Object[] { name, type, vendor }, new Object[] { other.name, other.type, other.vendor });
     }
 
     /**
