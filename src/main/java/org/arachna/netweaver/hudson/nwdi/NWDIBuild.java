@@ -189,6 +189,9 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
      * Calculate build sequence for development components affected by
      * activities that triggered this build.
      * 
+     * @param filter
+     *            filter for development components affected by this build. Can
+     *            be used to filter only DCs relevant for a certain builder.
      * @return build sequence for development components affected by activities
      *         that triggered this build.
      */
@@ -299,28 +302,51 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
         protected Result doRun(final BuildListener listener) throws Exception {
             AntHelper antHelper = new AntHelper(FilePathHelper.makeAbsolute(getWorkspace()), dcFactory);
             reporters.addAll(getProject().getPublishersList().toList());
+            Result result = Result.SUCCESS;
 
             if (!preBuild(listener, project.getBuilders())) {
-                return Result.FAILURE;
+                result = Result.FAILURE;
             }
 
-            if (!preBuild(listener, getProject().getPublishers())) {
-                return Result.FAILURE;
+            if (Result.SUCCESS.equals(result) && !preBuild(listener, getProject().getPublishers())) {
+                result = Result.FAILURE;
             }
 
-            final PrintStream logger = listener.getLogger();
-
-            Result r = buildDevelopmentComponents(logger, antHelper);
-
-            if (!Result.FAILURE.equals(r) && !build(listener, project.getBuilders(), antHelper)) {
-                r = FAILURE;
+            if (Result.SUCCESS.equals(result)) {
+                result = buildDevelopmentComponents(listener.getLogger());
             }
 
-            return r;
+            if (Result.SUCCESS.equals(result)) {
+                updateSourceCodeLocations(listener.getLogger(), antHelper);
+                writeDevelopmentConfiguration(listener.getLogger());
+            }
+
+            if (Result.SUCCESS.equals(result) && !build(project.getBuilders(), antHelper)) {
+                result = FAILURE;
+            }
+
+            return result;
         }
 
-        private boolean build(final BuildListener listener, final Collection<Builder> steps, AntHelper antHelper)
-            throws IOException, InterruptedException {
+        /**
+         * Run all configured build steps.
+         * 
+         * @param steps
+         *            the build steps to execute.
+         * @param antHelper
+         *            various NWDI-*-Plugins define {@link AntTaskBuilder}s that
+         *            need an {@link AntHelper} to execute.
+         * @return the result of the executed build steps: <code>true</code>
+         *         when all build steps executed successfully,
+         *         <code>false</code> when a build step failed.
+         * @throws IOException
+         *             re-thrown from the perform method that executes the build
+         *             steps
+         * @throws InterruptedException
+         *             when the build was interrupted
+         */
+        private boolean build(final Collection<Builder> steps, AntHelper antHelper) throws IOException,
+            InterruptedException {
             for (final BuildStep bs : steps) {
 
                 if (AntTaskBuilder.class.isAssignableFrom(bs.getClass())) {
@@ -342,10 +368,11 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
          *            logger to log build messages
          * @return build result
          * @throws IOException
+         *             re-thrown from executing the DC build
          * @throws InterruptedException
+         *             re-thrown from executing the DC build
          */
-        protected Result buildDevelopmentComponents(final PrintStream logger, AntHelper antHelper) throws IOException,
-            InterruptedException {
+        protected Result buildDevelopmentComponents(final PrintStream logger) throws IOException, InterruptedException {
             final Collection<DevelopmentComponent> affectedComponents =
                 NWDIBuild.this.getAffectedDevelopmentComponents();
             logger.append(String.format("Building %s development components.\n", affectedComponents.size()));
@@ -354,7 +381,6 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
                 logger.append(component.getName()).append('\n');
             }
 
-            // TODO: annotate build results with links to build.log files.
             final DcToolCommandExecutionResult result =
                 getDCToolExecutor(launcher).buildDevelopmentComponents(affectedComponents);
 
@@ -373,17 +399,19 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
                 }
             }
 
-            updateSourceCodeLocations(logger, antHelper);
-
-            writeDevelopmentConfiguration(logger);
-
             return result.isExitCodeOk() ? null : Result.FAILURE;
         }
 
         /**
+         * Saves the current development configuration as XML to the workspace
+         * folder.
+         * 
          * @param logger
+         *            logger for logging exceptions
          * @throws IOException
+         *             re-thrown from {@link FilePath} operations
          * @throws InterruptedException
+         *             re-thrown from {@link FilePath} operations
          */
         private void writeDevelopmentConfiguration(final PrintStream logger) throws IOException, InterruptedException {
             try {
@@ -411,6 +439,9 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
          * 
          * @param logger
          *            Logger to report actions back to build.
+         * @param antHelper
+         *            {@link AntHelper} to compute the base location of
+         *            development components.
          * @param antHelper
          */
         private void updateSourceCodeLocations(final PrintStream logger, AntHelper antHelper) {

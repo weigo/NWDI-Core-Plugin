@@ -133,7 +133,6 @@ public class NWDIScm extends SCM {
 
         if (result.isExitCodeOk()) {
             final NWDIBuild lastSuccessfulBuild = currentBuild.getParent().getLastSuccessfulBuild();
-            boolean cleanCopy = currentBuild.getPreviousBuild() == null || this.cleanCopy;
 
             if (lastSuccessfulBuild != null) {
                 logger.append(String.format("Getting activities from DTR (since last successful build #%s).\n",
@@ -147,13 +146,9 @@ public class NWDIScm extends SCM {
                 lastSuccessfulBuild != null ? lastSuccessfulBuild.getAction(NWDIRevisionState.class).getCreationDate()
                     : null));
 
-            if (cleanCopy) {
-                for (final Compartment compartment : config.getCompartments(CompartmentState.Source)) {
-                    for (final DevelopmentComponent component : compartment.getDevelopmentComponents()) {
-                        component.setNeedsRebuild(true);
-                    }
-                }
-            }
+            boolean cleanCopy = currentBuild.getPreviousBuild() == null || this.cleanCopy;
+
+            setNeedsRebuildPropertyOnAllDevelopmentComponentsInSourceState(config, cleanCopy);
 
             result = executor.synchronizeDevelopmentComponents(cleanCopy);
 
@@ -181,13 +176,44 @@ public class NWDIScm extends SCM {
     }
 
     /**
-     * @param workspace
+     * Set the needsRebuild property on all development components in source
+     * state if a clean build was requested.
+     * 
      * @param config
+     *            the development configuration containing the DCs
+     * @param cleanCopy
+     *            <code>true</code> when a clean build was requested,
+     *            <code>false</code> otherwise.
+     */
+    private void setNeedsRebuildPropertyOnAllDevelopmentComponentsInSourceState(final DevelopmentConfiguration config,
+        boolean cleanCopy) {
+        if (cleanCopy) {
+            for (final Compartment compartment : config.getCompartments(CompartmentState.Source)) {
+                for (final DevelopmentComponent component : compartment.getDevelopmentComponents()) {
+                    component.setNeedsRebuild(true);
+                }
+            }
+        }
+    }
+
+    /**
+     * Read the development configuration saved during the last build or list
+     * development components from CBS if it doesn't exist.
+     * 
+     * @param workspace
+     *            workspace folder where the development configuration was
+     *            saved.
+     * @param config
+     *            development configuration to be used throughout the build
      * @param executor
+     *            executor for listing development components from the CBS
      * @param dcFactory
-     * @return
+     *            registry for development components.
+     * @return the result of DC tool execution
      * @throws IOException
+     *             re-thrown from DC tool execution
      * @throws InterruptedException
+     *             re-thrown from DC tool execution
      */
     private DcToolCommandExecutionResult readOrListDevelopmentComponents(FilePath workspace,
         DevelopmentConfiguration config, final DCToolCommandExecutor executor,
