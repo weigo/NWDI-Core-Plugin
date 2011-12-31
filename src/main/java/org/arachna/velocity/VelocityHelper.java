@@ -36,7 +36,9 @@ public final class VelocityHelper {
             engine.setProperty(VelocityEngine.RUNTIME_LOG_LOGSYSTEM, new VelocityLogChute(logger));
             engine.init(properties);
         }
+//CHECKSTYLE:OFF
         catch (Exception e) {
+//CHECKSTYLE:ON
             throw new RuntimeException(e);
         }
     }

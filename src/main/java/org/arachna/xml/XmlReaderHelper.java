@@ -73,7 +73,9 @@ public final class XmlReaderHelper {
         try {
             xmlReader = XMLReaderFactory.createXMLReader();
         }
+//CHECKSTYLE:OFF
         catch (final RuntimeException re) {
+//CHECKSTYLE:ON
             if (re.getCause() != null && ClassNotFoundException.class.equals(re.getCause().getClass())) {
                 final String saxDriverProperty = System.getProperty(ORG_XML_SAX_DRIVER);
 
@@ -82,6 +84,9 @@ public final class XmlReaderHelper {
                 }
 
                 xmlReader = XMLReaderFactory.createXMLReader();
+            }
+            else {
+                throw re;
             }
         }
 
