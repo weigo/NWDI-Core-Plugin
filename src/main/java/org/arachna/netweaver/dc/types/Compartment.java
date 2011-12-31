@@ -132,6 +132,13 @@ public final class Compartment {
         }
     }
 
+    /**
+     * Set the compartments used by this compartment.
+     * 
+     * @param usedCompartments
+     *            the compartments needed to build development components
+     *            contained in this compartment.
+     */
     public void set(final Collection<Compartment> usedCompartments) {
         this.usedCompartments.clear();
 
