@@ -312,8 +312,8 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
                 result = Result.FAILURE;
             }
 
-            if (Result.SUCCESS.equals(result)) {
-                result = buildDevelopmentComponents(listener.getLogger());
+            if (Result.SUCCESS.equals(result) && !buildDevelopmentComponents(listener.getLogger()).isExitCodeOk()) {
+                result = Result.FAILURE;
             }
 
             if (Result.SUCCESS.equals(result)) {
@@ -366,13 +366,14 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
          * 
          * @param logger
          *            logger to log build messages
-         * @return build result
+         * @return result of DC tool execution
          * @throws IOException
          *             re-thrown from executing the DC build
          * @throws InterruptedException
          *             re-thrown from executing the DC build
          */
-        protected Result buildDevelopmentComponents(final PrintStream logger) throws IOException, InterruptedException {
+        protected DcToolCommandExecutionResult buildDevelopmentComponents(final PrintStream logger) throws IOException,
+            InterruptedException {
             final Collection<DevelopmentComponent> affectedComponents =
                 NWDIBuild.this.getAffectedDevelopmentComponents();
             logger.append(String.format("Building %s development components.\n", affectedComponents.size()));
@@ -399,7 +400,7 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
                 }
             }
 
-            return result.isExitCodeOk() ? null : Result.FAILURE;
+            return result;
         }
 
         /**
