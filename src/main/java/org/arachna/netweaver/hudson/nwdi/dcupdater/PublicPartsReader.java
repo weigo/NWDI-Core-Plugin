@@ -5,6 +5,7 @@ package org.arachna.netweaver.hudson.nwdi.dcupdater;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ import java.util.List;
 
 import org.arachna.netweaver.dc.types.PublicPart;
 import org.arachna.xml.XmlReaderHelper;
+import org.xml.sax.SAXException;
 
 /**
  * Reader for Public Parts.
@@ -58,8 +60,13 @@ final class PublicPartsReader {
                         publicParts.add(part);
                     }
                 }
-                catch (final Exception e) {
-                    // FIXME: fix exception handling.
+                catch (final FileNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+                catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                catch (SAXException e) {
                     throw new RuntimeException(e);
                 }
                 finally {
@@ -68,8 +75,7 @@ final class PublicPartsReader {
                             ppFileReader.close();
                         }
                         catch (IOException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
+                            throw new RuntimeException(e);
                         }
                     }
                 }
