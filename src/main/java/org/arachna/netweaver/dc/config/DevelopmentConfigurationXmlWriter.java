@@ -24,6 +24,31 @@ import org.arachna.netweaver.dc.types.PublicPartReference;
  */
 public final class DevelopmentConfigurationXmlWriter {
     /**
+     * vendor attribute.
+     */
+    private static final String VENDOR = "vendor";
+
+    /**
+     * type attribute.
+     */
+    private static final String TYPE = "type";
+
+    /**
+     * name attribute.
+     */
+    private static final String NAME = "name";
+
+    /**
+     * description attribute.
+     */
+    private static final String DESCRIPTION = "description";
+
+    /**
+     * caption attribute.
+     */
+    private static final String CAPTION = "caption";
+
+    /**
      * development configuration that shall be persisted as XML.
      */
     private final DevelopmentConfiguration configuration;
@@ -48,18 +73,21 @@ public final class DevelopmentConfigurationXmlWriter {
      * Write the development configuration as XML into the given writer.
      * 
      * @param writer
-     *            {@link Writer} to write XML into
+     *            {@link Writer} to write XML into.
      * @throws XMLStreamException
+     *             when writing the attributes/elements fails.
      */
     public void write(final Writer writer) throws XMLStreamException {
-        XMLOutputFactory factory = XMLOutputFactory.newInstance();
+        final XMLOutputFactory factory = XMLOutputFactory.newInstance();
         output = factory.createXMLStreamWriter(writer);
         emitDocument();
     }
 
     /**
-     * @param output
+     * Save development configuration to XML.
+     * 
      * @throws XMLStreamException
+     *             when writing the attributes/elements fails.
      */
     private void emitDocument() throws XMLStreamException {
         output.writeStartDocument();
@@ -68,26 +96,30 @@ public final class DevelopmentConfigurationXmlWriter {
     }
 
     /**
-     * @param output
+     * Write the development configuration, build variant and contained
+     * compartments tags and respective attributes.
+     * 
      * @throws XMLStreamException
+     *             when writing the attributes/elements fails.
      */
     private void emitDevelopmentConfiguration() throws XMLStreamException {
         output.writeStartElement("development-configuration");
-        output.writeAttribute("caption", this.configuration.getCaption());
-        output.writeAttribute("description", this.configuration.getDescription());
-        // output.writeAttribute("location", this.configuration.getLocation());
-        output.writeAttribute("name", this.configuration.getName());
+        output.writeAttribute(CAPTION, configuration.getCaption());
+        output.writeAttribute(DESCRIPTION, configuration.getDescription());
+        output.writeAttribute(NAME, configuration.getName());
         emitBuildVariant();
         emitCompartments();
         output.writeEndElement();
     }
 
     /**
-     * @throws XMLStreamException
+     * Emit compartments as XML.
      * 
+     * @throws XMLStreamException
+     *             when writing the attributes/elements fails.
      */
     private void emitCompartments() throws XMLStreamException {
-        for (Compartment compartment : this.configuration.getCompartments()) {
+        for (final Compartment compartment : configuration.getCompartments()) {
             output.writeStartElement("compartment");
             emitCompartmentAttributes(compartment);
             emitUsedCompartments(compartment.getUsedCompartments());
@@ -97,14 +129,18 @@ public final class DevelopmentConfigurationXmlWriter {
     }
 
     /**
+     * Emit development components of a compartment as XML.
+     * 
      * @param developmentComponents
+     *            development components to serialize as XML.
      * @throws XMLStreamException
+     *             when writing the attributes/elements fails.
      */
-    private void emitDevelopmentComponents(Collection<DevelopmentComponent> developmentComponents)
+    private void emitDevelopmentComponents(final Collection<DevelopmentComponent> developmentComponents)
         throws XMLStreamException {
         output.writeStartElement("development-components");
 
-        for (DevelopmentComponent component : developmentComponents) {
+        for (final DevelopmentComponent component : developmentComponents) {
             emitDevelopmentComponent(component);
         }
 
@@ -112,13 +148,17 @@ public final class DevelopmentConfigurationXmlWriter {
     }
 
     /**
+     * Emit the given development component as XML.
+     * 
      * @param component
+     *            development component to serialize as XML.
      * @throws XMLStreamException
+     *             when writing the attributes/elements fails.
      */
-    private void emitDevelopmentComponent(DevelopmentComponent component) throws XMLStreamException {
+    private void emitDevelopmentComponent(final DevelopmentComponent component) throws XMLStreamException {
         output.writeStartElement("development-component");
         emitDevelopmentComponentAttributes(component);
-        output.writeStartElement("description");
+        output.writeStartElement(DESCRIPTION);
         output.writeCharacters(component.getDescription());
         output.writeEndElement();
         emitUsedDcs(component.getUsedDevelopmentComponents());
@@ -127,13 +167,17 @@ public final class DevelopmentConfigurationXmlWriter {
     }
 
     /**
-     * @param component
+     * Emit public parts of a development component to XML.
+     * 
+     * @param publicParts
+     *            public parts to serialize as XML.
      * @throws XMLStreamException
+     *             when writing the attributes/elements fails.
      */
-    private void emitPublicParts(Collection<PublicPart> publicParts) throws XMLStreamException {
+    private void emitPublicParts(final Collection<PublicPart> publicParts) throws XMLStreamException {
         output.writeStartElement("public-parts");
 
-        for (PublicPart pp : publicParts) {
+        for (final PublicPart pp : publicParts) {
             emitPublicPart(pp);
         }
 
@@ -141,28 +185,36 @@ public final class DevelopmentConfigurationXmlWriter {
     }
 
     /**
+     * Emit a public part as XML.
+     * 
      * @param pp
+     *            public part to serialize as XML.
      * @throws XMLStreamException
+     *             when writing the attributes/elements fails.
      */
-    private void emitPublicPart(PublicPart pp) throws XMLStreamException {
+    private void emitPublicPart(final PublicPart pp) throws XMLStreamException {
         output.writeStartElement("public-part");
-        output.writeAttribute("caption", pp.getCaption());
-        output.writeAttribute("name", pp.getPublicPart());
-        output.writeAttribute("type", pp.getType().toString());
-        output.writeStartElement("description");
+        output.writeAttribute(CAPTION, pp.getCaption());
+        output.writeAttribute(NAME, pp.getPublicPart());
+        output.writeAttribute(TYPE, pp.getType().toString());
+        output.writeStartElement(DESCRIPTION);
         output.writeCharacters(pp.getDescription());
         output.writeEndElement();
         output.writeEndElement();
     }
 
     /**
+     * Emit references to other development components to XML.
+     * 
      * @param usedDevelopmentComponents
+     *            references to public parts of used DCs to serialize as XML.
      * @throws XMLStreamException
+     *             when writing the attributes/elements fails.
      */
-    private void emitUsedDcs(Collection<PublicPartReference> usedDevelopmentComponents) throws XMLStreamException {
+    private void emitUsedDcs(final Collection<PublicPartReference> usedDevelopmentComponents) throws XMLStreamException {
         output.writeStartElement("dependencies");
 
-        for (PublicPartReference ppRef : usedDevelopmentComponents) {
+        for (final PublicPartReference ppRef : usedDevelopmentComponents) {
             emitUsedDc(ppRef);
         }
 
@@ -170,14 +222,18 @@ public final class DevelopmentConfigurationXmlWriter {
     }
 
     /**
+     * Emit the given public part reference as XML.
+     * 
      * @param ppRef
+     *            public part reference to serialize as XML.
      * @throws XMLStreamException
+     *             when writing the attributes/elements fails.
      */
-    private void emitUsedDc(PublicPartReference ppRef) throws XMLStreamException {
+    private void emitUsedDc(final PublicPartReference ppRef) throws XMLStreamException {
         output.writeStartElement("dependency");
-        output.writeAttribute("name", ppRef.getComponentName());
+        output.writeAttribute(NAME, ppRef.getComponentName());
         output.writeAttribute("pp-ref", ppRef.getName());
-        output.writeAttribute("vendor", ppRef.getVendor());
+        output.writeAttribute(VENDOR, ppRef.getVendor());
 
         if (ppRef.isAtBuildTime()) {
             output.writeEmptyElement("at-build-time");
@@ -191,23 +247,33 @@ public final class DevelopmentConfigurationXmlWriter {
     }
 
     /**
+     * Emit the name, type and vendor attributes of the given development
+     * component as XML.
+     * 
      * @param component
+     *            development component whose name, type and vendor attributes
+     *            shall be serialized to XML.
      * @throws XMLStreamException
+     *             when writing the attributes/elements fails.
      */
-    private void emitDevelopmentComponentAttributes(DevelopmentComponent component) throws XMLStreamException {
-        output.writeAttribute("name", component.getName());
-        output.writeAttribute("type", component.getType().toString());
-        output.writeAttribute("vendor", component.getVendor());
+    private void emitDevelopmentComponentAttributes(final DevelopmentComponent component) throws XMLStreamException {
+        output.writeAttribute(NAME, component.getName());
+        output.writeAttribute(TYPE, component.getType().toString());
+        output.writeAttribute(VENDOR, component.getVendor());
     }
 
     /**
-     * @param compartment
+     * Emit the given collection of compartments as used-compartments element.
+     * 
+     * @param compartments
+     *            compartments to serialize as used-compartments.
      * @throws XMLStreamException
+     *             when writing the attributes/elements fails.
      */
-    private void emitUsedCompartments(Collection<Compartment> compartments) throws XMLStreamException {
+    private void emitUsedCompartments(final Collection<Compartment> compartments) throws XMLStreamException {
         output.writeStartElement("used-compartments");
 
-        for (Compartment compartment : compartments) {
+        for (final Compartment compartment : compartments) {
             output.writeEmptyElement("used-compartment");
             emitCompartmentAttributes(compartment);
         }
@@ -216,29 +282,35 @@ public final class DevelopmentConfigurationXmlWriter {
     }
 
     /**
+     * Emit the given compartment as XML.
+     * 
      * @param compartment
+     *            compartment to save as XML.
      * @throws XMLStreamException
+     *             when writing the attributes/elements fails.
      */
-    private void emitCompartmentAttributes(Compartment compartment) throws XMLStreamException {
+    private void emitCompartmentAttributes(final Compartment compartment) throws XMLStreamException {
         output.writeAttribute("archive-state", compartment.isArchiveState() ? "yes" : "no");
-        output.writeAttribute("caption", compartment.getCaption());
-        output.writeAttribute("name", compartment.getName());
+        output.writeAttribute(CAPTION, compartment.getCaption());
+        output.writeAttribute(NAME, compartment.getName());
         output.writeAttribute("sc-name", compartment.getSoftwareComponent());
-        output.writeAttribute("vendor", compartment.getVendor());
+        output.writeAttribute(VENDOR, compartment.getVendor());
     }
 
     /**
-     * @throws XMLStreamException
+     * Emit the build variant as XML.
      * 
+     * @throws XMLStreamException
+     *             when writing the attributes/elements fails.
      */
     private void emitBuildVariant() throws XMLStreamException {
         output.writeStartElement("build-variant");
-        BuildVariant buildVariant = this.configuration.getBuildVariant();
-        output.writeAttribute("name", buildVariant.getName());
+        final BuildVariant buildVariant = configuration.getBuildVariant();
+        output.writeAttribute(NAME, buildVariant.getName());
 
-        for (String name : buildVariant.getBuildOptionNames()) {
+        for (final String name : buildVariant.getBuildOptionNames()) {
             output.writeStartElement("option");
-            output.writeAttribute("name", name);
+            output.writeAttribute(NAME, name);
             output.writeAttribute("value", buildVariant.getBuildOption(name));
             output.writeEndElement();
         }
