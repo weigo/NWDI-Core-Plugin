@@ -51,9 +51,6 @@ public class AntHelper {
      *            path to workspace the build is taking place on
      * @param dcFactory
      *            registry for development components
-     * @param excludesFactory
-     *            factory for generating file set excludes from development
-     *            component type.
      */
     public AntHelper(final String pathToWorkspace, final DevelopmentComponentFactory dcFactory) {
         this.pathToWorkspace = pathToWorkspace;
@@ -97,10 +94,10 @@ public class AntHelper {
      *         development component
      */
     public Set<String> createClassPath(final DevelopmentComponent component) {
-        Set<String> paths = new HashSet<String>();
+        final Set<String> paths = new HashSet<String>();
 
         for (final PublicPartReference ppRef : component.getUsedDevelopmentComponents()) {
-            DevelopmentComponent referencedDC = dcFactory.get(ppRef.getVendor(), ppRef.getComponentName());
+            final DevelopmentComponent referencedDC = dcFactory.get(ppRef.getVendor(), ppRef.getComponentName());
 
             if (referencedDC != null) {
                 final File baseDir = new File(this.getBaseLocation(referencedDC, ppRef.getName()));
@@ -123,15 +120,21 @@ public class AntHelper {
     }
 
     /**
-     * @param referencedDC
+     * Calculate the absolute path to the artifacts of the public part in the
+     * given development component.
+     * 
+     * @param component
+     *            development component
      * @param name
-     * @return
+     *            name of public part
+     * @return absolute path to artifacts of the given public part in the given
+     *         development component.
      */
-    public String getBaseLocation(final DevelopmentComponent referencedDC, final String name) {
+    public String getBaseLocation(final DevelopmentComponent component, final String name) {
         String ppName = name;
 
         if (Util.fixEmpty(ppName) == null) {
-            for (PublicPart pp : referencedDC.getPublicParts()) {
+            for (final PublicPart pp : component.getPublicParts()) {
                 if (PublicPartType.COMPILE.equals(pp.getType())) {
                     ppName = pp.getPublicPart();
                     break;
@@ -139,13 +142,22 @@ public class AntHelper {
             }
         }
 
-        return getPublicPartLocation(this.getBaseLocation(referencedDC), ppName);
+        return getPublicPartLocation(this.getBaseLocation(component), ppName);
     }
 
     /**
-     * @param name
+     * Return the location of the public part relative to the given base
+     * location.
+     * 
+     * The location is that of the given public part under
+     * <code>gen/default</code> or the <code>gen/default</code> folder.
+     * 
      * @param baseLocation
-     * @return
+     *            location of development component
+     * @param name
+     *            name of public part.
+     * @return the path to the artifacts of the given public part in the given
+     *         location of development component.
      */
     String getPublicPartLocation(final String baseLocation, final String name) {
         return Util.fixEmpty(name) != null ? String.format("%s/gen/default/public/%s/lib/java", baseLocation, name)
@@ -165,7 +177,8 @@ public class AntHelper {
      * Get the location of a development component in workspace.
      * 
      * @param component
-     * @return
+     *            development component the location is to be calculated for.
+     * @return the location of the given component in the workspace.
      */
     public String getBaseLocation(final DevelopmentComponent component) {
         return String.format(BASE_PATH_TEMPLATE, pathToWorkspace, component.getVendor(), component.getName());
@@ -180,9 +193,11 @@ public class AntHelper {
      *            current workspace.
      * @return location of given DC relative to the current workspace.
      */
-    public String getBaseLocationRelativeToWorkspace(final DevelopmentComponent component) {
-        return String.format(RELATIVE_BASE_PATH_TEMPLATE, component.getVendor(), component.getName());
-    }
+    // public String getBaseLocationRelativeToWorkspace(final
+    // DevelopmentComponent component) {
+    // return String.format(RELATIVE_BASE_PATH_TEMPLATE, component.getVendor(),
+    // component.getName());
+    // }
 
     /**
      * Get the location of a development components public part in workspace.
@@ -210,11 +225,12 @@ public class AntHelper {
     }
 
     /**
-     * Creates a collection of source file sets representing the source folders
-     * and the sources to in-/exclude.
+     * Creates a collection of source folders for the given development
+     * component.
      * 
      * @param component
      *            development component to create source file sets for.
+     * @return a collection of source folders of the given development component
      */
     public Collection<String> createSourceFileSets(final DevelopmentComponent component) {
         /**
@@ -235,13 +251,16 @@ public class AntHelper {
     }
 
     /**
-     * Creates a collection of source folders.
+     * Creates a collection of source folders for the given development
+     * component filtered using the given filter.
      * 
      * @param component
      *            development component to create source file sets for.
      * @param filter
      *            a filter that determines which of the source folders should be
      *            added to the result list
+     * @return a collection of source folders of the given development component
+     *         filtered using the given filter for source directories
      */
     public Collection<String> createSourceFileSets(final DevelopmentComponent component,
         final SourceDirectoryFilter filter) {

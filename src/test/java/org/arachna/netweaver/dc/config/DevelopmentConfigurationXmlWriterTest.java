@@ -30,6 +30,59 @@ import org.xml.sax.SAXException;
  */
 public class DevelopmentConfigurationXmlWriterTest extends XMLTestCase {
     /**
+     * xpath for selecting the first used compartment in archive state of the
+     * first serialized compartment.
+     */
+    private static final String XPATH_USED_COMPARTMENT_IN_ARCHIVE_STATE =
+        "/development-configuration/compartment[1]/used-compartments/used-compartment[1]/@archive-state";
+
+    /**
+     * expected xpath selection result.
+     */
+    private static final String NO = "no";
+
+    /**
+     * expected xpath selection result.
+     */
+    private static final String YES = "yes";
+
+    /**
+     * xpath expression for selecting the first compartment in archive state.
+     */
+    private static final String XPATH_COMPARTMENT_IN_ARCHIVE_STATE =
+        "/development-configuration/compartment[1]/@archive-state";
+
+    /**
+     * vendor SAP.
+     */
+    private static final String SAP_COM = "sap.com";
+
+    /**
+     * example vendor.
+     */
+    private static final String EXAMPLE_ORG = "example.org";
+
+    /**
+     * example compartment.
+     */
+    private static final String EXAMPLE_ORG_SC_1 = "example.org_SC_1";
+
+    /**
+     * compartment SAP_BUILDT.
+     */
+    private static final String SAP_COM_SAP_BUILDT_1 = "sap.com_SAP_BUILDT_1";
+
+    /**
+     * a sample value...
+     */
+    private static final String DEFAULT = "default";
+
+    /**
+     * sample value for a description...
+     */
+    private static final String DESCRIPTION = "description";
+
+    /**
      * Example configuration.
      */
     private DevelopmentConfiguration config;
@@ -73,26 +126,24 @@ public class DevelopmentConfigurationXmlWriterTest extends XMLTestCase {
         super.setUp();
         config = new DevelopmentConfiguration("DI0_Example_D");
         config.setCaption("caption");
-        config.setDescription("description");
+        config.setDescription(DESCRIPTION);
 
-        final BuildVariant variant = new BuildVariant("default");
+        final BuildVariant variant = new BuildVariant(DEFAULT);
         variant.addBuildOption("key", "value");
 
         config.setBuildVariant(variant);
 
         usedCompartment =
-            new Compartment("sap.com_SAP_BUILDT_1", CompartmentState.Archive, "sap.com", "sap.com_SAP_BUILDT_1",
-                "SAP_BUILDT");
-        compartment =
-            new Compartment("example.org_SC_1", CompartmentState.Source, "example.org", "example.org_SC_1", "SC");
+            new Compartment(SAP_COM_SAP_BUILDT_1, CompartmentState.Archive, SAP_COM, SAP_COM_SAP_BUILDT_1, "SAP_BUILDT");
+        compartment = new Compartment(EXAMPLE_ORG_SC_1, CompartmentState.Source, EXAMPLE_ORG, EXAMPLE_ORG_SC_1, "SC");
         compartment.add(usedCompartment);
         config.add(compartment);
 
-        component = new DevelopmentComponent("example/dc", "example.org");
-        publicPartReference = new PublicPartReference("sap.com", "com.sap.exception", "default");
+        component = new DevelopmentComponent("example/dc", EXAMPLE_ORG);
+        publicPartReference = new PublicPartReference(SAP_COM, "com.sap.exception", DEFAULT);
         component.add(publicPartReference);
 
-        publicPart = new PublicPart("api", "API public Part", "description", PublicPartType.COMPILE);
+        publicPart = new PublicPart("api", "API public Part", DESCRIPTION, PublicPartType.COMPILE);
         component.add(publicPart);
         compartment.add(component);
         writer = new DevelopmentConfigurationXmlWriter(config);
@@ -167,7 +218,7 @@ public class DevelopmentConfigurationXmlWriterTest extends XMLTestCase {
      */
     @Test
     public final void testPersistedConfigurationCompartmentInSourceState() {
-        this.assertXpathEvaluatesTo("no", "/development-configuration/compartment[1]/@archive-state");
+        this.assertXpathEvaluatesTo(NO, XPATH_COMPARTMENT_IN_ARCHIVE_STATE);
     }
 
     /**
@@ -178,7 +229,7 @@ public class DevelopmentConfigurationXmlWriterTest extends XMLTestCase {
     @Test
     public final void testPersistedConfigurationCompartmentInArchiveState() {
         compartment.setState(CompartmentState.Archive);
-        this.assertXpathEvaluatesTo("yes", "/development-configuration/compartment[1]/@archive-state");
+        this.assertXpathEvaluatesTo(YES, XPATH_COMPARTMENT_IN_ARCHIVE_STATE);
     }
 
     /**
@@ -209,8 +260,7 @@ public class DevelopmentConfigurationXmlWriterTest extends XMLTestCase {
      */
     @Test
     public final void testPersistedConfigurationUsedCompartmentInArchiveState() {
-        this.assertXpathEvaluatesTo("yes",
-            "/development-configuration/compartment[1]/used-compartments/used-compartment[1]/@archive-state");
+        this.assertXpathEvaluatesTo(YES, XPATH_USED_COMPARTMENT_IN_ARCHIVE_STATE);
     }
 
     /**
@@ -221,8 +271,7 @@ public class DevelopmentConfigurationXmlWriterTest extends XMLTestCase {
     @Test
     public final void testPersistedConfigurationUsedCompartmentInSourceState() {
         usedCompartment.setState(CompartmentState.Source);
-        this.assertXpathEvaluatesTo("no",
-            "/development-configuration/compartment[1]/used-compartments/used-compartment[1]/@archive-state");
+        this.assertXpathEvaluatesTo(NO, XPATH_USED_COMPARTMENT_IN_ARCHIVE_STATE);
     }
 
     /**
@@ -269,34 +318,42 @@ public class DevelopmentConfigurationXmlWriterTest extends XMLTestCase {
             "/development-configuration/compartment[1]/development-components/development-component[1]/@name");
     }
 
-    private void assertXpathEvaluatesTo(String expected, String xPath) {
+    /**
+     * Helper method for asserting the value of xpath results.
+     * 
+     * @param expected
+     *            expted result of xpath expression.
+     * @param xPath
+     *            xpath
+     */
+    private void assertXpathEvaluatesTo(final String expected, final String xPath) {
         try {
             this.assertXpathEvaluatesTo(expected, xPath, writeDevelopmentConfiguration());
         }
-        catch (XpathException e) {
+        catch (final XpathException e) {
             fail(e.getMessage());
         }
-        catch (SAXException e) {
+        catch (final SAXException e) {
             fail(e.getMessage());
         }
-        catch (IOException e) {
+        catch (final IOException e) {
             fail(e.getMessage());
         }
-        catch (XMLStreamException e) {
+        catch (final XMLStreamException e) {
             fail(e.getMessage());
         }
     }
 
     /**
-     * @return
-     * @throws IOException
+     * Write development configuration into a string.
+     * 
+     * @return result of XML serialization.
      * @throws XMLStreamException
+     *             thrown when serialization to XML fails
      */
-    protected String writeDevelopmentConfiguration() throws IOException, XMLStreamException {
+    protected String writeDevelopmentConfiguration() throws XMLStreamException {
         final StringWriter target = new StringWriter();
         writer.write(target);
-
-        System.err.println(target.toString());
 
         return target.toString();
     }
