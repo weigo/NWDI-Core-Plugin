@@ -3,8 +3,6 @@
  */
 package org.arachna.netweaver.dc.types;
 
-import hudson.Util;
-
 /**
  * Public part of a development component.
  * 
@@ -29,7 +27,7 @@ public class PublicPart {
     /**
      * The type of this public part.
      */
-    private PublicPartType type;
+    private final PublicPartType type;
 
     /**
      * Create a new public part object.
@@ -44,9 +42,9 @@ public class PublicPart {
      *            the type of this public part.
      */
     public PublicPart(final String name, final String caption, final String description, final PublicPartType type) {
-        this.publicPart = Util.fixNull(name);
-        this.caption = Util.fixNull(caption);
-        this.description = Util.fixNull(description);
+        publicPart = name;
+        this.caption = caption;
+        this.description = description;
 
         if (type == null) {
             throw new IllegalArgumentException("The type of this public part must not be null!");
@@ -105,9 +103,9 @@ public class PublicPart {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((description == null) ? 0 : description.hashCode());
-        result = prime * result + ((publicPart == null) ? 0 : publicPart.hashCode());
-        result = prime * result + ((type == null) ? 0 : type.toString().hashCode());
+        result = prime * result + (description == null ? 0 : description.hashCode());
+        result = prime * result + (publicPart == null ? 0 : publicPart.hashCode());
+        result = prime * result + (type == null ? 0 : type.toString().hashCode());
 
         return result;
     }
@@ -122,17 +120,17 @@ public class PublicPart {
         if (this == obj) {
             return true;
         }
-        
+
         if (obj == null) {
             return false;
         }
-        
+
         if (getClass() != obj.getClass()) {
             return false;
         }
-        
+
         final PublicPart other = (PublicPart)obj;
-        
+
         if (description == null) {
             if (other.description != null) {
                 return false;
@@ -141,7 +139,7 @@ public class PublicPart {
         else if (!description.equals(other.description)) {
             return false;
         }
-        
+
         if (publicPart == null) {
             if (other.publicPart != null) {
                 return false;
