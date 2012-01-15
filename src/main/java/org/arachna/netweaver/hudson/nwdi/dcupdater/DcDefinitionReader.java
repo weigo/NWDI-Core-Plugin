@@ -114,7 +114,7 @@ public class DcDefinitionReader extends AbstractDefaultHandler {
             this.component.setDescription(this.getText());
         }
         else if (DEPENDENCIES.equals(localName)) {
-            this.component.addAll(this.usedDependenciesReader.getUsedComponents());
+            this.component.setUsedComponents(this.usedDependenciesReader.getUsedComponents());
             this.usedDependenciesReader = null;
         }
         else if (COMPONENT_TYPE.equals(localName)) {

@@ -146,8 +146,10 @@ public final class DevelopmentComponent {
      *            references to public parts of other development components
      *            this DC references.
      */
-    public void addAll(final Set<PublicPartReference> references) {
-        usedComponents.addAll(references);
+    public void addAll(final Collection<PublicPartReference> references) {
+        if (references != null) {
+            usedComponents.addAll(references);
+        }
     }
 
     /**
@@ -411,7 +413,43 @@ public final class DevelopmentComponent {
      * @return the outputFolder folder the class files for this development
      *         component were generated to during the last build
      */
-    public final String getOutputFolder() {
+    public String getOutputFolder() {
         return outputFolder;
+    }
+
+    /**
+     * Determine whether this development component has a runtime reference to
+     * the public part given by the {@link PublicPartReference} parameter.
+     * 
+     * @param ppRef
+     *            public part reference to test
+     * @return <code>true</code> when the given public part is referenced at
+     *         runtim, <code>false</code> otherwise.
+     */
+    public boolean hasRuntimeReference(PublicPartReference ppRef) {
+        boolean result = false;
+
+        for (PublicPartReference ref : getUsedDevelopmentComponents()) {
+            if (ref.isAtRunTime() && ref.getVendor().equals(ppRef.getVendor())
+                && ref.getComponentName().equals(ppRef.getComponentName())) {
+                result = true;
+                break;
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Set the references to the public parts of other development components
+     * used by this component.
+     * 
+     * @param usedComponents
+     *            references to public parts of development components used by
+     *            this development components.
+     */
+    public void setUsedComponents(Collection<PublicPartReference> usedComponents) {
+        this.usedComponents.clear();
+        this.addAll(usedComponents);
     }
 }

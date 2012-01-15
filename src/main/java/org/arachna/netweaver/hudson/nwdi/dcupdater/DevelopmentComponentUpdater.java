@@ -143,28 +143,11 @@ public final class DevelopmentComponentUpdater {
 
         if (reader != null) {
             for (PublicPartReference newPpRef : reader.read()) {
-                if (!hasRuntimeReferenceTo(currentComponent, newPpRef)) {
+                if (!currentComponent.hasRuntimeReference(newPpRef)) {
                     currentComponent.add(newPpRef);
                 }
             }
         }
-    }
-
-    /**
-     * @param vendor
-     * @param libraryReference
-     */
-    private boolean hasRuntimeReferenceTo(DevelopmentComponent component, final PublicPartReference newPpRef) {
-        boolean result = false;
-
-        for (PublicPartReference ref : component.getUsedDevelopmentComponents()) {
-            if (ref.isAtRunTime() && ref.getVendor().equals(newPpRef.getVendor())
-                && ref.getComponentName().equals(newPpRef.getComponentName())) {
-                result = true;
-            }
-        }
-
-        return result;
     }
 
     /**
