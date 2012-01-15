@@ -3,6 +3,8 @@
  */
 package org.arachna.netweaver.dc.types;
 
+import java.util.Arrays;
+
 /**
  * Public part of a development component.
  * 
@@ -42,15 +44,24 @@ public class PublicPart {
      *            the type of this public part.
      */
     public PublicPart(final String name, final String caption, final String description, final PublicPartType type) {
-        publicPart = name;
-        this.caption = caption;
-        this.description = description;
+        if (name == null) {
+            throw new IllegalArgumentException("Name of public part must not be null!");
+        }
 
         if (type == null) {
             throw new IllegalArgumentException("The type of this public part must not be null!");
         }
 
+        this.publicPart = name;
         this.type = type;
+
+        if (caption != null) {
+            this.caption = caption;
+        }
+
+        if (description != null) {
+            this.description = description;
+        }
     }
 
     /**
@@ -101,13 +112,7 @@ public class PublicPart {
      */
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (description == null ? 0 : description.hashCode());
-        result = prime * result + (publicPart == null ? 0 : publicPart.hashCode());
-        result = prime * result + (type == null ? 0 : type.toString().hashCode());
-
-        return result;
+        return Arrays.hashCode(new String[] { caption, description, publicPart, type.toString() });
     }
 
     /*
@@ -131,25 +136,8 @@ public class PublicPart {
 
         final PublicPart other = (PublicPart)obj;
 
-        if (description == null) {
-            if (other.description != null) {
-                return false;
-            }
-        }
-        else if (!description.equals(other.description)) {
-            return false;
-        }
-
-        if (publicPart == null) {
-            if (other.publicPart != null) {
-                return false;
-            }
-        }
-        else if (!publicPart.equals(other.publicPart)) {
-            return false;
-        }
-
-        return true;
+        return Arrays.equals(new Object[] { caption, description, publicPart, type }, new Object[] { other.caption,
+            other.description, other.publicPart, other.type });
     }
 
     /**
