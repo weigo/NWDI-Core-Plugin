@@ -3,9 +3,6 @@
  */
 package org.arachna.netweaver.dc.config;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import org.arachna.netweaver.dc.types.BuildVariant;
 import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
@@ -14,7 +11,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
 /**
- * Reader für Entwicklungskonfigurationen.
+ * Reader for a {@link DevelopmentConfiguration} persisted to XML.
  * 
  * @author Dirk Weigenand
  */
@@ -58,32 +55,33 @@ public class DevelopmentConfigurationReader extends AbstractDefaultHandler {
     private static final String DEVELOPMENT_CONFIGURATION = "development-configuration";
 
     /**
-     * Factory für Entwicklungskomponenten.
+     * registry for development components.
      */
     private final DevelopmentComponentFactory developmentComponentFactory;
 
     /**
-     * Aktuell einzulesende Entwicklungskonfiguration.
+     * development configuration to read.
      */
     private DevelopmentConfiguration currentConfiguration;
 
     /**
-     * Reader für aktuelles Compartment.
+     * Reader for the current compartment.
      */
     private CompartmentReader compartmentReader;
 
     /**
-     * Build-Variante.
+     * Build-Variant.
      */
     private BuildVariant buildVariant;
 
     /**
-     * Erzeugt einen Reader für Entwicklungskonfigurationen.
+     * Create a new <code>DevelopmentConfigurationReader</code> instance. Use
+     * the given {@link DevelopmentComponentFactory} to register any
+     * {@link DevelopmentComponent}s read in the process of reading the
+     * development configuration.
      * 
-     * @param xmlReader
-     *            XMLReader zum Einlesen der Konfigurationen.
      * @param developmentComponentFactory
-     *            Factory zum Registrieren der Entwicklungskomponenten
+     *            registry for development components
      */
     public DevelopmentConfigurationReader(final DevelopmentComponentFactory developmentComponentFactory) {
         super();
@@ -133,18 +131,9 @@ public class DevelopmentConfigurationReader extends AbstractDefaultHandler {
     }
 
     /**
-     * Read development configurations from the given {@link InputStream}.
+     * Returns the development configuration.
      * 
-     * @param input
-     *            the configuration containing the stored development
-     *            configurations
-     * @return the developmentConfigurations
-     * @throws SAXException
-     *             any <code>SAXexception</code> that is throw in the underlying
-     *             code.
-     * @throws IOException
-     *             any <code>IOexception</code> that is throw in the underlying
-     *             code.
+     * @return the developmentConfiguration
      */
     public final DevelopmentConfiguration getDevelopmentConfiguration() {
         return currentConfiguration;
