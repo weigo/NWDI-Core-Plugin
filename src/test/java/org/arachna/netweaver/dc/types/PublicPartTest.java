@@ -32,7 +32,7 @@ public class PublicPartTest {
      */
     @Test
     public final void testThatNewPublicPartWithNullDescriptionInitializesDescriptionToEmptyString() {
-        assertThat(new PublicPart(null, null, null, PublicPartType.COMPILE).getDescription(), equalTo(""));
+        assertThat(new PublicPart("", null, null, PublicPartType.COMPILE).getDescription(), equalTo(""));
     }
 
     /**
@@ -42,6 +42,6 @@ public class PublicPartTest {
      */
     @Test
     public final void testThatNewPublicPartWithNullCaptionInitializesCaptionToEmptyString() {
-        assertThat(new PublicPart(null, null, null, PublicPartType.COMPILE).getCaption(), equalTo(""));
+        assertThat(new PublicPart("", null, null, PublicPartType.COMPILE).getCaption(), equalTo(""));
     }
 }
