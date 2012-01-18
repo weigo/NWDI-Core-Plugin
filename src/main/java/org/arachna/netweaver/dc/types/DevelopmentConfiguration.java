@@ -360,8 +360,8 @@ public final class DevelopmentConfiguration {
     public String getDtrServerUrl() {
         String dtrServerUrl = "";
 
-        for (final Compartment compartment : this.getCompartments()) {
-            if (CompartmentState.Source.equals(compartment.getState())) {
+        for (final Compartment compartment : this.getCompartments(CompartmentState.Source)) {
+            if (compartment.getDtrUrl() != null) {
                 dtrServerUrl = compartment.getDtrUrl();
                 break;
             }
