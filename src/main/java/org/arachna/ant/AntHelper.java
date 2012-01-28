@@ -28,12 +28,8 @@ public class AntHelper {
      */
     private static final String BASE_PATH_TEMPLATE = "%s/.dtc/DCs/%s/%s/_comp";
 
-    /**
-     * template for computing the base path of a development component relative
-     * to the workspace.
-     */
-    private static final String RELATIVE_BASE_PATH_TEMPLATE = ".dtc/DCs/%s/%s/_comp";
-
+    private static final SourceDirectoryFilter ALL_SOURCE_FOLDERS_ACCEPTING_FILTER =
+        new AllSourceFoldersAcceptingFilter();
     /**
      * registry for development components.
      */
@@ -233,21 +229,7 @@ public class AntHelper {
      * @return a collection of source folders of the given development component
      */
     public Collection<String> createSourceFileSets(final DevelopmentComponent component) {
-        /**
-         * An accept all source directories filter.
-         */
-        final SourceDirectoryFilter filter = new SourceDirectoryFilter() {
-            /**
-             * accept all folderNames given.
-             * 
-             * {@inheritDoc}
-             */
-            public boolean accept(final String folderName) {
-                return true;
-            }
-        };
-
-        return createSourceFileSets(component, filter);
+        return createSourceFileSets(component, ALL_SOURCE_FOLDERS_ACCEPTING_FILTER);
     }
 
     /**
