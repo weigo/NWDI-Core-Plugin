@@ -28,8 +28,12 @@ public class AntHelper {
      */
     private static final String BASE_PATH_TEMPLATE = "%s/.dtc/DCs/%s/%s/_comp";
 
+    /**
+     * An all folder names accepting filter.
+     */
     private static final SourceDirectoryFilter ALL_SOURCE_FOLDERS_ACCEPTING_FILTER =
         new AllSourceFoldersAcceptingFilter();
+
     /**
      * registry for development components.
      */
