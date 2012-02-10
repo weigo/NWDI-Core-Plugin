@@ -113,6 +113,8 @@ class BuildLogParser {
      * sources in the project directory.
      */
     private void readTestPackages() {
+        // FIXME: make this configurable
+        // FIXME: how are unit test folders handled in NW 7.3?
         final String testPackages =
             normalizeFileName(projectDirectory + File.separatorChar + "test" + File.separatorChar + "packages");
 

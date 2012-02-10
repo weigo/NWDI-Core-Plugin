@@ -14,7 +14,7 @@ import org.arachna.netweaver.dc.types.DevelopmentComponent;
  * 
  * @author Dirk Weigenand
  */
-final class ComponentsNeedingRebuildFinder {
+public final class ComponentsNeedingRebuildFinder {
     /**
      * Set of components needing a rebuild.
      */
