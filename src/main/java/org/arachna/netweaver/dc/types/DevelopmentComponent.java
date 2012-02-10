@@ -74,7 +74,7 @@ public final class DevelopmentComponent {
      * folder the class files for this development component were generated to
      * during the last build.
      */
-    private String outputFolder;
+    private String outputFolder = "";
 
     /**
      * Create an instance of a development component with the given name, vendor
@@ -403,7 +403,12 @@ public final class DevelopmentComponent {
      *            generated to during the last build
      */
     public void setOutputFolder(String outputFolder) {
-        this.outputFolder = outputFolder;
+        if (outputFolder != null) {
+            this.outputFolder = outputFolder;
+        }
+        else {
+            this.outputFolder = "";
+        }
     }
 
     /**

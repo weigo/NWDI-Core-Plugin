@@ -184,6 +184,8 @@ public class DevelopmentComponentReader extends AbstractDefaultHandler {
         else if (DEVELOPMENT_COMPONENTS.equals(localName)) {
             getXmlReader().setContentHandler(getParent());
             getParent().endElement(uri, localName, qName);
+        } else if ("classes".equals(localName)) {
+            currentComponent.setOutputFolder(getText());
         }
     }
 

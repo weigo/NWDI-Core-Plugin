@@ -20,6 +20,29 @@ public final class DevelopmentComponentFactory {
     private final Map<String, DevelopmentComponent> componentMap = new HashMap<String, DevelopmentComponent>();
 
     /**
+     * Default constructor.
+     */
+    public DevelopmentComponentFactory() {
+        super();
+    }
+
+    /**
+     * Create a new <code>DevelopmentComponentFactory</code> with the given
+     * {@link DevelopmentConfiguration}. Register all development components
+     * contained within the configuration with the factory.
+     * 
+     * @param developmentConfiguration
+     *            a development configuration to initialize the registry with.
+     */
+    public DevelopmentComponentFactory(DevelopmentConfiguration developmentConfiguration) {
+        for (Compartment compartment : developmentConfiguration.getCompartments()) {
+            for (DevelopmentComponent component : compartment.getDevelopmentComponents()) {
+                this.componentMap.put(this.createComponentKey(component.getName(), component.getVendor()), component);
+            }
+        }
+    }
+
+    /**
      * Create and register a {@link DevelopmentComponent}.
      * 
      * @param vendor

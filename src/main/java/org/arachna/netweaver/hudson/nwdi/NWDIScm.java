@@ -234,7 +234,8 @@ public class NWDIScm extends SCM {
                 for (Compartment compartment : savedConfig.getCompartments()) {
                     Compartment original = config.getCompartment(compartment.getName());
 
-                    // new compartment in development configuration that did not exist in previous build
+                    // new compartment in development configuration that did not
+                    // exist in previous build
                     if (original == null) {
                         original =
                             new Compartment(compartment.getName(), compartment.getState(), compartment.getVendor(),
@@ -276,7 +277,13 @@ public class NWDIScm extends SCM {
     protected PollingResult compareRemoteRevisionWith(final AbstractProject<?, ?> project, final Launcher launcher,
         final FilePath path, final TaskListener listener, final SCMRevisionState revisionState) throws IOException,
         InterruptedException {
-        final NWDIBuild lastBuild = ((NWDIProject)project).getLastSuccessfulBuild();
+        NWDIProject nwdiProject = (NWDIProject)project;
+        NWDIBuild lastBuild = nwdiProject.getLastSuccessfulBuild();
+
+        if (lastBuild == null) {
+            lastBuild = nwdiProject.getFirstBuild();
+        }
+
         final PrintStream logger = listener.getLogger();
         logger.append(String.format(
             "Comparing base line activities with activities accumulated since last build (#%s).\n",

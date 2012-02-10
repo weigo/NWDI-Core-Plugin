@@ -390,4 +390,28 @@ public final class DevelopmentConfiguration {
 
         return alias;
     }
+    
+    /**
+     * Returns the source version to use for generating javadoc documentation.
+     * 
+     * Uses the {@link JdkHomeAlias} defined in the development configuration.
+     * If there is no alias defined use the JDK version the ant task is run
+     * with.
+     * 
+     * @return java source version to use generating javadoc documentation.
+     */
+    public String getSourceVersion() {
+        final JdkHomeAlias alias = getJdkHomeAlias();
+        String sourceVersion;
+        
+        if (alias != null) {
+            sourceVersion = alias.getSourceVersion();
+        }
+        else {
+            final String[] versionParts = System.getProperty("java.version").replace('_', '.').split("\\.");
+            sourceVersion = String.format("%s.%s", versionParts[0], versionParts[1]);
+        }
+
+        return sourceVersion;
+    }
 }

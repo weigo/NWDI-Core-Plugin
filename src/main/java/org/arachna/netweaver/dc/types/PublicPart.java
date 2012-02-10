@@ -112,7 +112,8 @@ public class PublicPart {
      */
     @Override
     public int hashCode() {
-        return Arrays.hashCode(new String[] { caption, description, publicPart, type.toString() });
+        return Arrays
+            .hashCode(new String[] { caption, description, publicPart, (type == null ? "" : type.toString()) });
     }
 
     /*

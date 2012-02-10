@@ -163,6 +163,32 @@ public final class DevelopmentConfigurationXmlWriter {
         output.writeEndElement();
         emitUsedDcs(component.getUsedDevelopmentComponents());
         emitPublicParts(component.getPublicParts());
+        emitPackageFolders(component);
+        emitClassesDir(component);
+        output.writeEndElement();
+    }
+
+    /**
+     * @param component
+     * @throws XMLStreamException
+     */
+    private void emitClassesDir(DevelopmentComponent component) throws XMLStreamException {
+        output.writeStartElement("classes");
+        output.writeCharacters(component.getOutputFolder());
+        output.writeEndElement();
+    }
+
+    /**
+     * @param component
+     * @throws XMLStreamException
+     */
+    private void emitPackageFolders(final DevelopmentComponent component) throws XMLStreamException {
+        output.writeStartElement("sources");
+        for (String folder : component.getSourceFolders()) {
+            output.writeStartElement("package-folder");
+            output.writeCharacters(folder);
+            output.writeEndElement();
+        }
         output.writeEndElement();
     }
 
