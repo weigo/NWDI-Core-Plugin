@@ -30,6 +30,11 @@ public final class DevelopmentComponent {
     private DevelopmentComponentType type;
 
     /**
+     * shot description of a development component.
+     */
+    private String caption = "";
+
+    /**
      * compartment this development component belongs to.
      */
     private Compartment compartment;
@@ -352,7 +357,7 @@ public final class DevelopmentComponent {
      *            the source folders to set for this DC. If the given collection
      *            is null the DC will have no source folders afterwards.
      */
-    public void setSourceFolders(Set<String> sourceFolders) {
+    public void setSourceFolders(final Set<String> sourceFolders) {
         this.sourceFolders.clear();
 
         if (sourceFolders != null) {
@@ -402,7 +407,7 @@ public final class DevelopmentComponent {
      *            folder the class files for this development component were
      *            generated to during the last build
      */
-    public void setOutputFolder(String outputFolder) {
+    public void setOutputFolder(final String outputFolder) {
         if (outputFolder != null) {
             this.outputFolder = outputFolder;
         }
@@ -423,6 +428,30 @@ public final class DevelopmentComponent {
     }
 
     /**
+     * Returns the short description of this development component.
+     * 
+     * @return the short description of this development component
+     */
+    public String getCaption() {
+        return caption;
+    }
+
+    /**
+     * Sets the short description of this development component.
+     * 
+     * @param caption
+     *            the short description of this development component
+     */
+    public void setCaption(final String caption) {
+        if (caption == null) {
+            this.caption = "";
+        }
+        else {
+            this.caption = caption;
+        }
+    }
+
+    /**
      * Determine whether this development component has a runtime reference to
      * the public part given by the {@link PublicPartReference} parameter.
      * 
@@ -431,10 +460,10 @@ public final class DevelopmentComponent {
      * @return <code>true</code> when the given public part is referenced at
      *         runtim, <code>false</code> otherwise.
      */
-    public boolean hasRuntimeReference(PublicPartReference ppRef) {
+    public boolean hasRuntimeReference(final PublicPartReference ppRef) {
         boolean result = false;
 
-        for (PublicPartReference ref : getUsedDevelopmentComponents()) {
+        for (final PublicPartReference ref : getUsedDevelopmentComponents()) {
             if (ref.isAtRunTime() && ref.getVendor().equals(ppRef.getVendor())
                 && ref.getComponentName().equals(ppRef.getComponentName())) {
                 result = true;
@@ -453,8 +482,8 @@ public final class DevelopmentComponent {
      *            references to public parts of development components used by
      *            this development components.
      */
-    public void setUsedComponents(Collection<PublicPartReference> usedComponents) {
+    public void setUsedComponents(final Collection<PublicPartReference> usedComponents) {
         this.usedComponents.clear();
-        this.addAll(usedComponents);
+        addAll(usedComponents);
     }
 }

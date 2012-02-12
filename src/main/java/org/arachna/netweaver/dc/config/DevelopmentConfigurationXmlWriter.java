@@ -161,6 +161,9 @@ public final class DevelopmentConfigurationXmlWriter {
         output.writeStartElement(DESCRIPTION);
         output.writeCharacters(component.getDescription());
         output.writeEndElement();
+        output.writeStartElement(CAPTION);
+        output.writeCharacters(component.getCaption());
+        output.writeEndElement();
         emitUsedDcs(component.getUsedDevelopmentComponents());
         emitPublicParts(component.getPublicParts());
         emitPackageFolders(component);
@@ -172,7 +175,7 @@ public final class DevelopmentConfigurationXmlWriter {
      * @param component
      * @throws XMLStreamException
      */
-    private void emitClassesDir(DevelopmentComponent component) throws XMLStreamException {
+    private void emitClassesDir(final DevelopmentComponent component) throws XMLStreamException {
         output.writeStartElement("classes");
         output.writeCharacters(component.getOutputFolder());
         output.writeEndElement();
@@ -184,7 +187,7 @@ public final class DevelopmentConfigurationXmlWriter {
      */
     private void emitPackageFolders(final DevelopmentComponent component) throws XMLStreamException {
         output.writeStartElement("sources");
-        for (String folder : component.getSourceFolders()) {
+        for (final String folder : component.getSourceFolders()) {
             output.writeStartElement("package-folder");
             output.writeCharacters(folder);
             output.writeEndElement();

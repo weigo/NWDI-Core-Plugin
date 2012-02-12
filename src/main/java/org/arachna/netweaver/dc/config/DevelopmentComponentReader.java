@@ -184,8 +184,12 @@ public class DevelopmentComponentReader extends AbstractDefaultHandler {
         else if (DEVELOPMENT_COMPONENTS.equals(localName)) {
             getXmlReader().setContentHandler(getParent());
             getParent().endElement(uri, localName, qName);
-        } else if ("classes".equals(localName)) {
+        }
+        else if ("classes".equals(localName)) {
             currentComponent.setOutputFolder(getText());
+        }
+        else if (CAPTION.equals(localName)) {
+            currentComponent.setCaption(getText());
         }
     }
 
@@ -238,7 +242,7 @@ public class DevelopmentComponentReader extends AbstractDefaultHandler {
             reference.setAtRunTime(true);
         }
         else if (PUBLIC_PART.equals(localName)) {
-            String type = attributes.getValue("type");
+            String type = attributes.getValue(TYPE);
 
             if (type == null) {
                 type = PublicPartType.COMPILE.toString();

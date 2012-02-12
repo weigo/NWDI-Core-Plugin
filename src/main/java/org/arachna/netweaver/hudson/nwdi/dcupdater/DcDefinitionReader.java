@@ -28,6 +28,11 @@ public class DcDefinitionReader extends AbstractDefaultHandler {
     private static final String CAPTION = "caption";
 
     /**
+     * tag name for a component's long description.
+     */
+    private static final String DESCRIPTION = "description";
+
+    /**
      * tag name for a development component.
      */
     private static final String DEVELOPMENT_COMPONENT = "development-component";
@@ -107,18 +112,21 @@ public class DcDefinitionReader extends AbstractDefaultHandler {
      */
     @Override
     public void endElement(final String uri, final String localName, final String name) throws SAXException {
-        this.parentElements.pop();
-        final String parent = this.getParentElementName();
+        parentElements.pop();
+        final String parent = getParentElementName();
 
         if (CAPTION.equals(localName)) {
-            this.component.setDescription(this.getText());
+            component.setCaption(getText());
+        }
+        else if (DESCRIPTION.equals(localName)) {
+            component.setDescription(getText());
         }
         else if (DEPENDENCIES.equals(localName)) {
-            this.component.setUsedComponents(this.usedDependenciesReader.getUsedComponents());
-            this.usedDependenciesReader = null;
+            component.setUsedComponents(usedDependenciesReader.getUsedComponents());
+            usedDependenciesReader = null;
         }
         else if (COMPONENT_TYPE.equals(localName)) {
-            this.component.setType(DevelopmentComponentType.fromString(this.componentType, this.componentSubType));
+            component.setType(DevelopmentComponentType.fromString(componentType, componentSubType));
         }
         else if (DEVELOPMENT_COMPONENT.equals(parent)) {
             updateVendorOrName(localName);
@@ -127,10 +135,10 @@ public class DcDefinitionReader extends AbstractDefaultHandler {
             updateDevelopmentComponentTypeInfo(localName);
         }
         else if (PACKAGE_FOLDER.equals(localName)) {
-            this.component.addSourceFolder(this.getText());
+            component.addSourceFolder(getText());
         }
 
-        this.getText();
+        getText();
     }
 
     /**
@@ -142,10 +150,10 @@ public class DcDefinitionReader extends AbstractDefaultHandler {
      */
     private void updateDevelopmentComponentTypeInfo(final String tagName) {
         if (TYPE.equals(tagName)) {
-            this.componentType = this.getText();
+            componentType = getText();
         }
         else if (COMPONENT_SUB_TYPE.equals(tagName)) {
-            this.componentSubType = this.getText();
+            componentSubType = getText();
         }
     }
 
@@ -158,10 +166,10 @@ public class DcDefinitionReader extends AbstractDefaultHandler {
      */
     private void updateVendorOrName(final String tagName) {
         if (NAME.equals(tagName)) {
-            this.component.setName(this.getText());
+            component.setName(getText());
         }
         else if (VENDOR.equals(tagName)) {
-            this.component.setVendor(this.getText());
+            component.setVendor(getText());
         }
     }
 
@@ -173,8 +181,8 @@ public class DcDefinitionReader extends AbstractDefaultHandler {
     private String getParentElementName() {
         String parent = "";
 
-        if (!this.parentElements.isEmpty()) {
-            parent = this.parentElements.peek();
+        if (!parentElements.isEmpty()) {
+            parent = parentElements.peek();
         }
 
         return parent;
@@ -189,12 +197,12 @@ public class DcDefinitionReader extends AbstractDefaultHandler {
     @Override
     public void startElement(final String uri, final String localName, final String name, final Attributes atts)
         throws SAXException {
-        this.parentElements.push(localName);
+        parentElements.push(localName);
 
         if (DEPENDENCIES.equals(localName)) {
-            this.usedDependenciesReader = new DcDependenciesReader(this);
-            this.usedDependenciesReader.setXmlReader(this.getXmlReader());
-            this.getXmlReader().setContentHandler(this.usedDependenciesReader);
+            usedDependenciesReader = new DcDependenciesReader(this);
+            usedDependenciesReader.setXmlReader(getXmlReader());
+            getXmlReader().setContentHandler(usedDependenciesReader);
         }
     }
 }

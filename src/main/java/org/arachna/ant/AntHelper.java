@@ -97,7 +97,7 @@ public class AntHelper {
         final Set<String> paths = new HashSet<String>();
 
         for (final PublicPartReference ppRef : component.getUsedDevelopmentComponents()) {
-            final DevelopmentComponent referencedDC = dcFactory.get(ppRef.getVendor(), ppRef.getComponentName());
+            final DevelopmentComponent referencedDC = dcFactory.get(ppRef);
 
             if (referencedDC != null) {
                 final File baseDir = new File(this.getBaseLocation(referencedDC, ppRef.getName()));
@@ -183,21 +183,6 @@ public class AntHelper {
     public String getBaseLocation(final DevelopmentComponent component) {
         return String.format(BASE_PATH_TEMPLATE, pathToWorkspace, component.getVendor(), component.getName());
     }
-
-    /**
-     * Get the location of the given development component relative to the
-     * current workspace.
-     * 
-     * @param component
-     *            development component to get the location relative to the
-     *            current workspace.
-     * @return location of given DC relative to the current workspace.
-     */
-    // public String getBaseLocationRelativeToWorkspace(final
-    // DevelopmentComponent component) {
-    // return String.format(RELATIVE_BASE_PATH_TEMPLATE, component.getVendor(),
-    // component.getName());
-    // }
 
     /**
      * Get the location of a development components public part in workspace.

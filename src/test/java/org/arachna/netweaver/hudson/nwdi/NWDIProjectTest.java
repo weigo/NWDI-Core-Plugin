@@ -59,8 +59,7 @@ public class NWDIProjectTest extends HudsonTestCase {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        project = hudson.createProject(NWDIProject.class, "nwdi");
-        descriptor = project.getDescriptor();
+        descriptor = NWDIProject.DescriptorImpl.DESCRIPTOR;
     }
 
     /**
