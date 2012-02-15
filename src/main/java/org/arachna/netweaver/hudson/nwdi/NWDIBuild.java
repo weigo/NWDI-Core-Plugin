@@ -383,9 +383,12 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
                 logger.append(component.getName()).append('\n');
             }
 
-            final DcToolCommandExecutionResult result =
-                getDCToolExecutor(launcher).buildDevelopmentComponents(affectedComponents);
+            DcToolCommandExecutionResult result = new DcToolCommandExecutionResult("", 0);
 
+            if (!affectedComponents.isEmpty()) {
+                result = getDCToolExecutor(launcher).buildDevelopmentComponents(affectedComponents);
+            }
+            
             for (final DevelopmentComponent component : affectedComponents) {
                 FilePath buildXml =
                     NWDIBuild.this.getWorkspace().child(
