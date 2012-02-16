@@ -10,6 +10,7 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.arachna.netweaver.dc.types.BuildVariant;
 import org.arachna.netweaver.dc.types.Compartment;
 import org.arachna.netweaver.dc.types.DevelopmentComponent;
@@ -90,7 +91,7 @@ public final class DevelopmentConfigurationXmlWriter {
      *             when writing the attributes/elements fails.
      */
     private void emitDocument() throws XMLStreamException {
-        output.writeStartDocument();
+        output.writeStartDocument("UTF-8", "1.0");
         emitDevelopmentConfiguration();
         output.writeEndDocument();
     }
@@ -159,10 +160,10 @@ public final class DevelopmentConfigurationXmlWriter {
         output.writeStartElement("development-component");
         emitDevelopmentComponentAttributes(component);
         output.writeStartElement(DESCRIPTION);
-        output.writeCharacters(component.getDescription());
+        output.writeCharacters(StringEscapeUtils.escapeXml(component.getDescription()));
         output.writeEndElement();
         output.writeStartElement(CAPTION);
-        output.writeCharacters(component.getCaption());
+        output.writeCharacters(StringEscapeUtils.escapeXml(component.getCaption()));
         output.writeEndElement();
         emitUsedDcs(component.getUsedDevelopmentComponents());
         emitPublicParts(component.getPublicParts());
@@ -223,11 +224,11 @@ public final class DevelopmentConfigurationXmlWriter {
      */
     private void emitPublicPart(final PublicPart pp) throws XMLStreamException {
         output.writeStartElement("public-part");
-        output.writeAttribute(CAPTION, pp.getCaption());
+        output.writeAttribute(CAPTION, StringEscapeUtils.escapeXml(pp.getCaption()));
         output.writeAttribute(NAME, pp.getPublicPart());
         output.writeAttribute(TYPE, pp.getType().toString());
         output.writeStartElement(DESCRIPTION);
-        output.writeCharacters(pp.getDescription());
+        output.writeCharacters(StringEscapeUtils.escapeXml(pp.getDescription()));
         output.writeEndElement();
         output.writeEndElement();
     }

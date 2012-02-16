@@ -3,9 +3,13 @@
  */
 package org.arachna.netweaver.hudson.nwdi.dcupdater;
 
+import hudson.XmlFile;
+
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -99,10 +103,10 @@ public final class DevelopmentComponentUpdater {
      *            configuration file to be read for updating the component.
      */
     private void updateCurrentComponent(final File config) {
-        FileReader configReader = null;
+        Reader configReader = null;
 
         try {
-            configReader = new FileReader(config);
+            configReader = new InputStreamReader(new FileInputStream(config), "UTF-8");
             new XmlReaderHelper(new DcDefinitionReader(currentComponent)).parse(configReader);
         }
         catch (final IOException e) {

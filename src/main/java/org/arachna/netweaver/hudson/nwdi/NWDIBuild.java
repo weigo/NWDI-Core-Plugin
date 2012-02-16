@@ -19,7 +19,6 @@ import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.StringReader;
 import java.io.Writer;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -388,7 +387,7 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
             if (!affectedComponents.isEmpty()) {
                 result = getDCToolExecutor(launcher).buildDevelopmentComponents(affectedComponents);
             }
-            
+
             for (final DevelopmentComponent component : affectedComponents) {
                 FilePath buildXml =
                     NWDIBuild.this.getWorkspace().child(
@@ -421,7 +420,7 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
         private void writeDevelopmentConfiguration(final PrintStream logger) throws IOException, InterruptedException {
             try {
                 FilePath devConfXml = NWDIBuild.this.getWorkspace().child("DevelopmentConfiguration.xml");
-                Writer content = new OutputStreamWriter(devConfXml.write(), Charset.forName("UTF-8"));
+                Writer content = new OutputStreamWriter(devConfXml.write(), "UTF-8");
                 DevelopmentConfigurationXmlWriter xmlWriter =
                     new DevelopmentConfigurationXmlWriter(NWDIBuild.this.getDevelopmentConfiguration());
                 xmlWriter.write(content);

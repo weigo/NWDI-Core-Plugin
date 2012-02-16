@@ -165,6 +165,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
 
         if (nwdiBuild.isCleanCopy()) {
             final long start = System.currentTimeMillis();
+            // FIXME: add I18N for message
             listener.getLogger().append("Wiping workspace...");
             build.getWorkspace().deleteContents();
             listener.getLogger().append(

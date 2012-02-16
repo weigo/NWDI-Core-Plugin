@@ -3,6 +3,7 @@
  */
 package org.arachna.xml;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
@@ -72,7 +73,7 @@ public abstract class AbstractDefaultHandler extends DefaultHandler {
         final String value = this.text.toString().trim();
         this.text.setLength(0);
 
-        return value;
+        return StringEscapeUtils.unescapeXml(value);
     }
 
     /**
