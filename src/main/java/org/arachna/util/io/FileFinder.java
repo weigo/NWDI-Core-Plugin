@@ -11,7 +11,7 @@ import java.util.List;
  * Finder for file objects. Scans the given directory recursively for files
  * whose names match the given pattern.
  * 
- * @author G526521
+ * @author Dirk Weigenand
  */
 public final class FileFinder {
 
