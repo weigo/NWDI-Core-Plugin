@@ -390,7 +390,7 @@ public final class DevelopmentConfiguration {
 
         return alias;
     }
-    
+
     /**
      * Returns the source version to use for generating javadoc documentation.
      * 
@@ -403,7 +403,7 @@ public final class DevelopmentConfiguration {
     public String getSourceVersion() {
         final JdkHomeAlias alias = getJdkHomeAlias();
         String sourceVersion;
-        
+
         if (alias != null) {
             sourceVersion = alias.getSourceVersion();
         }
@@ -413,5 +413,24 @@ public final class DevelopmentConfiguration {
         }
 
         return sourceVersion;
+    }
+
+    /**
+     * Accept a visitor of this development configuration. Iterate over its
+     * compartments and development components.
+     * 
+     * @param visitor
+     *            the visitor
+     */
+    public void accept(final DevelopmentConfigurationVisitor visitor) {
+        visitor.visitDevelopmentConfiguration(this);
+
+        for (final Compartment compartment : this.getCompartments()) {
+            visitor.visitCompartment(compartment);
+
+            for (final DevelopmentComponent component : compartment.getDevelopmentComponents()) {
+                visitor.visitDevelopmentComponent(component);
+            }
+        }
     }
 }
