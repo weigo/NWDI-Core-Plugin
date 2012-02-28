@@ -12,18 +12,18 @@ public abstract class AbstractDevelopmentConfigurationVisitor implements Develop
     /**
      * {@inheritDoc}
      */
-    public void visitDevelopmentConfiguration(final DevelopmentConfiguration configuration) {
+    public void visit(final DevelopmentConfiguration configuration) {
     }
 
     /**
      * {@inheritDoc}
      */
-    public void visitCompartment(final Compartment compartment) {
+    public void visit(final Compartment compartment) {
     }
 
     /**
      * {@inheritDoc}
      */
-    public void visitDevelopmentComponent(final DevelopmentComponent component) {
+    public void visit(final DevelopmentComponent component) {
     }
 }

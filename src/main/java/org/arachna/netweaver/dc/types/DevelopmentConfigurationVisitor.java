@@ -13,7 +13,7 @@ public interface DevelopmentConfigurationVisitor {
      * @param configuration
      *            the configuration instance to visit.
      */
-    void visitDevelopmentConfiguration(DevelopmentConfiguration configuration);
+    void visit(DevelopmentConfiguration configuration);
 
     /**
      * Visit a compartment.
@@ -21,7 +21,7 @@ public interface DevelopmentConfigurationVisitor {
      * @param compartment
      *            the compartment instance to visit.
      */
-    void visitCompartment(Compartment compartment);
+    void visit(Compartment compartment);
 
     /**
      * Visit a development component.
@@ -29,5 +29,5 @@ public interface DevelopmentConfigurationVisitor {
      * @param component
      *            the development component instance to visit.
      */
-    void visitDevelopmentComponent(DevelopmentComponent component);
+    void visit(DevelopmentComponent component);
 }

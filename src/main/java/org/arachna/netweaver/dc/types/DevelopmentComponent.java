@@ -237,6 +237,13 @@ public final class DevelopmentComponent {
         return parts;
     }
 
+    /**
+     * Set the public parts for this development component. Clears the existing
+     * public parts and adds those public parts given as argument iff not null.
+     * 
+     * @param publicParts
+     *            public parts to set.
+     */
     public void setPublicParts(final Collection<PublicPart> publicParts) {
         this.publicParts.clear();
 
@@ -485,5 +492,20 @@ public final class DevelopmentComponent {
     public void setUsedComponents(final Collection<PublicPartReference> usedComponents) {
         this.usedComponents.clear();
         addAll(usedComponents);
+    }
+
+    /**
+     * Returns the components name as
+     * <code>'vendor' + separator + 'name'.replace('/', separator)</code>.
+     * 
+     * @param separator
+     *            the separator character to use between vendor and component
+     *            name and also replacing the slashes probably in the component
+     *            name.
+     * @return the vendor/name combination normalized using the given separator
+     *         character.
+     */
+    public String getNormalizedName(final Character separator) {
+        return String.format("%s%c%s", getVendor(), getName().replace('/', separator.charValue()));
     }
 }

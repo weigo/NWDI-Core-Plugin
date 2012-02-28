@@ -417,19 +417,20 @@ public final class DevelopmentConfiguration {
 
     /**
      * Accept a visitor of this development configuration. Iterate over its
-     * compartments and development components.
+     * compartments and development components and call the respective visit
+     * method.
      * 
      * @param visitor
-     *            the visitor
+     *            visitor for this development configuration.
      */
     public void accept(final DevelopmentConfigurationVisitor visitor) {
-        visitor.visitDevelopmentConfiguration(this);
+        visitor.visit(this);
 
         for (final Compartment compartment : this.getCompartments()) {
-            visitor.visitCompartment(compartment);
+            visitor.visit(compartment);
 
             for (final DevelopmentComponent component : compartment.getDevelopmentComponents()) {
-                visitor.visitDevelopmentComponent(component);
+                visitor.visit(component);
             }
         }
     }
