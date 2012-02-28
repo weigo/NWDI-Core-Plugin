@@ -506,6 +506,6 @@ public final class DevelopmentComponent {
      *         character.
      */
     public String getNormalizedName(final Character separator) {
-        return String.format("%s%c%s", getVendor(), getName().replace('/', separator.charValue()));
+        return String.format("%s%c%s", getVendor(), separator, getName().replace('/', separator.charValue()));
     }
 }

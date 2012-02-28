@@ -72,4 +72,10 @@ public class DevelopmentComponentTest {
         this.component.add(part1);
         assertThat(1, is(equalTo(this.component.getPublicParts().size())));
     }
+    
+    @Test
+    public void testNormalize() {
+        this.component = new DevelopmentComponent("name/subname", "vendor");
+        assertThat(component.getNormalizedName(' '), equalTo("vendor name subname"));
+    }
 }
