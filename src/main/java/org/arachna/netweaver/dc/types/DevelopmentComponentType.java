@@ -68,6 +68,11 @@ public enum DevelopmentComponentType {
     J2EEEnterpriseApplication("J2EE", "Enterprise Application", false),
 
     /**
+     * DC of type 'J2EE Server Component', subtype 'service'.
+     */
+    J2EEServerComponentService("J2EE Server Component", "Service", false),
+
+    /**
      * DC of type 'J2EE', subtype 'web module'.
      */
     J2EEWebModule("J2EE", "WebModule", true),
@@ -128,7 +133,7 @@ public enum DevelopmentComponentType {
      * @param canContainJavaSources
      *            indicate whether DCs of this type co.ntains java sources
      */
-    DevelopmentComponentType(final String type, boolean canContainJavaSources) {
+    DevelopmentComponentType(final String type, final boolean canContainJavaSources) {
         this.type = type;
         this.canContainJavaSources = canContainJavaSources;
     }
@@ -144,17 +149,17 @@ public enum DevelopmentComponentType {
      * @param canContainJavaSources
      *            indicate whether DCs of this type co.ntains java sources
      */
-    DevelopmentComponentType(final String type, final String subType, boolean canContainJavaSources) {
+    DevelopmentComponentType(final String type, final String subType, final boolean canContainJavaSources) {
         this(type, canContainJavaSources);
         this.subType = subType;
     }
 
     @Override
     public String toString() {
-        final StringBuilder result = new StringBuilder(this.type);
+        final StringBuilder result = new StringBuilder(type);
 
-        if (this.subType.trim().length() > 0) {
-            result.append(':').append(this.subType);
+        if (subType.trim().length() > 0) {
+            result.append(':').append(subType);
         }
 
         return result.toString();
