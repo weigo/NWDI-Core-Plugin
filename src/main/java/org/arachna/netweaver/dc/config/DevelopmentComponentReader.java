@@ -25,8 +25,8 @@ import org.xml.sax.XMLReader;
  */
 public class DevelopmentComponentReader extends AbstractDefaultHandler {
     /**
-     * attribute name signalling that a component probably needs rebuilding
-     * (depending on the attributs value).
+     * attribute name signaling that a component probably needs rebuilding
+     * (depending on the attributes value).
      */
     private static final String NEEDS_REBUILD = "needsRebuild";
 

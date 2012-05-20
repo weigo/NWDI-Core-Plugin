@@ -487,8 +487,8 @@ public final class DevelopmentComponent {
      *            name.
      * @return the vendor/name combination normalized using the given separator character.
      */
-    public String getNormalizedName(final Character separator) {
-        return String.format("%s%c%s", getVendor(), separator, getName().replace('/', separator.charValue()));
+    public String getNormalizedName(final String separator) {
+        return String.format("%s%s%s", getVendor(), separator, getName().replaceAll("/", separator));
     }
 
     /**
