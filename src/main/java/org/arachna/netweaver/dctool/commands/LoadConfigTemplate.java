@@ -4,14 +4,14 @@
 package org.arachna.netweaver.dctool.commands;
 
 /**
- * Template for generating <code>loadconfig</code> and <code>timing</code>
- * commands.
+ * Template for generating <code>loadconfig</code> and <code>timing</code> commands.
  * 
  * @author Dirk Weigenand
  */
 enum LoadConfigTemplate {
     V70("loadconfig -u %s -p %s -c \"%s\" -r \"%s\";\n", "exectime -m on;"), V71(
-        "loadconfig -u %s -p %s -v \"%s\" -l \"%s\"", "timing on");
+        "loadconfig -u %s -p %s -v \"%s\" -l \"%s\"",
+        "timing on\ntracefile dctool.trace\nspool dctool.spool");
 
     /**
      * template string for generation of a <code>loadconfig</code> command.
@@ -24,15 +24,13 @@ enum LoadConfigTemplate {
     private final String timingCommand;
 
     /**
-     * Create a <code>LoadConfigTemplate</code> with the given template strings
-     * for <code>loadconfig</code> and <code>timing</code> commands.
+     * Create a <code>LoadConfigTemplate</code> with the given template strings for <code>loadconfig</code> and <code>timing</code>
+     * commands.
      * 
      * @param loadConfigCommand
-     *            template string for generation of a <code>loadconfig</code>
-     *            command.
+     *            template string for generation of a <code>loadconfig</code> command.
      * @param timingCommand
-     *            template string for generation of a <code>timing</code>
-     *            command.
+     *            template string for generation of a <code>timing</code> command.
      */
     LoadConfigTemplate(final String loadConfigCommand, final String timingCommand) {
         this.loadConfigCommand = loadConfigCommand;

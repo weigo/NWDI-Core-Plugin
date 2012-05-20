@@ -21,14 +21,16 @@ public enum SyncDcCommandTemplate {
     /**
      * Template for NW 7.0.
      */
-    SyncDcCommandTemplateV70("syncdc -s %s -n %s -v %s -m inactive -y;", "syncalldcs -s %s -m archive;",
+    SyncDcCommandTemplateV70("syncdc -s %s -n %s -v %s -m inactive -y;", "syncdc -s %s -n %s -v %s -m archive -y;",
+        "syncalldcs -s %s -m archive;",
         "syncalldcs -m archive;", "syncalldcs -s %s -m inactive;", "unsyncdc -s %s -n %s -v %s;", "exit;",
         "SoftwareComponents70"),
 
     /**
      * Template for NW 7.1+.
      */
-    SyncDcCommandTemplateV71("syncdc -c %s -n %s -v %s -m inactive -f", "syncalldcs -c %s -m archive",
+    SyncDcCommandTemplateV71("syncdc -c %s -n %s -v %s -m inactive -f", "syncdc -c %s -n %s -v %s -m archive -f",
+        "syncalldcs -c %s -m archive",
         "syncalldcs -m archive", "syncalldcs -c %s -m inactive", "unsyncdc -c %s -n %s -v %s", "exit",
         "SoftwareComponents73");
 
@@ -38,13 +40,17 @@ public enum SyncDcCommandTemplate {
     private String syncInactiveDcTemplate;
 
     /**
+     * template to use for creating a 'syncdc' in active state command.
+     */
+    private String syncArchiveDcTemplate;
+
+    /**
      * template to use for creating a 'syncalldcs' in archive state command.
      */
     private String syncAllDcsForGivenCompartmentInArchiveModeTemplate;
 
     /**
-     * Template for synchronizing all DCs of a development configuration in
-     * archive mode.
+     * Template for synchronizing all DCs of a development configuration in archive mode.
      */
     private final String syncAllDcsInArchiveModeTemplate;
 
@@ -69,35 +75,32 @@ public enum SyncDcCommandTemplate {
     private final Set<String> excludeSCs = new HashSet<String>();
 
     /**
-     * Create an instance of a command template provider using the given
-     * templates.
+     * Create an instance of a command template provider using the given templates.
      * 
      * @param syncInactiveDcTemplate
-     *            template to use for creating a 'syncdc' in inactive state
-     *            command.
+     *            template to use for creating a 'syncdc' in inactive state command.
+     * @param syncArchiveDcTemplate
+     *            template to use for creating a 'syncdc' in active state command.
      * @param syncAllDcsForGivenCompartmentInArchiveModeTemplate
-     *            template to use for creating a 'syncalldcs' in active state
-     *            command for a given compartment.
+     *            template to use for creating a 'syncalldcs' in active state command for a given compartment.
      * @param syncAllDcsInArchiveModeTemplate
-     *            template to use for creating a 'syncalldcs' in active state
-     *            command for a whole development configuration.
+     *            template to use for creating a 'syncalldcs' in active state command for a whole development configuration.
      * @param syncAllDcsInInactiveModeTemplate
      *            template for creating a 'syncalldcs' in archive mode command.
      * @param unsyncDcTemplate
-     *            template to use for creating a 'unsyncdc' in active state
-     *            command.
+     *            template to use for creating a 'unsyncdc' in active state command.
      * @param exitTemplate
      *            template for generating an 'exit' command.
      * @param compartmentDirectory
-     *            the 'compartment directory' containing software components
-     *            supplied for the respective NW version.
+     *            the 'compartment directory' containing software components supplied for the respective NW version.
      * @param syncAllDcsInArchiveModeTemplate
      */
-    SyncDcCommandTemplate(final String syncInactiveDcTemplate,
+    SyncDcCommandTemplate(final String syncInactiveDcTemplate, final String syncArchiveDcTemplate,
         final String syncAllDcsForGivenCompartmentInArchiveModeTemplate, final String syncAllDcsInArchiveModeTemplate,
         final String syncAllDcsInInactiveModeTemplate, final String unsyncDcTemplate, final String exitTemplate,
         final String compartmentDirectory) {
         this.syncInactiveDcTemplate = syncInactiveDcTemplate;
+        this.syncArchiveDcTemplate = syncArchiveDcTemplate;
         this.syncAllDcsForGivenCompartmentInArchiveModeTemplate = syncAllDcsForGivenCompartmentInArchiveModeTemplate;
         this.syncAllDcsInArchiveModeTemplate = syncAllDcsInArchiveModeTemplate;
         this.syncAllDcsInInactiveModeTemplate = syncAllDcsInInactiveModeTemplate;
@@ -114,22 +117,27 @@ public enum SyncDcCommandTemplate {
     }
 
     /**
-     * Returns template to use for creating a 'syncdc' in inactive state
-     * command.
+     * Returns template to use for creating a 'syncdc' in inactive state command.
      * 
-     * @return template to use for creating a 'syncdc' in inactive state
-     *         command.
+     * @return template to use for creating a 'syncdc' in inactive state command.
      */
     String getSyncInactiveDcTemplate() {
         return syncInactiveDcTemplate;
     }
 
     /**
-     * Returns template to use for creating a 'syncalldcs' in active state
-     * command for a given compartment.
+     * Returns template to use for creating a 'syncdc' in active state command.
      * 
-     * @return template to use for creating a 'syncalldcs' in active state
-     *         command for a given compartment.
+     * @return template to use for creating a 'syncdc' in active state command.
+     */
+    String getSyncArchiveDcTemplate() {
+        return syncArchiveDcTemplate;
+    }
+
+    /**
+     * Returns template to use for creating a 'syncalldcs' in active state command for a given compartment.
+     * 
+     * @return template to use for creating a 'syncalldcs' in active state command for a given compartment.
      */
     String getSyncAllDcsForGivenCompartmentInArchiveModeTemplate() {
         return syncAllDcsForGivenCompartmentInArchiveModeTemplate;
@@ -143,22 +151,18 @@ public enum SyncDcCommandTemplate {
     }
 
     /**
-     * Returns the template to create a 'syncalldcs' command for synchronizing
-     * DCs in inactive mode.
+     * Returns the template to create a 'syncalldcs' command for synchronizing DCs in inactive mode.
      * 
-     * @return template to create a 'syncalldcs' command for synchronizing DCs
-     *         in inactive mode.
+     * @return template to create a 'syncalldcs' command for synchronizing DCs in inactive mode.
      */
     String getSyncAllDcsInInactiveModeTemplate() {
         return syncAllDcsInInactiveModeTemplate;
     }
 
     /**
-     * Returns template to use for creating a 'unsyncdc' in active state
-     * command.
+     * Returns template to use for creating a 'unsyncdc' in active state command.
      * 
-     * @return template to use for creating a 'unsyncdc' in active state
-     *         command.
+     * @return template to use for creating a 'unsyncdc' in active state command.
      */
     String getUnsyncDcTemplate() {
         return unsyncDcTemplate;
@@ -174,21 +178,18 @@ public enum SyncDcCommandTemplate {
     }
 
     /**
-     * Returns whether the given compartment should be excluded from
-     * synchronization.
+     * Returns whether the given compartment should be excluded from synchronization.
      * 
      * @param compartment
      *            the compartment that should be checked for exclusion
-     * @return whether the given compartment should be excluded from
-     *         synchronization
+     * @return whether the given compartment should be excluded from synchronization
      */
     public boolean shouldCompartmentBeExcludedFromSynchronization(final Compartment compartment) {
         return excludeSCs.contains(compartment.getName());
     }
 
     /**
-     * Reader for the compartments delivered by SAP to exclude from
-     * synchronization.
+     * Reader for the compartments delivered by SAP to exclude from synchronization.
      * 
      * @author Dirk Weigenand
      */
@@ -197,8 +198,7 @@ public enum SyncDcCommandTemplate {
          * Set of compartments delivered for a certain version of NW.
          * 
          * @param compartmentDirectory
-         *            the file containing compartments delivered for a given NW
-         *            version
+         *            the file containing compartments delivered for a given NW version
          * @return Set of compartments delivered for a certain version of NW.
          * @throws IOException
          *             when the given directory could not be found.

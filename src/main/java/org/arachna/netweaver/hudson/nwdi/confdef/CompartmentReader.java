@@ -16,8 +16,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
 /**
- * Reader for the <compartment> part of <code>.confdef</code> files (that
- * describe a development configuration in the NWDI).
+ * Reader for the <compartment> part of <code>.confdef</code> files (that describe a development configuration in the NWDI).
  * 
  * @author Dirk Weigenand
  * 
@@ -124,12 +123,11 @@ public final class CompartmentReader extends AbstractDefaultHandler {
     private String buildVariantName;
 
     /**
-     * Create an instance of a <code>CompartmentReader</code> using the given
-     * {@link XMLReader} and parent <code>AbstractDefaultHandler</code> object.
+     * Create an instance of a <code>CompartmentReader</code> using the given {@link XMLReader} and parent
+     * <code>AbstractDefaultHandler</code> object.
      * 
      * @param parent
-     *            the parent <code>AbstractDefaultHandler</code> to give control
-     *            back when finished handling SAX events.
+     *            the parent <code>AbstractDefaultHandler</code> to give control back when finished handling SAX events.
      */
     public CompartmentReader(final AbstractDefaultHandler parent) {
         super(parent);
@@ -138,8 +136,7 @@ public final class CompartmentReader extends AbstractDefaultHandler {
     /*
      * (non-Javadoc)
      * 
-     * @see org.xml.sax.ContentHandler#endElement(java.lang.String,
-     * java.lang.String, java.lang.String)
+     * @see org.xml.sax.ContentHandler#endElement(java.lang.String, java.lang.String, java.lang.String)
      */
     @Override
     public void endElement(final String uri, final String localName, final String name) throws SAXException {
@@ -179,8 +176,7 @@ public final class CompartmentReader extends AbstractDefaultHandler {
     /*
      * (non-Javadoc)
      * 
-     * @see org.xml.sax.ContentHandler#startElement(java.lang.String,
-     * java.lang.String, java.lang.String, org.xml.sax.Attributes)
+     * @see org.xml.sax.ContentHandler#startElement(java.lang.String, java.lang.String, java.lang.String, org.xml.sax.Attributes)
      */
     @Override
     public void startElement(final String uri, final String localName, final String name, final Attributes atts)

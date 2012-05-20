@@ -34,6 +34,7 @@ import hudson.util.FormValidation;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.List;
 import java.util.Map;
 
@@ -60,14 +61,12 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
     private static final float THOUSAND_MILLI_SECONDS = 1000f;
 
     /**
-     * parameter name for project configuration controlling whether the
-     * workspace should be clean before building.
+     * parameter name for project configuration controlling whether the workspace should be clean before building.
      */
     private static final String PARAMETER_CLEAN_COPY = "cleanCopy";
 
     /**
-     * Store the content of the '.confdef' configuration file for a development
-     * configuration.
+     * Store the content of the '.confdef' configuration file for a development configuration.
      */
     private String confDef;
 
@@ -79,27 +78,26 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
     /**
      * List of active {@link Builder}s configured for this project.
      */
-    private DescribableList<Builder, Descriptor<Builder>> builders = new DescribableList<Builder, Descriptor<Builder>>(
+    private final DescribableList<Builder, Descriptor<Builder>> builders = new DescribableList<Builder, Descriptor<Builder>>(
         this);
 
     /**
      * List of active {@link Publisher}s configured for this project.
      */
-    private DescribableList<Publisher, Descriptor<Publisher>> publishers =
+    private final DescribableList<Publisher, Descriptor<Publisher>> publishers =
         new DescribableList<Publisher, Descriptor<Publisher>>(this);
 
     /**
      * List of active {@link BuildWrapper}s configured for this project.
      */
-    private DescribableList<BuildWrapper, Descriptor<BuildWrapper>> buildWrappers =
+    private final DescribableList<BuildWrapper, Descriptor<BuildWrapper>> buildWrappers =
         new DescribableList<BuildWrapper, Descriptor<BuildWrapper>>(this);
 
     /**
      * Create an instance of a NWDI project.
      * 
      * @param parent
-     *            the parent <code>ItemGroup</code> in the project configuration
-     *            page.
+     *            the parent <code>ItemGroup</code> in the project configuration page.
      * @param name
      *            project name
      */
@@ -108,8 +106,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
     }
 
     /**
-     * Create an instance of a NWDI project using the given project name and
-     * configuration.
+     * Create an instance of a NWDI project using the given project name and configuration.
      * 
      * @param name
      *            project name
@@ -155,25 +152,27 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
     /*
      * (non-Javadoc)
      * 
-     * @see hudson.model.AbstractProject#checkout(hudson.model.AbstractBuild,
-     * hudson.Launcher, hudson.model.BuildListener, java.io.File)
+     * @see hudson.model.AbstractProject#checkout(hudson.model.AbstractBuild, hudson.Launcher, hudson.model.BuildListener, java.io.File)
      */
     @Override
     public boolean checkout(final AbstractBuild build, final Launcher launcher, final BuildListener listener,
         final File changelogFile) throws IOException, InterruptedException {
         final NWDIBuild nwdiBuild = (NWDIBuild)build;
 
+        PrintStream logger = listener.getLogger();
+
         if (nwdiBuild.isCleanCopy()) {
             final long start = System.currentTimeMillis();
             // FIXME: add I18N for message
-            listener.getLogger().append("Wiping workspace...");
+            logger.append("Wiping workspace...");
             build.getWorkspace().deleteContents();
-            listener.getLogger().append(
+            logger.append(
                 String.format(" (%f sec.).\n", (System.currentTimeMillis() - start) / THOUSAND_MILLI_SECONDS));
         }
 
+        logger.append("Updating DTR client configuration...");
         final DtrConfigCreator configCreator =
-            new DtrConfigCreator(build.getWorkspace(), nwdiBuild.getDevelopmentConfiguration(), getConfDef());
+            new DtrConfigCreator(build.getWorkspace(), nwdiBuild.getDevelopmentConfiguration(), getConfDef(), logger);
 
         configCreator.execute();
 
@@ -183,6 +182,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
     /**
      * {@inheritDoc}
      */
+    @Override
     public DescriptorImpl getDescriptor() {
         return NWDIProject.DescriptorImpl.DESCRIPTOR;
     }
@@ -205,6 +205,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
             DescriptorImpl.DESCRIPTOR.getPassword()));
     }
 
+    @Override
     public AbstractProject<?, ?> asProject() {
         return this;
     }
@@ -241,6 +242,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
         return builders;
     }
 
+    @Override
     public DescribableList<Publisher, Descriptor<Publisher>> getPublishersList() {
         return publishers;
     }
@@ -249,6 +251,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
         return buildWrappers.toMap();
     }
 
+    @Override
     public DescribableList<BuildWrapper, Descriptor<BuildWrapper>> getBuildWrappersList() {
         return buildWrappers;
     }
@@ -270,8 +273,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
     }
 
     /**
-     * Descriptor for NWDIProjects. Contains the global configuration commonly
-     * used for different NWDI tracks.
+     * Descriptor for NWDIProjects. Contains the global configuration commonly used for different NWDI tracks.
      * 
      * @author Dirk Weigenand
      */
@@ -343,8 +345,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
         private String jdkOpts;
 
         /**
-         * Create descriptor for NWDI-Projects and load global configuration
-         * data.
+         * Create descriptor for NWDI-Projects and load global configuration data.
          */
         public DescriptorImpl() {
             load();
@@ -423,11 +424,9 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
         }
 
         /**
-         * Returns the paths to JDK installations to be used for building
-         * tracks.
+         * Returns the paths to JDK installations to be used for building tracks.
          * 
-         * @return the paths to JDK installations to be used for building
-         *         tracks.
+         * @return the paths to JDK installations to be used for building tracks.
          */
         public String getJdkHomePaths() {
             return jdkHomePaths;
@@ -437,8 +436,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
          * Set the paths to JDK installations to be used for building tracks.
          * 
          * @param jdkHomePaths
-         *            the paths to JDK installations to be used for building
-         *            tracks.
+         *            the paths to JDK installations to be used for building tracks.
          */
         public void setJdkHomePaths(final String jdkHomePaths) {
             this.jdkHomePaths = jdkHomePaths;
@@ -462,9 +460,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
         /*
          * (non-Javadoc)
          * 
-         * @see
-         * hudson.model.Descriptor#configure(org.kohsuke.stapler.StaplerRequest,
-         * net.sf.json.JSONObject)
+         * @see hudson.model.Descriptor#configure(org.kohsuke.stapler.StaplerRequest, net.sf.json.JSONObject)
          */
         @Override
         public boolean configure(final StaplerRequest req, final JSONObject json) throws FormException {
@@ -503,8 +499,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
         }
 
         /**
-         * Verify the given values for options that should be passed to the JDK
-         * executing the dctool.
+         * Verify the given values for options that should be passed to the JDK executing the dctool.
          * 
          * @param value
          *            verify that all options passed to the JDK start with -X.
@@ -559,13 +554,11 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
         }
 
         /**
-         * Validate that the given <code>FilePath</code> contains a 'dc' sub
-         * folder.
+         * Validate that the given <code>FilePath</code> contains a 'dc' sub folder.
          * 
          * @param folder
          *            the 'tools' folder of a NWDI tool library installation.
-         * @return the validation result <code>FormValidation.ok()</code> when
-         *         the 'dc' sub folder exists,
+         * @return the validation result <code>FormValidation.ok()</code> when the 'dc' sub folder exists,
          *         <code>FormValidation.error()</code> otherwise.
          * @throws IOException
          *             when an error occurred accessing the folder.
@@ -683,8 +676,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
     /**
      * Return whether the workspace should be cleaned before building.
      * 
-     * @return whether the workspace should be cleaned before building (
-     *         <code>true</code> yes, leave it as it is otherwise).
+     * @return whether the workspace should be cleaned before building ( <code>true</code> yes, leave it as it is otherwise).
      */
     public boolean isCleanCopy() {
         return cleanCopy;
@@ -694,8 +686,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
      * Indicate whether the workspace should be cleaned before building.
      * 
      * @param cleanCopy
-     *            whether the workspace should be cleaned before building (
-     *            <code>true</code> yes, leave it as it is otherwise).
+     *            whether the workspace should be cleaned before building ( <code>true</code> yes, leave it as it is otherwise).
      */
     public void setCleanCopy(final boolean cleanCopy) {
         this.cleanCopy = cleanCopy;

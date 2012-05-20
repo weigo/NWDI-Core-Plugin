@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 
 /**
  * base class for readers of dctool output.
- *
+ * 
  * @author Dirk Weigenand
  */
 public abstract class AbstractDcToolOutputReader {
@@ -22,9 +22,8 @@ public abstract class AbstractDcToolOutputReader {
     private final LineNumberReader reader;
 
     /**
-     * Create an instance of an <code>DcToolOutputReader</code> using the given
-     * {@link Reader} containing the output of the DC tool.
-     *
+     * Create an instance of an <code>DcToolOutputReader</code> using the given {@link Reader} containing the output of the DC tool.
+     * 
      * @param dcToolOutput
      *            reader for output of DC tool.
      */
@@ -34,11 +33,10 @@ public abstract class AbstractDcToolOutputReader {
 
     /**
      * Reads a line trying to match the given pattern.
-     *
+     * 
      * @param pattern
      *            the pattern to use in matching the line
-     * @return If the pattern matches the first group will be extracted and
-     *         returned, the empty string otherwise;
+     * @return If the pattern matches the first group will be extracted and returned, the empty string otherwise;
      * @throws IOException
      *             when an exception occured during reading the next line
      */
@@ -62,7 +60,7 @@ public abstract class AbstractDcToolOutputReader {
 
     /**
      * read a line using the internal line number reader.
-     *
+     * 
      * @return the line just read
      * @throws IOException
      *             if an I/O error occurs.
@@ -73,7 +71,7 @@ public abstract class AbstractDcToolOutputReader {
 
     /**
      * Close the internal reader.
-     *
+     * 
      * @throws IOException
      *             if an I/O error occurs.
      */
@@ -81,5 +79,10 @@ public abstract class AbstractDcToolOutputReader {
         this.reader.close();
     }
 
+    /**
+     * To be implemented by classes extending this abstract DCTool output reader.
+     * 
+     * @throws IOException
+     */
     public abstract void read() throws IOException;
 }

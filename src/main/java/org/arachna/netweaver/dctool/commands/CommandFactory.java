@@ -15,38 +15,38 @@ import org.arachna.netweaver.dctool.JdkHomeAlias;
 /**
  * Factory for creation of DC tool commands.
  * 
- * Encapsulates knowledge which command to create depending on the build variant
- * used in a development configuration. This influences the DC tool version to
- * be used.
+ * Encapsulates knowledge which command to create depending on the build variant used in a development configuration. This influences the DC
+ * tool version to be used.
  * 
  * @author Dirk Weigenand
  */
 public final class CommandFactory {
     /**
-     * Creates a DC tool command builder for building synchronizing development
-     * components commands.
+     * Creates a DC tool command builder for building synchronizing development components commands.
      * 
      * @param configuration
      *            development configuration to synchronize.
+     * @param dcFactory
+     *            registry for development components
      * @param cleanCopy
-     *            indicate that the current build should operate on a fresh copy
-     *            from the DTR.
+     *            indicate that the current build should operate on a fresh copy from the DTR.
      * @return a command builder for creating 'syncdc' commands.
      */
     public DCToolCommandBuilder createSyncDevelopmentComponentsCommandBuilder(
-        final DevelopmentConfiguration configuration, final boolean cleanCopy) {
+        final DevelopmentConfiguration configuration, final DevelopmentComponentFactory dcFactory, final boolean syncSources,
+        final boolean cleanCopy) {
         final JdkHomeAlias alias = configuration.getJdkHomeAlias();
         DCToolCommandBuilder builder = null;
 
         if (JdkHomeAlias.Jdk131Home.equals(alias) || JdkHomeAlias.Jdk142Home.equals(alias)) {
             builder =
-                new SyncDevelopmentComponentsCommandBuilder(configuration,
-                    SyncDcCommandTemplate.SyncDcCommandTemplateV70, cleanCopy);
+                new SyncDevelopmentComponentsCommandBuilder(configuration, dcFactory,
+                    SyncDcCommandTemplate.SyncDcCommandTemplateV70, syncSources, cleanCopy);
         }
         else if (JdkHomeAlias.Jdk150Home.equals(alias) || JdkHomeAlias.Jdk160Home.equals(alias)) {
             builder =
-                new SyncDevelopmentComponentsCommandBuilder(configuration,
-                    SyncDcCommandTemplate.SyncDcCommandTemplateV71, cleanCopy);
+                new SyncDevelopmentComponentsCommandBuilder(configuration, dcFactory,
+                    SyncDcCommandTemplate.SyncDcCommandTemplateV71, syncSources, cleanCopy);
         }
         else {
             throw new RuntimeException("Cannot map configuration.getJdkHomeAlias() onto a DCToolCommandBuilder.");
@@ -56,8 +56,7 @@ public final class CommandFactory {
     }
 
     /**
-     * Creates a DC tool command builder for building build development
-     * components commands.
+     * Creates a DC tool command builder for building build development components commands.
      * 
      * @param configuration
      *            development configuration to synchronize.
@@ -84,8 +83,7 @@ public final class CommandFactory {
     }
 
     /**
-     * Creates a DC tool command builder for building build development
-     * components commands.
+     * Creates a DC tool command builder for building build development components commands.
      * 
      * @param configuration
      *            development configuration to list contained DCs for.
@@ -110,8 +108,7 @@ public final class CommandFactory {
     }
 
     /**
-     * Creates a DC tool command builder for building build development
-     * components commands.
+     * Creates a DC tool command builder for building build development components commands.
      * 
      * @param configuration
      *            development configuration to list contained DCs for.

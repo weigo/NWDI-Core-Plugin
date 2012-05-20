@@ -3,6 +3,7 @@
  */
 package org.arachna.netweaver.hudson.dtr.browser;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
@@ -27,11 +28,15 @@ abstract class AbstractResourceParser {
         final Document document = JTidyHelper.getDocument(content);
 
         try {
+            content.close();
             final DOMXPath xPath = new DOMXPath(this.getXPath());
 
             this.parseInternal(xPath.selectNodes(document));
         }
         catch (final JaxenException e) {
+            throw new RuntimeException(e);
+        }
+        catch (IOException e) {
             throw new RuntimeException(e);
         }
     }

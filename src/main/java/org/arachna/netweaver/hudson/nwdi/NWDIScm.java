@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Logger;
 
 import net.sf.json.JSONObject;
 
@@ -52,6 +53,11 @@ import org.xml.sax.SAXException;
  * @author Dirk Weigenand
  */
 public class NWDIScm extends SCM {
+    /**
+     * Logger.
+     */
+    private static final Logger LOGGER = Logger.getLogger(NWDIScm.class.getName());
+
     /**
      * 1000 milliseconds.
      */
@@ -80,8 +86,7 @@ public class NWDIScm extends SCM {
      * @param password
      *            password to use for authentication.
      * @param cleanCopy
-     *            indicate whether only changed development components should be
-     *            loaded from the NWDI or all that are contained in the
+     *            indicate whether only changed development components should be loaded from the NWDI or all that are contained in the
      *            indicated CBS workspace
      */
     public NWDIScm(final boolean cleanCopy, final String dtrUser, final String password) {
@@ -150,7 +155,19 @@ public class NWDIScm extends SCM {
 
             setNeedsRebuildPropertyOnAllDevelopmentComponentsInSourceState(config, cleanCopy);
 
-            result = executor.synchronizeDevelopmentComponents(cleanCopy);
+            // FIXME: only synchronize sources!
+            // synchronize sources
+            result = executor.synchronizeDevelopmentComponents(dcFactory, cleanCopy, true);
+
+            if (result.isExitCodeOk()) {
+                // update used DCs
+                new DevelopmentComponentUpdater(FilePathHelper.makeAbsolute(currentBuild.getWorkspace().child(".dtc")),
+                    dcFactory).execute();
+
+                // FIXME: only synchronize used DCs!
+                // synchronize used DCs
+                result = executor.synchronizeDevelopmentComponents(dcFactory, cleanCopy, false);
+            }
 
             if (!result.isExitCodeOk()) {
                 final String output = result.getOutput();
@@ -176,14 +193,12 @@ public class NWDIScm extends SCM {
     }
 
     /**
-     * Set the needsRebuild property on all development components in source
-     * state if a clean build was requested.
+     * Set the needsRebuild property on all development components in source state if a clean build was requested.
      * 
      * @param config
      *            the development configuration containing the DCs
      * @param cleanCopy
-     *            <code>true</code> when a clean build was requested,
-     *            <code>false</code> otherwise.
+     *            <code>true</code> when a clean build was requested, <code>false</code> otherwise.
      */
     private void setNeedsRebuildPropertyOnAllDevelopmentComponentsInSourceState(final DevelopmentConfiguration config,
         boolean cleanCopy) {
@@ -197,12 +212,10 @@ public class NWDIScm extends SCM {
     }
 
     /**
-     * Read the development configuration saved during the last build or list
-     * development components from CBS if it doesn't exist.
+     * Read the development configuration saved during the last build or list development components from CBS if it doesn't exist.
      * 
      * @param workspace
-     *            workspace folder where the development configuration was
-     *            saved.
+     *            workspace folder where the development configuration was saved.
      * @param config
      *            development configuration to be used throughout the build
      * @param executor
@@ -305,8 +318,7 @@ public class NWDIScm extends SCM {
      * 
      * @param revisionState
      *            an <code>SCMRevisionState</code> object
-     * @return the date/time when the given SCM revision state was computed iff
-     *         it's type is {@link NWDIRevisionState}, <code>null</code>
+     * @return the date/time when the given SCM revision state was computed iff it's type is {@link NWDIRevisionState}, <code>null</code>
      *         otherwise.
      */
     private Date getCreationDate(final SCMRevisionState revisionState) {
@@ -373,8 +385,7 @@ public class NWDIScm extends SCM {
     }
 
     /**
-     * Get list of activities since last run. If <code>lastRun</code> is
-     * <code>null</code> all activities will be read.
+     * Get list of activities since last run. If <code>lastRun</code> is <code>null</code> all activities will be read.
      * 
      * @param logger
      *            the logger to use.
@@ -382,8 +393,7 @@ public class NWDIScm extends SCM {
      *            the {@link DtrBrowser} to be used getting the activities.
      * @param since
      *            since when to get activities
-     * @return a list of {@link Activity} objects that were checked in since the
-     *         last run or all activities.
+     * @return a list of {@link Activity} objects that were checked in since the last run or all activities.
      */
     private List<Activity> getActivities(final PrintStream logger, final DtrBrowser browser, final Date since) {
         final List<Activity> activities = new ArrayList<Activity>();
@@ -419,15 +429,12 @@ public class NWDIScm extends SCM {
     }
 
     /**
-     * Returns an instance of {@link DtrBrowser} using the given development
-     * configuration and development component factory.
+     * Returns an instance of {@link DtrBrowser} using the given development configuration and development component factory.
      * 
      * @param config
-     *            the development configuration to be used to connect to the
-     *            DTR.
+     *            the development configuration to be used to connect to the DTR.
      * @param dcFactory
-     *            the development component factory to be used getting
-     *            development components associated with activities.
+     *            the development component factory to be used getting development components associated with activities.
      * @return the {@link DtrBrowser} for browsing the DTR for activities.
      */
     private DtrBrowser getDtrBrowser(final DevelopmentConfiguration config, final DevelopmentComponentFactory dcFactory) {
@@ -435,8 +442,7 @@ public class NWDIScm extends SCM {
     }
 
     /**
-     * Determine the time in seconds passed since the given start time and log
-     * it using the message given.
+     * Determine the time in seconds passed since the given start time and log it using the message given.
      * 
      * @param logger
      *            the logger to use.

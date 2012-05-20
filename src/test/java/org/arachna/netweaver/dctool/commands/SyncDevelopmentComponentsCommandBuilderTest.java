@@ -16,6 +16,7 @@ import java.util.LinkedList;
 import org.arachna.netweaver.dc.types.Compartment;
 import org.arachna.netweaver.dc.types.CompartmentState;
 import org.arachna.netweaver.dc.types.DevelopmentComponent;
+import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 import org.arachna.netweaver.dctool.commands.SyncDcCommandTemplate.CompartmentsReader;
 import org.junit.Before;
@@ -54,6 +55,8 @@ public class SyncDevelopmentComponentsCommandBuilderTest {
 
     private DevelopmentComponent component;
 
+    private DevelopmentComponentFactory dcFactory;
+
     /**
      * @throws java.lang.Exception
      */
@@ -62,19 +65,19 @@ public class SyncDevelopmentComponentsCommandBuilderTest {
         config = new DevelopmentConfiguration("DI0_Example_D");
         compartment = new Compartment(EXAMPLE_SC, CompartmentState.Source, VENDOR, "", "EXAMPLE_SC");
         config.add(compartment);
-        component = new DevelopmentComponent("dc/example1", VENDOR);
+
+        dcFactory = new DevelopmentComponentFactory();
+        component = dcFactory.create(VENDOR, "dc/example1");
         compartment.add(component);
     }
 
     /**
-     * Test method for
-     * {@link org.arachna.netweaver.dctool.commands.SyncDevelopmentComponentsCommandBuilder#executeInternal()}
-     * .
+     * Test method for {@link org.arachna.netweaver.dctool.commands.SyncDevelopmentComponentsCommandBuilder#executeInternal()} .
      */
     @Test
     public final void testExecuteInternalV70() {
         builder =
-            new SyncDevelopmentComponentsCommandBuilder(config, SyncDcCommandTemplate.SyncDcCommandTemplateV70, false);
+            createSyncDevelopmentComponentsCommandBuilder(SyncDcCommandTemplate.SyncDcCommandTemplateV70, false);
         compartment.setState(CompartmentState.Source);
         component.setNeedsRebuild(true);
         config.add(new Compartment("example.com_EXAMPLE_SC_2", CompartmentState.Archive, VENDOR, "", "EXAMPLE_SC_2"));
@@ -89,14 +92,12 @@ public class SyncDevelopmentComponentsCommandBuilderTest {
     }
 
     /**
-     * Test method for
-     * {@link org.arachna.netweaver.dctool.commands.SyncDevelopmentComponentsCommandBuilder#executeInternal()}
-     * .
+     * Test method for {@link org.arachna.netweaver.dctool.commands.SyncDevelopmentComponentsCommandBuilder#executeInternal()} .
      */
     @Test
     public final void testExecuteInternalV71() {
         builder =
-            new SyncDevelopmentComponentsCommandBuilder(config, SyncDcCommandTemplate.SyncDcCommandTemplateV71, false);
+            createSyncDevelopmentComponentsCommandBuilder(SyncDcCommandTemplate.SyncDcCommandTemplateV71, false);
         compartment.setState(CompartmentState.Source);
         component.setNeedsRebuild(true);
         config.add(new Compartment("example.com_EXAMPLE_SC_2", CompartmentState.Archive, VENDOR, "", "EXAMPLE_SC_2"));
@@ -112,13 +113,12 @@ public class SyncDevelopmentComponentsCommandBuilderTest {
 
     /**
      * Test method for
-     * {@link org.arachna.netweaver.dctool.commands.SyncDevelopmentComponentsCommandBuilder#synchronizeDCsNeedingRebuild70()}
-     * .
+     * {@link org.arachna.netweaver.dctool.commands.SyncDevelopmentComponentsCommandBuilder#synchronizeDCsNeedingRebuild70()} .
      */
     @Test
     public final void testSynchronizeDCsNeedingRebuildV70() {
         builder =
-            new SyncDevelopmentComponentsCommandBuilder(config, SyncDcCommandTemplate.SyncDcCommandTemplateV70, false);
+            createSyncDevelopmentComponentsCommandBuilder(SyncDcCommandTemplate.SyncDcCommandTemplateV70, false);
         compartment.setState(CompartmentState.Source);
         component.setNeedsRebuild(true);
         final String commands[] = builder.synchronizeDCsNeedingRebuild().toArray(new String[0]);
@@ -130,13 +130,12 @@ public class SyncDevelopmentComponentsCommandBuilderTest {
 
     /**
      * Test method for
-     * {@link org.arachna.netweaver.dctool.commands.SyncDevelopmentComponentsCommandBuilder#synchronizeDCsNeedingRebuild70()}
-     * .
+     * {@link org.arachna.netweaver.dctool.commands.SyncDevelopmentComponentsCommandBuilder#synchronizeDCsNeedingRebuild70()} .
      */
     @Test
     public final void testSynchronizeDCsNeedingRebuildWithOneDCNeedingRebuildAndOneUnTouchedV70() {
         builder =
-            new SyncDevelopmentComponentsCommandBuilder(config, SyncDcCommandTemplate.SyncDcCommandTemplateV70, false);
+            createSyncDevelopmentComponentsCommandBuilder(SyncDcCommandTemplate.SyncDcCommandTemplateV70, false);
         compartment.setState(CompartmentState.Source);
         component.setNeedsRebuild(true);
         compartment.add(new DevelopmentComponent("dc/example2", VENDOR));
@@ -150,13 +149,12 @@ public class SyncDevelopmentComponentsCommandBuilderTest {
 
     /**
      * Test method for
-     * {@link org.arachna.netweaver.dctool.commands.SyncDevelopmentComponentsCommandBuilder#synchronizeDCsNeedingRebuild71()}
-     * .
+     * {@link org.arachna.netweaver.dctool.commands.SyncDevelopmentComponentsCommandBuilder#synchronizeDCsNeedingRebuild71()} .
      */
     @Test
     public final void testSynchronizeDCsNeedingRebuildV71() {
         builder =
-            new SyncDevelopmentComponentsCommandBuilder(config, SyncDcCommandTemplate.SyncDcCommandTemplateV71, false);
+            createSyncDevelopmentComponentsCommandBuilder(SyncDcCommandTemplate.SyncDcCommandTemplateV71, false);
         compartment.setState(CompartmentState.Source);
         component.setNeedsRebuild(true);
         final String commands[] = builder.synchronizeDCsNeedingRebuild().toArray(new String[0]);
@@ -176,7 +174,7 @@ public class SyncDevelopmentComponentsCommandBuilderTest {
     @Test
     public final void testSynchronizeCompartmentsInArchiveModeV70InCleanCopyMode() throws IOException {
         builder =
-            new SyncDevelopmentComponentsCommandBuilder(config, SyncDcCommandTemplate.SyncDcCommandTemplateV70, true);
+            createSyncDevelopmentComponentsCommandBuilder(SyncDcCommandTemplate.SyncDcCommandTemplateV70, true);
         compartment.setState(CompartmentState.Archive);
         config.add(new Compartment("example.com_EXAMPLE_SC_2", CompartmentState.Archive, VENDOR, "", "EXAMPLE_SC_2"));
         addSapCompartments("SoftwareComponents70");
@@ -187,15 +185,14 @@ public class SyncDevelopmentComponentsCommandBuilderTest {
 
     /**
      * Test method for
-     * {@link org.arachna.netweaver.dctool.commands.SyncDevelopmentComponentsCommandBuilder#synchronizeCompartmentsInArchiveMode71()}
-     * .
+     * {@link org.arachna.netweaver.dctool.commands.SyncDevelopmentComponentsCommandBuilder#synchronizeCompartmentsInArchiveMode71()} .
      * 
      * @throws IOException
      */
     @Test
     public final void testSynchronizeCompartmentsInArchiveModeV71InCleanCopyMode() throws IOException {
         builder =
-            new SyncDevelopmentComponentsCommandBuilder(config, SyncDcCommandTemplate.SyncDcCommandTemplateV71, true);
+            createSyncDevelopmentComponentsCommandBuilder(SyncDcCommandTemplate.SyncDcCommandTemplateV71, true);
         compartment.setState(CompartmentState.Archive);
         config.add(new Compartment("example.com_EXAMPLE_SC_2", CompartmentState.Archive, VENDOR, "", "EXAMPLE_SC_2"));
         addSapCompartments("SoftwareComponents73");
@@ -209,15 +206,15 @@ public class SyncDevelopmentComponentsCommandBuilderTest {
      * {@link org.arachna.netweaver.dctool.commands.SyncDevelopmentComponentsCommandBuilder#synchronizeCompartmentsInArchiveMode70(java.util.List)}
      * .
      * 
-     * Standard mode means that no fresh checkout of the workspace was
-     * requested. This should ignore the standard compartments provided by SAP.
+     * Standard mode means that no fresh checkout of the workspace was requested. This should ignore the standard compartments provided by
+     * SAP.
      * 
      * @throws IOException
      */
     @Test
     public final void testSynchronizeCompartmentsInArchiveModeV70InStandardMode() throws IOException {
         builder =
-            new SyncDevelopmentComponentsCommandBuilder(config, SyncDcCommandTemplate.SyncDcCommandTemplateV70, false);
+            createSyncDevelopmentComponentsCommandBuilder(SyncDcCommandTemplate.SyncDcCommandTemplateV70, false);
         compartment.setState(CompartmentState.Archive);
         config.add(new Compartment("example.com_EXAMPLE_SC_2", CompartmentState.Archive, VENDOR, "", "EXAMPLE_SC_2"));
 
@@ -245,16 +242,16 @@ public class SyncDevelopmentComponentsCommandBuilderTest {
 
     /**
      * Test method for
-     * {@link org.arachna.netweaver.dctool.commands.SyncDevelopmentComponentsCommandBuilder#synchronizeCompartmentsInArchiveMode71()}
-     * . Standard mode means that no fresh checkout of the workspace was
-     * requested. This should ignore the standard compartments provided by SAP.
+     * {@link org.arachna.netweaver.dctool.commands.SyncDevelopmentComponentsCommandBuilder#synchronizeCompartmentsInArchiveMode71()} .
+     * Standard mode means that no fresh checkout of the workspace was requested. This should ignore the standard compartments provided by
+     * SAP.
      * 
      * @throws IOException
      */
     @Test
     public final void testSynchronizeCompartmentsInArchiveModeV71InStandardMode() throws IOException {
         builder =
-            new SyncDevelopmentComponentsCommandBuilder(config, SyncDcCommandTemplate.SyncDcCommandTemplateV71, false);
+            createSyncDevelopmentComponentsCommandBuilder(SyncDcCommandTemplate.SyncDcCommandTemplateV71, false);
         compartment.setState(CompartmentState.Archive);
         config.add(new Compartment("example.com_EXAMPLE_SC_2", CompartmentState.Archive, VENDOR, "", "EXAMPLE_SC_2"));
         addSapCompartments("SoftwareComponents73");
@@ -273,7 +270,7 @@ public class SyncDevelopmentComponentsCommandBuilderTest {
     @Test
     public final void testCreateSyncDcsInArchiveModeCommandV70() {
         builder =
-            new SyncDevelopmentComponentsCommandBuilder(config, SyncDcCommandTemplate.SyncDcCommandTemplateV70, false);
+            createSyncDevelopmentComponentsCommandBuilder(SyncDcCommandTemplate.SyncDcCommandTemplateV70, false);
         assertThat(builder.createSyncDcsInArchiveModeCommand(compartment),
             is(equalTo("syncalldcs -s example.com_EXAMPLE_SC_1 -m archive;")));
     }
@@ -286,7 +283,7 @@ public class SyncDevelopmentComponentsCommandBuilderTest {
     @Test
     public final void testCreateSyncDcsInArchiveModeCommandV71() {
         builder =
-            new SyncDevelopmentComponentsCommandBuilder(config, SyncDcCommandTemplate.SyncDcCommandTemplateV71, false);
+            createSyncDevelopmentComponentsCommandBuilder(SyncDcCommandTemplate.SyncDcCommandTemplateV71, false);
         assertThat(builder.createSyncDcsInArchiveModeCommand(compartment),
             is(equalTo("syncalldcs -c example.com_EXAMPLE_SC_1 -m archive")));
     }
@@ -299,7 +296,7 @@ public class SyncDevelopmentComponentsCommandBuilderTest {
     @Test
     public final void testCreateSyncInactiveDCCommandV70() {
         builder =
-            new SyncDevelopmentComponentsCommandBuilder(config, SyncDcCommandTemplate.SyncDcCommandTemplateV70, false);
+            createSyncDevelopmentComponentsCommandBuilder(SyncDcCommandTemplate.SyncDcCommandTemplateV70, false);
         assertThat(builder.createSyncInactiveDCCommand(component),
             is(equalTo("syncdc -s example.com_EXAMPLE_SC_1 -n dc/example1 -v example.com -m inactive -y;")));
     }
@@ -312,7 +309,7 @@ public class SyncDevelopmentComponentsCommandBuilderTest {
     @Test
     public final void testCreateSyncInactiveDCCommandV71() {
         builder =
-            new SyncDevelopmentComponentsCommandBuilder(config, SyncDcCommandTemplate.SyncDcCommandTemplateV71, false);
+            createSyncDevelopmentComponentsCommandBuilder(SyncDcCommandTemplate.SyncDcCommandTemplateV71, false);
         assertThat(builder.createSyncInactiveDCCommand(component),
             is(equalTo("syncdc -c example.com_EXAMPLE_SC_1 -n dc/example1 -v example.com -m inactive -f")));
     }
@@ -325,7 +322,7 @@ public class SyncDevelopmentComponentsCommandBuilderTest {
     @Test
     public final void testCreateUnsyncDCCommandV70() {
         builder =
-            new SyncDevelopmentComponentsCommandBuilder(config, SyncDcCommandTemplate.SyncDcCommandTemplateV70, false);
+            createSyncDevelopmentComponentsCommandBuilder(SyncDcCommandTemplate.SyncDcCommandTemplateV70, false);
         assertThat(builder.createUnsyncDCCommand(component),
             is(equalTo("unsyncdc -s example.com_EXAMPLE_SC_1 -n dc/example1 -v example.com;")));
     }
@@ -338,7 +335,7 @@ public class SyncDevelopmentComponentsCommandBuilderTest {
     @Test
     public final void testCreateUnsyncDCCommandV71() {
         builder =
-            new SyncDevelopmentComponentsCommandBuilder(config, SyncDcCommandTemplate.SyncDcCommandTemplateV71, false);
+            createSyncDevelopmentComponentsCommandBuilder(SyncDcCommandTemplate.SyncDcCommandTemplateV71, false);
         assertThat(builder.createUnsyncDCCommand(component),
             is(equalTo("unsyncdc -c example.com_EXAMPLE_SC_1 -n dc/example1 -v example.com")));
     }
@@ -351,7 +348,7 @@ public class SyncDevelopmentComponentsCommandBuilderTest {
     @Test
     public final void testGetExitCommandV70() {
         builder =
-            new SyncDevelopmentComponentsCommandBuilder(config, SyncDcCommandTemplate.SyncDcCommandTemplateV70, false);
+            createSyncDevelopmentComponentsCommandBuilder(SyncDcCommandTemplate.SyncDcCommandTemplateV70, false);
         assertThat(builder.getExitCommand(), is(equalTo("exit;")));
     }
 
@@ -363,7 +360,12 @@ public class SyncDevelopmentComponentsCommandBuilderTest {
     @Test
     public final void testGetExitCommandV71() {
         builder =
-            new SyncDevelopmentComponentsCommandBuilder(config, SyncDcCommandTemplate.SyncDcCommandTemplateV71, false);
+            createSyncDevelopmentComponentsCommandBuilder(SyncDcCommandTemplate.SyncDcCommandTemplateV71, false);
         assertThat(builder.getExitCommand(), is(equalTo("exit")));
+    }
+
+    private SyncDevelopmentComponentsCommandBuilder createSyncDevelopmentComponentsCommandBuilder(SyncDcCommandTemplate template,
+        boolean cleanCopy) {
+        return new SyncDevelopmentComponentsCommandBuilder(config, dcFactory, template, cleanCopy, true);
     }
 }

@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <system name="%s">
- <repositoryServers>
-  <repositoryServer url="%s">
-   <filters>
-   </filters>
-  </repositoryServer>
- </repositoryServers>
- <buildServers>
-  <buildServer url="%s" />
- </buildServers>
+  <repositoryServers>
+    <repositoryServer url="%s">
+      <filters />
+    </repositoryServer>
+  </repositoryServers>
+  <buildServers>
+    <buildServer url="%s" />
+  </buildServers>
 </system>

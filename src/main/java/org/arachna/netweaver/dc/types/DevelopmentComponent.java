@@ -60,10 +60,14 @@ public final class DevelopmentComponent {
     private final Set<PublicPart> publicParts = new HashSet<PublicPart>();
 
     /**
-     * contains references to development components used by this development
-     * component.
+     * contains references to development components used by this development component.
      */
     private final Set<PublicPartReference> usedComponents = new HashSet<PublicPartReference>();
+
+    /**
+     * build plugin used to build this development component.
+     */
+    private PublicPartReference buildPlugin;
 
     /**
      * collection of development components that use this DC.
@@ -76,14 +80,12 @@ public final class DevelopmentComponent {
     private final Set<String> sourceFolders = new HashSet<String>();
 
     /**
-     * folder the class files for this development component were generated to
-     * during the last build.
+     * folder the class files for this development component were generated to during the last build.
      */
     private String outputFolder = "";
 
     /**
-     * Create an instance of a development component with the given name, vendor
-     * and DC type.
+     * Create an instance of a development component with the given name, vendor and DC type.
      * 
      * @param name
      *            name of this development component.
@@ -99,8 +101,7 @@ public final class DevelopmentComponent {
     }
 
     /**
-     * Create an instance of a development component with the given name, vendor
-     * and DC type {@link DevelopmentComponentType#unknown}.
+     * Create an instance of a development component with the given name, vendor and DC type {@link DevelopmentComponentType#unknown}.
      * 
      * @param name
      *            name of this development component.
@@ -136,20 +137,17 @@ public final class DevelopmentComponent {
      * Adds a reference to a public part of a used development component.
      * 
      * @param reference
-     *            reference to public part of other development component this
-     *            DC references.
+     *            reference to public part of other development component this DC references.
      */
     public void add(final PublicPartReference reference) {
         usedComponents.add(reference);
     }
 
     /**
-     * Adds the given references to public parts of a used development
-     * components.
+     * Adds the given references to public parts of a used development components.
      * 
      * @param references
-     *            references to public parts of other development components
-     *            this DC references.
+     *            references to public parts of other development components this DC references.
      */
     public void addAll(final Collection<PublicPartReference> references) {
         if (references != null) {
@@ -224,8 +222,7 @@ public final class DevelopmentComponent {
     }
 
     /**
-     * Get public parts of this DC. The returned collection is sorted by
-     * {@link PublicPartByNameComparator}.
+     * Get public parts of this DC. The returned collection is sorted by {@link PublicPartByNameComparator}.
      * 
      * @return the publicParts
      */
@@ -238,8 +235,8 @@ public final class DevelopmentComponent {
     }
 
     /**
-     * Set the public parts for this development component. Clears the existing
-     * public parts and adds those public parts given as argument iff not null.
+     * Set the public parts for this development component. Clears the existing public parts and adds those public parts given as argument
+     * iff not null.
      * 
      * @param publicParts
      *            public parts to set.
@@ -299,8 +296,7 @@ public final class DevelopmentComponent {
      * Set whether this DC needs a rebuild.
      * 
      * @param needsRebuild
-     *            <code>true</code> when this DC needs a rebuild,
-     *            <code>false</code> otherwise.
+     *            <code>true</code> when this DC needs a rebuild, <code>false</code> otherwise.
      */
     public void setNeedsRebuild(final boolean needsRebuild) {
         this.needsRebuild = needsRebuild;
@@ -309,8 +305,7 @@ public final class DevelopmentComponent {
     /**
      * Returns whether this development component is deprecated.
      * 
-     * @return <code>true</code> if this development component is deprecated,
-     *         <code>false</code> otherwise.
+     * @return <code>true</code> if this development component is deprecated, <code>false</code> otherwise.
      */
     public boolean isDeprecated() {
         return isDeprecated;
@@ -320,8 +315,7 @@ public final class DevelopmentComponent {
      * Set whether this development component is deprecated.
      * 
      * @param isDeprecated
-     *            <code>true</code> if this development component is deprecated,
-     *            <code>false</code> otherwise.
+     *            <code>true</code> if this development component is deprecated, <code>false</code> otherwise.
      */
     public void setDeprecated(final boolean isDeprecated) {
         this.isDeprecated = isDeprecated;
@@ -347,8 +341,7 @@ public final class DevelopmentComponent {
     }
 
     /**
-     * Add the given folderName to the source folders of this development
-     * component.
+     * Add the given folderName to the source folders of this development component.
      * 
      * @param folderName
      *            source folder to add to this development component.
@@ -361,8 +354,7 @@ public final class DevelopmentComponent {
      * Set source folders for this development component.
      * 
      * @param sourceFolders
-     *            the source folders to set for this DC. If the given collection
-     *            is null the DC will have no source folders afterwards.
+     *            the source folders to set for this DC. If the given collection is null the DC will have no source folders afterwards.
      */
     public void setSourceFolders(final Set<String> sourceFolders) {
         this.sourceFolders.clear();
@@ -407,28 +399,24 @@ public final class DevelopmentComponent {
     }
 
     /**
-     * Sets the folder the class files for this development component were
-     * generated to during the last build.
+     * Sets the folder the class files for this development component were generated to during the last build.
      * 
      * @param outputFolder
-     *            folder the class files for this development component were
-     *            generated to during the last build
+     *            folder the class files for this development component were generated to during the last build
      */
     public void setOutputFolder(final String outputFolder) {
-        if (outputFolder != null) {
+        if (outputFolder != null && !outputFolder.isEmpty()) {
             this.outputFolder = outputFolder;
         }
         else {
-            this.outputFolder = "";
+            this.outputFolder = "gen/classes";
         }
     }
 
     /**
-     * Returns the folder the class files for this development component were
-     * generated to during the last build.
+     * Returns the folder the class files for this development component were generated to during the last build.
      * 
-     * @return the outputFolder folder the class files for this development
-     *         component were generated to during the last build
+     * @return the outputFolder folder the class files for this development component were generated to during the last build
      */
     public String getOutputFolder() {
         return outputFolder;
@@ -459,13 +447,12 @@ public final class DevelopmentComponent {
     }
 
     /**
-     * Determine whether this development component has a runtime reference to
-     * the public part given by the {@link PublicPartReference} parameter.
+     * Determine whether this development component has a runtime reference to the public part given by the {@link PublicPartReference}
+     * parameter.
      * 
      * @param ppRef
      *            public part reference to test
-     * @return <code>true</code> when the given public part is referenced at
-     *         runtim, <code>false</code> otherwise.
+     * @return <code>true</code> when the given public part is referenced at runtim, <code>false</code> otherwise.
      */
     public boolean hasRuntimeReference(final PublicPartReference ppRef) {
         boolean result = false;
@@ -482,12 +469,10 @@ public final class DevelopmentComponent {
     }
 
     /**
-     * Set the references to the public parts of other development components
-     * used by this component.
+     * Set the references to the public parts of other development components used by this component.
      * 
      * @param usedComponents
-     *            references to public parts of development components used by
-     *            this development components.
+     *            references to public parts of development components used by this development components.
      */
     public void setUsedComponents(final Collection<PublicPartReference> usedComponents) {
         this.usedComponents.clear();
@@ -495,17 +480,31 @@ public final class DevelopmentComponent {
     }
 
     /**
-     * Returns the components name as
-     * <code>'vendor' + separator + 'name'.replace('/', separator)</code>.
+     * Returns the components name as <code>'vendor' + separator + 'name'.replace('/', separator)</code>.
      * 
      * @param separator
-     *            the separator character to use between vendor and component
-     *            name and also replacing the slashes probably in the component
+     *            the separator character to use between vendor and component name and also replacing the slashes probably in the component
      *            name.
-     * @return the vendor/name combination normalized using the given separator
-     *         character.
+     * @return the vendor/name combination normalized using the given separator character.
      */
     public String getNormalizedName(final Character separator) {
         return String.format("%s%c%s", getVendor(), separator, getName().replace('/', separator.charValue()));
+    }
+
+    /**
+     * Returns a public part reference to the development component used to build this development component.
+     * 
+     * @return the buildPlugin
+     */
+    public PublicPartReference getBuildPlugin() {
+        return buildPlugin;
+    }
+
+    /**
+     * @param buildPlugin
+     *            the buildPlugin to set
+     */
+    public void setBuildPlugin(PublicPartReference buildPlugin) {
+        this.buildPlugin = buildPlugin;
     }
 }

@@ -10,7 +10,10 @@ import hudson.Util;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 
+import org.arachna.netweaver.dc.types.Compartment;
+import org.arachna.netweaver.dc.types.CompartmentState;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 import org.arachna.netweaver.hudson.util.FilePathHelper;
 import org.custommonkey.xmlunit.XMLUnit;
@@ -28,6 +31,11 @@ import org.xml.sax.SAXException;
  * @author Dirk Weigenand
  */
 public final class DtrConfigCreatorTest {
+    /**
+     * 
+     */
+    private static final String DTR_URL = "http://di01db.example.com:53000/dtr";
+
     /**
      * URL to build server.
      */
@@ -52,8 +60,7 @@ public final class DtrConfigCreatorTest {
      * Set up the fixture used during test.
      * 
      * @throws IOException
-     *             when creating the temporary directory used as workspace or
-     *             sub folders in it fail
+     *             when creating the temporary directory used as workspace or sub folders in it fail
      * @throws InterruptedException
      *             might be thrown from FilePath operations
      */
@@ -63,9 +70,17 @@ public final class DtrConfigCreatorTest {
         config = new DevelopmentConfiguration("DI0_testTrack_D");
         config.setBuildServer(BUILD_SERVER_URL);
 
+        Compartment compartment = new Compartment("sap.com_EP_BUILDT_1", CompartmentState.Source, "sap.com", "", "EP_BUILDT");
+        compartment.setDtrUrl("http://di01db.example.com:53000");
+        config.add(compartment);
+
+        compartment = new Compartment("sap.com_SAP_BUILDT_1", CompartmentState.Source, "sap.com", "", "SAP_BUILDT");
+        compartment.setDtrUrl(DTR_URL);
+        config.add(compartment);
+
         this.configCreator =
             new DtrConfigCreator(new FilePath(this.workspace), config,
-                "<?xml version=\"1.0\" encoding=\"UTF-8\"?><confdef />");
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?><confdef />", new PrintStream(System.out));
         this.configCreator.execute();
     }
 
@@ -86,11 +101,9 @@ public final class DtrConfigCreatorTest {
     }
 
     /**
-     * Assert that the various configuration files are created with correct
-     * content.
+     * Assert that the various configuration files are created with correct content.
      * 
-     * Test method for
-     * {@link org.arachna.netweaver.hudson.nwdi.DtrConfigCreator#execute()}.
+     * Test method for {@link org.arachna.netweaver.hudson.nwdi.DtrConfigCreator#execute()}.
      */
     @Test
     public void testServersXml() {
@@ -108,11 +121,9 @@ public final class DtrConfigCreatorTest {
     }
 
     /**
-     * Assert that the various configuration files are created with correct
-     * content.
+     * Assert that the various configuration files are created with correct content.
      * 
-     * Test method for
-     * {@link org.arachna.netweaver.hudson.nwdi.DtrConfigCreator#execute()}.
+     * Test method for {@link org.arachna.netweaver.hudson.nwdi.DtrConfigCreator#execute()}.
      */
     @Test
     public void testClientsXml() {
@@ -132,8 +143,26 @@ public final class DtrConfigCreatorTest {
     }
 
     /**
-     * Assert that the given <code>FilePath</code> contains content that is
-     * matched by the given XPath expression.
+     * Assert that the various configuration files are created with correct content.
+     * 
+     * Test method for {@link org.arachna.netweaver.hudson.nwdi.DtrConfigCreator#execute()}.
+     */
+    @Test
+    public void testSystemXml() {
+        final FilePath workspace = new FilePath(this.workspace);
+        final FilePath dotDtr = workspace.child(DtrConfigCreator.DOT_DTR);
+        assertFilePathExists(dotDtr);
+
+        final FilePath dotDtc = workspace.child(DtrConfigCreator.DOT_DTC);
+        assertFilePathExists(dotDtc);
+
+        final FilePath systemXml = dotDtr.child(config.getName() + ".system");
+        assertFilePathExists(systemXml);
+        assertContent(systemXml, String.format("/system/repositoryServers/repositoryServer[@url = '%s']", DTR_URL));
+    }
+
+    /**
+     * Assert that the given <code>FilePath</code> contains content that is matched by the given XPath expression.
      * 
      * @param path
      *            the <code>FilePath</code> whose contents is to be tested.
@@ -163,7 +192,7 @@ public final class DtrConfigCreatorTest {
      * Assert that the given <code>FilePath</code> exists.
      * 
      * @param path
-     *            the <code>FilePath</code> to be tested for existance.
+     *            the <code>FilePath</code> to be tested for existence.
      */
     private void assertFilePathExists(final FilePath path) {
         try {

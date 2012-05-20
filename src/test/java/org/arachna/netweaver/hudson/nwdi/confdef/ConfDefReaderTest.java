@@ -27,8 +27,7 @@ import org.junit.Test;
 import org.xml.sax.SAXException;
 
 /**
- * JUnit-Test for reading '.confdef' configuration files using
- * {@link ConfDefReader}.
+ * JUnit-Test for reading '.confdef' configuration files using {@link ConfDefReader}.
  * 
  * @author Dirk Weigenand
  */
@@ -44,88 +43,62 @@ public final class ConfDefReaderTest {
     private static final String COM_SAP_JDK_HOME_PATH_KEY = "com.sap.jdk.home_path_key";
 
     /**
-     * Test method for reading a development configuration with a default build
-     * variant.
+     * Test method for reading a development configuration with a default build variant.
      */
     @Test
     public void testReadDevelopmentConfigurationWithDefaultBuildVariant() {
-        try {
-            final DevelopmentConfiguration configuration =
-                readDevelopmentConfiguration("DevelopmentConfigurationWithDefaultBuildVariant.confdef");
-            final BuildVariant variant = configuration.getBuildVariant();
-            assertNotNull(variant);
-            assertNull(variant.getBuildOption(COM_SAP_JDK_HOME_PATH_KEY));
-            assertNull(variant.getBuildOption(COM_SAP_JDK_JAVAC_FORCE_FORK));
-        }
-        catch (final IOException e) {
-            fail(e.getLocalizedMessage());
-        }
-        catch (final SAXException e) {
-            fail(e.getLocalizedMessage());
-        }
+        final DevelopmentConfiguration configuration =
+            readDevelopmentConfiguration("DevelopmentConfigurationWithDefaultBuildVariant.confdef");
+        final BuildVariant variant = configuration.getBuildVariant();
+        assertNotNull(variant);
+        assertNull(variant.getBuildOption(COM_SAP_JDK_HOME_PATH_KEY));
+        assertNull(variant.getBuildOption(COM_SAP_JDK_JAVAC_FORCE_FORK));
     }
 
     /**
-     * Test method for reading a development configuration with a configured
-     * build variant.
+     * Test method for reading a development configuration with a configured build variant.
      */
     @Test
     public void testReadDevelopmentConfigurationWithConfiguredDefaultBuildVariant() {
-        try {
-            final DevelopmentConfiguration configuration =
-                readDevelopmentConfiguration("DevelopmentConfigurationWithConfiguredDefaultBuildVariant.confdef");
-            final BuildVariant variant = configuration.getBuildVariant();
-            assertNotNull(variant);
-            assertEquals("JDK1.3.1_HOME", variant.getBuildOption(COM_SAP_JDK_HOME_PATH_KEY));
-            assertEquals("true", variant.getBuildOption(COM_SAP_JDK_JAVAC_FORCE_FORK));
-            assertEquals("http://di0db.example.com:50000", configuration.getBuildServer());
-        }
-        catch (final IOException e) {
-            fail(e.getLocalizedMessage());
-        }
-        catch (final SAXException e) {
-            fail(e.getLocalizedMessage());
-        }
+        final DevelopmentConfiguration configuration =
+            readDevelopmentConfiguration("DevelopmentConfigurationWithConfiguredDefaultBuildVariant.confdef");
+        final BuildVariant variant = configuration.getBuildVariant();
+        assertNotNull(variant);
+        assertEquals("JDK1.3.1_HOME", variant.getBuildOption(COM_SAP_JDK_HOME_PATH_KEY));
+        assertEquals("true", variant.getBuildOption(COM_SAP_JDK_JAVAC_FORCE_FORK));
+        assertEquals("http://di0db.example.com:50000", configuration.getBuildServer());
     }
 
     @Test
     public void testReadExampleConfDef() {
-        try {
-            final DevelopmentConfiguration configuration = readDevelopmentConfiguration("Example.confdef");
+        final DevelopmentConfiguration configuration = readDevelopmentConfiguration("Example.confdef");
 
-            final Collection<Compartment> compartments = configuration.getCompartments();
+        final Collection<Compartment> compartments = configuration.getCompartments();
 
-            assertThat(8, equalTo(compartments.size()));
+        assertThat(8, equalTo(compartments.size()));
 
-            final Set<String> compartmentNames = getExpectedCompartmentNames();
+        final Set<String> compartmentNames = getExpectedCompartmentNames();
 
-            for (final Compartment compartment : compartments) {
-                assertThat(compartmentNames, hasItem(compartment.getName()));
-            }
+        for (final Compartment compartment : compartments) {
+            assertThat(compartmentNames, hasItem(compartment.getName()));
         }
-        catch (final IOException e) {
-            fail(e.getLocalizedMessage());
-        }
-        catch (final SAXException e) {
-            fail(e.getLocalizedMessage());
-        }
+
     }
 
     @Test
     public void testReadExampleConfDefAndVerifyThatGetCompartmentsReturnsTheCorrectCompartments() {
-        try {
-            final DevelopmentConfiguration configuration = readDevelopmentConfiguration("Example.confdef");
+        final DevelopmentConfiguration configuration = readDevelopmentConfiguration("Example.confdef");
 
-            for (final String compartmentName : getExpectedCompartmentNames()) {
-                assertThat(null, is(not(equalTo(configuration.getCompartment(compartmentName)))));
-            }
+        for (final String compartmentName : getExpectedCompartmentNames()) {
+            assertThat(null, is(not(equalTo(configuration.getCompartment(compartmentName)))));
         }
-        catch (final IOException e) {
-            fail(e.getLocalizedMessage());
-        }
-        catch (final SAXException e) {
-            fail(e.getLocalizedMessage());
-        }
+    }
+
+    @Test
+    public void x() {
+        final DevelopmentConfiguration configuration = readDevelopmentConfiguration("Example.confdef");
+
+        assertThat(configuration.getDtrServerUrl(), equalTo("http://di0db:53000/dtr"));
     }
 
     /**
@@ -158,11 +131,19 @@ public final class ConfDefReaderTest {
      * @throws SAXException
      *             any <code>SAXException</code> thrown in the underlying code.
      */
-    private DevelopmentConfiguration readDevelopmentConfiguration(final String configurationName) throws IOException,
-        SAXException {
+    private DevelopmentConfiguration readDevelopmentConfiguration(final String configurationName) {
         final ConfDefReader developmentConfigurationReader = new ConfDefReader();
-        new XmlReaderHelper(developmentConfigurationReader).parse(new InputStreamReader(this.getClass()
-            .getResourceAsStream(configurationName)));
+
+        try {
+            new XmlReaderHelper(developmentConfigurationReader).parse(new InputStreamReader(this.getClass()
+                .getResourceAsStream(configurationName)));
+        }
+        catch (IOException e) {
+            fail(e.getLocalizedMessage());
+        }
+        catch (SAXException e) {
+            fail(e.getLocalizedMessage());
+        }
 
         return developmentConfigurationReader.getDevelopmentConfiguration();
     }

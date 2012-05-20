@@ -22,7 +22,7 @@ class LoadConfigCommandBuilder implements DCToolCommandBuilder {
     /**
      * Template for the different versions of NetWeaver dctool.
      */
-    private LoadConfigTemplate template;
+    private final LoadConfigTemplate template;
 
     /**
      * 
@@ -37,6 +37,7 @@ class LoadConfigCommandBuilder implements DCToolCommandBuilder {
     /**
      * {@inheritDoc}
      */
+    @Override
     public final List<String> execute() {
         List<String> commands = new ArrayList<String>();
 

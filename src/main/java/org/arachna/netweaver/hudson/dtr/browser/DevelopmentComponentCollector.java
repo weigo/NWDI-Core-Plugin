@@ -21,8 +21,7 @@ import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
  */
 final class DevelopmentComponentCollector {
     /**
-     * error message when an error occured computing the associated development
-     * components of the given set of activities.
+     * error message when an error occurred computing the associated development components of the given set of activities.
      */
     private static final String ERROR_CALCULATING_AFFECTED_DEVELOPMENT_COMPONENTS =
         "There was an error calculating the affected development components for the given set of activities.";
@@ -65,16 +64,14 @@ final class DevelopmentComponentCollector {
     private final DevelopmentComponentFactory dcFactory;
 
     /**
-     * Create an instance of a <code>DevelopmentComponentCollector</code> with
-     * the list of given activities.
+     * Create an instance of a <code>DevelopmentComponentCollector</code> with the list of given activities.
      * 
      * @param dtrHttpClient
      *            HTTP-Client for querying the DTR.
      * @param dtrUrl
      *            URL of DTR server.
      * @param dcFactory
-     *            registry for {@link DevelopmentComponent} objects. Used to
-     *            create and register development components that are related to
+     *            registry for {@link DevelopmentComponent} objects. Used to create and register development components that are related to
      *            an activity in the DTR.
      */
     public DevelopmentComponentCollector(final DtrHttpClient dtrHttpClient, final String dtrUrl,
@@ -85,12 +82,10 @@ final class DevelopmentComponentCollector {
     }
 
     /**
-     * Collect development components associated to the given list of
-     * activities.
+     * Collect development components associated to the given list of activities.
      * 
      * @param activities
-     *            list of activities the associated development components are
-     *            to belooked up
+     *            list of activities the associated development components are to belooked up
      * @return the set of associated development components
      */
     public Set<DevelopmentComponent> collect(final List<Activity> activities) {
@@ -106,10 +101,8 @@ final class DevelopmentComponentCollector {
     }
 
     /**
-     * Calculate the set of development components affected by the given
-     * activity. The affected components will have their
-     * {@link DevelopmentComponent#isNeedsRebuild()} property set to
-     * <code>true</code>.
+     * Calculate the set of development components affected by the given activity. The affected components will have their
+     * {@link DevelopmentComponent#isNeedsRebuild()} property set to <code>true</code>.
      * 
      * @param activity
      *            activity to calculate affected development components for.
@@ -122,11 +115,8 @@ final class DevelopmentComponentCollector {
             updateActivityDetails(activity);
             createActivityResources(activity);
 
-            ResourceDetailsParser detailParser;
-
             for (final ActivityResource resource : activity.getResources()) {
-                detailParser = new ResourceDetailsParser(resource);
-                detailParser.parse(this.dtrHttpClient.getContent(String.format(RESOURCE_DETAIL_QUERY_TEMPLATE,
+                new ResourceDetailsParser(resource).parse(this.dtrHttpClient.getContent(String.format(RESOURCE_DETAIL_QUERY_TEMPLATE,
                     this.dtrUrl, resource.getId())));
                 components.add(resource.getDevelopmentComponent());
                 activity.getCompartment().add(resource.getDevelopmentComponent());

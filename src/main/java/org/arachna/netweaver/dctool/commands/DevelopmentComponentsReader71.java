@@ -1,6 +1,5 @@
 package org.arachna.netweaver.dctool.commands;
 
-import java.io.EOFException;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.regex.Matcher;
@@ -8,26 +7,19 @@ import java.util.regex.Pattern;
 
 import org.arachna.netweaver.dc.types.Compartment;
 import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
-import org.arachna.netweaver.dc.types.DevelopmentComponentType;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 
 /**
- * Reader for dctool 'listdcs' output of a compartment. The reader will read the
- * generated file and update the compartments with the found development
- * components (and register them).
- *
+ * Reader for dctool 'listdcs' output of a compartment. The reader will read the generated file and update the compartments with the found
+ * development components (and register them).
+ * 
  * @author Dirk Weigenand
  */
 public final class DevelopmentComponentsReader71 extends AbstractDcToolOutputReader {
     /**
-     * regexp for a compartment.
-     */
-    private final Pattern compartmentPattern = Pattern.compile(".*?Compartment '(.*?)'\\..*?");
-
-    /**
      * regexp for a development component name, vendor.
      */
-    private final Pattern dcNamePattern = Pattern.compile("^\\d+\\s+(.*?\\s+.*?)\\s+.*?$");
+    private final Pattern dcNamePattern = Pattern.compile("^\\d+\\s+(.*?)\\s+(.*?)\\s+(.*?)$");
 
     /**
      * registry for development components.
@@ -35,15 +27,13 @@ public final class DevelopmentComponentsReader71 extends AbstractDcToolOutputRea
     private final DevelopmentComponentFactory dcFactory;
 
     /**
-     * development configuration to use for updating the compartments with
-     * development components.
+     * development configuration to use for updating the compartments with development components.
      */
     private final DevelopmentConfiguration developmentConfiguration;
 
     /**
-     * Creates a new reader for development components and their respective
-     * compartments from the output of DC tool.
-     *
+     * Creates a new reader for development components and their respective compartments from the output of DC tool.
+     * 
      * @param input
      *            <code>Reader</code> for reading DC tool output.
      * @param dcFactory
@@ -59,75 +49,33 @@ public final class DevelopmentComponentsReader71 extends AbstractDcToolOutputRea
     }
 
     /**
-     * Reads the DC tool generated output and updates the found compartments
-     * with their associated development components.
-     *
+     * Reads the DC tool generated output and updates the found compartments with their associated development components.
+     * 
      * @throws IOException
-     *             wenn beim Einlesen der Daten ein Fehler auftritt
+     *             when an i/o error occurs reading the DC listing
      */
+    @Override
     public void read() throws IOException {
         try {
-            Compartment compartment = readCompartment();
+            String line = null;
+            Matcher matcher = null;
 
-            if (compartment != null) {
-                while (true) {
-                    final String description = this.readLine(this.dcNamePattern);
+            while ((line = this.readLine()) != null) {
+                matcher = this.dcNamePattern.matcher(line);
 
-                    if (isEmpty(description)) {
-                        compartment = readCompartment();
-                        continue;
-                    }
-
-                    String parts[] = description.split("\\s+");
-                    compartment.add(this.dcFactory.create(parts[1], parts[0]));
+                if (!matcher.matches()) {
+                    continue;
                 }
+
+                Compartment compartment = this.developmentConfiguration.getCompartment(matcher.group(3));
+                compartment.add(this.dcFactory.create(matcher.group(2), matcher.group(1)));
             }
         }
-        catch (final EOFException e) {
-            // at EOF simply execute the finally clause...
+        catch (final IOException e) {
+            throw e;
         }
         finally {
             this.close();
         }
-    }
-
-    /**
-     * determines whether given supplied is <code>null</code> or white space
-     * only.
-     *
-     * @param name
-     *            string to test
-     * @return <code>true</code> iff given string is null or contains only white
-     *         space.
-     */
-    private boolean isEmpty(final String name) {
-        return name == null || name.trim().length() == 0;
-    }
-
-    /**
-     * Liest solange die Ausgabedatei ein, bis die Zeile die
-     * Compartment-Eigenschaften enthält.
-     *
-     * @return a compartment when one could be read a name for or
-     *         <code>null</code>
-     * @throws IOException
-     *             wenn beim Lesen der Eingabe ein Fehler auftritt.
-     */
-    private Compartment readCompartment() throws IOException {
-        Compartment compartment = null;
-        String line;
-        Matcher compartmentMatcher;
-
-        while ((line = this.readLine()) != null) {
-            compartmentMatcher = compartmentPattern.matcher(line);
-
-            if (compartmentMatcher.matches()) {
-                compartment = this.developmentConfiguration.getCompartment(compartmentMatcher.group(1));
-                this.readLine();
-                break;
-            }
-        }
-
-        return compartment;
     }
 }

@@ -11,8 +11,10 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.arachna.netweaver.dc.types.CompartmentState;
 import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
+import org.arachna.netweaver.dc.types.DevelopmentComponentType;
 import org.arachna.netweaver.dc.types.PublicPart;
 import org.arachna.netweaver.dc.types.PublicPartReference;
 import org.arachna.netweaver.dc.types.PublicPartType;
@@ -58,14 +60,12 @@ public class AntHelper {
     }
 
     /**
-     * Iterate over the DCs source folders and return those that actually exist
-     * in the file system.
+     * Iterate over the DCs source folders and return those that actually exist in the file system.
      * 
      * @param component
      *            development component to get the existing source folders for.
      * @param filter
-     *            determines which source folders should be included in the
-     *            resulting collection of source folders
+     *            determines which source folders should be included in the resulting collection of source folders
      * @return source folders that exist in the DCs directory structure.
      */
     private Collection<File> getExistingSourceFolders(final DevelopmentComponent component,
@@ -84,14 +84,12 @@ public class AntHelper {
     }
 
     /**
-     * Create a set of paths using the public part references of the given
-     * development component.
+     * Create a set of paths using the public part references of the given development component.
      * 
      * @param component
      *            development component the ant class path shall be created for.
      * 
-     * @return set of paths built from the public part references of the given
-     *         development component
+     * @return set of paths built from the public part references of the given development component
      */
     public Set<String> createClassPath(final DevelopmentComponent component) {
         final Set<String> paths = new HashSet<String>();
@@ -120,15 +118,13 @@ public class AntHelper {
     }
 
     /**
-     * Calculate the absolute path to the artifacts of the public part in the
-     * given development component.
+     * Calculate the absolute path to the artifacts of the public part in the given development component.
      * 
      * @param component
      *            development component
      * @param name
      *            name of public part
-     * @return absolute path to artifacts of the given public part in the given
-     *         development component.
+     * @return absolute path to artifacts of the given public part in the given development component.
      */
     public String getBaseLocation(final DevelopmentComponent component, final String name) {
         String ppName = name;
@@ -142,22 +138,24 @@ public class AntHelper {
             }
         }
 
+        if (DevelopmentComponentType.ExternalLibrary.equals(component.getType()) && CompartmentState.Source.equals(
+            component.getCompartment().getState())) {
+            return String.format("%s/libraries", this.getBaseLocation(component));
+        }
+
         return getPublicPartLocation(this.getBaseLocation(component), ppName);
     }
 
     /**
-     * Return the location of the public part relative to the given base
-     * location.
+     * Return the location of the public part relative to the given base location.
      * 
-     * The location is that of the given public part under
-     * <code>gen/default</code> or the <code>gen/default</code> folder.
+     * The location is that of the given public part under <code>gen/default</code> or the <code>gen/default</code> folder.
      * 
      * @param baseLocation
      *            location of development component
      * @param name
      *            name of public part.
-     * @return the path to the artifacts of the given public part in the given
-     *         location of development component.
+     * @return the path to the artifacts of the given public part in the given location of development component.
      */
     String getPublicPartLocation(final String baseLocation, final String name) {
         return Util.fixEmpty(name) != null ? String.format("%s/gen/default/public/%s/lib/java", baseLocation, name)
@@ -189,8 +187,7 @@ public class AntHelper {
      * 
      * @param ppRef
      *            reference to public part
-     * @return the location of the files comprising the given public part
-     *         reference
+     * @return the location of the files comprising the given public part reference
      */
     public String getLocation(final PublicPartReference ppRef) {
         return getPublicPartLocation(this.getBaseLocation(ppRef.getVendor(), ppRef.getComponentName()), ppRef.getName());
@@ -210,8 +207,7 @@ public class AntHelper {
     }
 
     /**
-     * Creates a collection of source folders for the given development
-     * component.
+     * Creates a collection of source folders for the given development component.
      * 
      * @param component
      *            development component to create source file sets for.
@@ -222,16 +218,13 @@ public class AntHelper {
     }
 
     /**
-     * Creates a collection of source folders for the given development
-     * component filtered using the given filter.
+     * Creates a collection of source folders for the given development component filtered using the given filter.
      * 
      * @param component
      *            development component to create source file sets for.
      * @param filter
-     *            a filter that determines which of the source folders should be
-     *            added to the result list
-     * @return a collection of source folders of the given development component
-     *         filtered using the given filter for source directories
+     *            a filter that determines which of the source folders should be added to the result list
+     * @return a collection of source folders of the given development component filtered using the given filter for source directories
      */
     public Collection<String> createSourceFileSets(final DevelopmentComponent component,
         final SourceDirectoryFilter filter) {
