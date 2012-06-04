@@ -78,6 +78,11 @@ public enum DevelopmentComponentType {
     J2EEWebModule("J2EE", "WebModule", true),
 
     /**
+     * DC of type 'Software Component Description'.
+     */
+    SoftwareComponentDescription("Software Component Description", false),
+
+    /**
      * DC of type 'java'.
      */
     Java("Java", true),
@@ -119,14 +124,12 @@ public enum DevelopmentComponentType {
     private String subType = "";
 
     /**
-     * Indicate whether development components of this type can contain java
-     * source.
+     * Indicate whether development components of this type can contain java source.
      */
     private boolean canContainJavaSources;
 
     /**
-     * Create an instance of a <code>DevelopmentComponentType</code> with the
-     * given type. The sub type is empty (non existant).
+     * Create an instance of a <code>DevelopmentComponentType</code> with the given type. The sub type is empty (non existant).
      * 
      * @param type
      *            the type of the development component.
@@ -139,8 +142,7 @@ public enum DevelopmentComponentType {
     }
 
     /**
-     * Create an instance of a <code>DevelopmentComponentType</code> with the
-     * given type and sub type.
+     * Create an instance of a <code>DevelopmentComponentType</code> with the given type and sub type.
      * 
      * @param type
      *            the type of the development component.
@@ -166,27 +168,23 @@ public enum DevelopmentComponentType {
     }
 
     /**
-     * Returns <code>true</code> when development components of this type can
-     * contain java source, <code>false</code> otherwise.
+     * Returns <code>true</code> when development components of this type can contain java source, <code>false</code> otherwise.
      * 
-     * @return <code>true</code> when development components of this type can
-     *         contain java source, <code>false</code> otherwise.
+     * @return <code>true</code> when development components of this type can contain java source, <code>false</code> otherwise.
      */
     public boolean canContainJavaSources() {
         return canContainJavaSources;
     }
 
     /**
-     * factory method for creating development component types. If the given
-     * arguments do not match any type in this enum a
+     * factory method for creating development component types. If the given arguments do not match any type in this enum a
      * {@link DevelopmentComponentType#unknown} is returned.
      * 
      * @param typeName
      *            name of the requested type of development components.
      * @param subTypeName
      *            name of the requested sub type of development components.
-     * @return the matching development component type, {@link #unknown}
-     *         otherwise.
+     * @return the matching development component type, {@link #unknown} otherwise.
      */
     public static DevelopmentComponentType fromString(final String typeName, final String subTypeName) {
         final String key =
