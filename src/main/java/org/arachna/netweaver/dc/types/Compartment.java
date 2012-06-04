@@ -4,12 +4,12 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
 /**
- * Represents a compartment/software component of a
- * {@link DevelopmentConfiguration} in the NetWeaver development infrastructure.
+ * Represents a compartment/software component of a {@link DevelopmentConfiguration} in the NetWeaver development infrastructure.
  * 
  * @author Dirk Weigenand
  */
@@ -70,8 +70,7 @@ public final class Compartment {
     private String inactiveLocation;
 
     /**
-     * Create a new Compartment instance with the given name and
-     * {@link CompartmentState}.
+     * Create a new Compartment instance with the given name and {@link CompartmentState}.
      * 
      * @param name
      *            name of compartment.
@@ -102,14 +101,13 @@ public final class Compartment {
     }
 
     /**
-     * Validate the given string and check that it is neither <code>null</code>
-     * nor empty. Throw an {@link IllegalArgumentException} otherwise.
+     * Validate the given string and check that it is neither <code>null</code> nor empty. Throw an {@link IllegalArgumentException}
+     * otherwise.
      * 
      * @param argument
      *            the argument to validate.
      * @param argumentName
-     *            the name to use in the message in case the argument didn't
-     *            meet our expectations.
+     *            the name to use in the message in case the argument didn't meet our expectations.
      */
     private void validateString(final String argument, final String argumentName) {
         if (argument == null || argument.trim().length() == 0) {
@@ -136,8 +134,7 @@ public final class Compartment {
      * Set the compartments used by this compartment.
      * 
      * @param usedCompartments
-     *            the compartments needed to build development components
-     *            contained in this compartment.
+     *            the compartments needed to build development components contained in this compartment.
      */
     public void set(final Collection<Compartment> usedCompartments) {
         this.usedCompartments.clear();
@@ -220,8 +217,7 @@ public final class Compartment {
     }
 
     /**
-     * Return the {@link DevelopmentConfiguration} this compartment is
-     * associated with.
+     * Return the {@link DevelopmentConfiguration} this compartment is associated with.
      * 
      * @return the developmentConfiguration this compartment is associated with.
      */
@@ -230,34 +226,28 @@ public final class Compartment {
     }
 
     /**
-     * Associate the given {@link DevelopmentConfiguration} with this
-     * compartment.
+     * Associate the given {@link DevelopmentConfiguration} with this compartment.
      * 
      * @param developmentConfiguration
-     *            the developmentConfiguration to associate this compartment
-     *            with.
+     *            the developmentConfiguration to associate this compartment with.
      */
     void setDevelopmentConfiguration(final DevelopmentConfiguration developmentConfiguration) {
         this.developmentConfiguration = developmentConfiguration;
     }
 
     /**
-     * Return whether this compartment is of state
-     * {@link CompartmentState#Archive}.
+     * Return whether this compartment is of state {@link CompartmentState#Archive}.
      * 
-     * @return <code>true</code> if this compartment has state
-     *         {@link CompartmentState#Archive}, <code>false</code> otherwise.
+     * @return <code>true</code> if this compartment has state {@link CompartmentState#Archive}, <code>false</code> otherwise.
      */
     public boolean isArchiveState() {
         return CompartmentState.Archive.equals(this.state);
     }
 
     /**
-     * Return whether this compartment is of state
-     * {@link CompartmentState#Source}.
+     * Return whether this compartment is of state {@link CompartmentState#Source}.
      * 
-     * @return <code>true</code> if this compartment has state
-     *         {@link CompartmentState#Source}, <code>false</code> otherwise.
+     * @return <code>true</code> if this compartment has state {@link CompartmentState#Source}, <code>false</code> otherwise.
      */
     public boolean isSourceState() {
         return CompartmentState.Source.equals(this.state);
@@ -329,6 +319,29 @@ public final class Compartment {
      */
     public Collection<DevelopmentComponent> getDevelopmentComponents() {
         return Collections.unmodifiableCollection(this.components);
+    }
+
+    /**
+     * Get development components filtered by the given type.
+     * 
+     * @param dcType
+     *            the {@link DevelopmentComponentType} to be filtered with.
+     * @return a collection of development components matching the given development component type.
+     */
+    public Collection<DevelopmentComponent> getDevelopmentComponents(DevelopmentComponentType dcType) {
+        if (dcType == null) {
+            throw new IllegalArgumentException("DevelopmentComponentType to be filtered with must not be null!");
+        }
+
+        Collection<DevelopmentComponent> matchingDCs = new LinkedList<DevelopmentComponent>();
+
+        for (DevelopmentComponent component : this.components) {
+            if (dcType.equals(component.getType())) {
+                matchingDCs.add(component);
+            }
+        }
+
+        return matchingDCs;
     }
 
     /**
