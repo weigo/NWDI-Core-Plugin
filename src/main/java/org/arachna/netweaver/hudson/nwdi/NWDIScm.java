@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Logger;
 
 import net.sf.json.JSONObject;
 
@@ -53,11 +52,6 @@ import org.xml.sax.SAXException;
  * @author Dirk Weigenand
  */
 public class NWDIScm extends SCM {
-    /**
-     * Logger.
-     */
-    private static final Logger LOGGER = Logger.getLogger(NWDIScm.class.getName());
-
     /**
      * 1000 milliseconds.
      */
@@ -96,14 +90,6 @@ public class NWDIScm extends SCM {
         this.password = password;
     }
 
-    // /**
-    // * {@inheritDoc}
-    // */
-    // @Override
-    // public DescriptorImpl getDescriptor() {
-    // return (DescriptorImpl)super.getDescriptor();
-    // }
-
     /**
      * {@inheritDoc}
      */
@@ -135,6 +121,7 @@ public class NWDIScm extends SCM {
 
         final DevelopmentComponentFactory dcFactory = currentBuild.getDevelopmentComponentFactory();
         DcToolCommandExecutionResult result = readOrListDevelopmentComponents(workspace, config, executor, dcFactory);
+        String dtcPath = FilePathHelper.makeAbsolute(currentBuild.getWorkspace().child(".dtc"));
 
         if (result.isExitCodeOk()) {
             final NWDIBuild lastSuccessfulBuild = currentBuild.getParent().getLastSuccessfulBuild();
@@ -155,36 +142,34 @@ public class NWDIScm extends SCM {
 
             setNeedsRebuildPropertyOnAllDevelopmentComponentsInSourceState(config, cleanCopy);
 
-            // FIXME: only synchronize sources!
-            // synchronize sources
-            result = executor.synchronizeDevelopmentComponents(dcFactory, cleanCopy, true);
-
-            if (result.isExitCodeOk()) {
+            if (cleanCopy || !activities.isEmpty()) {
+                // synchronize sources
+                result = executor.synchronizeDevelopmentComponents(dcFactory, cleanCopy, true);
                 // update used DCs
-                new DevelopmentComponentUpdater(FilePathHelper.makeAbsolute(currentBuild.getWorkspace().child(".dtc")),
+                new DevelopmentComponentUpdater(dtcPath,
                     dcFactory).execute();
 
-                // FIXME: only synchronize used DCs!
-                // synchronize used DCs
-                result = executor.synchronizeDevelopmentComponents(dcFactory, cleanCopy, false);
-            }
-
-            if (!result.isExitCodeOk()) {
-                final String output = result.getOutput();
-
-                // FIXME: make heap used for dctool configurable!
-                // ignore OutOfMemoryError on exit from dctool
-                if (output.contains("java.lang.OutOfMemoryError") && output.contains("java.lang.System.exit")
-                    && output.contains("com.sap.tc.devconf.dctool.startup.DCToolMain.main")) {
-                    result = new DcToolCommandExecutionResult(output, 0);
+                if (result.isExitCodeOk()) {
+                    // synchronize used DCs
+                    result = executor.synchronizeDevelopmentComponents(dcFactory, cleanCopy, false);
                 }
-            }
 
-            if (result.isExitCodeOk()) {
-                new DevelopmentComponentUpdater(FilePathHelper.makeAbsolute(currentBuild.getWorkspace().child(".dtc")),
-                    dcFactory).execute();
+                if (!result.isExitCodeOk()) {
+                    final String output = result.getOutput();
+
+                    // FIXME: make heap used for dctool configurable!
+                    // ignore OutOfMemoryError on exit from dctool
+                    if (output.contains("java.lang.OutOfMemoryError") && output.contains("java.lang.System.exit")
+                        && output.contains("com.sap.tc.devconf.dctool.startup.DCToolMain.main")) {
+                        result = new DcToolCommandExecutionResult(output, 0);
+                    }
+                }
+
             }
         }
+
+        new DevelopmentComponentUpdater(dtcPath,
+            dcFactory).execute();
 
         build.addAction(new NWDIRevisionState(activities));
         writeChangeLog(build, changelogFile, activities);
