@@ -11,20 +11,20 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.conn.SingleClientConnManager;
+import org.apache.http.impl.conn.BasicClientConnectionManager;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 
 /**
  * Dtr client using the <code>http</code> protocol.
- *
+ * 
  * @author Dirk Weigenand
  */
 final class DtrHttpClient {
     /**
      * HTTP client to use for requests.
      */
-    private final DefaultHttpClient httpClient = new DefaultHttpClient(new SingleClientConnManager());
+    private final DefaultHttpClient httpClient = new DefaultHttpClient(new BasicClientConnectionManager());
 
     /**
      * Context to use for conversations.
@@ -33,7 +33,7 @@ final class DtrHttpClient {
 
     /**
      * Create an instance of a <code>DtrHttpClient</code>.
-     *
+     * 
      * @param dtrUser
      *            user for accessing the DTR.
      * @param password
@@ -49,7 +49,7 @@ final class DtrHttpClient {
 
     /**
      * Validate the given String argument.
-     *
+     * 
      * @param arg
      *            argument to validate.
      * @param argumentDescription
@@ -64,7 +64,7 @@ final class DtrHttpClient {
 
     /**
      * Get the content of the page returned by the given query.
-     *
+     * 
      * @param queryUrl
      *            url for querying activities for a given compartment.
      * @return the content of the page returned by the given query.
