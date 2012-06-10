@@ -340,30 +340,6 @@ public class SyncDevelopmentComponentsCommandBuilderTest {
             is(equalTo("unsyncdc -c example.com_EXAMPLE_SC_1 -n dc/example1 -v example.com")));
     }
 
-    /**
-     * Test method for
-     * {@link org.arachna.netweaver.dctool.commands.SyncDevelopmentComponentsCommandBuilder#getExitCommand(org.arachna.netweaver.dc.types.DevelopmentComponent)}
-     * .
-     */
-    @Test
-    public final void testGetExitCommandV70() {
-        builder =
-            createSyncDevelopmentComponentsCommandBuilder(SyncDcCommandTemplate.SyncDcCommandTemplateV70, false);
-        assertThat(builder.getExitCommand(), is(equalTo("exit;")));
-    }
-
-    /**
-     * Test method for
-     * {@link org.arachna.netweaver.dctool.commands.SyncDevelopmentComponentsCommandBuilder#getExitCommand(org.arachna.netweaver.dc.types.DevelopmentComponent)}
-     * .
-     */
-    @Test
-    public final void testGetExitCommandV71() {
-        builder =
-            createSyncDevelopmentComponentsCommandBuilder(SyncDcCommandTemplate.SyncDcCommandTemplateV71, false);
-        assertThat(builder.getExitCommand(), is(equalTo("exit")));
-    }
-
     private SyncDevelopmentComponentsCommandBuilder createSyncDevelopmentComponentsCommandBuilder(SyncDcCommandTemplate template,
         boolean cleanCopy) {
         return new SyncDevelopmentComponentsCommandBuilder(config, dcFactory, template, cleanCopy, true);
