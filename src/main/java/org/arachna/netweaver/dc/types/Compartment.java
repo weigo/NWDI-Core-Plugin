@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -426,5 +427,25 @@ public final class Compartment {
         }
 
         return result;
+    }
+
+    /**
+     * Return the description of the first development component of type {@see DevelopmentComponentType.SoftwareComponentDescription}.
+     * 
+     * The description will be empty if no such DC could be found or the found DC contains no description (shame on you).
+     * 
+     * @return description of the software component.
+     */
+    public String getDescription() {
+        String description = "";
+
+        Iterator<DevelopmentComponent> scDescriptions =
+            this.getDevelopmentComponents(DevelopmentComponentType.SoftwareComponentDescription).iterator();
+
+        if (scDescriptions.hasNext()) {
+            description = scDescriptions.next().getDescription();
+        }
+
+        return description;
     }
 }
