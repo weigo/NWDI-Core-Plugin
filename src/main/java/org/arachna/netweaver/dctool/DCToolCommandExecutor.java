@@ -121,7 +121,7 @@ public final class DCToolCommandExecutor {
         final ByteArrayOutputStream result = new ByteArrayOutputStream();
         int exitCode = 0;
 
-        if (commands.size() > 0) {
+        if (!commands.isEmpty()) {
             final ProcStarter starter = launcher.launch();
             starter.pwd(workspace);
             starter.envs(createEnvironment());
@@ -130,6 +130,7 @@ public final class DCToolCommandExecutor {
             commands.addAll(0, commandFactory
                 .createLoadConfigCommandBuilder(developmentConfiguration, dcToolDescriptor)
                 .execute());
+            commands.add(commandFactory.getExitCommand(developmentConfiguration));
 
             starter.stdin(createCommandInputStream(commands));
             final ForkOutputStream tee = new ForkOutputStream(launcher.getListener().getLogger(), result);
@@ -164,12 +165,14 @@ public final class DCToolCommandExecutor {
     }
 
     /**
-     * Synchronize development configurations in the development configuration.
+     * Synchronize development components in the development configuration.
      * 
      * @param dcFactory
      *            registry for development components.
      * @param cleanCopy
      *            indicate whether to synchronize all DCs or only DCs marked as needing a rebuild.
+     * @param syncSources
+     *            synchronize in inactive or archive mode
      * @return the result of the syncdc-command operation.
      * @throws IOException
      *             might be thrown be the {@link ProcStarter} used to execute the DC tool commands.
