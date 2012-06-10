@@ -12,7 +12,7 @@ import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 
 /**
  * Builder for 'builddc' commands for DC tool.
- *
+ * 
  * @author Dirk Weigenand
  */
 abstract class BuildDevelopmentComponentsCommandBuilder extends AbstractDCToolCommandBuilder {
@@ -22,12 +22,10 @@ abstract class BuildDevelopmentComponentsCommandBuilder extends AbstractDCToolCo
     private final List<DevelopmentComponent> components = new ArrayList<DevelopmentComponent>();
 
     /**
-     * Creates a <code>DevelopmentComponentBuilder</code> instance for the given
-     * development components.
-     *
+     * Creates a <code>DevelopmentComponentBuilder</code> instance for the given development components.
+     * 
      * @param config
-     *            development configuration to use for executing dc tool
-     *            commands.
+     *            development configuration to use for executing dc tool commands.
      * @param components
      *            development components to create build dc commands for.
      */
@@ -39,7 +37,7 @@ abstract class BuildDevelopmentComponentsCommandBuilder extends AbstractDCToolCo
 
     /**
      * Create collection of builddc commands.
-     *
+     * 
      * @return created list of 'builddc' commands.
      */
     @Override
@@ -47,7 +45,6 @@ abstract class BuildDevelopmentComponentsCommandBuilder extends AbstractDCToolCo
         final List<String> commands = new ArrayList<String>();
 
         for (final DevelopmentComponent component : components) {
-            // FIXME: guard against NPE when compartment is not set!!!
             if (component.getCompartment() != null) {
                 commands.add(this.createBuildDcCommand(component));
             }
@@ -57,14 +54,12 @@ abstract class BuildDevelopmentComponentsCommandBuilder extends AbstractDCToolCo
             }
         }
 
-        commands.add(getExitCommand());
-
         return commands;
     }
 
     /**
      * Create command for building a development component for the given DC.
-     *
+     * 
      * @param component
      *            development component to create builddc command for.
      * @return the created builddc command

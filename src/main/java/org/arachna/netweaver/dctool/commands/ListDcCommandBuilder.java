@@ -12,15 +12,14 @@ import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 
 /**
  * A 'listdc' command generator for a development configuration.
- *
+ * 
  * @author Dirk Weigenand
  */
 abstract class ListDcCommandBuilder extends AbstractDCToolCommandBuilder {
 
     /**
-     * Create an instance of 'listdc' command generator for the given
-     * development configuration.
-     *
+     * Create an instance of 'listdc' command generator for the given development configuration.
+     * 
      * @param developmentConfiguration
      *            development configuration to generate 'listdc' commands for.
      */
@@ -29,9 +28,8 @@ abstract class ListDcCommandBuilder extends AbstractDCToolCommandBuilder {
     }
 
     /**
-     * Generate 'listdc' commands for all compartments contained in the
-     * development configuration.
-     *
+     * Generate 'listdc' commands for all compartments contained in the development configuration.
+     * 
      * {@inheritDoc}
      */
     @Override
@@ -43,17 +41,15 @@ abstract class ListDcCommandBuilder extends AbstractDCToolCommandBuilder {
             commands.add(this.getListDcCommand(compartment));
         }
 
-        commands.add(getExitCommand());
-
         return commands;
     }
 
     /**
      * Create a listdc command.
-     *
+     * 
      * @param compartment
      *            the compartment to list DCs from.
-     *
+     * 
      * @return the create listdc command
      */
     abstract String getListDcCommand(Compartment compartment);

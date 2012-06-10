@@ -132,6 +132,13 @@ public final class CommandFactory {
         return builder;
     }
 
+    /**
+     * 
+     * @param output
+     * @param dcFactory
+     * @param configuration
+     * @return
+     */
     public AbstractDcToolOutputReader getListDcCommandResultReader(final Reader output,
         final DevelopmentComponentFactory dcFactory, final DevelopmentConfiguration configuration) {
         final JdkHomeAlias alias = configuration.getJdkHomeAlias();
@@ -148,5 +155,29 @@ public final class CommandFactory {
         }
 
         return reader;
+    }
+
+    /**
+     * Create dctool exit command for the given development configuration.
+     * 
+     * @param configuration
+     *            development configuration used to determine version of exit command from.
+     * @return the proper exit command
+     */
+    public String getExitCommand(final DevelopmentConfiguration configuration) {
+        final JdkHomeAlias alias = configuration.getJdkHomeAlias();
+        String exitCommand = "";
+
+        if (JdkHomeAlias.Jdk131Home.equals(alias) || JdkHomeAlias.Jdk142Home.equals(alias)) {
+            exitCommand = "exit;";
+        }
+        else if (JdkHomeAlias.Jdk150Home.equals(alias) || JdkHomeAlias.Jdk160Home.equals(alias)) {
+            exitCommand = "exit";
+        }
+        else {
+            throw new RuntimeException("Cannot map configuration.getJdkHomeAlias() onto a DCToolCommandBuilder.");
+        }
+
+        return exitCommand;
     }
 }

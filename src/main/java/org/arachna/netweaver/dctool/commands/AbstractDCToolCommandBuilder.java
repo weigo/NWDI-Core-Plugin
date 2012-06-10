@@ -9,7 +9,7 @@ import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 
 /**
  * Base class for DC tool command builders.
- *
+ * 
  * @author Dirk Weigenand
  */
 public abstract class AbstractDCToolCommandBuilder implements DCToolCommandBuilder {
@@ -20,7 +20,7 @@ public abstract class AbstractDCToolCommandBuilder implements DCToolCommandBuild
 
     /**
      * create a builder for DC Tool commands.
-     *
+     * 
      * @param developmentConfiguration
      *            development configuration to use.
      */
@@ -31,7 +31,7 @@ public abstract class AbstractDCToolCommandBuilder implements DCToolCommandBuild
 
     /**
      * Returns the development configuration of this DC tool command builder.
-     *
+     * 
      * @return the developmentConfiguration
      */
     protected final DevelopmentConfiguration getDevelopmentConfiguration() {
@@ -40,23 +40,18 @@ public abstract class AbstractDCToolCommandBuilder implements DCToolCommandBuild
 
     /**
      * Create list of DC tool commands.
-     *
+     * 
      * @return list of DC tool commands.
      */
+    @Override
     public final List<String> execute() {
         return this.executeInternal();
     }
 
     /**
      * Implemented by sub classes to generate the DC Tool commands specific to this DC tool command builder.
-     *
+     * 
      * @return DC Tool commands specific to this DC tool command builder.
      */
     protected abstract List<String> executeInternal();
-
-    /**
-     * Get the exit command to be used with the used DC tool implementation.
-     * @return
-     */
-    protected abstract String getExitCommand();
 }

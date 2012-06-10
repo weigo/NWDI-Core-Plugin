@@ -21,17 +21,17 @@ public enum SyncDcCommandTemplate {
     /**
      * Template for NW 7.0.
      */
-    SyncDcCommandTemplateV70("syncdc -s %s -n %s -v %s -m inactive -y;", "syncdc -s %s -n %s -v %s -m archive -y;",
+    SyncDcCommandTemplateV70("syncdc -s %s -n %s -v %s -m inactive -y;", "syncdc -s %s -n %s -v %s -m archive -u;",
         "syncalldcs -s %s -m archive;",
-        "syncalldcs -m archive;", "syncalldcs -s %s -m inactive;", "unsyncdc -s %s -n %s -v %s;", "exit;",
+        "syncalldcs -m archive;", "syncalldcs -s %s -m inactive;", "unsyncdc -s %s -n %s -v %s;",
         "SoftwareComponents70"),
 
     /**
      * Template for NW 7.1+.
      */
-    SyncDcCommandTemplateV71("syncdc -c %s -n %s -v %s -m inactive -f", "syncdc -c %s -n %s -v %s -m archive -f",
+    SyncDcCommandTemplateV71("syncdc -c %s -n %s -v %s -m inactive -f", "syncdc -c %s -n %s -v %s -m archive",
         "syncalldcs -c %s -m archive",
-        "syncalldcs -m archive", "syncalldcs -c %s -m inactive", "unsyncdc -c %s -n %s -v %s", "exit",
+        "syncalldcs -m archive", "syncalldcs -c %s -m inactive", "unsyncdc -c %s -n %s -v %s",
         "SoftwareComponents73");
 
     /**
@@ -65,11 +65,6 @@ public enum SyncDcCommandTemplate {
     private String unsyncDcTemplate;
 
     /**
-     * template for generating an 'exit' command.
-     */
-    private String exitTemplate;
-
-    /**
      * 
      */
     private final Set<String> excludeSCs = new HashSet<String>();
@@ -89,15 +84,13 @@ public enum SyncDcCommandTemplate {
      *            template for creating a 'syncalldcs' in archive mode command.
      * @param unsyncDcTemplate
      *            template to use for creating a 'unsyncdc' in active state command.
-     * @param exitTemplate
-     *            template for generating an 'exit' command.
      * @param compartmentDirectory
      *            the 'compartment directory' containing software components supplied for the respective NW version.
      * @param syncAllDcsInArchiveModeTemplate
      */
     SyncDcCommandTemplate(final String syncInactiveDcTemplate, final String syncArchiveDcTemplate,
         final String syncAllDcsForGivenCompartmentInArchiveModeTemplate, final String syncAllDcsInArchiveModeTemplate,
-        final String syncAllDcsInInactiveModeTemplate, final String unsyncDcTemplate, final String exitTemplate,
+        final String syncAllDcsInInactiveModeTemplate, final String unsyncDcTemplate,
         final String compartmentDirectory) {
         this.syncInactiveDcTemplate = syncInactiveDcTemplate;
         this.syncArchiveDcTemplate = syncArchiveDcTemplate;
@@ -105,7 +98,6 @@ public enum SyncDcCommandTemplate {
         this.syncAllDcsInArchiveModeTemplate = syncAllDcsInArchiveModeTemplate;
         this.syncAllDcsInInactiveModeTemplate = syncAllDcsInInactiveModeTemplate;
         this.unsyncDcTemplate = unsyncDcTemplate;
-        this.exitTemplate = exitTemplate;
 
         try {
             excludeSCs.addAll(new CompartmentsReader().read("/org/arachna/netweaver/dctool/commands/"
@@ -166,15 +158,6 @@ public enum SyncDcCommandTemplate {
      */
     String getUnsyncDcTemplate() {
         return unsyncDcTemplate;
-    }
-
-    /**
-     * Return the template for creating exit commands.
-     * 
-     * @return the exitTemplate
-     */
-    String getExitTemplate() {
-        return exitTemplate;
     }
 
     /**
