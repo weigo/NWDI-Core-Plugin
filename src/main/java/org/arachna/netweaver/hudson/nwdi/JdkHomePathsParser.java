@@ -3,8 +3,6 @@
  */
 package org.arachna.netweaver.hudson.nwdi;
 
-import hudson.Util;
-
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -34,7 +32,7 @@ final class JdkHomePathsParser {
      *            JDK home path specifications.
      */
     JdkHomePathsParser(final String pathSpec) {
-        this.pathSpec = pathSpec;
+        this.pathSpec = pathSpec == null ? "" : pathSpec;
     }
 
     /**
@@ -44,19 +42,18 @@ final class JdkHomePathsParser {
      */
     JdkHomePaths parse() {
         final JdkHomePaths paths = new JdkHomePaths();
+        final String[] pathDefs = pathSpec.split(",|;");
 
-        final String[] pathDefs = Util.fixNull(this.pathSpec).split(",|;");
-
-        for (String pathDef : pathDefs) {
+        for (final String pathDef : pathDefs) {
             final String[] parts = pathDef.split("=");
 
-            final JdkHomeAlias alias = JdkHomeAlias.fromString(Util.fixEmptyAndTrim(Util.fixNull(parts[0])));
+            final JdkHomeAlias alias = JdkHomeAlias.fromString(parts[0].trim());
 
             if (alias != null) {
-                paths.add(alias, Util.fixEmptyAndTrim(Util.fixNull(parts[1])));
+                paths.add(alias, parts[1].trim());
             }
             else {
-                this.invalidJdkHomeNames.add(parts[0]);
+                invalidJdkHomeNames.add(parts[0]);
             }
         }
 
@@ -70,7 +67,7 @@ final class JdkHomePathsParser {
      *         found during parsing, <code>false</code> otherwise.
      */
     boolean hasInvalidJdkHomeNames() {
-        return !this.invalidJdkHomeNames.isEmpty();
+        return !invalidJdkHomeNames.isEmpty();
     }
 
     /**
@@ -81,7 +78,7 @@ final class JdkHomePathsParser {
     String getInvalidJdkHomeNames() {
         final StringBuffer invalidHomes = new StringBuffer();
 
-        for (String invalidHome : this.invalidJdkHomeNames) {
+        for (final String invalidHome : invalidJdkHomeNames) {
             invalidHomes.append(invalidHome).append(", ");
         }
 

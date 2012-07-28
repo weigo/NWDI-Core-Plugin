@@ -80,7 +80,8 @@ public class NWDIScm extends SCM {
      * @param password
      *            password to use for authentication.
      * @param cleanCopy
-     *            indicate whether only changed development components should be loaded from the NWDI or all that are contained in the
+     *            indicate whether only changed development components should be
+     *            loaded from the NWDI or all that are contained in the
      *            indicated CBS workspace
      */
     public NWDIScm(final boolean cleanCopy, final String dtrUser, final String password) {
@@ -121,7 +122,7 @@ public class NWDIScm extends SCM {
 
         final DevelopmentComponentFactory dcFactory = currentBuild.getDevelopmentComponentFactory();
         DcToolCommandExecutionResult result = readOrListDevelopmentComponents(workspace, config, executor, dcFactory);
-        String dtcPath = FilePathHelper.makeAbsolute(currentBuild.getWorkspace().child(".dtc"));
+        final String dtcPath = FilePathHelper.makeAbsolute(currentBuild.getWorkspace().child(".dtc"));
 
         if (result.isExitCodeOk()) {
             final NWDIBuild lastSuccessfulBuild = currentBuild.getParent().getLastSuccessfulBuild();
@@ -134,11 +135,11 @@ public class NWDIScm extends SCM {
                 logger.append("Getting all activities from DTR.\n");
             }
 
-            activities.addAll(getActivities(logger, getDtrBrowser(config, dcFactory),
+            activities.addAll(getActivities(logger, getDtrBrowser(config),
                 lastSuccessfulBuild != null ? lastSuccessfulBuild.getAction(NWDIRevisionState.class).getCreationDate()
-                    : null));
+                    : null, dcFactory));
 
-            boolean cleanCopy = currentBuild.getPreviousBuild() == null || this.cleanCopy;
+            final boolean cleanCopy = currentBuild.getPreviousBuild() == null || this.cleanCopy;
 
             setNeedsRebuildPropertyOnAllDevelopmentComponentsInSourceState(config, cleanCopy);
 
@@ -146,30 +147,16 @@ public class NWDIScm extends SCM {
                 // synchronize sources
                 result = executor.synchronizeDevelopmentComponents(dcFactory, cleanCopy, true);
                 // update used DCs
-                new DevelopmentComponentUpdater(dtcPath,
-                    dcFactory).execute();
+                new DevelopmentComponentUpdater(dtcPath, dcFactory).execute();
 
                 if (result.isExitCodeOk()) {
                     // synchronize used DCs
                     result = executor.synchronizeDevelopmentComponents(dcFactory, cleanCopy, false);
                 }
-
-                if (!result.isExitCodeOk()) {
-                    final String output = result.getOutput();
-
-                    // FIXME: make heap used for dctool configurable!
-                    // ignore OutOfMemoryError on exit from dctool
-                    if (output.contains("java.lang.OutOfMemoryError") && output.contains("java.lang.System.exit")
-                        && output.contains("com.sap.tc.devconf.dctool.startup.DCToolMain.main")) {
-                        result = new DcToolCommandExecutionResult(output, 0);
-                    }
-                }
-
             }
         }
 
-        new DevelopmentComponentUpdater(dtcPath,
-            dcFactory).execute();
+        new DevelopmentComponentUpdater(dtcPath, dcFactory).execute();
 
         build.addAction(new NWDIRevisionState(activities));
         writeChangeLog(build, changelogFile, activities);
@@ -178,15 +165,17 @@ public class NWDIScm extends SCM {
     }
 
     /**
-     * Set the needsRebuild property on all development components in source state if a clean build was requested.
+     * Set the needsRebuild property on all development components in source
+     * state if a clean build was requested.
      * 
      * @param config
      *            the development configuration containing the DCs
      * @param cleanCopy
-     *            <code>true</code> when a clean build was requested, <code>false</code> otherwise.
+     *            <code>true</code> when a clean build was requested,
+     *            <code>false</code> otherwise.
      */
     private void setNeedsRebuildPropertyOnAllDevelopmentComponentsInSourceState(final DevelopmentConfiguration config,
-        boolean cleanCopy) {
+        final boolean cleanCopy) {
         if (cleanCopy) {
             for (final Compartment compartment : config.getCompartments(CompartmentState.Source)) {
                 for (final DevelopmentComponent component : compartment.getDevelopmentComponents()) {
@@ -197,10 +186,12 @@ public class NWDIScm extends SCM {
     }
 
     /**
-     * Read the development configuration saved during the last build or list development components from CBS if it doesn't exist.
+     * Read the development configuration saved during the last build or list
+     * development components from CBS if it doesn't exist.
      * 
      * @param workspace
-     *            workspace folder where the development configuration was saved.
+     *            workspace folder where the development configuration was
+     *            saved.
      * @param config
      *            development configuration to be used throughout the build
      * @param executor
@@ -213,23 +204,23 @@ public class NWDIScm extends SCM {
      * @throws InterruptedException
      *             re-thrown from DC tool execution
      */
-    private DcToolCommandExecutionResult readOrListDevelopmentComponents(FilePath workspace,
-        DevelopmentConfiguration config, final DCToolCommandExecutor executor,
+    private DcToolCommandExecutionResult readOrListDevelopmentComponents(final FilePath workspace,
+        final DevelopmentConfiguration config, final DCToolCommandExecutor executor,
         final DevelopmentComponentFactory dcFactory) throws IOException, InterruptedException {
-        FilePath devConfFile = workspace.child("DevelopmentConfiguration.xml");
+        final FilePath devConfFile = workspace.child("DevelopmentConfiguration.xml");
         DcToolCommandExecutionResult result = new DcToolCommandExecutionResult("", 0);
 
         if (!devConfFile.exists()) {
             result = executor.listDevelopmentComponents(dcFactory);
         }
         else {
-            DevelopmentConfigurationReader configurationReader = new DevelopmentConfigurationReader(dcFactory);
+            final DevelopmentConfigurationReader configurationReader = new DevelopmentConfigurationReader(dcFactory);
 
             try {
                 new XmlReaderHelper(configurationReader).parse(new InputStreamReader(devConfFile.read()));
-                DevelopmentConfiguration savedConfig = configurationReader.getDevelopmentConfiguration();
+                final DevelopmentConfiguration savedConfig = configurationReader.getDevelopmentConfiguration();
 
-                for (Compartment compartment : savedConfig.getCompartments()) {
+                for (final Compartment compartment : savedConfig.getCompartments()) {
                     Compartment original = config.getCompartment(compartment.getName());
 
                     // new compartment in development configuration that did not
@@ -247,7 +238,7 @@ public class NWDIScm extends SCM {
                     original.add(compartment.getDevelopmentComponents());
                 }
             }
-            catch (SAXException e) {
+            catch (final SAXException e) {
                 throw new RuntimeException(e);
             }
         }
@@ -275,7 +266,7 @@ public class NWDIScm extends SCM {
     protected PollingResult compareRemoteRevisionWith(final AbstractProject<?, ?> project, final Launcher launcher,
         final FilePath path, final TaskListener listener, final SCMRevisionState revisionState) throws IOException,
         InterruptedException {
-        NWDIProject nwdiProject = (NWDIProject)project;
+        final NWDIProject nwdiProject = (NWDIProject)project;
         NWDIBuild lastBuild = nwdiProject.getLastSuccessfulBuild();
 
         if (lastBuild == null) {
@@ -288,9 +279,8 @@ public class NWDIScm extends SCM {
             lastBuild.getNumber()));
 
         final List<Activity> activities =
-            getActivities(logger,
-                getDtrBrowser(lastBuild.getDevelopmentConfiguration(), new DevelopmentComponentFactory()),
-                getCreationDate(revisionState));
+            getActivities(logger, getDtrBrowser(lastBuild.getDevelopmentConfiguration()),
+                getCreationDate(revisionState), new DevelopmentComponentFactory());
 
         final Change changeState = activities.isEmpty() ? Change.NONE : Change.SIGNIFICANT;
         logger.append(String.format("Found changes: %s.\n", changeState.toString()));
@@ -303,7 +293,8 @@ public class NWDIScm extends SCM {
      * 
      * @param revisionState
      *            an <code>SCMRevisionState</code> object
-     * @return the date/time when the given SCM revision state was computed iff it's type is {@link NWDIRevisionState}, <code>null</code>
+     * @return the date/time when the given SCM revision state was computed iff
+     *         it's type is {@link NWDIRevisionState}, <code>null</code>
      *         otherwise.
      */
     private Date getCreationDate(final SCMRevisionState revisionState) {
@@ -370,7 +361,8 @@ public class NWDIScm extends SCM {
     }
 
     /**
-     * Get list of activities since last run. If <code>lastRun</code> is <code>null</code> all activities will be read.
+     * Get list of activities since last run. If <code>lastRun</code> is
+     * <code>null</code> all activities will be read.
      * 
      * @param logger
      *            the logger to use.
@@ -378,9 +370,11 @@ public class NWDIScm extends SCM {
      *            the {@link DtrBrowser} to be used getting the activities.
      * @param since
      *            since when to get activities
-     * @return a list of {@link Activity} objects that were checked in since the last run or all activities.
+     * @return a list of {@link Activity} objects that were checked in since the
+     *         last run or all activities.
      */
-    private List<Activity> getActivities(final PrintStream logger, final DtrBrowser browser, final Date since) {
+    private List<Activity> getActivities(final PrintStream logger, final DtrBrowser browser, final Date since,
+        final DevelopmentComponentFactory dcFactory) {
         final List<Activity> activities = new ArrayList<Activity>();
         long start = System.currentTimeMillis();
         final long startGetActivities = start;
@@ -398,7 +392,7 @@ public class NWDIScm extends SCM {
         // update activities with their respective resources
         // FIXME: add methods to DtrBrowser that get activities with their
         // respective resources!
-        browser.getDevelopmentComponents(activities);
+        browser.getDevelopmentComponents(activities, dcFactory);
         browser.close();
 
         for (final Activity activity : activities) {
@@ -414,20 +408,21 @@ public class NWDIScm extends SCM {
     }
 
     /**
-     * Returns an instance of {@link DtrBrowser} using the given development configuration and development component factory.
+     * Returns an instance of {@link DtrBrowser} using the given development
+     * configuration and development component factory.
      * 
      * @param config
-     *            the development configuration to be used to connect to the DTR.
-     * @param dcFactory
-     *            the development component factory to be used getting development components associated with activities.
+     *            the development configuration to be used to connect to the
+     *            DTR.
      * @return the {@link DtrBrowser} for browsing the DTR for activities.
      */
-    private DtrBrowser getDtrBrowser(final DevelopmentConfiguration config, final DevelopmentComponentFactory dcFactory) {
-        return new DtrBrowser(config, dcFactory, dtrUser, password);
+    private DtrBrowser getDtrBrowser(final DevelopmentConfiguration config) {
+        return new DtrBrowser(config, dtrUser, password);
     }
 
     /**
-     * Determine the time in seconds passed since the given start time and log it using the message given.
+     * Determine the time in seconds passed since the given start time and log
+     * it using the message given.
      * 
      * @param logger
      *            the logger to use.
