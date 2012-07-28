@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -35,7 +34,6 @@ import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 import org.arachna.netweaver.hudson.dtr.browser.Activity;
-import org.arachna.netweaver.hudson.dtr.browser.ActivityByDateComparator;
 import org.arachna.netweaver.hudson.dtr.browser.ActivityResource;
 import org.arachna.netweaver.hudson.dtr.browser.DtrBrowser;
 import org.arachna.netweaver.hudson.nwdi.dcupdater.DevelopmentComponentUpdater;
@@ -118,8 +116,9 @@ public class NWDIScm extends SCM {
         final DCToolCommandExecutor executor = currentBuild.getDCToolExecutor(launcher);
 
         final DevelopmentComponentFactory dcFactory = currentBuild.getDevelopmentComponentFactory();
-        DIToolCommandExecutionResult result = readOrListDevelopmentComponents(workspace, config, executor, dcFactory);
-        String dtcPath = FilePathHelper.makeAbsolute(currentBuild.getWorkspace().child(".dtc"));
+
+        DIToolCommandExecutionResult result = executor.listDevelopmentComponents(dcFactory);
+        final String dtcPath = FilePathHelper.makeAbsolute(currentBuild.getWorkspace().child(".dtc"));
 
         if (result.isExitCodeOk()) {
             final NWDIBuild lastSuccessfulBuild = currentBuild.getParent().getLastSuccessfulBuild();
@@ -132,11 +131,11 @@ public class NWDIScm extends SCM {
                 logger.append("Getting all activities from DTR.\n");
             }
 
-            activities.addAll(getActivities(logger, getDtrBrowser(config, dcFactory),
+            activities.addAll(getActivities(logger, getDtrBrowser(config),
                 lastSuccessfulBuild != null ? lastSuccessfulBuild.getAction(NWDIRevisionState.class).getCreationDate()
-                    : null));
+                    : null, dcFactory));
 
-            boolean cleanCopy = currentBuild.getPreviousBuild() == null || this.cleanCopy;
+            final boolean cleanCopy = currentBuild.getPreviousBuild() == null || this.cleanCopy;
 
             setNeedsRebuildPropertyOnAllDevelopmentComponentsInSourceState(config, cleanCopy);
 
@@ -170,7 +169,7 @@ public class NWDIScm extends SCM {
      *            <code>true</code> when a clean build was requested, <code>false</code> otherwise.
      */
     private void setNeedsRebuildPropertyOnAllDevelopmentComponentsInSourceState(final DevelopmentConfiguration config,
-        boolean cleanCopy) {
+        final boolean cleanCopy) {
         if (cleanCopy) {
             for (final Compartment compartment : config.getCompartments(CompartmentState.Source)) {
                 for (final DevelopmentComponent component : compartment.getDevelopmentComponents()) {
@@ -178,65 +177,6 @@ public class NWDIScm extends SCM {
                 }
             }
         }
-    }
-
-    /**
-     * Read the development configuration saved during the last build or list development components from CBS if it doesn't exist.
-     * 
-     * @param workspace
-     *            workspace folder where the development configuration was saved.
-     * @param config
-     *            development configuration to be used throughout the build
-     * @param executor
-     *            executor for listing development components from the CBS
-     * @param dcFactory
-     *            registry for development components.
-     * @return the result of DC tool execution
-     * @throws IOException
-     *             re-thrown from DC tool execution
-     * @throws InterruptedException
-     *             re-thrown from DC tool execution
-     */
-    private DIToolCommandExecutionResult readOrListDevelopmentComponents(FilePath workspace,
-        DevelopmentConfiguration config, final DCToolCommandExecutor executor,
-        final DevelopmentComponentFactory dcFactory) throws IOException, InterruptedException {
-        // FilePath devConfFile = workspace.child("DevelopmentConfiguration.xml");
-        DIToolCommandExecutionResult result = new DIToolCommandExecutionResult("", 0);
-
-        // if (devConfFile.exists()) {
-        // DevelopmentConfigurationReader configurationReader = new DevelopmentConfigurationReader(dcFactory);
-        //
-        // try {
-        // new XmlReaderHelper(configurationReader).parse(new InputStreamReader(devConfFile.read()));
-        // DevelopmentConfiguration savedConfig = configurationReader.getDevelopmentConfiguration();
-        //
-        // for (Compartment compartment : savedConfig.getCompartments()) {
-        // Compartment original = config.getCompartment(compartment.getName());
-        //
-        // // new compartment in development configuration that did not
-        // // exist in previous build
-        // if (original == null) {
-        // original =
-        // new Compartment(compartment.getName(), compartment.getState(), compartment.getVendor(),
-        // compartment.getCaption(), compartment.getSoftwareComponent());
-        // original.setDtrUrl(config.getDtrServerUrl());
-        // original.setInactiveLocation(compartment.getInactiveLocation());
-        // original.set(compartment.getUsedCompartments());
-        // config.add(original);
-        // }
-        //
-        // original.add(compartment.getDevelopmentComponents());
-        // }
-        // }
-        // catch (SAXException e) {
-        // throw new RuntimeException(e);
-        // }
-        // }
-        // else {
-        result = executor.listDevelopmentComponents(dcFactory);
-        // }
-
-        return result;
     }
 
     /**
@@ -259,7 +199,7 @@ public class NWDIScm extends SCM {
     protected PollingResult compareRemoteRevisionWith(final AbstractProject<?, ?> project, final Launcher launcher,
         final FilePath path, final TaskListener listener, final SCMRevisionState revisionState) throws IOException,
         InterruptedException {
-        NWDIProject nwdiProject = (NWDIProject)project;
+        final NWDIProject nwdiProject = (NWDIProject)project;
         NWDIBuild lastBuild = nwdiProject.getLastSuccessfulBuild();
 
         if (lastBuild == null) {
@@ -272,9 +212,8 @@ public class NWDIScm extends SCM {
             lastBuild.getNumber()));
 
         final List<Activity> activities =
-            getActivities(logger,
-                getDtrBrowser(lastBuild.getDevelopmentConfiguration(), new DevelopmentComponentFactory()),
-                getCreationDate(revisionState));
+            getActivities(logger, getDtrBrowser(lastBuild.getDevelopmentConfiguration()),
+                getCreationDate(revisionState), new DevelopmentComponentFactory());
 
         final Change changeState = activities.isEmpty() ? Change.NONE : Change.SIGNIFICANT;
         logger.append(String.format("Found changes: %s.\n", changeState.toString()));
@@ -364,7 +303,8 @@ public class NWDIScm extends SCM {
      *            since when to get activities
      * @return a list of {@link Activity} objects that were checked in since the last run or all activities.
      */
-    private List<Activity> getActivities(final PrintStream logger, final DtrBrowser browser, final Date since) {
+    private List<Activity> getActivities(final PrintStream logger, final DtrBrowser browser, final Date since,
+        final DevelopmentComponentFactory dcFactory) {
         final List<Activity> activities = new ArrayList<Activity>();
         long start = System.currentTimeMillis();
         final long startGetActivities = start;
@@ -382,7 +322,7 @@ public class NWDIScm extends SCM {
         // update activities with their respective resources
         // FIXME: add methods to DtrBrowser that get activities with their
         // respective resources!
-        browser.getDevelopmentComponents(activities);
+        browser.getDevelopmentComponents(activities, dcFactory);
         browser.close();
 
         for (final Activity activity : activities) {
@@ -390,8 +330,6 @@ public class NWDIScm extends SCM {
                 resource.getDevelopmentComponent().setNeedsRebuild(true);
             }
         }
-
-        Collections.sort(activities, new ActivityByDateComparator());
 
         duration(logger, start, "Determine affected DCs for activities");
         duration(logger, startGetActivities, String.format("Read %s activities", activities.size()));
@@ -404,12 +342,10 @@ public class NWDIScm extends SCM {
      * 
      * @param config
      *            the development configuration to be used to connect to the DTR.
-     * @param dcFactory
-     *            the development component factory to be used getting development components associated with activities.
      * @return the {@link DtrBrowser} for browsing the DTR for activities.
      */
-    private DtrBrowser getDtrBrowser(final DevelopmentConfiguration config, final DevelopmentComponentFactory dcFactory) {
-        return new DtrBrowser(config, dcFactory, dtrUser, password);
+    private DtrBrowser getDtrBrowser(final DevelopmentConfiguration config) {
+        return new DtrBrowser(config, dtrUser, password);
     }
 
     /**

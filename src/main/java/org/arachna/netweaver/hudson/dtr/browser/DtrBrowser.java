@@ -52,27 +52,18 @@ public final class DtrBrowser {
     private final DevelopmentConfiguration config;
 
     /**
-     * registry for {@link DevelopmentComponent} objects.
-     */
-    private DevelopmentComponentFactory dcFactory = new DevelopmentComponentFactory();
-
-    /**
      * Create an instance of a <code>DtrBrowser</code>.
      * 
      * @param config
      *            the {@link DevelopmentConfiguration} to use in queries.
-     * @param dcFactory
-     *            registry of {@link DevelopmentComponent} objects.
      * @param dtrUser
      *            user for accessing the DTR.
      * @param password
      *            password to authenticate the user against the DTR's UME.
      */
-    public DtrBrowser(final DevelopmentConfiguration config, final DevelopmentComponentFactory dcFactory,
-        final String dtrUser, final String password) {
+    public DtrBrowser(final DevelopmentConfiguration config, final String dtrUser, final String password) {
         this.config = config;
         dtrHttpClient = new DtrHttpClient(dtrUser, password);
-        this.dcFactory = dcFactory;
     }
 
     /**
@@ -114,7 +105,8 @@ public final class DtrBrowser {
      *            activities the changed development components shall be extracted from.
      * @return list of changed development components associated with the given activities.
      */
-    public Set<DevelopmentComponent> getDevelopmentComponents(final List<Activity> activities) {
+    public Set<DevelopmentComponent> getDevelopmentComponents(final List<Activity> activities,
+        final DevelopmentComponentFactory dcFactory) {
         final DevelopmentComponentCollector collector =
             new DevelopmentComponentCollector(dtrHttpClient, config.getCmsUrl(), dcFactory);
 
@@ -124,24 +116,16 @@ public final class DtrBrowser {
     /**
      * Get a list of changed development components for the given workspace since the given date.
      * 
-     * @return a list of changed development components
-     */
-    public Set<DevelopmentComponent> getChangedDevelopmentComponents() {
-        return this.getChangedDevelopmentComponents(new ActivityCheckinDateFilter());
-    }
-
-    /**
-     * Get a list of changed development components for the given workspace since the given date.
-     * 
      * @param activityFilter
      *            filter the activities using the given {@link ActivityFilter}.
      * @return a list of changed development components matched by the given {@link ActivityFilter}.
      */
-    private Set<DevelopmentComponent> getChangedDevelopmentComponents(final ActivityFilter activityFilter) {
+    private Set<DevelopmentComponent> getChangedDevelopmentComponents(final ActivityFilter activityFilter,
+        DevelopmentComponentFactory dcFactory) {
         final List<Activity> activities = this.getActivities(activityFilter);
         Collections.sort(activities, new ActivityByCheckInDateComparator());
 
-        return getDevelopmentComponents(activities);
+        return getDevelopmentComponents(activities, dcFactory);
     }
 
     /**
@@ -189,17 +173,6 @@ public final class DtrBrowser {
     }
 
     /**
-     * Get a list of changed development components for the given workspace since the given date.
-     * 
-     * @param since
-     *            date after which to look for activities.
-     * @return a list of changed development components
-     */
-    public Set<DevelopmentComponent> getChangedDevelopmentComponents(final Date since) {
-        return this.getChangedDevelopmentComponents(createActivityCheckinDateFilter(since));
-    }
-
-    /**
      * @param since
      *            start date for activity filtering.
      * @return the configured filter (with the given start date and the current time).
@@ -227,6 +200,6 @@ public final class DtrBrowser {
      * Shut down the {@link DtrHttpClient}.
      */
     public void close() {
-        this.dtrHttpClient.close();
+        dtrHttpClient.close();
     }
 }
