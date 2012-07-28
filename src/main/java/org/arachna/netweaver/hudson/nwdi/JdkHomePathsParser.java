@@ -8,8 +8,8 @@ import hudson.Util;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.arachna.netweaver.dctool.JdkHomeAlias;
-import org.arachna.netweaver.dctool.JdkHomePaths;
+import org.arachna.netweaver.dc.types.JdkHomeAlias;
+import org.arachna.netweaver.tools.dc.JdkHomePaths;
 
 /**
  * @author Dirk Weigenand

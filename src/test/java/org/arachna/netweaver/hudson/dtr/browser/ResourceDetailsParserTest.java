@@ -13,8 +13,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-import org.arachna.netweaver.dc.types.Compartment;
-import org.arachna.netweaver.dc.types.CompartmentState;
 import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.junit.After;
 import org.junit.Before;
@@ -27,8 +25,7 @@ import org.junit.Test;
  */
 public final class ResourceDetailsParserTest {
     /**
-     * {@link ActivityResource} that shall be updated from the
-     * resourceDetailsPage.
+     * {@link ActivityResource} that shall be updated from the resourceDetailsPage.
      */
     private ActivityResource resource;
 
@@ -43,8 +40,7 @@ public final class ResourceDetailsParserTest {
     @Before
     public void setUp() throws Exception {
         this.resource =
-            new ActivityResource(new Activity(new Compartment("EXAMPLE_SC1", CompartmentState.Source, "example.com",
-                "", "example.com_EXAMPLE_SC1"), "", new Principal(""), "", Calendar.getInstance().getTime()),
+            new ActivityResource(new Activity("", new Principal(""), "", Calendar.getInstance().getTime()),
                 new DevelopmentComponent("", ""), "", "");
         this.parser = new ResourceDetailsParser(this.resource);
     }
@@ -66,9 +62,7 @@ public final class ResourceDetailsParserTest {
     }
 
     /**
-     * Test method for
-     * {@link org.arachna.netweaver.hudson.dtr.browser.ResourceDetailsParser#parse(java.io.InputStream)}
-     * .
+     * Test method for {@link org.arachna.netweaver.hudson.dtr.browser.ResourceDetailsParser#parse(java.io.InputStream)} .
      */
     @Test
     public void testParseDeleteStateIsFalse() {
@@ -78,9 +72,7 @@ public final class ResourceDetailsParserTest {
     }
 
     /**
-     * Test method for
-     * {@link org.arachna.netweaver.hudson.dtr.browser.ResourceDetailsParser#parse(java.io.InputStream)}
-     * .
+     * Test method for {@link org.arachna.netweaver.hudson.dtr.browser.ResourceDetailsParser#parse(java.io.InputStream)} .
      */
     @Test
     public void testParseDeleteStateIsTrue() {
@@ -90,9 +82,7 @@ public final class ResourceDetailsParserTest {
     }
 
     /**
-     * Test method for
-     * {@link org.arachna.netweaver.hudson.dtr.browser.ResourceDetailsParser#parse(java.io.InputStream)}
-     * .
+     * Test method for {@link org.arachna.netweaver.hudson.dtr.browser.ResourceDetailsParser#parse(java.io.InputStream)} .
      * 
      * @throws ParseException
      */
@@ -106,9 +96,7 @@ public final class ResourceDetailsParserTest {
     }
 
     /**
-     * Test method for
-     * {@link org.arachna.netweaver.hudson.dtr.browser.ResourceDetailsParser#parse(java.io.InputStream)}
-     * .
+     * Test method for {@link org.arachna.netweaver.hudson.dtr.browser.ResourceDetailsParser#parse(java.io.InputStream)} .
      */
     @Test
     public void testParseLastModified() throws ParseException {
@@ -120,9 +108,7 @@ public final class ResourceDetailsParserTest {
     }
 
     /**
-     * Test method for
-     * {@link org.arachna.netweaver.hudson.dtr.browser.ResourceDetailsParser#parse(java.io.InputStream)}
-     * .
+     * Test method for {@link org.arachna.netweaver.hudson.dtr.browser.ResourceDetailsParser#parse(java.io.InputStream)} .
      */
     @Test
     public void testParseSequenceNumber() {

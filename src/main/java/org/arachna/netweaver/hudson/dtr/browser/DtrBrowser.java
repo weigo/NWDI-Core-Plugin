@@ -21,7 +21,7 @@ import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 
 /**
  * A browser for the design time repository's web browser interface.
- *
+ * 
  * @author Dirk Weigenand
  */
 public final class DtrBrowser {
@@ -58,7 +58,7 @@ public final class DtrBrowser {
 
     /**
      * Create an instance of a <code>DtrBrowser</code>.
-     *
+     * 
      * @param config
      *            the {@link DevelopmentConfiguration} to use in queries.
      * @param dcFactory
@@ -76,9 +76,8 @@ public final class DtrBrowser {
     }
 
     /**
-     * Get list of activities in the given workspace containing the given
-     * compartment.
-     *
+     * Get list of activities in the given workspace containing the given compartment.
+     * 
      * @param compartment
      *            compartment to use for retrieving activities.
      * @param activityFilter
@@ -87,7 +86,7 @@ public final class DtrBrowser {
      */
     public List<Activity> getActivities(final Compartment compartment, final ActivityFilter activityFilter) {
         final List<Activity> activities = new ArrayList<Activity>();
-        final ActivityListParser activityListBrowser = new ActivityListParser(compartment, activityFilter);
+        final ActivityListParser activityListBrowser = new ActivityListParser(activityFilter);
         String queryUrl = null;
 
         try {
@@ -110,12 +109,10 @@ public final class DtrBrowser {
 
     /**
      * Extract changed development components from the given list of activities.
-     *
+     * 
      * @param activities
-     *            activities the changed development components shall be
-     *            extracted from.
-     * @return list of changed development components associated with the given
-     *         activities.
+     *            activities the changed development components shall be extracted from.
+     * @return list of changed development components associated with the given activities.
      */
     public Set<DevelopmentComponent> getDevelopmentComponents(final List<Activity> activities) {
         final DevelopmentComponentCollector collector =
@@ -125,9 +122,8 @@ public final class DtrBrowser {
     }
 
     /**
-     * Get a list of changed development components for the given workspace
-     * since the given date.
-     *
+     * Get a list of changed development components for the given workspace since the given date.
+     * 
      * @return a list of changed development components
      */
     public Set<DevelopmentComponent> getChangedDevelopmentComponents() {
@@ -135,13 +131,11 @@ public final class DtrBrowser {
     }
 
     /**
-     * Get a list of changed development components for the given workspace
-     * since the given date.
-     *
+     * Get a list of changed development components for the given workspace since the given date.
+     * 
      * @param activityFilter
      *            filter the activities using the given {@link ActivityFilter}.
-     * @return a list of changed development components matched by the given
-     *         {@link ActivityFilter}.
+     * @return a list of changed development components matched by the given {@link ActivityFilter}.
      */
     private Set<DevelopmentComponent> getChangedDevelopmentComponents(final ActivityFilter activityFilter) {
         final List<Activity> activities = this.getActivities(activityFilter);
@@ -151,14 +145,11 @@ public final class DtrBrowser {
     }
 
     /**
-     * Get a list of activities in the given workspace matching the given
-     * {@link ActivityFilter}.
-     *
+     * Get a list of activities in the given workspace matching the given {@link ActivityFilter}.
+     * 
      * @param activityFilter
-     *            an {@link ActivityFilter} for filtering the list of returned
-     *            activities.
-     * @return a list of activities matching the given {@link ActivityFilter} in
-     *         the given workspace.
+     *            an {@link ActivityFilter} for filtering the list of returned activities.
+     * @return a list of activities matching the given {@link ActivityFilter} in the given workspace.
      */
     public List<Activity> getActivities(final ActivityFilter activityFilter) {
         final List<Activity> activities = new ArrayList<Activity>();
@@ -172,11 +163,12 @@ public final class DtrBrowser {
 
     /**
      * Get a list of all activities in the given workspace.
-     *
+     * 
      * @return a list of all activities in the given workspace.
      */
     public List<Activity> getActivities() {
         final ActivityFilter activityFilter = new ActivityFilter() {
+            @Override
             public boolean accept(final Activity activity) {
                 return true;
             }
@@ -186,9 +178,8 @@ public final class DtrBrowser {
     }
 
     /**
-     * Get a list of activities in the given workspace matching the given
-     * {@link ActivityFilter}.
-     *
+     * Get a list of activities in the given workspace matching the given {@link ActivityFilter}.
+     * 
      * @param since
      *            date after which to look for activities.
      * @return a list of activities in the given workspace.
@@ -198,9 +189,8 @@ public final class DtrBrowser {
     }
 
     /**
-     * Get a list of changed development components for the given workspace
-     * since the given date.
-     *
+     * Get a list of changed development components for the given workspace since the given date.
+     * 
      * @param since
      *            date after which to look for activities.
      * @return a list of changed development components
@@ -212,8 +202,7 @@ public final class DtrBrowser {
     /**
      * @param since
      *            start date for activity filtering.
-     * @return the configured filter (with the given start date and the current
-     *         time).
+     * @return the configured filter (with the given start date and the current time).
      */
     private ActivityFilter createActivityCheckinDateFilter(final Date since) {
         return new ActivityCheckinDateFilter(since, Calendar.getInstance().getTime());
@@ -221,13 +210,14 @@ public final class DtrBrowser {
 
     /**
      * Comparator for {@link Activity} by check in date.
-     *
+     * 
      * @author Dirk Weigenand
      */
     private static final class ActivityByCheckInDateComparator implements Comparator<Activity> {
         /**
          * {@inheritDoc}
          */
+        @Override
         public int compare(final Activity activity1, final Activity activity2) {
             return activity1.getCheckinTime().compareTo(activity2.getCheckinTime());
         }

@@ -20,31 +20,29 @@ import hudson.scm.SCM;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
 import net.sf.json.JSONObject;
 
-import org.arachna.netweaver.dc.config.DevelopmentConfigurationReader;
 import org.arachna.netweaver.dc.types.Compartment;
 import org.arachna.netweaver.dc.types.CompartmentState;
 import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
-import org.arachna.netweaver.dctool.DCToolCommandExecutor;
-import org.arachna.netweaver.dctool.DcToolCommandExecutionResult;
 import org.arachna.netweaver.hudson.dtr.browser.Activity;
+import org.arachna.netweaver.hudson.dtr.browser.ActivityByDateComparator;
 import org.arachna.netweaver.hudson.dtr.browser.ActivityResource;
 import org.arachna.netweaver.hudson.dtr.browser.DtrBrowser;
 import org.arachna.netweaver.hudson.nwdi.dcupdater.DevelopmentComponentUpdater;
 import org.arachna.netweaver.hudson.util.FilePathHelper;
-import org.arachna.xml.XmlReaderHelper;
+import org.arachna.netweaver.tools.DIToolCommandExecutionResult;
+import org.arachna.netweaver.tools.dc.DCToolCommandExecutor;
 import org.kohsuke.stapler.StaplerRequest;
-import org.xml.sax.SAXException;
 
 /**
  * Interface to NetWeaver Developer Infrastructure.
@@ -120,7 +118,7 @@ public class NWDIScm extends SCM {
         final DCToolCommandExecutor executor = currentBuild.getDCToolExecutor(launcher);
 
         final DevelopmentComponentFactory dcFactory = currentBuild.getDevelopmentComponentFactory();
-        DcToolCommandExecutionResult result = readOrListDevelopmentComponents(workspace, config, executor, dcFactory);
+        DIToolCommandExecutionResult result = readOrListDevelopmentComponents(workspace, config, executor, dcFactory);
         String dtcPath = FilePathHelper.makeAbsolute(currentBuild.getWorkspace().child(".dtc"));
 
         if (result.isExitCodeOk()) {
@@ -146,30 +144,16 @@ public class NWDIScm extends SCM {
                 // synchronize sources
                 result = executor.synchronizeDevelopmentComponents(dcFactory, cleanCopy, true);
                 // update used DCs
-                new DevelopmentComponentUpdater(dtcPath,
-                    dcFactory).execute();
+                new DevelopmentComponentUpdater(dtcPath, dcFactory).execute();
 
                 if (result.isExitCodeOk()) {
                     // synchronize used DCs
                     result = executor.synchronizeDevelopmentComponents(dcFactory, cleanCopy, false);
                 }
-
-                if (!result.isExitCodeOk()) {
-                    final String output = result.getOutput();
-
-                    // FIXME: make heap used for dctool configurable!
-                    // ignore OutOfMemoryError on exit from dctool
-                    if (output.contains("java.lang.OutOfMemoryError") && output.contains("java.lang.System.exit")
-                        && output.contains("com.sap.tc.devconf.dctool.startup.DCToolMain.main")) {
-                        result = new DcToolCommandExecutionResult(output, 0);
-                    }
-                }
-
             }
         }
 
-        new DevelopmentComponentUpdater(dtcPath,
-            dcFactory).execute();
+        new DevelopmentComponentUpdater(dtcPath, dcFactory).execute();
 
         build.addAction(new NWDIRevisionState(activities));
         writeChangeLog(build, changelogFile, activities);
@@ -213,44 +197,44 @@ public class NWDIScm extends SCM {
      * @throws InterruptedException
      *             re-thrown from DC tool execution
      */
-    private DcToolCommandExecutionResult readOrListDevelopmentComponents(FilePath workspace,
+    private DIToolCommandExecutionResult readOrListDevelopmentComponents(FilePath workspace,
         DevelopmentConfiguration config, final DCToolCommandExecutor executor,
         final DevelopmentComponentFactory dcFactory) throws IOException, InterruptedException {
-        FilePath devConfFile = workspace.child("DevelopmentConfiguration.xml");
-        DcToolCommandExecutionResult result = new DcToolCommandExecutionResult("", 0);
+        // FilePath devConfFile = workspace.child("DevelopmentConfiguration.xml");
+        DIToolCommandExecutionResult result = new DIToolCommandExecutionResult("", 0);
 
-        if (!devConfFile.exists()) {
-            result = executor.listDevelopmentComponents(dcFactory);
-        }
-        else {
-            DevelopmentConfigurationReader configurationReader = new DevelopmentConfigurationReader(dcFactory);
-
-            try {
-                new XmlReaderHelper(configurationReader).parse(new InputStreamReader(devConfFile.read()));
-                DevelopmentConfiguration savedConfig = configurationReader.getDevelopmentConfiguration();
-
-                for (Compartment compartment : savedConfig.getCompartments()) {
-                    Compartment original = config.getCompartment(compartment.getName());
-
-                    // new compartment in development configuration that did not
-                    // exist in previous build
-                    if (original == null) {
-                        original =
-                            new Compartment(compartment.getName(), compartment.getState(), compartment.getVendor(),
-                                compartment.getCaption(), compartment.getSoftwareComponent());
-                        original.setDtrUrl(config.getDtrServerUrl());
-                        original.setInactiveLocation(compartment.getInactiveLocation());
-                        original.set(compartment.getUsedCompartments());
-                        config.add(original);
-                    }
-
-                    original.add(compartment.getDevelopmentComponents());
-                }
-            }
-            catch (SAXException e) {
-                throw new RuntimeException(e);
-            }
-        }
+        // if (devConfFile.exists()) {
+        // DevelopmentConfigurationReader configurationReader = new DevelopmentConfigurationReader(dcFactory);
+        //
+        // try {
+        // new XmlReaderHelper(configurationReader).parse(new InputStreamReader(devConfFile.read()));
+        // DevelopmentConfiguration savedConfig = configurationReader.getDevelopmentConfiguration();
+        //
+        // for (Compartment compartment : savedConfig.getCompartments()) {
+        // Compartment original = config.getCompartment(compartment.getName());
+        //
+        // // new compartment in development configuration that did not
+        // // exist in previous build
+        // if (original == null) {
+        // original =
+        // new Compartment(compartment.getName(), compartment.getState(), compartment.getVendor(),
+        // compartment.getCaption(), compartment.getSoftwareComponent());
+        // original.setDtrUrl(config.getDtrServerUrl());
+        // original.setInactiveLocation(compartment.getInactiveLocation());
+        // original.set(compartment.getUsedCompartments());
+        // config.add(original);
+        // }
+        //
+        // original.add(compartment.getDevelopmentComponents());
+        // }
+        // }
+        // catch (SAXException e) {
+        // throw new RuntimeException(e);
+        // }
+        // }
+        // else {
+        result = executor.listDevelopmentComponents(dcFactory);
+        // }
 
         return result;
     }
@@ -406,6 +390,8 @@ public class NWDIScm extends SCM {
                 resource.getDevelopmentComponent().setNeedsRebuild(true);
             }
         }
+
+        Collections.sort(activities, new ActivityByDateComparator());
 
         duration(logger, start, "Determine affected DCs for activities");
         duration(logger, startGetActivities, String.format("Read %s activities", activities.size()));

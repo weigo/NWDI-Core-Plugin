@@ -27,9 +27,8 @@ public final class DevelopmentComponentFactory {
     }
 
     /**
-     * Create a new <code>DevelopmentComponentFactory</code> with the given
-     * {@link DevelopmentConfiguration}. Register all development components
-     * contained within the configuration with the factory.
+     * Create a new <code>DevelopmentComponentFactory</code> with the given {@link DevelopmentConfiguration}. Register all development
+     * components contained within the configuration with the factory.
      * 
      * @param developmentConfiguration
      *            a development configuration to initialize the registry with.
@@ -65,8 +64,7 @@ public final class DevelopmentComponentFactory {
     }
 
     /**
-     * Create a development component using the given vendor, DC name and public
-     * parts and public part references.
+     * Create a development component using the given vendor, DC name and public parts and public part references.
      * 
      * @param vendor
      *            DC vendor
@@ -100,23 +98,20 @@ public final class DevelopmentComponentFactory {
      *            name to use as part of the key.
      * @param vendor
      *            vendor to use as part of the key.
-     * @return the concatenation of the given vendor, ':' and the given
-     *         component name.
+     * @return the concatenation of the given vendor, ':' and the given component name.
      */
     private String createComponentKey(final String name, final String vendor) {
         return vendor + ":" + name;
     }
 
     /**
-     * Create and register a development component. If the development component
-     * is already registered the existing object will be returned.
+     * Create and register a development component. If the development component is already registered the existing object will be returned.
      * 
      * @param vendor
      *            vendor of development component.
      * @param name
      *            name of development component.
-     * @return a development component with the given vendor, name and type
-     *         {@link DevelopmentComponentType#unknown}.
+     * @return a development component with the given vendor, name and type {@link DevelopmentComponentType#unknown}.
      */
     public DevelopmentComponent create(final String vendor, final String name) {
         return this.create(vendor, name, DevelopmentComponentType.unknown);
@@ -138,9 +133,8 @@ public final class DevelopmentComponentFactory {
     /**
      * Update the using DCs for all registered DCs.
      * 
-     * For each registered development component the list of public parts it
-     * references will be iterated. The respective development component will be
-     * looked up and the currently worked on DC will be added to its using DCs.
+     * For each registered development component the list of public parts it references will be iterated. The respective development
+     * component will be looked up and the currently worked on DC will be added to its using DCs.
      */
     public void updateUsingDCs() {
         for (final DevelopmentComponent component : this.componentMap.values()) {
@@ -172,30 +166,38 @@ public final class DevelopmentComponentFactory {
     }
 
     /**
-     * Return the development component matching the given vendor and component
-     * name.
+     * Return the development component matching the given vendor and component name.
      * 
      * @param vendor
      *            vendor of development component.
      * @param name
      *            name of development component.
-     * @return the development component asked for or <code>null</code> if it is
-     *         not registered.
+     * @return the development component asked for or <code>null</code> if it is not registered.
      */
     public DevelopmentComponent get(final String vendor, final String name) {
         return this.componentMap.get(createComponentKey(name, vendor));
     }
 
     /**
-     * Return the development component matching the given
-     * {@link PublicPartReference}.
+     * Return the development component matching the given {@link PublicPartReference}.
      * 
      * @param ppRef
      *            reference to a development components public part.
-     * @return the development component asked for or <code>null</code> if it is
-     *         not registered.
+     * @return the development component asked for or <code>null</code> if it is not registered.
      */
     public DevelopmentComponent get(PublicPartReference ppRef) {
         return this.componentMap.get(createComponentKey(ppRef.getComponentName(), ppRef.getVendor()));
+    }
+
+    /**
+     * @param component
+     */
+    public void remove(DevelopmentComponent component) {
+        this.componentMap.remove(createComponentKey(component.getName(), component.getVendor()));
+        Compartment compartment = component.getCompartment();
+
+        if (compartment != null) {
+            compartment.remove(component);
+        }
     }
 }

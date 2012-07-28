@@ -22,7 +22,9 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -34,14 +36,14 @@ import org.arachna.netweaver.dc.types.CompartmentState;
 import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
-import org.arachna.netweaver.dctool.DCToolCommandExecutor;
-import org.arachna.netweaver.dctool.DCToolDescriptor;
-import org.arachna.netweaver.dctool.DcToolCommandExecutionResult;
-import org.arachna.netweaver.dctool.JdkHomeAlias;
+import org.arachna.netweaver.dc.types.JdkHomeAlias;
 import org.arachna.netweaver.hudson.dtr.browser.Activity;
 import org.arachna.netweaver.hudson.dtr.browser.ActivityResource;
 import org.arachna.netweaver.hudson.nwdi.confdef.ConfDefReader;
 import org.arachna.netweaver.hudson.util.FilePathHelper;
+import org.arachna.netweaver.tools.DIToolCommandExecutionResult;
+import org.arachna.netweaver.tools.DIToolDescriptor;
+import org.arachna.netweaver.tools.dc.DCToolCommandExecutor;
 import org.arachna.xml.XmlReaderHelper;
 import org.xml.sax.SAXException;
 
@@ -51,11 +53,6 @@ import org.xml.sax.SAXException;
  * @author Dirk Weigenand
  */
 public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
-    /**
-     * Executor for DC tool commands used throughout.
-     */
-    private transient DCToolCommandExecutor dcToolExecutor;
-
     /**
      * the development configuration this build will process.
      */
@@ -144,7 +141,7 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
     public Collection<DevelopmentComponent> getAffectedDevelopmentComponents() {
         if (affectedComponents == null) {
             final NWDIRevisionState revisionState = this.getAction(NWDIRevisionState.class);
-            final Collection<DevelopmentComponent> affectedComponents = new HashSet<DevelopmentComponent>();
+            final Set<DevelopmentComponent> affectedComponents = new HashSet<DevelopmentComponent>();
 
             for (final Activity activity : revisionState.getActivities()) {
                 for (final ActivityResource resource : activity.getResources()) {
@@ -167,17 +164,46 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
                 }
             }
 
+            Collection<DevelopmentComponent> components = new LinkedList<DevelopmentComponent>();
+
+            for (DevelopmentComponent component : affectedComponents) {
+                try {
+                    if (componentExists(component)) {
+                        components.add(component);
+                    }
+                    else {
+                        // remove DCs from build that might have come from activities but
+                        dcFactory.remove(component);
+                        // component.getCompartment().remove(component);
+                    }
+                }
+                catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace(System.err);
+                }
+                catch (InterruptedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace(System.err);
+                }
+            }
+
             // update usage relations from public part references.
             dcFactory.updateUsingDCs();
             final ComponentsNeedingRebuildFinder finder = new ComponentsNeedingRebuildFinder();
             final DependencySorter dependencySorter =
                 new DependencySorter(dcFactory,
-                    finder.calculateDevelopmentComponentsThatNeedRebuilding(affectedComponents));
+                    finder.calculateDevelopmentComponentsThatNeedRebuilding(components));
 
             this.affectedComponents = dependencySorter.determineBuildSequence();
         }
 
         return affectedComponents;
+    }
+
+    private boolean componentExists(DevelopmentComponent component) throws IOException, InterruptedException {
+        FilePath dcFolder = this.getWorkspace().child(".dtc/DCs");
+
+        return dcFolder.child(String.format("%s/%s/_comp/.dcdef", component.getVendor(), component.getName())).exists();
     }
 
     /**
@@ -235,8 +261,18 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
      * @return <code>DCToolCommandExecutor</code> to execute DC tool commands.
      */
     DCToolCommandExecutor getDCToolExecutor(final Launcher launcher) {
-        final NWDIProject.DescriptorImpl descriptor = NWDIProject.DescriptorImpl.DESCRIPTOR;
         final DevelopmentConfiguration configuration = getDevelopmentConfiguration();
+        final NWDIProject.DescriptorImpl descriptor = NWDIProject.DescriptorImpl.DESCRIPTOR;
+        final DIToolDescriptor dcToolDescriptor = getDCToolDescriptor(configuration, descriptor);
+        return new DCToolCommandExecutor(launcher, getWorkspace(), dcToolDescriptor, configuration);
+    }
+
+    /**
+     * @param configuration
+     * @param descriptor
+     * @return
+     */
+    DIToolDescriptor getDCToolDescriptor(final DevelopmentConfiguration configuration, final NWDIProject.DescriptorImpl descriptor) {
         final JdkHomeAlias alias = configuration.getJdkHomeAlias();
         String nwdiToolLibraryFolder = "";
 
@@ -251,10 +287,10 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
                 alias));
         }
 
-        final DCToolDescriptor dcToolDescriptor =
-            new DCToolDescriptor(descriptor.getUser(), descriptor.getPassword(), nwdiToolLibraryFolder,
+        final DIToolDescriptor dcToolDescriptor =
+            new DIToolDescriptor(descriptor.getUser(), descriptor.getPassword(), nwdiToolLibraryFolder,
                 descriptor.getConfiguredJdkHomePaths(), descriptor.getJdkOpts());
-        return dcToolExecutor = new DCToolCommandExecutor(launcher, getWorkspace(), dcToolDescriptor, configuration);
+        return dcToolDescriptor;
     }
 
     /**
@@ -350,26 +386,40 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
          * @throws InterruptedException
          *             re-thrown from executing the DC build
          */
-        protected DcToolCommandExecutionResult buildDevelopmentComponents(final PrintStream logger) throws IOException,
+        protected DIToolCommandExecutionResult buildDevelopmentComponents(final PrintStream logger) throws IOException,
             InterruptedException {
+            NWDIBuild nwdiBuild = NWDIBuild.this;
             final Collection<DevelopmentComponent> affectedComponents =
-                NWDIBuild.this.getAffectedDevelopmentComponents();
-            logger.append(String.format("Building %s development components.\n", affectedComponents.size()));
+                nwdiBuild.getAffectedDevelopmentComponents();
 
-            for (final DevelopmentComponent component : affectedComponents) {
-                logger.append(component.getName()).append('\n');
-            }
-
-            DcToolCommandExecutionResult result = new DcToolCommandExecutionResult("", 0);
+            DIToolCommandExecutionResult result = new DIToolCommandExecutionResult("", 0);
 
             if (!affectedComponents.isEmpty()) {
+                logger.append(String.format("Building %s development components.\n", affectedComponents.size()));
+
+                for (final DevelopmentComponent component : affectedComponents) {
+                    logger.append(component.getName()).append('\n');
+                }
+
                 result = getDCToolExecutor(launcher).buildDevelopmentComponents(affectedComponents);
+                // AntHelper antHelper =
+                // new AntHelper(FilePathHelper.makeAbsolute(nwdiBuild.getWorkspace()), nwdiBuild.getDevelopmentComponentFactory());
+                // DCToolDescriptor dcToolDescriptor = nwdiBuild.getDCToolDescriptor(
+                // nwdiBuild.getDevelopmentConfiguration(),
+                // nwdiBuild.getParent().getDescriptor());
+                // File workspace = new File(antHelper.getPathToWorkspace());
+                //
+                // // for (DevelopmentComponent component : affectedComponents) {
+                // DCBuilder builder = new DCBuilder(workspace, dcToolDescriptor, affectedComponents /* Arrays.asList(component) */);
+                // // FIXME: honor build result: i.e. return value
+                // builder.perform(nwdiBuild, launcher, listener);
+                // // }
             }
 
             for (final DevelopmentComponent component : affectedComponents) {
                 FilePath buildXml =
-                    NWDIBuild.this.getWorkspace().child(
-                        String.format("%s/DCs/%s/%s/_comp/gen/default/logs/build.xml", DCToolDescriptor.DTC_FOLDER,
+                    nwdiBuild.getWorkspace().child(
+                        String.format("%s/DCs/%s/%s/_comp/gen/default/logs/build.xml", DIToolDescriptor.DTC_FOLDER,
                             component.getVendor(), component.getName()));
                 if (buildXml.exists()) {
                     String content =

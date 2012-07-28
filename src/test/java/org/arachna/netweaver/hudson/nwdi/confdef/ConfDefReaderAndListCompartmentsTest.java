@@ -17,7 +17,7 @@ import org.arachna.netweaver.dc.types.Compartment;
 import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
-import org.arachna.netweaver.dctool.commands.DevelopmentComponentsReader70;
+import org.arachna.netweaver.tools.dc.commands.DevelopmentComponentsReader70;
 import org.arachna.xml.XmlReaderHelper;
 import org.junit.After;
 import org.junit.Before;

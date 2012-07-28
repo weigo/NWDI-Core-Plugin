@@ -12,8 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.arachna.netweaver.dctool.JdkHomeAlias;
-
 /**
  * A class representing an NWDI development configuration description, i.e. the name of the development configuration and the compartments
  * contained therein.
@@ -424,5 +422,27 @@ public final class DevelopmentConfiguration {
                 visitor.visit(component);
             }
         }
+    }
+
+    /**
+     * Check whether the used JDK is 1.3 or 1.4. This means that the NW development configuration corresponds to 6.40 or 7.00.
+     * 
+     * @return <code>true</code> when the used JDK is 1.3 or 1.4, <code>false</code> otherwise.
+     */
+    public boolean isNW64Or70() {
+        final JdkHomeAlias alias = getJdkHomeAlias();
+
+        return JdkHomeAlias.Jdk131Home.equals(alias) || JdkHomeAlias.Jdk142Home.equals(alias);
+    }
+
+    /**
+     * Check whether the used JDK is 1.5 or 1.6. This means that the NW development configuration corresponds to NetWeaver after 7.00.
+     * 
+     * @return <code>true</code> when the used JDK is 1.3 or 1.4, <code>false</code> otherwise.
+     */
+    public boolean isPost70() {
+        final JdkHomeAlias alias = getJdkHomeAlias();
+
+        return JdkHomeAlias.Jdk150Home.equals(alias) || JdkHomeAlias.Jdk160Home.equals(alias);
     }
 }

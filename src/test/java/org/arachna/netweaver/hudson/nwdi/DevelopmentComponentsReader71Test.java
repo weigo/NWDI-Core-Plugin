@@ -14,7 +14,7 @@ import org.arachna.netweaver.dc.types.Compartment;
 import org.arachna.netweaver.dc.types.CompartmentState;
 import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
-import org.arachna.netweaver.dctool.commands.DevelopmentComponentsReader71;
+import org.arachna.netweaver.tools.dc.commands.DevelopmentComponentsReader71;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -60,7 +60,7 @@ public class DevelopmentComponentsReader71Test {
 
     /**
      * Test method for
-     * {@link org.arachna.netweaver.dctool.commands.DevelopmentComponentsReader71#read()}
+     * {@link org.arachna.netweaver.tools.dc.commands.DevelopmentComponentsReader71#read()}
      * .
      *
      * @throws IOException

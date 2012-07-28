@@ -34,14 +34,12 @@ public final class Activity {
     private final Principal principal;
 
     /**
-     * short description of activity as given by principal that created this
-     * activity.
+     * short description of activity as given by principal that created this activity.
      */
     private final String comment;
 
     /**
-     * long description of activity as given by principal that created this
-     * activity.
+     * long description of activity as given by principal that created this activity.
      */
     private String description;
 
@@ -56,30 +54,26 @@ public final class Activity {
     private final Set<ActivityResource> resources = new HashSet<ActivityResource>();
 
     /**
-     * compartment this activity belongs to.
+     * @deprecated
      */
-    private final Compartment compartment;
+    @Deprecated
+    private transient Compartment compartment;
 
     /**
-     * Create an instance of an <code>Activity</code> using the principal that
-     * created it, its description and checkin date. Also contains the relative
-     * URL where the content of the activity can be browsed.
+     * Create an instance of an <code>Activity</code> using the principal that created it, its description and checkin date. Also contains
+     * the relative URL where the content of the activity can be browsed.
      * 
-     * @param compartment
-     *            compartment this activity belongs to.
      * @param activityUrl
      *            relative URL where the content of the activity can be browsed.
      * @param principal
      *            user that created the activity.
      * @param comment
-     *            the short description of the activity as was given by the user
-     *            creating it.
+     *            the short description of the activity as was given by the user creating it.
      * @param checkinTime
      *            time the activity was checked into the DTR.
      */
-    Activity(final Compartment compartment, final String activityUrl, final Principal principal, final String comment,
+    Activity(final String activityUrl, final Principal principal, final String comment,
         final Date checkinTime) {
-        this.compartment = compartment;
         this.activityUrl = activityUrl;
         this.principal = principal;
         this.comment = comment;
@@ -157,8 +151,7 @@ public final class Activity {
     }
 
     /**
-     * Returns the path part of the activity url (i.e. the string after
-     * '&path=').
+     * Returns the path part of the activity url (i.e. the string after '&path=').
      * 
      * @return the path part of the activity url
      */
@@ -179,8 +172,7 @@ public final class Activity {
     }
 
     /**
-     * Add the given resource to this activity's resources. If the given
-     * resource is <code>null</code> it is ignored.
+     * Add the given resource to this activity's resources. If the given resource is <code>null</code> it is ignored.
      * 
      * @param resource
      *            resource to add to this activity's resources.
@@ -188,7 +180,6 @@ public final class Activity {
     void add(final ActivityResource resource) {
         if (resource != null) {
             this.resources.add(resource);
-            this.compartment.add(resource.getDevelopmentComponent());
         }
     }
 
@@ -199,15 +190,6 @@ public final class Activity {
      */
     public Collection<ActivityResource> getResources() {
         return Collections.unmodifiableCollection(this.resources);
-    }
-
-    /**
-     * Returns the compartment this activity belongs to.
-     * 
-     * @return the compartment
-     */
-    Compartment getCompartment() {
-        return compartment;
     }
 
     /*
