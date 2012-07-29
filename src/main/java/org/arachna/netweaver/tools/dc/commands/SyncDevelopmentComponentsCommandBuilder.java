@@ -97,7 +97,7 @@ final class SyncDevelopmentComponentsCommandBuilder extends AbstractDCToolComman
 
         for (final Compartment compartment : developmentConfiguration.getCompartments(CompartmentState.Source)) {
             if (cleanCopy) {
-                commands.add(createSyncDcsInActiveModeCommand(compartment));
+                commands.add(createSyncDcsInInActiveModeCommand(compartment));
             }
             else {
                 for (final DevelopmentComponent component : compartment.getDevelopmentComponents()) {
@@ -119,7 +119,7 @@ final class SyncDevelopmentComponentsCommandBuilder extends AbstractDCToolComman
      *            the compartment whose components should be synchronized in archive mode
      * @return command for synchronizing DCs in inactive mode.
      */
-    protected String createSyncDcsInActiveModeCommand(final Compartment compartment) {
+    protected String createSyncDcsInInActiveModeCommand(final Compartment compartment) {
         return String.format(templateProvider.getSyncAllDcsInInactiveModeTemplate(), compartment.getName());
     }
 
