@@ -83,7 +83,8 @@ public class SyncDevelopmentComponentsCommandBuilderTest {
     }
 
     /**
-     * Synchronize DCs of one
+     * Synchronize DCs of one compartment in source state. Use clean copy.
+     * Verify commands for NW 7.0.
      */
     @Test
     public void synchronizeDCsInSourceStateWhithCleanCopyForNW70() {
