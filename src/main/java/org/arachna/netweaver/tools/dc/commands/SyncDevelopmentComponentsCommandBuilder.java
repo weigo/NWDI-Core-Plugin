@@ -25,8 +25,12 @@ import org.arachna.netweaver.dc.types.PublicPartReference;
  * @author Dirk Weigenand
  */
 final class SyncDevelopmentComponentsCommandBuilder extends AbstractDCToolCommandBuilder {
+    /**
+     * names of build infrastructure compartments.
+     */
     private static final Set<String> BUILD_INFRASTRUCTURE_COMPARTMENTS = new HashSet<String>(Arrays.asList(
         "sap.com_SAP_BUILDT_1", "sap.com_EP_BUILDT_1"));
+
     /**
      * Provides templates for the various sync/unsync dc commands.
      */
