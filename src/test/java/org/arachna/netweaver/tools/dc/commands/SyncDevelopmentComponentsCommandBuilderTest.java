@@ -15,6 +15,7 @@ import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 import org.arachna.netweaver.dc.types.JdkHomeAlias;
+import org.arachna.netweaver.dc.types.PublicPartReference;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -24,6 +25,11 @@ import org.junit.Test;
  * @author Dirk Weigenand
  */
 public class SyncDevelopmentComponentsCommandBuilderTest {
+    /**
+     * 
+     */
+    private static final String APACHE_ORG = "apache.org";
+
     /**
      * 
      */
@@ -49,8 +55,6 @@ public class SyncDevelopmentComponentsCommandBuilderTest {
      */
     private Compartment compartment;
 
-    private DevelopmentComponent component;
-
     private DevelopmentComponentFactory dcFactory;
 
     /**
@@ -64,9 +68,6 @@ public class SyncDevelopmentComponentsCommandBuilderTest {
 
         compartment = new Compartment(EXAMPLE_SC, CompartmentState.Source, VENDOR, "", "EXAMPLE_SC");
         config.add(compartment);
-
-        component = dcFactory.create(VENDOR, "dc/example1");
-        compartment.add(component);
     }
 
     /**
@@ -95,6 +96,94 @@ public class SyncDevelopmentComponentsCommandBuilderTest {
     }
 
     /**
+     * Synchronize DCs of one compartment in source state. Use clean copy.
+     * Verify commands for NW 7.0.
+     */
+    @Test
+    public void synchronizeEmptyCompartmentInSourceStateWhithoutCleanCopyForNW70ReturnsNoCommands() {
+        builder = createSyncDevelopmentComponentCommandBuilder(true, false);
+        final List<String> commands = builder.executeInternal();
+        assertThat(commands.size(), equalTo(0));
+    }
+
+    /**
+     * Synchronize DCs of one compartment in source state. Use clean copy.
+     * Verify commands for NW 7.0.
+     */
+    @Test
+    public void synchronizeEmptyCompartmentInSourceStateWhithoutCleanCopyForNW70ReturnsOneCommand() {
+        builder = createSyncDevelopmentComponentCommandBuilder(true, false);
+        final DevelopmentComponent component = dcFactory.create("example.com", "dc1");
+        component.setNeedsRebuild(true);
+        compartment.add(component);
+        final List<String> commands = builder.executeInternal();
+        String expected =
+            String.format("unsyncdc -s %s -n %s -v %s;", compartment.getName(), component.getName(),
+                component.getVendor());
+        assertThat(commands.get(0), equalTo(expected));
+        expected =
+            String.format("syncdc -s %s -n %s -v %s -m inactive -y;", compartment.getName(), component.getName(),
+                component.getVendor());
+        assertThat(commands.get(1), equalTo(expected));
+    }
+
+    @Test
+    public void synchronizeComponentsInArchiveStateWhithoutCleanCopyForNW70ReturnsOneCommand() {
+        builder = createSyncDevelopmentComponentCommandBuilder(false, false);
+        final DevelopmentComponent component = dcFactory.create(VENDOR, "dc1");
+        component.setNeedsRebuild(true);
+        compartment.add(component);
+
+        final DevelopmentComponent library = dcFactory.create(APACHE_ORG, "commons");
+        component.add(new PublicPartReference(library.getVendor(), library.getName()));
+        compartment = createCompartment(APACHE_ORG, "COMMONS", CompartmentState.Archive);
+        compartment.add(library);
+        config.add(compartment);
+
+        final List<String> commands = builder.executeInternal();
+        assertThat(commands.size(), equalTo(1));
+        final String expected =
+            String.format("syncdc -s %s -n %s -v %s -m archive -u;", compartment.getName(), library.getName(),
+                library.getVendor());
+        assertThat(commands.get(0), equalTo(expected));
+    }
+
+    @Test
+    public void dontSynchronizeBuildPluginsWhithoutCleanCopyForNW70() {
+        builder = createSyncDevelopmentComponentCommandBuilder(false, false);
+        final DevelopmentComponent component = dcFactory.create(VENDOR, "dc1");
+        component.setNeedsRebuild(true);
+        compartment.add(component);
+
+        final DevelopmentComponent buildPlugin = dcFactory.create("sap.com", "tc/bi/webDynpro");
+        component.add(new PublicPartReference(buildPlugin.getVendor(), buildPlugin.getName()));
+        compartment = createCompartment("sap.com", "SAP_BUILDT", CompartmentState.Archive);
+        compartment.add(buildPlugin);
+        config.add(compartment);
+
+        final List<String> commands = builder.executeInternal();
+        assertThat(commands.size(), equalTo(0));
+    }
+
+    @Test
+    public void synchronizeCompartmentsInArchiveStateWithCleanCopyForNW70OnlySyncsBuildInfraStructureCompartments() {
+        builder = createSyncDevelopmentComponentCommandBuilder(false, true);
+        final DevelopmentComponent component = dcFactory.create(VENDOR, "dc1");
+        component.setNeedsRebuild(true);
+        compartment.add(component);
+
+        final Compartment commons = createCompartment(APACHE_ORG, "COMMONS", CompartmentState.Archive);
+        config.add(commons);
+
+        final Compartment sapBuildt = createCompartment("sap.com", "SAP_BUILDT", CompartmentState.Archive);
+        config.add(sapBuildt);
+
+        final List<String> commands = builder.executeInternal();
+        assertThat(commands.size(), equalTo(1));
+        assertThat(commands.get(0), equalTo(String.format("syncalldcs -s %s -m archive;", sapBuildt.getName())));
+    }
+
+    /**
      * Create a command builder indicating whether to synchronize sources or
      * archives and to synchronize complete compartments.
      * 
@@ -104,5 +193,10 @@ public class SyncDevelopmentComponentsCommandBuilderTest {
         final boolean syncSources, final boolean cleanCopy) {
         return new SyncDevelopmentComponentsCommandBuilder(config, dcFactory, SyncDcCommandTemplate.create(config
             .getJdkHomeAlias()), syncSources, cleanCopy);
+    }
+
+    private Compartment createCompartment(final String vendor, final String name, final CompartmentState state) {
+        return new Compartment(String.format("%s_%s_1", vendor, name), state, vendor, "", name);
+
     }
 }
