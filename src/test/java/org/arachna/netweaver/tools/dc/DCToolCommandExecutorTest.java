@@ -19,7 +19,7 @@ import java.util.List;
 import org.arachna.netweaver.dc.types.BuildVariant;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 import org.arachna.netweaver.dc.types.JdkHomeAlias;
-import org.arachna.netweaver.tools.DCToolCommandBuilder;
+import org.arachna.netweaver.tools.DIToolCommandBuilder;
 import org.arachna.netweaver.tools.DIToolDescriptor;
 import org.arachna.netweaver.tools.dc.DCToolCommandExecutor;
 import org.arachna.netweaver.tools.dc.JdkHomePaths;
@@ -132,7 +132,7 @@ public class DCToolCommandExecutorTest {
 
     /**
      * Test method for
-     * {@link org.arachna.netweaver.tools.dc.DCToolCommandExecutor#execute(org.arachna.netweaver.tools.DCToolCommandBuilder)}
+     * {@link org.arachna.netweaver.tools.dc.DCToolCommandExecutor#execute(org.arachna.netweaver.tools.DIToolCommandBuilder)}
      * .
      */
     @Test
@@ -155,7 +155,7 @@ public class DCToolCommandExecutorTest {
      * 
      * @author Dirk Weigenand
      */
-    private static final class DummyDCToolCommandBuilder implements DCToolCommandBuilder {
+    private static final class DummyDCToolCommandBuilder implements DIToolCommandBuilder {
         /**
          * {@inheritDoc}
          */

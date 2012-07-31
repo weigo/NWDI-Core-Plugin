@@ -6,14 +6,14 @@ package org.arachna.netweaver.tools.dc.commands;
 import java.util.List;
 
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
-import org.arachna.netweaver.tools.DCToolCommandBuilder;
+import org.arachna.netweaver.tools.DIToolCommandBuilder;
 
 /**
  * Base class for DC tool command builders.
  * 
  * @author Dirk Weigenand
  */
-public abstract class AbstractDCToolCommandBuilder implements DCToolCommandBuilder {
+public abstract class AbstractDCToolCommandBuilder implements DIToolCommandBuilder {
     /**
      * development configuration to list compartments/development components from.
      */

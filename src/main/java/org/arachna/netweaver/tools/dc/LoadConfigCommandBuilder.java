@@ -1,12 +1,12 @@
 /**
  *
  */
-package org.arachna.netweaver.tools.dc.commands;
+package org.arachna.netweaver.tools.dc;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.arachna.netweaver.tools.DCToolCommandBuilder;
+import org.arachna.netweaver.tools.DIToolCommandBuilder;
 import org.arachna.netweaver.tools.DIToolDescriptor;
 
 /**
@@ -14,7 +14,7 @@ import org.arachna.netweaver.tools.DIToolDescriptor;
  * 
  * @author Dirk Weigenand
  */
-class LoadConfigCommandBuilder implements DCToolCommandBuilder {
+class LoadConfigCommandBuilder implements DIToolCommandBuilder {
     /**
      * descriptor for DC tool configuration.
      */
@@ -30,7 +30,7 @@ class LoadConfigCommandBuilder implements DCToolCommandBuilder {
      * @param dcToolDescriptor
      * @param template
      */
-    public LoadConfigCommandBuilder(final DIToolDescriptor dcToolDescriptor, final LoadConfigTemplate template) {
+    LoadConfigCommandBuilder(final DIToolDescriptor dcToolDescriptor, final LoadConfigTemplate template) {
         this.dcToolDescriptor = dcToolDescriptor;
         this.template = template;
     }
@@ -40,7 +40,7 @@ class LoadConfigCommandBuilder implements DCToolCommandBuilder {
      */
     @Override
     public final List<String> execute() {
-        List<String> commands = new ArrayList<String>();
+        final List<String> commands = new ArrayList<String>();
 
         commands.add(getTimingCommand());
         commands.add(getLoadConfigCommand());
@@ -49,20 +49,13 @@ class LoadConfigCommandBuilder implements DCToolCommandBuilder {
     }
 
     /**
-     * @return the dcToolDescriptor
-     */
-    protected final DIToolDescriptor getDcToolDescriptor() {
-        return dcToolDescriptor;
-    }
-
-    /**
      * Get the command for loading a development configuration.
      * 
      * @return command for loading a development configuration.
      */
-    private String getLoadConfigCommand() {
-        return String.format(this.template.getLoadConfigCommand(), getDcToolDescriptor().getUser(),
-            getDcToolDescriptor().getPassword(), DIToolDescriptor.DTR_FOLDER, DIToolDescriptor.DTC_FOLDER);
+    String getLoadConfigCommand() {
+        return String.format(template.getLoadConfigCommand(), dcToolDescriptor.getUser(),
+            dcToolDescriptor.getPassword(), DIToolDescriptor.DTR_FOLDER, DIToolDescriptor.DTC_FOLDER);
     }
 
     /**
@@ -70,7 +63,16 @@ class LoadConfigCommandBuilder implements DCToolCommandBuilder {
      * 
      * @return command to enable timing of dc tool commands.
      */
-    private String getTimingCommand() {
-        return this.template.getTimingCommand();
+    String getTimingCommand() {
+        return template.getTimingCommand();
+    }
+
+    /**
+     * Return the exit command to use for the respective NetWeaver environment.
+     * 
+     * @return exit command.
+     */
+    String getExitCommand() {
+        return template.getExitCommand();
     }
 }

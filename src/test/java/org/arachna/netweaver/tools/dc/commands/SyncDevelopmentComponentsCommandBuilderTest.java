@@ -191,8 +191,7 @@ public class SyncDevelopmentComponentsCommandBuilderTest {
      */
     protected SyncDevelopmentComponentsCommandBuilder createSyncDevelopmentComponentCommandBuilder(
         final boolean syncSources, final boolean cleanCopy) {
-        return new SyncDevelopmentComponentsCommandBuilder(config, dcFactory, SyncDcCommandTemplate.create(config
-            .getJdkHomeAlias()), syncSources, cleanCopy);
+        return new SyncDevelopmentComponentsCommandBuilder(config, dcFactory, syncSources, cleanCopy);
     }
 
     private Compartment createCompartment(final String vendor, final String name, final CompartmentState state) {

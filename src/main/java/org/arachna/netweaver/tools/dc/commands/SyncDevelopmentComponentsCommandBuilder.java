@@ -59,19 +59,16 @@ final class SyncDevelopmentComponentsCommandBuilder extends AbstractDCToolComman
      *            components for.
      * @param dcFactory
      *            registry for development components
-     * @param templateProvider
-     *            provider of templates for dc tool command generation
      * @param syncSources
      *            synchronize in inactive mode or in archive mode
      * @param cleanCopy
      *            indicate whether a clean copy of the workspace is needed.
      */
     SyncDevelopmentComponentsCommandBuilder(final DevelopmentConfiguration developmentConfiguration,
-        final DevelopmentComponentFactory dcFactory, final SyncDcCommandTemplate templateProvider,
-        final boolean syncSources, final boolean cleanCopy) {
+        final DevelopmentComponentFactory dcFactory, final boolean syncSources, final boolean cleanCopy) {
         super(developmentConfiguration);
         this.dcFactory = dcFactory;
-        this.templateProvider = templateProvider;
+        templateProvider = SyncDcCommandTemplate.create(developmentConfiguration.getJdkHomeAlias());
         this.syncSources = syncSources;
         this.cleanCopy = cleanCopy;
     }
