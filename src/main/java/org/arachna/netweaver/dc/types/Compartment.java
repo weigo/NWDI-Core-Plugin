@@ -448,4 +448,22 @@ public final class Compartment {
 
         return description;
     }
+
+    /**
+     * Factory method for compartments.
+     * 
+     * @param vendor
+     *            vendor of software component
+     * @param name
+     *            software component name
+     * @param state
+     *            {@see CompartmentState#Archive} and {@see CompartmentState#Source}.
+     * @param caption
+     *            short description
+     * @return new compartment.
+     */
+    public static Compartment create(String vendor, String name, CompartmentState state, String caption) {
+        return new Compartment(String.format("%s_%s_1", vendor, name), state, vendor, caption, name);
+
+    }
 }

@@ -16,7 +16,7 @@ import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 class DCListReader {
     private final DevelopmentConfiguration config;
     private final DevelopmentComponentFactory dcFactory;
-    private final Pattern regexp = Pattern.compile("^\\d+\\s+\\(.*?\\)\\s+\\(.*?\\)\\s+\\(.*?\\).*?$");
+    private final Pattern regexp = Pattern.compile("^\\d+\\s+(.*?)\\s+(.*?)\\s+(.*?)\\s+.*?$");
 
     DCListReader(final DevelopmentConfiguration config, final DevelopmentComponentFactory dcFactory) {
         this.config = config;
