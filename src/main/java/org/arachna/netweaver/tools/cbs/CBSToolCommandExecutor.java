@@ -27,16 +27,14 @@ import org.arachna.netweaver.tools.DIToolDescriptor;
  */
 public final class CBSToolCommandExecutor extends AbstractDIToolExecutor {
     /**
-     * create DC tool executor with the given command line generator and given
-     * command build.
+     * create DC tool executor with the given command line generator and given command build.
      * 
      * @param launcher
      *            the launcher to use executing the DC tool.
      * @param workspace
      *            the workspace where the DC tool should be executed.
      * @param diToolDescriptor
-     *            descriptor for various parameters needed for DC tool
-     *            execution.
+     *            descriptor for various parameters needed for DC tool execution.
      * @param developmentConfiguration
      *            {@link DevelopmentConfiguration} to use executing the DC tool.
      */
@@ -49,12 +47,10 @@ public final class CBSToolCommandExecutor extends AbstractDIToolExecutor {
      * List development components in the development configuration.
      * 
      * @param dcFactory
-     *            registry for development components to update with DCs listed
-     *            from CBS.
+     *            registry for development components to update with DCs listed from CBS.
      * @return the result of the listdc-command operation.
      * @throws IOException
-     *             might be thrown be the {@link ProcStarter} used to execute
-     *             the DC tool commands.
+     *             might be thrown be the {@link ProcStarter} used to execute the DC tool commands.
      * @throws InterruptedException
      *             when the user canceled the action.
      */
@@ -76,8 +72,7 @@ public final class CBSToolCommandExecutor extends AbstractDIToolExecutor {
      * Generate the fully qualified command to be used to execute the dc tool.
      * 
      * @param isUnix
-     *            indicate whether the platform to run on is Unix(oid) or
-     *            Windows.
+     *            indicate whether the platform to run on is Unix(oid) or Windows.
      * @return fully qualified command to be used to execute the dc tool.
      */
     @Override
@@ -117,9 +112,8 @@ public final class CBSToolCommandExecutor extends AbstractDIToolExecutor {
         private final DIToolDescriptor diToolDescriptor;
 
         /**
-         * Create a DC lister using the given URL to connect to the CBS, the
-         * build space to list DCs from and the authentication information from
-         * the {@link DIToolDescriptor}.
+         * Create a DC lister using the given URL to connect to the CBS, the build space to list DCs from and the authentication information
+         * from the {@link DIToolDescriptor}.
          * 
          * @param cbsUrl
          *            URL to connect to the CBS
@@ -141,7 +135,10 @@ public final class CBSToolCommandExecutor extends AbstractDIToolExecutor {
         public List<String> execute() {
             final List<String> commands = new ArrayList<String>(3);
 
-            commands.add(String.format("connect –c %s -u %s -p %s", cbsUrl, diToolDescriptor.getUser(),
+            commands.add("timing on");
+            commands.add("tracefile tracefile.txt");
+            commands.add("spool spool.txt");
+            commands.add(String.format("connect -cbsurl %s -u %s -p %s", cbsUrl, diToolDescriptor.getUser(),
                 diToolDescriptor.getPassword()));
             commands.add(String.format("listdcs -b %s -m all", buildSpace));
             commands.add("exit");

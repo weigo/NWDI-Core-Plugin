@@ -17,7 +17,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Unit tests for {@link DCListReader}
+ * Unit tests for {@link DCListReader}.
  * 
  * @author Dirk Weigenand
  */

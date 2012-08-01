@@ -41,8 +41,9 @@ class LoadConfigCommandBuilder implements DIToolCommandBuilder {
     @Override
     public final List<String> execute() {
         final List<String> commands = new ArrayList<String>();
-
-        commands.add(getTimingCommand());
+        commands.add(template.getSpoolCommand());
+        commands.add(template.getTracefileCommand());
+        commands.add(template.getTimingCommand());
         commands.add(getLoadConfigCommand());
 
         return commands;

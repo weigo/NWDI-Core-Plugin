@@ -39,16 +39,14 @@ public final class DCToolCommandExecutor extends AbstractDIToolExecutor {
     private final LoadConfigCommandBuilder loadConfigCommandBuilder;
 
     /**
-     * create DC tool executor with the given command line generator and given
-     * command build.
+     * create DC tool executor with the given command line generator and given command build.
      * 
      * @param launcher
      *            the launcher to use executing the DC tool.
      * @param workspace
      *            the workspace where the DC tool should be executed.
      * @param diToolDescriptor
-     *            descriptor for various parameters needed for DC tool
-     *            execution.
+     *            descriptor for various parameters needed for DC tool execution.
      * @param developmentConfiguration
      *            {@link DevelopmentConfiguration} to use executing the DC tool.
      */
@@ -67,8 +65,7 @@ public final class DCToolCommandExecutor extends AbstractDIToolExecutor {
      * @param dcFactory
      * @return the result of the listdc-command operation.
      * @throws IOException
-     *             might be thrown be the {@link ProcStarter} used to execute
-     *             the DC tool commands.
+     *             might be thrown be the {@link ProcStarter} used to execute the DC tool commands.
      * @throws InterruptedException
      *             when the user canceled the action.
      */
@@ -99,14 +96,12 @@ public final class DCToolCommandExecutor extends AbstractDIToolExecutor {
      * @param dcFactory
      *            registry for development components.
      * @param cleanCopy
-     *            indicate whether to synchronize all DCs or only DCs marked as
-     *            needing a rebuild.
+     *            indicate whether to synchronize all DCs or only DCs marked as needing a rebuild.
      * @param syncSources
      *            synchronize in inactive or archive mode
      * @return the result of the syncdc-command operation.
      * @throws IOException
-     *             might be thrown be the {@link ProcStarter} used to execute
-     *             the DC tool commands.
+     *             might be thrown be the {@link ProcStarter} used to execute the DC tool commands.
      * @throws InterruptedException
      *             when the user canceled the action.
      */
@@ -115,7 +110,7 @@ public final class DCToolCommandExecutor extends AbstractDIToolExecutor {
         final long startSyncDCs = System.currentTimeMillis();
         log("Synchronizing development components from NWDI.\n");
         final DIToolCommandExecutionResult result =
-            execute(commandFactory.createSyncDevelopmentComponentsCommandBuilder(dcFactory, syncSources, cleanCopy));
+            wrapAndExecute(commandFactory.createSyncDevelopmentComponentsCommandBuilder(dcFactory, syncSources, cleanCopy));
         duration(startSyncDCs, "Done synchronizing development components from NWDI.\n");
 
         return result;
@@ -128,29 +123,29 @@ public final class DCToolCommandExecutor extends AbstractDIToolExecutor {
      *            development components to build.
      * @return the result of the builddc operation.
      * @throws IOException
-     *             might be thrown be the {@link ProcStarter} used to execute
-     *             the DC tool commands.
+     *             might be thrown be the {@link ProcStarter} used to execute the DC tool commands.
      * @throws InterruptedException
      *             when the user canceled the action.
      */
     public DIToolCommandExecutionResult buildDevelopmentComponents(
         final Collection<DevelopmentComponent> affectedComponents) throws IOException, InterruptedException {
         final long start = System.currentTimeMillis();
-        final DCToolCommandBuilderWrapper wrapper =
-            new DCToolCommandBuilderWrapper(loadConfigCommandBuilder,
-                commandFactory.createBuildDevelopmentComponentsCommandBuilder(affectedComponents));
-        final DIToolCommandExecutionResult result = execute(wrapper);
+        final DIToolCommandExecutionResult result =
+            wrapAndExecute(commandFactory.createBuildDevelopmentComponentsCommandBuilder(affectedComponents));
         duration(start, "Done building development components");
 
         return result;
+    }
+
+    private DIToolCommandExecutionResult wrapAndExecute(DIToolCommandBuilder builder) throws IOException, InterruptedException {
+        return execute(new DCToolCommandBuilderWrapper(loadConfigCommandBuilder, builder));
     }
 
     /**
      * Generate the fully qualified command to be used to execute the dc tool.
      * 
      * @param isUnix
-     *            indicate whether the platform to run on is Unix(oid) or
-     *            Windows.
+     *            indicate whether the platform to run on is Unix(oid) or Windows.
      * @return fully qualified command to be used to execute the dc tool.
      */
     @Override
@@ -169,8 +164,7 @@ public final class DCToolCommandExecutor extends AbstractDIToolExecutor {
     }
 
     /**
-     * Wrap a given {@link DIToolCommandBuilder} in order to prepend
-     * 'loadconfig' and timing commands and append an 'exit' command.
+     * Wrap a given {@link DIToolCommandBuilder} in order to prepend 'loadconfig' and timing commands and append an 'exit' command.
      * 
      * @author Dirk Weigenand
      * 
@@ -187,8 +181,7 @@ public final class DCToolCommandExecutor extends AbstractDIToolExecutor {
         private final DIToolCommandBuilder wrappedBuilder;
 
         /**
-         * Create a new builder wrapper using the given
-         * {@link LoadConfigCommandBuilder} and builder to wrap.
+         * Create a new builder wrapper using the given {@link LoadConfigCommandBuilder} and builder to wrap.
          * 
          * @param loadConfigCommandBuilder
          *            builder for connecting/disconnecting to/from the NDWI.
@@ -208,9 +201,7 @@ public final class DCToolCommandExecutor extends AbstractDIToolExecutor {
         public List<String> execute() {
             final List<String> commands = new LinkedList<String>();
 
-            commands.add(loadConfigCommandBuilder.getTimingCommand());
-            commands.add(loadConfigCommandBuilder.getLoadConfigCommand());
-
+            commands.addAll(loadConfigCommandBuilder.execute());
             commands.addAll(wrappedBuilder.execute());
 
             commands.add(loadConfigCommandBuilder.getExitCommand());
