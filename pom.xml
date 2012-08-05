@@ -123,4 +123,5 @@
       </plugins>
     </pluginManagement>
   </build>
+  <groupId>org.arachna.netweaver</groupId>
 </project>
