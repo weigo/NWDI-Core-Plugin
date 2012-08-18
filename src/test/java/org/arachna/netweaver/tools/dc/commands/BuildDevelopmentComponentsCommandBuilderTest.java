@@ -77,9 +77,8 @@ public final class BuildDevelopmentComponentsCommandBuilderTest {
             createBuildCommands(new DevelopmentComponent[] { dcFactory.get(
                 ExampleDevelopmentComponentFactory.EXAMPLE_COM, ExampleDevelopmentComponentFactory.LIB_JETM) });
         final String[] expected =
-            new String[] {
-                String.format("builddc -s %s -n %s -v %s -o;", EXAMPLE_SC, ExampleDevelopmentComponentFactory.LIB_JETM,
-                    ExampleDevelopmentComponentFactory.EXAMPLE_COM), "exit;" };
+            new String[] { String.format("builddc -s %s -n %s -v %s -o;", EXAMPLE_SC,
+                ExampleDevelopmentComponentFactory.LIB_JETM, ExampleDevelopmentComponentFactory.EXAMPLE_COM) };
         assertThat(commands, hasSize(expected.length));
     }
 
