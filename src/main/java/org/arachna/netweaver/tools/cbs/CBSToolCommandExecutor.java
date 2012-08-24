@@ -10,13 +10,10 @@ import hudson.Launcher.ProcStarter;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 import org.arachna.netweaver.tools.AbstractDIToolExecutor;
-import org.arachna.netweaver.tools.DIToolCommandBuilder;
 import org.arachna.netweaver.tools.DIToolCommandExecutionResult;
 import org.arachna.netweaver.tools.DIToolDescriptor;
 
@@ -88,62 +85,5 @@ public final class CBSToolCommandExecutor extends AbstractDIToolExecutor {
     @Override
     protected File getToolPath() {
         return new File(new File(getNwdiToolLibrary()), "cbstool");
-    }
-
-    /**
-     * List DCs using the cbstool.
-     * 
-     * @author Dirk Weigenand
-     */
-    private class DCLister implements DIToolCommandBuilder {
-        /**
-         * URL to connect to CBS.
-         */
-        private final String cbsUrl;
-
-        /**
-         * build space name to list DCs from.
-         */
-        private final String buildSpace;
-
-        /**
-         * Authentication information.
-         */
-        private final DIToolDescriptor diToolDescriptor;
-
-        /**
-         * Create a DC lister using the given URL to connect to the CBS, the build space to list DCs from and the authentication information
-         * from the {@link DIToolDescriptor}.
-         * 
-         * @param cbsUrl
-         *            URL to connect to the CBS
-         * @param buildSpace
-         *            build space to list DCs from
-         * @param diToolDescriptor
-         *            authentication information
-         */
-        DCLister(final String cbsUrl, final String buildSpace, final DIToolDescriptor diToolDescriptor) {
-            this.cbsUrl = cbsUrl;
-            this.buildSpace = buildSpace;
-            this.diToolDescriptor = diToolDescriptor;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public List<String> execute() {
-            final List<String> commands = new ArrayList<String>(3);
-
-            commands.add("timing on");
-            commands.add("tracefile tracefile.txt");
-            commands.add("spool spool.txt");
-            commands.add(String.format("connect -cbsurl %s -u %s -p %s", cbsUrl, diToolDescriptor.getUser(),
-                diToolDescriptor.getPassword()));
-            commands.add(String.format("listdcs -b %s -m all", buildSpace));
-            commands.add("exit");
-
-            return commands;
-        }
     }
 }
