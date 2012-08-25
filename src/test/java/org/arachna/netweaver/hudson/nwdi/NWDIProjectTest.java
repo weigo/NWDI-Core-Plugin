@@ -46,11 +46,6 @@ public class NWDIProjectTest extends HudsonTestCase {
     private static final String JDK_HOME_PATHS = "jdkHomePaths";
 
     /**
-     * A sample NWDI project, necessary for getting to the descriptor.
-     */
-    private NWDIProject project;
-
-    /**
      * The descriptor under test.
      */
     private NWDIProject.DescriptorImpl descriptor;
@@ -76,7 +71,7 @@ public class NWDIProjectTest extends HudsonTestCase {
         json.accumulate(NWDITOOLLIB71, "");
         json.accumulate(PASSWORD, "");
         json.accumulate(USER, "");
-        json.accumulate("jdkOpts", "");
+        json.accumulate("cbsUrl", "");
         descriptor.configure(null, json);
 
         assertThat(descriptor.getJdkHomePaths(), equalTo(""));
@@ -84,7 +79,7 @@ public class NWDIProjectTest extends HudsonTestCase {
         assertThat(descriptor.getNwdiToolLibFolder71(), equalTo(""));
         assertThat(descriptor.getUser(), equalTo(""));
         assertThat(descriptor.getPassword(), equalTo(""));
-        assertThat(descriptor.getJdkOpts(), equalTo(""));
+        assertThat(descriptor.getCbsUrl(), equalTo(""));
     }
 
     /**
@@ -99,7 +94,7 @@ public class NWDIProjectTest extends HudsonTestCase {
         final String nwdiToolsFolder = "/opt/nwdi/lib";
         final String user = USER;
         final String password = "secret";
-        final String jdkOpts = "-Xmx1024m";
+        final String cbsUrl = "http://di0db.example.com";
 
         final JSONObject json = new JSONObject();
         json.accumulate(JDK_HOME_PATHS, jdk16);
@@ -107,7 +102,7 @@ public class NWDIProjectTest extends HudsonTestCase {
         json.accumulate(NWDITOOLLIB71, nwdiToolsFolder);
         json.accumulate(PASSWORD, password);
         json.accumulate(USER, user);
-        json.accumulate("jdkOpts", jdkOpts);
+        json.accumulate("cbsUrl", cbsUrl);
         descriptor.configure(null, json);
 
         assertThat(descriptor.getJdkHomePaths(), equalTo(jdk16));
@@ -115,7 +110,7 @@ public class NWDIProjectTest extends HudsonTestCase {
         assertThat(descriptor.getNwdiToolLibFolder71(), equalTo(nwdiToolsFolder));
         assertThat(descriptor.getUser(), equalTo(user));
         assertThat(descriptor.getPassword(), equalTo(password));
-        assertThat(descriptor.getJdkOpts(), equalTo(jdkOpts));
+        assertThat(descriptor.getCbsUrl(), equalTo(cbsUrl));
     }
 
     @Test
