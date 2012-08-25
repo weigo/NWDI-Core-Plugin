@@ -31,17 +31,28 @@ import hudson.tasks.Publisher;
 import hudson.triggers.Trigger;
 import hudson.util.DescribableList;
 import hudson.util.FormValidation;
+import hudson.util.LogTaskListener;
+import hudson.util.ListBoxModel;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 
+import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
 
+import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
+import org.arachna.netweaver.tools.DIToolDescriptor;
+import org.arachna.netweaver.tools.cbs.CBSToolCommandExecutor;
 import org.arachna.netweaver.tools.dc.JdkHomePaths;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
@@ -71,6 +82,11 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
      * configuration.
      */
     private String confDef;
+
+    /**
+     * Name of build space in NWDI.
+     */
+    private String buildSpaceName;
 
     /**
      * clean workspace before building when <code>true</code>.
@@ -113,15 +129,18 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
      * configuration.
      * 
      * @param name
-     *            project name
+     *            project name.
+     * @param buildSpaceName
+     *            name of build space in CBS.
      * @param confDef
-     *            development configuration file
+     *            development configuration file.
      * @param cleanCopy
-     *            clean workspace before building when <code>true</code>
+     *            clean workspace before building when <code>true</code>.
      */
     @DataBoundConstructor
-    public NWDIProject(final String name, final String confDef, final boolean cleanCopy) {
+    public NWDIProject(final String name, final String buildSpaceName, final String confDef, final boolean cleanCopy) {
         super(Hudson.getInstance(), name);
+        this.buildSpaceName = buildSpaceName;
         this.confDef = confDef;
         this.cleanCopy = cleanCopy;
     }
@@ -353,8 +372,16 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
 
         /**
          * Options that should be passed to the JDK executing the DC tool.
+         * 
+         * @deprecated
          */
-        private String jdkOpts;
+        @Deprecated
+        private transient String jdkOpts;
+
+        /**
+         * URL to CBS.
+         */
+        private String cbsUrl;
 
         /**
          * Create descriptor for NWDI-Projects and load global configuration
@@ -487,7 +514,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
             nwdiToolLibFolder71 = Util.fixNull(json.getString("nwdiToolLibFolder71"));
             user = Util.fixNull(json.getString("user"));
             password = Util.fixNull(json.getString("password"));
-            jdkOpts = Util.fixNull(json.getString("jdkOpts"));
+            cbsUrl = Util.fixNull(json.getString("cbsUrl"));
 
             save();
 
@@ -517,23 +544,18 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
         }
 
         /**
-         * Verify the given values for options that should be passed to the JDK
-         * executing the dctool.
+         * Verify that the given URL can be reached and using the credentials
+         * for user and password can be used to access the NWDI.
          * 
          * @param value
-         *            verify that all options passed to the JDK start with -X.
-         * @return
+         *            URL to CBS
+         * 
+         * @return the validation result.
          */
-        public FormValidation doJdkOptsCheck(@QueryParameter final String value) {
-            final String[] jdkOpts = value == null ? new String[0] : value.split(" ");
-            FormValidation result = FormValidation.ok();
-
-            for (final String option : jdkOpts) {
-                if (!option.startsWith("-X")) {
-                    result = FormValidation.error(Messages.NWDIProject_invalid_jdk_option(option));
-                    break;
-                }
-            }
+        public FormValidation doCbsUrlCheck(@QueryParameter final String value) {
+            // FIXME: Validate that CBS URL is reachable and the use can login
+            // (how???)
+            final FormValidation result = FormValidation.ok();
 
             return result;
         }
@@ -649,6 +671,62 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
             return new JdkHomePathsParser(getJdkHomePaths()).parse();
         }
 
+        public ListBoxModel doFillBuildSpaceNameItems() {
+            final ListBoxModel items = new ListBoxModel();
+            for (final String buildSpaceName : getBuildSpaceNames()) {
+                items.add(buildSpaceName, buildSpaceName);
+            }
+
+            return items;
+        }
+
+        private String getNwdiToolibFolder() {
+            String nwdiToolLibraryFolder = getNwdiToolLibFolder71();
+
+            if (nwdiToolLibraryFolder.isEmpty()) {
+                nwdiToolLibraryFolder = getNwdiToolLibFolder();
+            }
+
+            return nwdiToolLibraryFolder;
+        }
+
+        private Collection<String> getBuildSpaceNames() {
+            // FIXME: very complicated! To get to the list of build spaces one
+            // should need only the CBS URL, NWDI credentials and the
+            // NWDITOOLLIBDIR to use.
+            final DevelopmentConfiguration configuration = new DevelopmentConfiguration("xxx");
+            configuration.setCmsUrl(cbsUrl);
+            // final BuildVariant variant = new BuildVariant("default");
+            // variant.addBuildOption(DevelopmentConfiguration.COM_SAP_JDK_HOME_PATH_KEY,
+            // System.getProperty("java.home"));
+            final DIToolDescriptor descriptor =
+                new DIToolDescriptor(getUser(), getPassword(), getCbsUrl(), getNwdiToolibFolder(),
+                    getConfiguredJdkHomePaths());
+            final Launcher launcher =
+                Jenkins.getInstance().createLauncher(
+                    new LogTaskListener(Logger.getLogger(this.getClass().getName()), Level.ALL));
+            final FilePath pwd = Jenkins.getInstance().createPath(System.getProperty("java.io.tmpdir"));
+            final CBSToolCommandExecutor executor =
+                new CBSToolCommandExecutor(launcher, pwd, descriptor, configuration);
+            final List<String> buildSpaceNames = new LinkedList<String>();
+
+            try {
+                buildSpaceNames.addAll(executor.getBuildSpaceNames());
+            }
+            catch (final IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            catch (final InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+            Collections.sort(buildSpaceNames);
+
+            return buildSpaceNames;
+        }
+
         /**
          * {@inheritDoc}
          */
@@ -663,6 +741,21 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
         @Override
         public NWDIProject newInstance(final ItemGroup group, final String name) {
             return new NWDIProject(group, name);
+        }
+
+        /**
+         * @return the cbsUrl
+         */
+        public String getCbsUrl() {
+            return cbsUrl;
+        }
+
+        /**
+         * @param cbsUrl
+         *            the cbsUrl to set
+         */
+        public void setCbsUrl(final String cbsUrl) {
+            this.cbsUrl = cbsUrl;
         }
     }
 
@@ -713,5 +806,20 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
      */
     public void setCleanCopy(final boolean cleanCopy) {
         this.cleanCopy = cleanCopy;
+    }
+
+    /**
+     * @return the buildSpaceName
+     */
+    public String getBuildSpaceName() {
+        return buildSpaceName;
+    }
+
+    /**
+     * @param buildSpaceName
+     *            the buildSpaceName to set
+     */
+    public void setBuildSpaceName(final String buildSpaceName) {
+        this.buildSpaceName = buildSpaceName;
     }
 }

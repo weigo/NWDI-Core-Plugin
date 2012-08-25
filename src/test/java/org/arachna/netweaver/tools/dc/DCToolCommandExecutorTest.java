@@ -109,7 +109,8 @@ public class DCToolCommandExecutorTest {
 
         final Writer messages = new OutputStreamWriter(System.out);
         final Launcher launcher = new Launcher.LocalLauncher(new StreamTaskListener(messages));
-        final DIToolDescriptor dcToolDescriptor = new DIToolDescriptor("developer", "secret", nwdiToolLibDir, paths);
+        final DIToolDescriptor dcToolDescriptor =
+            new DIToolDescriptor("developer", "secret", nwdiToolLibDir, "", paths);
         final DevelopmentConfiguration config = new DevelopmentConfiguration("Test");
         config.setBuildVariant(buildVariant);
 

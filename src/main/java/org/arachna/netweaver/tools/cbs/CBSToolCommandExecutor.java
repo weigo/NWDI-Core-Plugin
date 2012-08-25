@@ -10,6 +10,8 @@ import hudson.Launcher.ProcStarter;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
@@ -24,14 +26,16 @@ import org.arachna.netweaver.tools.DIToolDescriptor;
  */
 public final class CBSToolCommandExecutor extends AbstractDIToolExecutor {
     /**
-     * create DC tool executor with the given command line generator and given command build.
+     * create DC tool executor with the given command line generator and given
+     * command build.
      * 
      * @param launcher
      *            the launcher to use executing the DC tool.
      * @param workspace
      *            the workspace where the DC tool should be executed.
      * @param diToolDescriptor
-     *            descriptor for various parameters needed for DC tool execution.
+     *            descriptor for various parameters needed for DC tool
+     *            execution.
      * @param developmentConfiguration
      *            {@link DevelopmentConfiguration} to use executing the DC tool.
      */
@@ -44,10 +48,12 @@ public final class CBSToolCommandExecutor extends AbstractDIToolExecutor {
      * List development components in the development configuration.
      * 
      * @param dcFactory
-     *            registry for development components to update with DCs listed from CBS.
+     *            registry for development components to update with DCs listed
+     *            from CBS.
      * @return the result of the listdc-command operation.
      * @throws IOException
-     *             might be thrown be the {@link ProcStarter} used to execute the DC tool commands.
+     *             might be thrown be the {@link ProcStarter} used to execute
+     *             the DC tool commands.
      * @throws InterruptedException
      *             when the user canceled the action.
      */
@@ -66,10 +72,30 @@ public final class CBSToolCommandExecutor extends AbstractDIToolExecutor {
     }
 
     /**
+     * Get a list of build spaces from CBS.
+     * 
+     * @return list of build spaces from CBS.
+     * @throws IOException
+     *             re-thrown from executing the CBS tool via the launcher.
+     * @throws InterruptedException
+     *             when the command execution was interrupted.
+     */
+    public Collection<String> getBuildSpaceNames() throws IOException, InterruptedException {
+        System.currentTimeMillis();
+        final DevelopmentConfiguration config = getDevelopmentConfiguration();
+
+        final DIToolCommandExecutionResult result =
+            execute(new ListBuildSpaces(config.getCmsUrl(), getDiToolDescriptor()));
+
+        return Arrays.asList(result.getOutput().split("\n"));
+    }
+
+    /**
      * Generate the fully qualified command to be used to execute the dc tool.
      * 
      * @param isUnix
-     *            indicate whether the platform to run on is Unix(oid) or Windows.
+     *            indicate whether the platform to run on is Unix(oid) or
+     *            Windows.
      * @return fully qualified command to be used to execute the dc tool.
      */
     @Override

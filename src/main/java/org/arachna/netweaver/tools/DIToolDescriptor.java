@@ -40,6 +40,11 @@ public final class DIToolDescriptor {
     private final JdkHomePaths paths;
 
     /**
+     * URL to CBS.
+     */
+    private final String cbsUrl;
+
+    /**
      * Create an instance of a <code>DCToolDescriptor</code>.
      * 
      * @param user
@@ -48,15 +53,18 @@ public final class DIToolDescriptor {
      *            password to use authenticating the user.
      * @param nwdiToolLibrary
      *            path to NWDI tool library folder.
+     * @param cbsUrl
+     *            URL to CBS.
      * @param paths
      *            configured JDKs.
      */
     public DIToolDescriptor(final String user, final String password, final String nwdiToolLibrary,
-        final JdkHomePaths paths) {
+        final String cbsUrl, final JdkHomePaths paths) {
         super();
         this.user = user;
         this.password = password;
         this.nwdiToolLibrary = nwdiToolLibrary;
+        this.cbsUrl = cbsUrl;
         this.paths = paths;
     }
 
@@ -98,5 +106,12 @@ public final class DIToolDescriptor {
      */
     String getJavaHome(final JdkHomeAlias alias) {
         return paths.get(alias);
+    }
+
+    /**
+     * @return the cbsUrl
+     */
+    public String getCbsUrl() {
+        return cbsUrl;
     }
 }

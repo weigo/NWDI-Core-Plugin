@@ -29,6 +29,11 @@ import org.arachna.netweaver.dc.types.JdkHomeAlias;
  */
 public abstract class AbstractDIToolExecutor {
     /**
+     * 
+     */
+    private static final String JAVA_HOME = "JAVA_HOME";
+
+    /**
      * 1000 milliseconds.
      */
     private static final float A_THOUSAND_MSECS = 1000f;
@@ -202,8 +207,12 @@ public abstract class AbstractDIToolExecutor {
         final JdkHomeAlias alias = developmentConfiguration.getJdkHomeAlias();
 
         if (alias != null) {
-            environment.put("JAVA_HOME", getDiToolDescriptor().getJavaHome(alias));
+            environment.put(JAVA_HOME, getDiToolDescriptor().getJavaHome(alias));
             environment.put("JDK_PROPERTY_NAME", alias.toString());
+        }
+        else {
+            environment.put(JAVA_HOME, System.getProperty("java.home"));
+
         }
 
         return environment;

@@ -393,7 +393,7 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
         }
 
         return new DIToolDescriptor(descriptor.getUser(), descriptor.getPassword(), nwdiToolLibraryFolder,
-            descriptor.getConfiguredJdkHomePaths());
+            descriptor.getCbsUrl(), descriptor.getConfiguredJdkHomePaths());
     }
 
     /**
