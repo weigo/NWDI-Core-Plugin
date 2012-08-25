@@ -19,8 +19,9 @@ import org.arachna.xml.XmlReaderHelper;
 import org.xml.sax.SAXException;
 
 /**
- * Update development components with information read from the on disk representation of those DCs (i.e. .confdef, .dcdef, project
- * properties and various JEE configuration files).
+ * Update development components with information read from the on disk
+ * representation of those DCs (i.e. .confdef, .dcdef, project properties and
+ * various JEE configuration files).
  * 
  * @author Dirk Weigenand
  */
@@ -69,8 +70,9 @@ public final class DevelopmentComponentUpdater {
     }
 
     /**
-     * Loops through all components and updates information read from dc tool with information from file system (i.e. configuration data of
-     * DCs: .dcdef, Project.wdproperties, etc.)
+     * Loops through all components and updates information read from dc tool
+     * with information from file system (i.e. configuration data of DCs:
+     * .dcdef, Project.wdproperties, etc.)
      */
     public void execute() {
         for (final DevelopmentComponent component : dcFactory.getAll()) {
@@ -84,15 +86,12 @@ public final class DevelopmentComponentUpdater {
                 readPublicParts();
                 readProperties();
             }
-            else {
-                LOGGER.log(Level.INFO, config.getAbsolutePath() + " does not exist in development configuration "
-                    + location + "!");
-            }
         }
     }
 
     /**
-     * Update the current development component with information read from its development component configuration file.
+     * Update the current development component with information read from its
+     * development component configuration file.
      * 
      * @param config
      *            configuration file to be read for updating the component.
@@ -125,7 +124,8 @@ public final class DevelopmentComponentUpdater {
     }
 
     /**
-     * Read additional properties from configurations files specific to the type of development component.
+     * Read additional properties from configurations files specific to the type
+     * of development component.
      */
     private void readProperties() {
         AbstractComponentConfigurationReader reader = null;
@@ -140,7 +140,7 @@ public final class DevelopmentComponentUpdater {
         }
 
         if (reader != null) {
-            for (PublicPartReference newPpRef : reader.read()) {
+            for (final PublicPartReference newPpRef : reader.read()) {
                 if (!currentComponent.hasRuntimeReference(newPpRef)) {
                     currentComponent.add(newPpRef);
                 }
@@ -149,10 +149,11 @@ public final class DevelopmentComponentUpdater {
     }
 
     /**
-     * Read the public parts of the current development component and add them to it.
+     * Read the public parts of the current development component and add them
+     * to it.
      */
     private void readPublicParts() {
-        this.currentComponent.setPublicParts(new PublicPartsReader(componentBase).read());
+        currentComponent.setPublicParts(new PublicPartsReader(componentBase).read());
     }
 
     /**

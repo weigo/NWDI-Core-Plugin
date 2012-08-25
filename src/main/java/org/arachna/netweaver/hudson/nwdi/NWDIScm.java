@@ -37,7 +37,6 @@ import org.arachna.netweaver.hudson.dtr.browser.Activity;
 import org.arachna.netweaver.hudson.dtr.browser.ActivityResource;
 import org.arachna.netweaver.hudson.dtr.browser.DtrBrowser;
 import org.arachna.netweaver.hudson.nwdi.dcupdater.DevelopmentComponentUpdater;
-import org.arachna.netweaver.hudson.util.FilePathHelper;
 import org.arachna.netweaver.tools.DIToolCommandExecutionResult;
 import org.arachna.netweaver.tools.dc.DCToolCommandExecutor;
 import org.kohsuke.stapler.StaplerRequest;
@@ -120,7 +119,8 @@ public class NWDIScm extends SCM {
 
         DIToolCommandExecutionResult result =
             currentBuild.getCBSToolExecutor(launcher).listDevelopmentComponents(dcFactory);
-        final String dtcPath = FilePathHelper.makeAbsolute(currentBuild.getWorkspace().child(".dtc"));
+        final DevelopmentComponentUpdater updater =
+            new DevelopmentComponentUpdater(currentBuild.getAbsolutePathToDtcFolder(), dcFactory);
 
         if (result.isExitCodeOk()) {
             final NWDIBuild lastSuccessfulBuild = currentBuild.getParent().getLastSuccessfulBuild();
@@ -145,16 +145,16 @@ public class NWDIScm extends SCM {
                 // synchronize sources
                 result = executor.synchronizeDevelopmentComponents(dcFactory, cleanCopy, true);
                 // update used DCs
-                new DevelopmentComponentUpdater(dtcPath, dcFactory).execute();
+                updater.execute();
 
                 if (result.isExitCodeOk()) {
-                    // synchronize used DCs
+                    // synchronize used DCs (in archive state)
                     result = executor.synchronizeDevelopmentComponents(dcFactory, cleanCopy, false);
                 }
             }
         }
 
-        new DevelopmentComponentUpdater(dtcPath, dcFactory).execute();
+        updater.execute();
 
         build.addAction(new NWDIRevisionState(activities));
         writeChangeLog(build, changelogFile, activities);

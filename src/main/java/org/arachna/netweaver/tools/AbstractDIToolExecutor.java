@@ -59,14 +59,16 @@ public abstract class AbstractDIToolExecutor {
     private final PrintStream logger;
 
     /**
-     * create DC tool executor with the given command line generator and given command build.
+     * create DC tool executor with the given command line generator and given
+     * command build.
      * 
      * @param launcher
      *            the launcher to use executing the DC tool.
      * @param workspace
      *            the workspace where the DC tool should be executed.
      * @param diToolDescriptor
-     *            descriptor for various parameters needed for DC tool execution.
+     *            descriptor for various parameters needed for DC tool
+     *            execution.
      * @param developmentConfiguration
      *            {@link DevelopmentConfiguration} to use executing the DC tool.
      */
@@ -86,37 +88,39 @@ public abstract class AbstractDIToolExecutor {
      *            builder for dc tool commands
      * @return content of log file created by the executed dc tool.
      * @throws IOException
-     *             might be thrown be the {@link ProcStarter} used to execute the DC tool commands.
+     *             might be thrown be the {@link ProcStarter} used to execute
+     *             the DC tool commands.
      * @throws InterruptedException
      *             when the user canceled the action.
      */
     public DIToolCommandExecutionResult execute(final DIToolCommandBuilder commandBuilder) throws IOException,
         InterruptedException {
-        final List<String> commands = commandBuilder.execute();
-        final ByteArrayOutputStream result = new ByteArrayOutputStream();
-        int exitCode = 0;
-
         final ProcStarter starter = launcher.launch();
         starter.pwd(workspace);
         starter.envs(createEnvironment());
         starter.cmds(createToolCommand(launcher.isUnix(), null));
-        starter.stdin(createCommandInputStream(commands, launcher.isUnix()));
+        starter.stdin(createCommandInputStream(commandBuilder.execute(), launcher.isUnix()));
 
+        final ByteArrayOutputStream result = new ByteArrayOutputStream();
         final ForkOutputStream tee = new ForkOutputStream(launcher.getListener().getLogger(), result);
         starter.stdout(tee);
-        exitCode = starter.join();
+        final int exitCode = starter.join();
 
         return new DIToolCommandExecutionResult(result.toString(), exitCode);
     }
 
     /**
-     * Create an <code>InputStream</code> containing the given NWDI tool commands.
+     * Create an <code>InputStream</code> containing the given NWDI tool
+     * commands.
      * 
      * @param commands
      *            list of NWDI tool commands
+     * @param isUnix
+     *            indicates whether we run on a Unix OS (<code>true</code>) or
+     *            not (<code>false</code>).
      * @return <code>InputStream</code> containing the given NWDI tool commands.
      */
-    private InputStream createCommandInputStream(final List<String> commands, boolean isUnix) {
+    private InputStream createCommandInputStream(final List<String> commands, final boolean isUnix) {
         final StringBuilder cmds = new StringBuilder();
 
         for (final String cmd : commands) {
@@ -138,7 +142,8 @@ public abstract class AbstractDIToolExecutor {
      * @param isUnix
      *            indicate whether to run on a unixoid OS or Windows.
      * @param commandFile
-     *            <code>FilePath</code> where tool commands should be written to.
+     *            <code>FilePath</code> where tool commands should be written
+     *            to.
      * @return the created command line.
      */
     private ArgumentListBuilder createToolCommand(final boolean isUnix, final FilePath commandFile) {
@@ -158,7 +163,8 @@ public abstract class AbstractDIToolExecutor {
      * Generate the fully qualified command to be used to execute the dc tool.
      * 
      * @param isUnix
-     *            indicate whether the platform to run on is Unix(oid) or Windows.
+     *            indicate whether the platform to run on is Unix(oid) or
+     *            Windows.
      * @return fully qualified command to be used to execute the dc tool.
      */
     private String getFullyQualifiedToolCommand(final boolean isUnix) {
@@ -166,10 +172,12 @@ public abstract class AbstractDIToolExecutor {
     }
 
     /**
-     * Determine the name of the command to be executed. I.e. the name of the shell script or batch file.
+     * Determine the name of the command to be executed. I.e. the name of the
+     * shell script or batch file.
      * 
      * @param isUnix
-     *            <code>true</code> if command is executed on a unix system, <code>false</code> otherwise.
+     *            <code>true</code> if command is executed on a unix system,
+     *            <code>false</code> otherwise.
      * @return the name of the shell script or batch file to be executed.
      */
     protected abstract String getCommandName(boolean isUnix);
@@ -184,7 +192,8 @@ public abstract class AbstractDIToolExecutor {
     /**
      * Prepare the environment variables for the launcher.
      * 
-     * @return the map containing the environment variable name mapping to their corresponding values.
+     * @return the map containing the environment variable name mapping to their
+     *         corresponding values.
      */
     private Map<String, String> createEnvironment() {
         final Map<String, String> environment = new HashMap<String, String>();
@@ -193,17 +202,16 @@ public abstract class AbstractDIToolExecutor {
         final JdkHomeAlias alias = developmentConfiguration.getJdkHomeAlias();
 
         if (alias != null) {
-            environment.put("JAVA_HOME", getDiToolDescriptor().getPaths().get(alias));
+            environment.put("JAVA_HOME", getDiToolDescriptor().getJavaHome(alias));
             environment.put("JDK_PROPERTY_NAME", alias.toString());
         }
-
-        environment.put("JAVA_OPTS", getDiToolDescriptor().getJdkOpts());
 
         return environment;
     }
 
     /**
-     * Determine the time in seconds passed since the given start time and log it using the message given.
+     * Determine the time in seconds passed since the given start time and log
+     * it using the message given.
      * 
      * @param start
      *            begin of action whose duration should be logged.

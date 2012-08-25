@@ -21,8 +21,6 @@ import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 import org.arachna.netweaver.dc.types.JdkHomeAlias;
 import org.arachna.netweaver.tools.DIToolCommandBuilder;
 import org.arachna.netweaver.tools.DIToolDescriptor;
-import org.arachna.netweaver.tools.dc.DCToolCommandExecutor;
-import org.arachna.netweaver.tools.dc.JdkHomePaths;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -111,7 +109,7 @@ public class DCToolCommandExecutorTest {
 
         final Writer messages = new OutputStreamWriter(System.out);
         final Launcher launcher = new Launcher.LocalLauncher(new StreamTaskListener(messages));
-        final DIToolDescriptor dcToolDescriptor = new DIToolDescriptor("developer", "secret", nwdiToolLibDir, paths, "");
+        final DIToolDescriptor dcToolDescriptor = new DIToolDescriptor("developer", "secret", nwdiToolLibDir, paths);
         final DevelopmentConfiguration config = new DevelopmentConfiguration("Test");
         config.setBuildVariant(buildVariant);
 

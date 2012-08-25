@@ -1,5 +1,6 @@
 package org.arachna.netweaver.tools;
 
+import org.arachna.netweaver.dc.types.JdkHomeAlias;
 import org.arachna.netweaver.tools.dc.JdkHomePaths;
 
 /**
@@ -8,11 +9,6 @@ import org.arachna.netweaver.tools.dc.JdkHomePaths;
  * @author Dirk Weigenand
  */
 public final class DIToolDescriptor {
-    /**
-     * default options that should be passed to JDK executing the dctool.
-     */
-    private static final String DEFAULT_JDK_OPTS = "-Xmx256m -Xss20m";
-
     /**
      * folder name that contains the DTR configuration files.
      */
@@ -39,11 +35,6 @@ public final class DIToolDescriptor {
     private final String nwdiToolLibrary;
 
     /**
-     * Options that should be passed to the JDK executing the DC tool.
-     */
-    private String jdkOpts = DEFAULT_JDK_OPTS;
-
-    /**
      * configured JDKs.
      */
     private final JdkHomePaths paths;
@@ -59,21 +50,19 @@ public final class DIToolDescriptor {
      *            path to NWDI tool library folder.
      * @param paths
      *            configured JDKs.
-     * @param jdkOpts
-     *            Options that should be passed to the JDK executing the DC
-     *            tool.
      */
     public DIToolDescriptor(final String user, final String password, final String nwdiToolLibrary,
-        final JdkHomePaths paths, final String jdkOpts) {
+        final JdkHomePaths paths) {
         super();
         this.user = user;
         this.password = password;
         this.nwdiToolLibrary = nwdiToolLibrary;
         this.paths = paths;
-        this.jdkOpts = jdkOpts;
     }
 
     /**
+     * Return the NWDI user.
+     * 
      * @return the user
      */
     public String getUser() {
@@ -81,6 +70,8 @@ public final class DIToolDescriptor {
     }
 
     /**
+     * Return the password for the NWDI user.
+     * 
      * @return the password
      */
     public String getPassword() {
@@ -88,6 +79,9 @@ public final class DIToolDescriptor {
     }
 
     /**
+     * Path to the NWDI tools library folder (folder where the di_tools were
+     * extracted to).
+     * 
      * @return the nwdiToolLibrary
      */
     public String getNwdiToolLibrary() {
@@ -95,19 +89,14 @@ public final class DIToolDescriptor {
     }
 
     /**
-     * @return the paths
-     */
-    public JdkHomePaths getPaths() {
-        return paths;
-    }
-
-    /**
-     * Returns the options that should be passed to the JDK executing the DC
-     * tool.
+     * Return the JavaHome for the given {@link JdkHomeAlias}.
      * 
-     * @return options that should be passed to the JDK executing the DC tool.
+     * @param alias
+     *            the <code>JdkHomeAlias</code> the JavaHome folder shall be
+     *            returned.
+     * @return the registered JavaHome folder or <code>null</code>.
      */
-    public String getJdkOpts() {
-        return this.jdkOpts == null || this.jdkOpts.isEmpty() ? DEFAULT_JDK_OPTS : this.jdkOpts;
+    String getJavaHome(final JdkHomeAlias alias) {
+        return paths.get(alias);
     }
 }

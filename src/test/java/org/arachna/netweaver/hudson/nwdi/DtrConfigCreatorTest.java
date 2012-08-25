@@ -10,7 +10,6 @@ import hudson.Util;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
 
 import org.arachna.netweaver.dc.types.Compartment;
 import org.arachna.netweaver.dc.types.CompartmentState;
@@ -31,6 +30,11 @@ import org.xml.sax.SAXException;
  * @author Dirk Weigenand
  */
 public final class DtrConfigCreatorTest {
+    /**
+     * 
+     */
+    private static final String VENDOR = "sap.com";
+
     /**
      * 
      */
@@ -60,28 +64,29 @@ public final class DtrConfigCreatorTest {
      * Set up the fixture used during test.
      * 
      * @throws IOException
-     *             when creating the temporary directory used as workspace or sub folders in it fail
+     *             when creating the temporary directory used as workspace or
+     *             sub folders in it fail
      * @throws InterruptedException
      *             might be thrown from FilePath operations
      */
     @Before
     public void setUp() throws IOException, InterruptedException {
-        this.workspace = Util.createTempDir();
+        workspace = Util.createTempDir();
         config = new DevelopmentConfiguration("DI0_testTrack_D");
         config.setBuildServer(BUILD_SERVER_URL);
 
-        Compartment compartment = new Compartment("sap.com_EP_BUILDT_1", CompartmentState.Source, "sap.com", "", "EP_BUILDT");
+        Compartment compartment = Compartment.create(VENDOR, "EP_BUILDT", CompartmentState.Source, "");
         compartment.setDtrUrl("http://di01db.example.com:53000");
         config.add(compartment);
 
-        compartment = new Compartment("sap.com_SAP_BUILDT_1", CompartmentState.Source, "sap.com", "", "SAP_BUILDT");
+        compartment = Compartment.create(VENDOR, "SAP_BUILDT", CompartmentState.Source, "");
         compartment.setDtrUrl(DTR_URL);
         config.add(compartment);
 
-        this.configCreator =
-            new DtrConfigCreator(new FilePath(this.workspace), config,
-                "<?xml version=\"1.0\" encoding=\"UTF-8\"?><confdef />", new PrintStream(System.out));
-        this.configCreator.execute();
+        configCreator =
+            new DtrConfigCreator(new FilePath(workspace), config,
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?><confdef />");
+        configCreator.execute();
     }
 
     /**
@@ -94,16 +99,18 @@ public final class DtrConfigCreatorTest {
      */
     @After
     public void tearDown() throws IOException {
-        this.config = null;
-        this.configCreator = null;
+        config = null;
+        configCreator = null;
 
-        Util.deleteRecursive(this.workspace);
+        Util.deleteRecursive(workspace);
     }
 
     /**
-     * Assert that the various configuration files are created with correct content.
+     * Assert that the various configuration files are created with correct
+     * content.
      * 
-     * Test method for {@link org.arachna.netweaver.hudson.nwdi.DtrConfigCreator#execute()}.
+     * Test method for
+     * {@link org.arachna.netweaver.hudson.nwdi.DtrConfigCreator#execute()}.
      */
     @Test
     public void testServersXml() {
@@ -121,9 +128,11 @@ public final class DtrConfigCreatorTest {
     }
 
     /**
-     * Assert that the various configuration files are created with correct content.
+     * Assert that the various configuration files are created with correct
+     * content.
      * 
-     * Test method for {@link org.arachna.netweaver.hudson.nwdi.DtrConfigCreator#execute()}.
+     * Test method for
+     * {@link org.arachna.netweaver.hudson.nwdi.DtrConfigCreator#execute()}.
      */
     @Test
     public void testClientsXml() {
@@ -136,16 +145,18 @@ public final class DtrConfigCreatorTest {
 
         final FilePath clientsXml = dotDtr.child(DtrConfigCreator.CLIENTS_XML);
         assertFilePathExists(clientsXml);
-        assertContent(clientsXml, String.format("/clients/client[@name = '%s']", this.config.getName()));
-        assertContent(clientsXml, String.format("/clients/client[@logicalSystem = '%s']", this.config.getName()));
+        assertContent(clientsXml, String.format("/clients/client[@name = '%s']", config.getName()));
+        assertContent(clientsXml, String.format("/clients/client[@logicalSystem = '%s']", config.getName()));
         assertContent(clientsXml,
             String.format("/clients/client[@absoluteLocalRoot = '%s']", FilePathHelper.makeAbsolute(dotDtc)));
     }
 
     /**
-     * Assert that the various configuration files are created with correct content.
+     * Assert that the various configuration files are created with correct
+     * content.
      * 
-     * Test method for {@link org.arachna.netweaver.hudson.nwdi.DtrConfigCreator#execute()}.
+     * Test method for
+     * {@link org.arachna.netweaver.hudson.nwdi.DtrConfigCreator#execute()}.
      */
     @Test
     public void testSystemXml() {
@@ -162,7 +173,8 @@ public final class DtrConfigCreatorTest {
     }
 
     /**
-     * Assert that the given <code>FilePath</code> contains content that is matched by the given XPath expression.
+     * Assert that the given <code>FilePath</code> contains content that is
+     * matched by the given XPath expression.
      * 
      * @param path
      *            the <code>FilePath</code> whose contents is to be tested.

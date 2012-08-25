@@ -39,8 +39,10 @@ import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 import org.arachna.netweaver.dc.types.JdkHomeAlias;
 import org.arachna.netweaver.hudson.dtr.browser.Activity;
 import org.arachna.netweaver.hudson.dtr.browser.ActivityResource;
+import org.arachna.netweaver.hudson.dtr.browser.DtrBrowser;
 import org.arachna.netweaver.hudson.nwdi.confdef.ConfDefReader;
 import org.arachna.netweaver.hudson.util.FilePathHelper;
+import org.arachna.netweaver.tools.AbstractDIToolExecutor;
 import org.arachna.netweaver.tools.DIToolCommandExecutionResult;
 import org.arachna.netweaver.tools.DIToolDescriptor;
 import org.arachna.netweaver.tools.cbs.CBSToolCommandExecutor;
@@ -77,7 +79,8 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
     /**
      * wipe workspace before building.
      */
-    private boolean cleanCopy;
+    // FIXME: Remove cleanCopy property!
+    private transient boolean cleanCopy;
 
     /**
      * Create an instance of <code>NWDIBuild</code> using the given
@@ -146,29 +149,8 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
      */
     public Collection<DevelopmentComponent> getAffectedDevelopmentComponents() {
         if (affectedComponents == null) {
-            final NWDIRevisionState revisionState = this.getAction(NWDIRevisionState.class);
-            final Set<DevelopmentComponent> affectedComponents = new HashSet<DevelopmentComponent>();
-
-            for (final Activity activity : revisionState.getActivities()) {
-                for (final ActivityResource resource : activity.getResources()) {
-                    final DevelopmentComponent component = resource.getDevelopmentComponent();
-
-                    // ignore DCs without compartment: those were probably
-                    // deleted.
-                    if (component.getCompartment() != null) {
-                        affectedComponents.add(component);
-                    }
-                }
-            }
-
-            // honor the cleanCopy property of NWDIProject
-            for (final Compartment compartment : getDevelopmentConfiguration().getCompartments(CompartmentState.Source)) {
-                for (final DevelopmentComponent component : compartment.getDevelopmentComponents()) {
-                    if (component.isNeedsRebuild()) {
-                        affectedComponents.add(component);
-                    }
-                }
-            }
+            final Set<DevelopmentComponent> affectedComponents = getAffectedDevelopmentComponentsFromRevisionState();
+            affectedComponents.addAll(getDevelopmentComponentsThatNeedRebuild());
 
             final Collection<DevelopmentComponent> components = new LinkedList<DevelopmentComponent>();
 
@@ -206,10 +188,93 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
         return affectedComponents;
     }
 
+    /**
+     * Return the set of development components that were marked as needing a
+     * rebuild previously.
+     * 
+     * @return set of development components that were marked as needing a
+     *         rebuild previously.
+     */
+    protected Set<DevelopmentComponent> getDevelopmentComponentsThatNeedRebuild() {
+        final Set<DevelopmentComponent> components = new HashSet<DevelopmentComponent>();
+
+        for (final Compartment compartment : getDevelopmentConfiguration().getCompartments(CompartmentState.Source)) {
+            for (final DevelopmentComponent component : compartment.getDevelopmentComponents()) {
+                if (component.isNeedsRebuild()) {
+                    components.add(component);
+                }
+            }
+        }
+
+        return components;
+    }
+
+    /**
+     * Calculate the set of development components to build from activities
+     * determined earlier by the {@link DtrBrowser}.
+     * 
+     * @return the set of development components to build as determined by
+     *         activities in the DTR.
+     */
+    private Set<DevelopmentComponent> getAffectedDevelopmentComponentsFromRevisionState() {
+        final Set<DevelopmentComponent> affectedComponents = new HashSet<DevelopmentComponent>();
+
+        final NWDIRevisionState revisionState = this.getAction(NWDIRevisionState.class);
+
+        for (final Activity activity : revisionState.getActivities()) {
+            for (final ActivityResource resource : activity.getResources()) {
+                final DevelopmentComponent component = resource.getDevelopmentComponent();
+
+                // ignore DCs without compartment: those were probably
+                // deleted.
+                if (component.getCompartment() != null) {
+                    affectedComponents.add(component);
+                }
+            }
+        }
+
+        return affectedComponents;
+    }
+
+    /**
+     * Determine whether the given development component has been synchronized
+     * to this builds workspace.
+     * 
+     * @param component
+     *            development component that should be synchronized to this
+     *            builds workspace.
+     * @return <code>true</code> when the component was synchronized,
+     *         <code>false</code> else.
+     * @throws IOException
+     *             when the folder for the given development component could not
+     *             be determined.
+     * @throws InterruptedException
+     *             when the operation was interrupted.
+     */
     private boolean componentExists(final DevelopmentComponent component) throws IOException, InterruptedException {
-        final FilePath dcFolder = getWorkspace().child(".dtc/DCs");
+        final FilePath dcFolder = getDtcFolder().child("DCs");
 
         return dcFolder.child(String.format("%s/%s/_comp/.dcdef", component.getVendor(), component.getName())).exists();
+    }
+
+    /**
+     * Return the {@link FilePath} object representing the <code>.dtc</code>
+     * Folder.
+     * 
+     * @return {@link FilePath} object representing the <code>.dtc</code>
+     *         Folder.
+     */
+    FilePath getDtcFolder() {
+        return getWorkspace().child(".dtc");
+    }
+
+    /**
+     * Return the absolute path to the <code>.dtc</code> Folder as String.
+     * 
+     * @return the absolute path to the <code>.dtc</code> Folder as String.
+     */
+    String getAbsolutePathToDtcFolder() {
+        return FilePathHelper.makeAbsolute(getDtcFolder());
     }
 
     /**
@@ -261,7 +326,10 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
     /**
      * 
      * @return the cleanCopy
+     * @deprecated The <code>cleanCopy</code> property should be used from the
+     *             {@link NWDIProject}.
      */
+    @Deprecated
     public boolean isCleanCopy() {
         return cleanCopy;
     }
@@ -298,9 +366,16 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
     }
 
     /**
+     * Create a descriptor for use the various NWDI tools (cbstool, dctool) for
+     * the given development configuration.
+     * 
      * @param configuration
+     *            development configuration to use for creating the descriptor.
      * @param descriptor
-     * @return
+     *            the NWDIProject descriptor containing the credentials and
+     *            NWDITOOLLIB folders to use
+     * @return a new {@link DIToolDescriptor} configured to run an
+     *         {@link AbstractDIToolExecutor}.
      */
     DIToolDescriptor getDCToolDescriptor(final DevelopmentConfiguration configuration,
         final NWDIProject.DescriptorImpl descriptor) {
@@ -317,10 +392,8 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
             throw new RuntimeException(String.format("Cannot map JdkHomeAlias '%s' onto a NWDITOOLLIB folder.", alias));
         }
 
-        final DIToolDescriptor dcToolDescriptor =
-            new DIToolDescriptor(descriptor.getUser(), descriptor.getPassword(), nwdiToolLibraryFolder,
-                descriptor.getConfiguredJdkHomePaths(), descriptor.getJdkOpts());
-        return dcToolDescriptor;
+        return new DIToolDescriptor(descriptor.getUser(), descriptor.getPassword(), nwdiToolLibraryFolder,
+            descriptor.getConfiguredJdkHomePaths());
     }
 
     /**
@@ -458,9 +531,10 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
 
             for (final DevelopmentComponent component : affectedComponents) {
                 final FilePath buildXml =
-                    nwdiBuild.getWorkspace().child(
-                        String.format("%s/DCs/%s/%s/_comp/gen/default/logs/build.xml", DIToolDescriptor.DTC_FOLDER,
-                            component.getVendor(), component.getName()));
+                    nwdiBuild.getDtcFolder().child(
+                        String.format("DCs/%s/%s/_comp/gen/default/logs/build.xml", component.getVendor(),
+                            component.getName()));
+
                 if (buildXml.exists()) {
                     final String content =
                         buildXml.readToString().replaceFirst(
