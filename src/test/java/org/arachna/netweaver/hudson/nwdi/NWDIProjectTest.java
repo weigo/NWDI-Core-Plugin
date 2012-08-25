@@ -131,12 +131,4 @@ public class NWDIProjectTest extends HudsonTestCase {
         final FormValidation validationResult = descriptor.doJdkHomePathsCheck(invalidPathSpec);
         assertThat(validationResult.kind, equalTo(FormValidation.Kind.ERROR));
     }
-
-    @Test
-    public void testDoIllegalJdkOptCheck() {
-        final String invalidJdkOptSpec = "Xmx1024m";
-        final FormValidation validationResult = descriptor.doJdkOptsCheck(invalidJdkOptSpec);
-        assertThat(validationResult.kind, equalTo(FormValidation.Kind.ERROR));
-    }
-
 }
