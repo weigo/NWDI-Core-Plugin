@@ -72,16 +72,14 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
     private static final float THOUSAND_MILLI_SECONDS = 1000f;
 
     /**
-     * parameter name for project configuration controlling whether the
-     * workspace should be clean before building.
+     * parameter name for project configuration controlling whether the workspace should be clean before building.
      */
     private static final String PARAMETER_CLEAN_COPY = "cleanCopy";
 
     /**
-     * Store the content of the '.confdef' configuration file for a development
-     * configuration.
+     * Store the content of the '.confdef' configuration file for a development configuration.
      */
-    private String confDef;
+    private transient String confDef;
 
     /**
      * Name of build space in NWDI.
@@ -115,8 +113,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
      * Create an instance of a NWDI project.
      * 
      * @param parent
-     *            the parent <code>ItemGroup</code> in the project configuration
-     *            page.
+     *            the parent <code>ItemGroup</code> in the project configuration page.
      * @param name
      *            project name
      */
@@ -125,23 +122,19 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
     }
 
     /**
-     * Create an instance of a NWDI project using the given project name and
-     * configuration.
+     * Create an instance of a NWDI project using the given project name and configuration.
      * 
      * @param name
      *            project name.
      * @param buildSpaceName
      *            name of build space in CBS.
-     * @param confDef
-     *            development configuration file.
      * @param cleanCopy
      *            clean workspace before building when <code>true</code>.
      */
     @DataBoundConstructor
-    public NWDIProject(final String name, final String buildSpaceName, final String confDef, final boolean cleanCopy) {
+    public NWDIProject(final String name, final String buildSpaceName, final boolean cleanCopy) {
         super(Hudson.getInstance(), name);
         this.buildSpaceName = buildSpaceName;
-        this.confDef = confDef;
         this.cleanCopy = cleanCopy;
     }
 
@@ -175,8 +168,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
     /*
      * (non-Javadoc)
      * 
-     * @see hudson.model.AbstractProject#checkout(hudson.model.AbstractBuild,
-     * hudson.Launcher, hudson.model.BuildListener, java.io.File)
+     * @see hudson.model.AbstractProject#checkout(hudson.model.AbstractBuild, hudson.Launcher, hudson.model.BuildListener, java.io.File)
      */
     @Override
     public boolean checkout(final AbstractBuild build, final Launcher launcher, final BuildListener listener,
@@ -194,15 +186,41 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
                 .append(String.format(" (%f sec.).\n", (System.currentTimeMillis() - start) / THOUSAND_MILLI_SECONDS));
         }
 
-        // FIXME: update development configuration using CBS tool!!!
+        FilePath dtcFolder = nwdiBuild.getDtcFolder();
 
-        logger.append("Updating DTR client configuration...");
-        final DtrConfigCreator configCreator =
-            new DtrConfigCreator(build.getWorkspace(), nwdiBuild.getDevelopmentConfiguration(), getConfDef());
+        if (!dtcFolder.exists()) {
+            dtcFolder.mkdirs();
+        }
 
-        configCreator.execute();
+        updateDevelopmentConfiguration(logger, dtcFolder);
+
+        DevelopmentConfiguration developmentConfiguration = nwdiBuild.getDevelopmentConfiguration();
+        logger.append(String.format("New development configuration version is: %s.\n", developmentConfiguration.getVersion()));
+        logger.append("Updating DTR client configuration...\n");
+        new DtrConfigCreator(build.getWorkspace(), developmentConfiguration).execute();
 
         return super.checkout(build, launcher, listener, changelogFile);
+    }
+
+    /**
+     * Update the development configuration from the CBS.
+     * 
+     * @param logger
+     *            logger for logging the update message.
+     * @param dtcFolder
+     *            the {@link FilePath} to the '.dtc' folder in the workspace.
+     * @throws IOException
+     *             when the update failed
+     * @throws InterruptedException
+     *             when the operation was interrupted
+     */
+    void updateDevelopmentConfiguration(final PrintStream logger, FilePath dtcFolder) throws IOException, InterruptedException {
+        logger.append("Updating development configuration...\n");
+        System.err.println("Updating development configuration...");
+        Exception e = new Exception();
+        e.fillInStackTrace();
+        e.printStackTrace(System.err);
+        getDescriptor().createCBSToolExecutor(dtcFolder).updateDevelopmentConfiguration(buildSpaceName, ".confdef");
     }
 
     /**
@@ -243,15 +261,14 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
     protected void submit(final StaplerRequest req, final StaplerResponse rsp) throws IOException, ServletException,
         FormException {
         final JSONObject json = req.getSubmittedForm();
-        confDef = json.getString("developmentConfiguration");
         cleanCopy = json.getBoolean(PARAMETER_CLEAN_COPY);
+        buildSpaceName = json.getString("buildSpaceName");
         setScm(new NWDIScm(cleanCopy, getDescriptor().getUser(), getDescriptor().getPassword()));
 
         buildWrappers.rebuild(req, json, BuildWrappers.getFor(this));
         builders.rebuildHetero(req, json, Builder.all(), "builder");
         publishers.rebuild(req, json, BuildStepDescriptor.filter(Publisher.all(), this.getClass()));
 
-        // not needed since setting the SCM saves automatically.
         save();
         super.submit(req, rsp);
     }
@@ -295,7 +312,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
         for (final BuildWrapper step : getBuildWrappers().values()) {
             r.addAll(step.getProjectActions(this));
         }
-        for (final Trigger trigger : getTriggers().values()) {
+        for (final Trigger<?> trigger : getTriggers().values()) {
             r.addAll(trigger.getProjectActions());
         }
 
@@ -303,8 +320,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
     }
 
     /**
-     * Descriptor for NWDIProjects. Contains the global configuration commonly
-     * used for different NWDI tracks.
+     * Descriptor for NWDIProjects. Contains the global configuration commonly used for different NWDI tracks.
      * 
      * @author Dirk Weigenand
      */
@@ -384,8 +400,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
         private String cbsUrl;
 
         /**
-         * Create descriptor for NWDI-Projects and load global configuration
-         * data.
+         * Create descriptor for NWDI-Projects and load global configuration data.
          */
         public DescriptorImpl() {
             load();
@@ -464,11 +479,9 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
         }
 
         /**
-         * Returns the paths to JDK installations to be used for building
-         * tracks.
+         * Returns the paths to JDK installations to be used for building tracks.
          * 
-         * @return the paths to JDK installations to be used for building
-         *         tracks.
+         * @return the paths to JDK installations to be used for building tracks.
          */
         public String getJdkHomePaths() {
             return jdkHomePaths;
@@ -478,8 +491,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
          * Set the paths to JDK installations to be used for building tracks.
          * 
          * @param jdkHomePaths
-         *            the paths to JDK installations to be used for building
-         *            tracks.
+         *            the paths to JDK installations to be used for building tracks.
          */
         public void setJdkHomePaths(final String jdkHomePaths) {
             this.jdkHomePaths = jdkHomePaths;
@@ -500,12 +512,8 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
             this.jdkOpts = jdkOpts;
         }
 
-        /*
-         * (non-Javadoc)
-         * 
-         * @see
-         * hudson.model.Descriptor#configure(org.kohsuke.stapler.StaplerRequest,
-         * net.sf.json.JSONObject)
+        /**
+         * {@inheritDoc}
          */
         @Override
         public boolean configure(final StaplerRequest req, final JSONObject json) throws FormException {
@@ -544,8 +552,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
         }
 
         /**
-         * Verify that the given URL can be reached and using the credentials
-         * for user and password can be used to access the NWDI.
+         * Verify that the given URL can be reached and using the credentials for user and password can be used to access the NWDI.
          * 
          * @param value
          *            URL to CBS
@@ -595,13 +602,11 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
         }
 
         /**
-         * Validate that the given <code>FilePath</code> contains a 'dc' sub
-         * folder.
+         * Validate that the given <code>FilePath</code> contains a 'dc' sub folder.
          * 
          * @param folder
          *            the 'tools' folder of a NWDI tool library installation.
-         * @return the validation result <code>FormValidation.ok()</code> when
-         *         the 'dc' sub folder exists,
+         * @return the validation result <code>FormValidation.ok()</code> when the 'dc' sub folder exists,
          *         <code>FormValidation.error()</code> otherwise.
          * @throws IOException
          *             when an error occurred accessing the folder.
@@ -671,16 +676,22 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
             return new JdkHomePathsParser(getJdkHomePaths()).parse();
         }
 
+        /**
+         * Return a {@link ListBoxModel} containing names of build spaces to choose from.
+         * 
+         * @return list of (development) build spaces in NWDI.
+         */
         public ListBoxModel doFillBuildSpaceNameItems() {
             final ListBoxModel items = new ListBoxModel();
             for (final String buildSpaceName : getBuildSpaceNames()) {
-                items.add(buildSpaceName, buildSpaceName);
+                // build space names are of the form: [A-Z0-9]{3}_[A-Z-a-z0-9]_D
+                items.add(buildSpaceName.split("_")[1], buildSpaceName);
             }
 
             return items;
         }
 
-        private String getNwdiToolibFolder() {
+        private String getNwdiToolLibraryFolder() {
             String nwdiToolLibraryFolder = getNwdiToolLibFolder71();
 
             if (nwdiToolLibraryFolder.isEmpty()) {
@@ -690,24 +701,14 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
             return nwdiToolLibraryFolder;
         }
 
+        /**
+         * List names of build spaces using the CBS tool.
+         * 
+         * @return a list of build spaces names retrieved from the CBS.
+         */
         private Collection<String> getBuildSpaceNames() {
-            // FIXME: very complicated! To get to the list of build spaces one
-            // should need only the CBS URL, NWDI credentials and the
-            // NWDITOOLLIBDIR to use.
-            final DevelopmentConfiguration configuration = new DevelopmentConfiguration("xxx");
-            configuration.setCmsUrl(cbsUrl);
-            // final BuildVariant variant = new BuildVariant("default");
-            // variant.addBuildOption(DevelopmentConfiguration.COM_SAP_JDK_HOME_PATH_KEY,
-            // System.getProperty("java.home"));
-            final DIToolDescriptor descriptor =
-                new DIToolDescriptor(getUser(), getPassword(), getCbsUrl(), getNwdiToolibFolder(),
-                    getConfiguredJdkHomePaths());
-            final Launcher launcher =
-                Jenkins.getInstance().createLauncher(
-                    new LogTaskListener(Logger.getLogger(this.getClass().getName()), Level.ALL));
             final FilePath pwd = Jenkins.getInstance().createPath(System.getProperty("java.io.tmpdir"));
-            final CBSToolCommandExecutor executor =
-                new CBSToolCommandExecutor(launcher, pwd, descriptor, configuration);
+            final CBSToolCommandExecutor executor = createCBSToolExecutor(pwd);
             final List<String> buildSpaceNames = new LinkedList<String>();
 
             try {
@@ -725,6 +726,28 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
             Collections.sort(buildSpaceNames);
 
             return buildSpaceNames;
+        }
+
+        /**
+         * Create a {@link CBSToolCommandExecutor}.
+         * 
+         * The executor is set up with a dummy development configuration and is executed in the temporary directory indicated by the system
+         * property 'java.io.tmpdir'.
+         * 
+         * @return a <code>CBSToolCommandExecutor</code> that can be used to execute commands not related to a certain development
+         *         configuration.
+         */
+        private CBSToolCommandExecutor createCBSToolExecutor(FilePath workspace) {
+            final DevelopmentConfiguration configuration = new DevelopmentConfiguration("xxx");
+            configuration.setCmsUrl(cbsUrl);
+            final DIToolDescriptor descriptor =
+                new DIToolDescriptor(getUser(), getPassword(), getNwdiToolLibraryFolder(), getCbsUrl(),
+                    getConfiguredJdkHomePaths());
+            final Launcher launcher =
+                Jenkins.getInstance().createLauncher(
+                    new LogTaskListener(Logger.getLogger(this.getClass().getName()), Level.ALL));
+
+            return new CBSToolCommandExecutor(launcher, workspace, descriptor, configuration);
         }
 
         /**
@@ -769,29 +792,9 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
     }
 
     /**
-     * Set the content of the '.confdef' configuration file.
-     * 
-     * @param confDef
-     *            content of the '.confdef' configuration file.
-     */
-    public void setConfDef(final String confDef) {
-        this.confDef = confDef;
-    }
-
-    /**
-     * Return the content of the '.confdef' configuration file.
-     * 
-     * @return the content of the '.confdef' configuration file.
-     */
-    public String getConfDef() {
-        return confDef;
-    }
-
-    /**
      * Return whether the workspace should be cleaned before building.
      * 
-     * @return whether the workspace should be cleaned before building (
-     *         <code>true</code> yes, leave it as it is otherwise).
+     * @return whether the workspace should be cleaned before building ( <code>true</code> yes, leave it as it is otherwise).
      */
     public boolean isCleanCopy() {
         return cleanCopy;
@@ -801,8 +804,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
      * Indicate whether the workspace should be cleaned before building.
      * 
      * @param cleanCopy
-     *            whether the workspace should be cleaned before building (
-     *            <code>true</code> yes, leave it as it is otherwise).
+     *            whether the workspace should be cleaned before building ( <code>true</code> yes, leave it as it is otherwise).
      */
     public void setCleanCopy(final boolean cleanCopy) {
         this.cleanCopy = cleanCopy;

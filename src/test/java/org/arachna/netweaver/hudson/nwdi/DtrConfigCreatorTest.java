@@ -64,8 +64,7 @@ public final class DtrConfigCreatorTest {
      * Set up the fixture used during test.
      * 
      * @throws IOException
-     *             when creating the temporary directory used as workspace or
-     *             sub folders in it fail
+     *             when creating the temporary directory used as workspace or sub folders in it fail
      * @throws InterruptedException
      *             might be thrown from FilePath operations
      */
@@ -83,9 +82,7 @@ public final class DtrConfigCreatorTest {
         compartment.setDtrUrl(DTR_URL);
         config.add(compartment);
 
-        configCreator =
-            new DtrConfigCreator(new FilePath(workspace), config,
-                "<?xml version=\"1.0\" encoding=\"UTF-8\"?><confdef />");
+        configCreator = new DtrConfigCreator(new FilePath(workspace), config);
         configCreator.execute();
     }
 
@@ -106,11 +103,9 @@ public final class DtrConfigCreatorTest {
     }
 
     /**
-     * Assert that the various configuration files are created with correct
-     * content.
+     * Assert that the various configuration files are created with correct content.
      * 
-     * Test method for
-     * {@link org.arachna.netweaver.hudson.nwdi.DtrConfigCreator#execute()}.
+     * Test method for {@link org.arachna.netweaver.hudson.nwdi.DtrConfigCreator#execute()}.
      */
     @Test
     public void testServersXml() {
@@ -128,11 +123,9 @@ public final class DtrConfigCreatorTest {
     }
 
     /**
-     * Assert that the various configuration files are created with correct
-     * content.
+     * Assert that the various configuration files are created with correct content.
      * 
-     * Test method for
-     * {@link org.arachna.netweaver.hudson.nwdi.DtrConfigCreator#execute()}.
+     * Test method for {@link org.arachna.netweaver.hudson.nwdi.DtrConfigCreator#execute()}.
      */
     @Test
     public void testClientsXml() {
@@ -152,11 +145,9 @@ public final class DtrConfigCreatorTest {
     }
 
     /**
-     * Assert that the various configuration files are created with correct
-     * content.
+     * Assert that the various configuration files are created with correct content.
      * 
-     * Test method for
-     * {@link org.arachna.netweaver.hudson.nwdi.DtrConfigCreator#execute()}.
+     * Test method for {@link org.arachna.netweaver.hudson.nwdi.DtrConfigCreator#execute()}.
      */
     @Test
     public void testSystemXml() {
@@ -173,8 +164,7 @@ public final class DtrConfigCreatorTest {
     }
 
     /**
-     * Assert that the given <code>FilePath</code> contains content that is
-     * matched by the given XPath expression.
+     * Assert that the given <code>FilePath</code> contains content that is matched by the given XPath expression.
      * 
      * @param path
      *            the <code>FilePath</code> whose contents is to be tested.

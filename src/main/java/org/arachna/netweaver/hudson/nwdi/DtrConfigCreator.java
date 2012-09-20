@@ -45,8 +45,7 @@ final class DtrConfigCreator {
     static final String SERVERS_XML = "servers.xml";
 
     /**
-     * {@link DevelopmentConfiguration} to use for creating the dtr config
-     * files.
+     * {@link DevelopmentConfiguration} to use for creating the dtr config files.
      */
     private final DevelopmentConfiguration config;
 
@@ -56,18 +55,12 @@ final class DtrConfigCreator {
     private final FilePath workspace;
 
     /**
-     * content of '.confdef' for the given development configuration.
-     */
-    private final String confDef;
-
-    /**
      * Folder where DTR configuration files are to be created/updated.
      */
     private FilePath dtrDirectory;
 
     /**
-     * Folder where the development configurations and its repsective
-     * development components live.
+     * Folder where the development configurations and its respective development components live.
      */
     private FilePath dtcDirectory;
 
@@ -75,29 +68,21 @@ final class DtrConfigCreator {
      * Create an instance of {@link DtrConfigCreator}.
      * 
      * @param workspace
-     *            the workspace where the configuration folders and files should
-     *            be created/updated.
+     *            the workspace where the configuration folders and files should be created/updated.
      * @param config
-     *            the {@link DevelopmentConfiguration} that shall be used to
-     *            create/update the configuration files.
-     * @param confDef
-     *            the content of the <code>.confdef</code> of the given
-     *            development configuration.
+     *            the {@link DevelopmentConfiguration} that shall be used to create/update the configuration files.
      */
-    DtrConfigCreator(final FilePath workspace, final DevelopmentConfiguration config, final String confDef) {
+    DtrConfigCreator(final FilePath workspace, final DevelopmentConfiguration config) {
         this.workspace = workspace;
         this.config = config;
-        this.confDef = confDef;
     }
 
     /**
-     * Creates/Updates the DTR and development configuration configuration
-     * files.
+     * Creates/Updates the DTR and development configuration configuration files.
      * 
      * @return the {@link FilePath} created for the DTR configuration directory.
      * @throws IOException
-     *             when an error occurred creating the directories and
-     *             configuration files.
+     *             when an error occurred creating the directories and configuration files.
      * @throws InterruptedException
      *             when the user canceled the operation.
      */
@@ -107,7 +92,6 @@ final class DtrConfigCreator {
 
         createOrUpdateServersXml();
         createOrUpdateClientsXml();
-        createOrUpdateDotConfDef();
         createOrUpdateTrackNameDotSystem();
 
         return dtrDirectory;
@@ -136,26 +120,13 @@ final class DtrConfigCreator {
     }
 
     /**
-     * Creates/Updates the <code>.confdef</code> file.
-     * 
-     * @throws IOException
-     *             when an error occurred creating the configuration file.
-     * @throws InterruptedException
-     *             when the user canceled the operation.
-     */
-    private void createOrUpdateDotConfDef() throws IOException, InterruptedException {
-        dtcDirectory.child(".confdef").write(confDef, DEFAULT_ENCODING);
-    }
-
-    /**
      * Creates the given folder in the workspace.
      * 
      * @param folderName
      *            the folder to be created.
      * @return the {@link FilePath} created.
      * @throws IOException
-     *             when an error occurred creating the given folder in the
-     *             workspace.
+     *             when an error occurred creating the given folder in the workspace.
      * @throws InterruptedException
      *             when the user canceled the operation.
      */
@@ -173,8 +144,7 @@ final class DtrConfigCreator {
      * Creates/Updates the 'clients.xml' in the given DTR folder.
      * 
      * @throws IOException
-     *             when an error occurred creating the configuration file in the
-     *             given folder.
+     *             when an error occurred creating the configuration file in the given folder.
      * @throws InterruptedException
      *             when the user canceled the operation.
      */
@@ -188,8 +158,7 @@ final class DtrConfigCreator {
      * Creates/Updates the 'servers.xml' in the given DTR configuration folder.
      * 
      * @throws IOException
-     *             when an error occurred creating the configuration file in the
-     *             given folder.
+     *             when an error occurred creating the configuration file in the given folder.
      * @throws InterruptedException
      *             when the user canceled the operation.
      */

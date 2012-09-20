@@ -1,17 +1,10 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form"
-  xmlns:p="/lib/hudson/project">
+  xmlns:p="/lib/hudson/project"
+>
   <!-- This jelly script is used for per-project configuration. See global.jelly for a general discussion about jelly script. -->
   <f:section title="${%NWDI-Build}">
-    <!-- Creates a text field that shows the value of the "name" property. When submitted, it will be passed to the corresponding constructor 
-      parameter. -->
-    <f:entry title="${%development.buildSpaceName}" description="${%insert.confdef}" field="buildSpaceName">
-      <select name="buildSpaceName">
-        <option value="buildGoal">Build Goal</option>
-        <option value="findBugsGoal">FindBugs goal</option>
-      </select>
-    </f:entry>
-    <f:entry title="${%development.configuration}" description="${%insert.confdef}" field="confDef">
-      <textarea class="setting-input  " name="developmentConfiguration" rows="8">${it.confDef}</textarea>
+    <f:entry title="${%development.buildSpaceName}" description="${%select.buildspace}">
+      <f:select name="buildSpaceName" value="${it.buildSpaceName}" field="buildSpaceName" clazz="required" />
     </f:entry>
     <f:entry title="${%clean.copy}" description="${%delete.before.build}" field="cleanCopy">
       <f:checkbox default="false" value="${it.cleanCopy}" clazz="required" />

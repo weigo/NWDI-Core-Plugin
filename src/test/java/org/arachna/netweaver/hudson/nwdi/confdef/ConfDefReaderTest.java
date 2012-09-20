@@ -3,14 +3,10 @@
  */
 package org.arachna.netweaver.hudson.nwdi.confdef;
 
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
@@ -50,9 +46,9 @@ public final class ConfDefReaderTest {
         final DevelopmentConfiguration configuration =
             readDevelopmentConfiguration("DevelopmentConfigurationWithDefaultBuildVariant.confdef");
         final BuildVariant variant = configuration.getBuildVariant();
-        assertNotNull(variant);
-        assertNull(variant.getBuildOption(COM_SAP_JDK_HOME_PATH_KEY));
-        assertNull(variant.getBuildOption(COM_SAP_JDK_JAVAC_FORCE_FORK));
+        assertThat(variant, notNullValue());
+        assertThat(variant.getBuildOption(COM_SAP_JDK_HOME_PATH_KEY), notNullValue());
+        assertThat(variant.getBuildOption(COM_SAP_JDK_JAVAC_FORCE_FORK), equalTo("true"));
     }
 
     /**
@@ -63,10 +59,10 @@ public final class ConfDefReaderTest {
         final DevelopmentConfiguration configuration =
             readDevelopmentConfiguration("DevelopmentConfigurationWithConfiguredDefaultBuildVariant.confdef");
         final BuildVariant variant = configuration.getBuildVariant();
-        assertNotNull(variant);
-        assertEquals("JDK1.3.1_HOME", variant.getBuildOption(COM_SAP_JDK_HOME_PATH_KEY));
-        assertEquals("true", variant.getBuildOption(COM_SAP_JDK_JAVAC_FORCE_FORK));
-        assertEquals("http://di0db.example.com:50000", configuration.getBuildServer());
+        assertThat(variant, notNullValue());
+        assertThat(variant.getBuildOption(COM_SAP_JDK_HOME_PATH_KEY), equalTo("JDK1.3.1_HOME"));
+        assertThat(variant.getBuildOption(COM_SAP_JDK_JAVAC_FORCE_FORK), equalTo("true"));
+        assertThat(configuration.getBuildServer(), equalTo("http://di0db.example.com:50000"));
     }
 
     @Test
@@ -90,7 +86,7 @@ public final class ConfDefReaderTest {
         final DevelopmentConfiguration configuration = readDevelopmentConfiguration("Example.confdef");
 
         for (final String compartmentName : getExpectedCompartmentNames()) {
-            assertThat(null, is(not(equalTo(configuration.getCompartment(compartmentName)))));
+            assertThat(configuration.getCompartment(compartmentName), notNullValue());
         }
     }
 
@@ -135,8 +131,8 @@ public final class ConfDefReaderTest {
         final ConfDefReader developmentConfigurationReader = new ConfDefReader();
 
         try {
-            new XmlReaderHelper(developmentConfigurationReader).parse(new InputStreamReader(this.getClass()
-                .getResourceAsStream(configurationName)));
+            new XmlReaderHelper(developmentConfigurationReader).parse(new InputStreamReader(this.getClass().getResourceAsStream(
+                configurationName)));
         }
         catch (IOException e) {
             fail(e.getLocalizedMessage());

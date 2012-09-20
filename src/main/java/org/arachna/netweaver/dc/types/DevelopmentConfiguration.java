@@ -22,6 +22,7 @@ public final class DevelopmentConfiguration {
     /**
      * constant for JDK to be used to build DCs.
      */
+    // FIXME: Move to BuildOption enumeration!
     public static final String COM_SAP_JDK_HOME_PATH_KEY = "com.sap.jdk.home_path_key";
 
     /**
@@ -73,6 +74,11 @@ public final class DevelopmentConfiguration {
      * URL to build server.
      */
     private String buildServer;
+
+    /**
+     * version of this development configuration.
+     */
+    private String version;
 
     /**
      * Create a development configuration with the given name.
@@ -425,24 +431,21 @@ public final class DevelopmentConfiguration {
     }
 
     /**
-     * Check whether the used JDK is 1.3 or 1.4. This means that the NW development configuration corresponds to 6.40 or 7.00.
+     * Return the version of this development configuration.
      * 
-     * @return <code>true</code> when the used JDK is 1.3 or 1.4, <code>false</code> otherwise.
+     * @return version of this development configuration.
      */
-    public boolean isNW64Or70() {
-        final JdkHomeAlias alias = getJdkHomeAlias();
-
-        return JdkHomeAlias.Jdk131Home.equals(alias) || JdkHomeAlias.Jdk142Home.equals(alias);
+    public String getVersion() {
+        return version;
     }
 
     /**
-     * Check whether the used JDK is 1.5 or 1.6. This means that the NW development configuration corresponds to NetWeaver after 7.00.
+     * Set the version of this development configuration.
      * 
-     * @return <code>true</code> when the used JDK is 1.3 or 1.4, <code>false</code> otherwise.
+     * @param version
+     *            the version to set
      */
-    public boolean isPost70() {
-        final JdkHomeAlias alias = getJdkHomeAlias();
-
-        return JdkHomeAlias.Jdk150Home.equals(alias) || JdkHomeAlias.Jdk160Home.equals(alias);
+    public void setVersion(String version) {
+        this.version = version;
     }
 }

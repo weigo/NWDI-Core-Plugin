@@ -33,7 +33,7 @@
       <f:password clazz="required setting-input" name="NWDIPlugin.password" value="${descriptor.password}"
         checkUrl="'descriptorByName/NWDIProject/passwordCheck?value='+escape(this.value)" />
     </f:entry>
-    <f:entry title="CBS URL" description="${%Enter the options that should be passed to the JDK executing the dctool.}" help="/plugin/NWDI-Core-Plugin/help-UME.html">
+    <f:entry title="CBS URL" description="${%Enter the URL to the NetWeaver development infrastructure.}" help="/plugin/NWDI-Core-Plugin/help-UME.html">
       <f:textbox  name="NWDIPlugin.cbsUrl" value="${descriptor.cbsUrl}"
         checkUrl="'descriptorByName/NWDIProject/cbsUrlCheck?value='+escape(this.value)" />
     </f:entry>

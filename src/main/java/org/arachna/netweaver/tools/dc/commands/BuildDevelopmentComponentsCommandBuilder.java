@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 import org.arachna.netweaver.dc.types.JdkHomeAlias;
@@ -35,8 +36,7 @@ final class BuildDevelopmentComponentsCommandBuilder extends AbstractDCToolComma
         V71("builddc -c %s -n %s -v %s");
 
         /**
-         * mapping of {@link JdkHomeAlias}es to template matching the respective
-         * NetWeaver version.
+         * mapping of {@link JdkHomeAlias}es to template matching the respective NetWeaver version.
          */
         private static final Map<JdkHomeAlias, BuildDevelopmentComponentsCommandTemplate> VALUES =
             new HashMap<JdkHomeAlias, BuildDevelopmentComponentsCommandTemplate>() {
@@ -99,17 +99,14 @@ final class BuildDevelopmentComponentsCommandBuilder extends AbstractDCToolComma
     private final BuildDevelopmentComponentsCommandTemplate template;
 
     /**
-     * Creates a <code>DevelopmentComponentBuilder</code> instance for the given
-     * development components.
+     * Creates a <code>DevelopmentComponentBuilder</code> instance for the given development components.
      * 
      * @param config
-     *            development configuration to use for executing dc tool
-     *            commands.
+     *            development configuration to use for executing dc tool commands.
      * @param components
      *            development components to create build dc commands for.
      */
-    public BuildDevelopmentComponentsCommandBuilder(final DevelopmentConfiguration config,
-        final Collection<DevelopmentComponent> components) {
+    public BuildDevelopmentComponentsCommandBuilder(final DevelopmentConfiguration config, final Collection<DevelopmentComponent> components) {
         super(config);
         template = BuildDevelopmentComponentsCommandTemplate.fromJdkHomeAlias(config.getJdkHomeAlias());
         this.components.addAll(components);
@@ -121,7 +118,7 @@ final class BuildDevelopmentComponentsCommandBuilder extends AbstractDCToolComma
      * @return created list of 'builddc' commands.
      */
     @Override
-    protected final List<String> executeInternal() {
+    protected List<String> executeInternal() {
         final List<String> commands = new ArrayList<String>();
 
         for (final DevelopmentComponent component : components) {
@@ -129,8 +126,8 @@ final class BuildDevelopmentComponentsCommandBuilder extends AbstractDCToolComma
                 commands.add(createBuildDcCommand(component));
             }
             else {
-                throw new RuntimeException(String.format("%s/%s has no compartment set!", component.getVendor(),
-                    component.getName()));
+                Logger.getLogger(getClass()).error(
+                    String.format("%s/%s has no compartment set!", component.getVendor(), component.getName()));
             }
         }
 
@@ -145,7 +142,7 @@ final class BuildDevelopmentComponentsCommandBuilder extends AbstractDCToolComma
      * @return the created builddc command
      */
     private String createBuildDcCommand(final DevelopmentComponent component) {
-        return String.format(template.getBuildCommandTemplate(), component.getCompartment().getName(),
-            component.getName(), component.getVendor());
+        return String.format(template.getBuildCommandTemplate(), component.getCompartment().getName(), component.getName(),
+            component.getVendor());
     }
 }

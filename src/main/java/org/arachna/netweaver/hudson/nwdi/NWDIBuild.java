@@ -83,8 +83,7 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
     private transient boolean cleanCopy;
 
     /**
-     * Create an instance of <code>NWDIBuild</code> using the given
-     * <code>NWDIProject</code>.
+     * Create an instance of <code>NWDIBuild</code> using the given <code>NWDIProject</code>.
      * 
      * @param project
      *            parent to use for creating this build.
@@ -97,8 +96,7 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
     }
 
     /**
-     * Create an instance of <code>NWDIBuild</code> using the given
-     * <code>NWDIProject</code> and build directory.
+     * Create an instance of <code>NWDIBuild</code> using the given <code>NWDIProject</code> and build directory.
      * 
      * @param project
      *            parent to use for creating this build.
@@ -119,14 +117,13 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
     /**
      * Returns the {@link DevelopmentConfiguration} used throughout this build.
      * 
-     * @return the <code>DevelopmentConfiguration</code> used throughout this
-     *         build.
+     * @return the <code>DevelopmentConfiguration</code> used throughout this build.
      */
     public DevelopmentConfiguration getDevelopmentConfiguration() {
         if (developmentConfiguration == null) {
             try {
                 final ConfDefReader confdefReader = new ConfDefReader();
-                new XmlReaderHelper(confdefReader).parse(new StringReader(project.getConfDef()));
+                new XmlReaderHelper(confdefReader).parse(new StringReader(getDtcFolder().child(".confdef").readToString()));
                 developmentConfiguration = confdefReader.getDevelopmentConfiguration();
             }
             catch (final SAXException e) {
@@ -141,11 +138,9 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
     }
 
     /**
-     * Calculate build sequence for development components affected by
-     * activities that triggered this build.
+     * Calculate build sequence for development components affected by activities that triggered this build.
      * 
-     * @return build sequence for development components affected by activities
-     *         that triggered this build.
+     * @return build sequence for development components affected by activities that triggered this build.
      */
     public Collection<DevelopmentComponent> getAffectedDevelopmentComponents() {
         if (affectedComponents == null) {
@@ -189,11 +184,9 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
     }
 
     /**
-     * Return the set of development components that were marked as needing a
-     * rebuild previously.
+     * Return the set of development components that were marked as needing a rebuild previously.
      * 
-     * @return set of development components that were marked as needing a
-     *         rebuild previously.
+     * @return set of development components that were marked as needing a rebuild previously.
      */
     protected Set<DevelopmentComponent> getDevelopmentComponentsThatNeedRebuild() {
         final Set<DevelopmentComponent> components = new HashSet<DevelopmentComponent>();
@@ -210,11 +203,9 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
     }
 
     /**
-     * Calculate the set of development components to build from activities
-     * determined earlier by the {@link DtrBrowser}.
+     * Calculate the set of development components to build from activities determined earlier by the {@link DtrBrowser}.
      * 
-     * @return the set of development components to build as determined by
-     *         activities in the DTR.
+     * @return the set of development components to build as determined by activities in the DTR.
      */
     private Set<DevelopmentComponent> getAffectedDevelopmentComponentsFromRevisionState() {
         final Set<DevelopmentComponent> affectedComponents = new HashSet<DevelopmentComponent>();
@@ -237,17 +228,13 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
     }
 
     /**
-     * Determine whether the given development component has been synchronized
-     * to this builds workspace.
+     * Determine whether the given development component has been synchronized to this builds workspace.
      * 
      * @param component
-     *            development component that should be synchronized to this
-     *            builds workspace.
-     * @return <code>true</code> when the component was synchronized,
-     *         <code>false</code> else.
+     *            development component that should be synchronized to this builds workspace.
+     * @return <code>true</code> when the component was synchronized, <code>false</code> else.
      * @throws IOException
-     *             when the folder for the given development component could not
-     *             be determined.
+     *             when the folder for the given development component could not be determined.
      * @throws InterruptedException
      *             when the operation was interrupted.
      */
@@ -258,11 +245,9 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
     }
 
     /**
-     * Return the {@link FilePath} object representing the <code>.dtc</code>
-     * Folder.
+     * Return the {@link FilePath} object representing the <code>.dtc</code> Folder.
      * 
-     * @return {@link FilePath} object representing the <code>.dtc</code>
-     *         Folder.
+     * @return {@link FilePath} object representing the <code>.dtc</code> Folder.
      */
     FilePath getDtcFolder() {
         return getWorkspace().child(".dtc");
@@ -278,14 +263,11 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
     }
 
     /**
-     * Calculate build sequence for development components affected by
-     * activities that triggered this build.
+     * Calculate build sequence for development components affected by activities that triggered this build.
      * 
      * @param filter
-     *            filter for development components affected by this build. Can
-     *            be used to filter only DCs relevant for a certain builder.
-     * @return build sequence for development components affected by activities
-     *         that triggered this build.
+     *            filter for development components affected by this build. Can be used to filter only DCs relevant for a certain builder.
+     * @return build sequence for development components affected by activities that triggered this build.
      */
     public Collection<DevelopmentComponent> getAffectedDevelopmentComponents(final IDevelopmentComponentFilter filter) {
         final Collection<DevelopmentComponent> filteredDCs = new ArrayList<DevelopmentComponent>();
@@ -302,22 +284,18 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
     }
 
     /**
-     * Returns the {@link DevelopmentComponentFactory} used throughout this
-     * build.
+     * Returns the {@link DevelopmentComponentFactory} used throughout this build.
      * 
-     * @return <code>DevelopmentComponentFactory</code> used as registry for
-     *         development components.
+     * @return <code>DevelopmentComponentFactory</code> used as registry for development components.
      */
     public DevelopmentComponentFactory getDevelopmentComponentFactory() {
         return dcFactory;
     }
 
     /**
-     * Returns a factory for generating ant excludes based on development
-     * component type.
+     * Returns a factory for generating ant excludes based on development component type.
      * 
-     * @return a factory for generating ant excludes based on development
-     *         component type.
+     * @return a factory for generating ant excludes based on development component type.
      */
     public ExcludesFactory getExcludesFactory() {
         return excludesFactory;
@@ -326,8 +304,7 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
     /**
      * 
      * @return the cleanCopy
-     * @deprecated The <code>cleanCopy</code> property should be used from the
-     *             {@link NWDIProject}.
+     * @deprecated The <code>cleanCopy</code> property should be used from the {@link NWDIProject}.
      */
     @Deprecated
     public boolean isCleanCopy() {
@@ -335,8 +312,7 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
     }
 
     /**
-     * Returns the {@link DCToolCommandExecutor} used throughout this build
-     * using the given {@link Launcher}.
+     * Returns the {@link DCToolCommandExecutor} used throughout this build using the given {@link Launcher}.
      * 
      * @param launcher
      *            the launcher to use executing DC tool.
@@ -350,13 +326,11 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
     }
 
     /**
-     * Returns the {@link CBSToolCommandExecutor} used throughout this build
-     * using the given {@link Launcher}.
+     * Returns the {@link CBSToolCommandExecutor} used throughout this build using the given {@link Launcher}.
      * 
      * @param launcher
      *            the launcher to use executing <code>cbstool</code>.
-     * @return <code>CBSToolCommandExecutor</code> to execute
-     *         <code>cbstool</code> commands.
+     * @return <code>CBSToolCommandExecutor</code> to execute <code>cbstool</code> commands.
      */
     CBSToolCommandExecutor getCBSToolExecutor(final Launcher launcher) {
         final DevelopmentConfiguration configuration = getDevelopmentConfiguration();
@@ -366,16 +340,13 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
     }
 
     /**
-     * Create a descriptor for use the various NWDI tools (cbstool, dctool) for
-     * the given development configuration.
+     * Create a descriptor for use the various NWDI tools (cbstool, dctool) for the given development configuration.
      * 
      * @param configuration
      *            development configuration to use for creating the descriptor.
      * @param descriptor
-     *            the NWDIProject descriptor containing the credentials and
-     *            NWDITOOLLIB folders to use
-     * @return a new {@link DIToolDescriptor} configured to run an
-     *         {@link AbstractDIToolExecutor}.
+     *            the NWDIProject descriptor containing the credentials and NWDITOOLLIB folders to use
+     * @return a new {@link DIToolDescriptor} configured to run an {@link AbstractDIToolExecutor}.
      */
     DIToolDescriptor getDCToolDescriptor(final DevelopmentConfiguration configuration,
         final NWDIProject.DescriptorImpl descriptor) {
@@ -408,11 +379,9 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
         private final List<Publisher> reporters = new ArrayList<Publisher>();
 
         /**
-         * Builds all (changed) development components and updates the in core
-         * information about them (i.e. all DCs associated with the current
-         * track in the development configuration stored in this build) so that
-         * this information can be used in post build tasks for e.g. quality
-         * control or generation of documentation.
+         * Builds all (changed) development components and updates the in core information about them (i.e. all DCs associated with the
+         * current track in the development configuration stored in this build) so that this information can be used in post build tasks for
+         * e.g. quality control or generation of documentation.
          * 
          * @param listener
          *            the {@link BuildListener} to use for e.g. reporting.
@@ -456,14 +425,11 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
          * @param steps
          *            the build steps to execute.
          * @param antHelper
-         *            various NWDI-*-Plugins define {@link AntTaskBuilder}s that
-         *            need an {@link AntHelper} to execute.
-         * @return the result of the executed build steps: <code>true</code>
-         *         when all build steps executed successfully,
-         *         <code>false</code> when a build step failed.
+         *            various NWDI-*-Plugins define {@link AntTaskBuilder}s that need an {@link AntHelper} to execute.
+         * @return the result of the executed build steps: <code>true</code> when all build steps executed successfully, <code>false</code>
+         *         when a build step failed.
          * @throws IOException
-         *             re-thrown from the perform method that executes the build
-         *             steps
+         *             re-thrown from the perform method that executes the build steps
          * @throws InterruptedException
          *             when the build was interrupted
          */
@@ -509,26 +475,9 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
                 }
 
                 result = getDCToolExecutor(launcher).buildDevelopmentComponents(affectedComponents);
-                // AntHelper antHelper =
-                // new
-                // AntHelper(FilePathHelper.makeAbsolute(nwdiBuild.getWorkspace()),
-                // nwdiBuild.getDevelopmentComponentFactory());
-                // DCToolDescriptor dcToolDescriptor =
-                // nwdiBuild.getDCToolDescriptor(
-                // nwdiBuild.getDevelopmentConfiguration(),
-                // nwdiBuild.getParent().getDescriptor());
-                // File workspace = new File(antHelper.getPathToWorkspace());
-                //
-                // // for (DevelopmentComponent component : affectedComponents)
-                // {
-                // DCBuilder builder = new DCBuilder(workspace,
-                // dcToolDescriptor, affectedComponents /*
-                // Arrays.asList(component) */);
-                // // FIXME: honor build result: i.e. return value
-                // builder.perform(nwdiBuild, launcher, listener);
-                // // }
             }
 
+            // update the generated build.xml files project tag for the static analysis tools to recognize modules.
             for (final DevelopmentComponent component : affectedComponents) {
                 final FilePath buildXml =
                     nwdiBuild.getDtcFolder().child(
@@ -549,8 +498,7 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
         }
 
         /**
-         * Saves the current development configuration as XML to the workspace
-         * folder.
+         * Saves the current development configuration as XML to the workspace folder.
          * 
          * @param logger
          *            logger for logging exceptions
@@ -574,20 +522,16 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
         }
 
         /**
-         * Update all development components with the location of their various
-         * source folders.
+         * Update all development components with the location of their various source folders.
          * 
-         * This is necessary since f.e. WebDynpro DCs have <code>gen_ddic</code>
-         * and <code>gen_wdp</code> folders that are not listed in
-         * <code>.dcdef</code> but are created when the component is built.
-         * Those folders have to be considered too when running analysis
+         * This is necessary since f.e. WebDynpro DCs have <code>gen_ddic</code> and <code>gen_wdp</code> folders that are not listed in
+         * <code>.dcdef</code> but are created when the component is built. Those folders have to be considered too when running analysis
          * plugins.
          * 
          * @param logger
          *            Logger to report actions back to build.
          * @param antHelper
-         *            {@link AntHelper} to compute the base location of
-         *            development components.
+         *            {@link AntHelper} to compute the base location of development components.
          * @param antHelper
          */
         private void updateSourceCodeLocations(final PrintStream logger, final AntHelper antHelper) {

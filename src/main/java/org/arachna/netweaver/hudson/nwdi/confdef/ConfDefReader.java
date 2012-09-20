@@ -9,8 +9,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
 /**
- * Reader for <code>.confdef</code> configuration files for development
- * configurations.
+ * Reader for <code>.confdef</code> configuration files for development configurations.
  * 
  * @author Dirk Weigenand
  */
@@ -70,8 +69,7 @@ public final class ConfDefReader extends AbstractDefaultHandler {
     /*
      * (non-Javadoc)
      * 
-     * @see org.xml.sax.ContentHandler#endElement(java.lang.String,
-     * java.lang.String, java.lang.String)
+     * @see org.xml.sax.ContentHandler#endElement(java.lang.String, java.lang.String, java.lang.String)
      */
     @Override
     public void endElement(final String uri, final String localName, final String name) throws SAXException {
@@ -91,8 +89,7 @@ public final class ConfDefReader extends AbstractDefaultHandler {
     /*
      * (non-Javadoc)
      * 
-     * @see org.xml.sax.ContentHandler#startElement(java.lang.String,
-     * java.lang.String, java.lang.String, org.xml.sax.Attributes)
+     * @see org.xml.sax.ContentHandler#startElement(java.lang.String, java.lang.String, java.lang.String, org.xml.sax.Attributes)
      */
     @Override
     public void startElement(final String uri, final String localName, final String name, final Attributes atts)
@@ -101,6 +98,7 @@ public final class ConfDefReader extends AbstractDefaultHandler {
             this.developmentConfiguration = new DevelopmentConfiguration(atts.getValue(NAME));
             this.developmentConfiguration.setCaption(atts.getValue(CAPTION));
             this.developmentConfiguration.setCmsUrl(atts.getValue(CMS_URL));
+            this.developmentConfiguration.setVersion(Integer.valueOf(atts.getValue("config-version")).toString());
         }
         else if (SC_COMPARTMENTS.equals(localName)) {
             this.compartmentReader = new CompartmentReader(this);

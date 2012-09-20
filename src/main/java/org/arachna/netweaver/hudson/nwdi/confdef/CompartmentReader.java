@@ -10,6 +10,7 @@ import java.util.List;
 import org.arachna.netweaver.dc.types.BuildVariant;
 import org.arachna.netweaver.dc.types.Compartment;
 import org.arachna.netweaver.dc.types.CompartmentState;
+import org.arachna.netweaver.dc.types.JdkHomeAlias;
 import org.arachna.xml.AbstractDefaultHandler;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -227,6 +228,8 @@ public final class CompartmentReader extends AbstractDefaultHandler {
         if (this.buildVariant == null) {
             // default build options
             this.buildVariant = new BuildVariant("default");
+            this.buildVariant.addBuildOption("com.sap.jdk.home_path_key", JdkHomeAlias.Jdk160Home.name());
+            this.buildVariant.addBuildOption("com.sap.jdk.javac.force_fork", "true");
         }
 
         return this.buildVariant;

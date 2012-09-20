@@ -13,7 +13,7 @@
                  truststore="default"
                  cookies="on"
                  cookiePrivacy="from original host only"
-                 compress="off,gzip"
+                 compress="on,gzip"
                  readTimeout="300000"
                  connectTimeout="10000"
                  expireTimeout="10000"

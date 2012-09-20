@@ -40,7 +40,11 @@ public final class FilePathHelper {
         final StringBuilder absolutePath = new StringBuilder();
 
         while (!paths.isEmpty()) {
-            absolutePath.append(paths.pop()).append(File.separatorChar);
+            absolutePath.append(paths.pop());
+
+            if (!paths.isEmpty()) {
+                absolutePath.append(File.separatorChar);
+            }
         }
 
         return absolutePath.toString();
