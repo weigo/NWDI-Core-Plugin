@@ -1,29 +1,30 @@
-<!-- The MIT License Copyright (c) 2004-2009, Sun Microsystems, Inc. Permission is hereby granted, free of charge, to any person obtaining a
-  copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation
-  the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the
-  Software is furnished to do so, subject to the following conditions: The above copyright notice and this permission notice shall be included
-  in all copies or substantial portions of the Software. THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
-  BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-  COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT
+<!-- The MIT License Copyright (c) 2004-2009, Sun Microsystems, Inc. Permission is hereby granted, free of charge, to any person obtaining a 
+  copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
+  the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the 
+  Software is furnished to do so, subject to the following conditions: The above copyright notice and this permission notice shall be included 
+  in all copies or substantial portions of the Software. THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING 
+  BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR 
+  COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT 
   OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. -->
 
 <!-- Config page -->
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
   <f:section title="${%NetWeaver developer infrastructure}">
-    <!-- optional @help points to the help document HTML. /plugin/NWDI-Core-Plugin is mapped to our webapp/ directory, so this is a convenient
+    <!-- optional @help points to the help document HTML. /plugin/NWDI-Core-Plugin is mapped to our webapp/ directory, so this is a convenient 
       way to serve static resources. -->
-    <f:entry title="${%NWDI tool library location} (7.0.x)" description="${%Enter the location of your NWDI tool library folder.}" help="/plugin/NWDI-Core-Plugin/help-nwdiToolLibFolder.html">
+    <f:entry title="${%NWDI tool library location} (7.0.x)" description="${%Enter the location of your NWDI tool library folder.}"
+      help="/plugin/NWDI-Core-Plugin/help-nwdiToolLibFolder.html">
       <f:textbox clazz="required" name="NWDIPlugin.nwdiToolLibFolder" value="${descriptor.nwdiToolLibFolder}"
         checkUrl="'descriptorByName/NWDIProject/nwdiToolLibFolderCheck?value='+escape(this.value)" />
     </f:entry>
-    <f:entry title="${%NWDI tool library location} (7.1+)" description="${%Enter the location of your NWDI tool library folder.}" help="/plugin/NWDI-Core-Plugin/help-nwdiToolLibFolder.html">
+    <f:entry title="${%NWDI tool library location} (7.1+)" description="${%Enter the location of your NWDI tool library folder.}"
+      help="/plugin/NWDI-Core-Plugin/help-nwdiToolLibFolder.html">
       <f:textbox clazz="required" name="NWDIPlugin.nwdiToolLibFolder71" value="${descriptor.nwdiToolLibFolder71}"
         checkUrl="'descriptorByName/NWDIProject/nwdiToolLibFolder71Check?value='+escape(this.value)" />
     </f:entry>
     <f:entry title="JDK_HOME_PATHS" description="${%Enter the locations of the JDKs that are to be used for building your tracks.}"
       help="/plugin/NWDI-Core-Plugin/help-jdkHomes.html">
-      <f:textbox name="NWDIPlugin.jdkHomePaths" value="${descriptor.jdkHomePaths}"
-        checkUrl="'descriptorByName/NWDIProject/jdkHomePathsCheck?value='+escape(this.value)" />
+      <f:textbox name="NWDIPlugin.jdkHomePaths" value="${descriptor.jdkHomePaths}" checkUrl="'descriptorByName/NWDIProject/jdkHomePathsCheck?value='+escape(this.value)" />
     </f:entry>
     <f:entry title="${%NWDI user}" description="${%Enter the user name to use for authentication against the NWDI.}" help="/plugin/NWDI-Core-Plugin/help-UME.html">
       <f:textbox clazz="required" name="NWDIPlugin.user" value="${descriptor.user}"
@@ -33,9 +34,8 @@
       <f:password clazz="required setting-input" name="NWDIPlugin.password" value="${descriptor.password}"
         checkUrl="'descriptorByName/NWDIProject/passwordCheck?value='+escape(this.value)" />
     </f:entry>
-    <f:entry title="CBS URL" description="${%Enter the URL to the NetWeaver development infrastructure.}" help="/plugin/NWDI-Core-Plugin/help-UME.html">
-      <f:textbox  name="NWDIPlugin.cbsUrl" value="${descriptor.cbsUrl}"
-        checkUrl="'descriptorByName/NWDIProject/cbsUrlCheck?value='+escape(this.value)" />
+    <f:entry title="CBS URL" description="${%Enter the URL to the NetWeaver development infrastructure.}" help="/plugin/NWDI-Core-Plugin/help-CBS.html">
+      <f:textbox name="NWDIPlugin.cbsUrl" value="${descriptor.cbsUrl}" checkUrl="'descriptorByName/NWDIProject/cbsUrlCheck?value='+escape(this.value)" />
     </f:entry>
   </f:section>
 </j:jelly>

@@ -1,9 +1,11 @@
 <div>
-<p>A track in the NWDI can be configured to be built with a
-different JDK than the NWDI is executed on.</p>
-<p>When configuring the NWDI one can define the 'JDK_1_3_1_HOME' and
-'JDK_1_4_2_HOME' to point to older JDK installation that can be used to
-build tracks that point to older NetWeaver installation.</p>
-<p>Provide the path to such an installation or leave the field empty
-when you don't intend to build tracks for NetWeaver 7.0.x.</p>
+<p>Enter key value pairs of locations of JKDs to build tracks with. Possible keys are:</p>
+<ul>
+<li>JDK_1_3_1_HOME,</li>
+<li>JDK_1_4_2_HOME,</li>
+<li>JDK_1_5_0_HOME and</li>
+<li>JDK_1_6_0_HOME.</li>
+</ul>
+<p>A key value pair should be separated from other entries by semicolon:</p>
+<code>JDK_1_4_2_HOME=/opt/jdk1.4.2;JDK_1_6_0_HOME=/opt/jdk1.6.0_35</code>
 </div>
