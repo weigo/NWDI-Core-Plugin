@@ -9,7 +9,7 @@
 
 <!-- Config page -->
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
-  <f:section title="${%NetWeaver developer infrastructure}">
+  <f:section title="${%NetWeaver development infrastructure}">
     <!-- optional @help points to the help document HTML. /plugin/NWDI-Core-Plugin is mapped to our webapp/ directory, so this is a convenient 
       way to serve static resources. -->
     <f:entry title="${%NWDI tool library location} (7.0.x)" description="${%Enter the location of your NWDI tool library folder.}"
