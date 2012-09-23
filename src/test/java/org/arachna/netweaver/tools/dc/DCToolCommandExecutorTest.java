@@ -19,7 +19,7 @@ import java.util.List;
 import org.arachna.netweaver.dc.types.BuildVariant;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 import org.arachna.netweaver.dc.types.JdkHomeAlias;
-import org.arachna.netweaver.hudson.nwdi.JdkHomePaths;
+import org.arachna.netweaver.dc.types.JdkHomePaths;
 import org.arachna.netweaver.tools.DIToolCommandBuilder;
 import org.arachna.netweaver.tools.DIToolDescriptor;
 import org.junit.After;

@@ -8,6 +8,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 
 import org.arachna.netweaver.dc.types.JdkHomeAlias;
+import org.arachna.netweaver.dc.types.JdkHomePaths;
 import org.junit.Test;
 
 /**

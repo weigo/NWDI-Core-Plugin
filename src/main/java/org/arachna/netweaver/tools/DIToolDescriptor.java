@@ -1,7 +1,7 @@
 package org.arachna.netweaver.tools;
 
 import org.arachna.netweaver.dc.types.JdkHomeAlias;
-import org.arachna.netweaver.hudson.nwdi.JdkHomePaths;
+import org.arachna.netweaver.dc.types.JdkHomePaths;
 
 /**
  * Container for parameters relevant to DC tool execution.

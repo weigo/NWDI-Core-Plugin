@@ -1,13 +1,12 @@
 /**
  *
  */
-package org.arachna.netweaver.hudson.nwdi;
+package org.arachna.netweaver.dc.types;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.arachna.netweaver.dc.types.JdkHomeAlias;
 
 /**
  * Mapping of JDKs to their respective installation directory.

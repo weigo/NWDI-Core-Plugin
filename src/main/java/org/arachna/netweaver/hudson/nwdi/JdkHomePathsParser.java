@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.arachna.netweaver.dc.types.JdkHomeAlias;
+import org.arachna.netweaver.dc.types.JdkHomePaths;
 
 /**
  * @author Dirk Weigenand
