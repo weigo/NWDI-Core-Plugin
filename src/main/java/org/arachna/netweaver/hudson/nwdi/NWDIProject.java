@@ -53,7 +53,6 @@ import net.sf.json.JSONObject;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 import org.arachna.netweaver.tools.DIToolDescriptor;
 import org.arachna.netweaver.tools.cbs.CBSToolCommandExecutor;
-import org.arachna.netweaver.tools.dc.JdkHomePaths;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;

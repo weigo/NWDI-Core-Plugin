@@ -1,7 +1,7 @@
 /**
  *
  */
-package org.arachna.netweaver.tools.dc;
+package org.arachna.netweaver.hudson.nwdi;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -39,7 +39,7 @@ public final class JdkHomePaths {
      *            the path for the alias.
      */
     public void add(final JdkHomeAlias alias, final String path) {
-        this.paths.put(alias, path);
+        paths.put(alias, path);
     }
 
     /**
@@ -50,7 +50,7 @@ public final class JdkHomePaths {
      * @return the configured path for the given alias or <code>null</code>.
      */
     public String get(final JdkHomeAlias alias) {
-        String path = this.paths.get(alias);
+        String path = paths.get(alias);
 
         if (path == null) {
             final String jdkHome = System.getProperty(JAVA_HOME);
@@ -70,6 +70,6 @@ public final class JdkHomePaths {
      * @return all configured aliases.
      */
     public Collection<JdkHomeAlias> getAliases() {
-        return this.paths.keySet();
+        return paths.keySet();
     }
 }
