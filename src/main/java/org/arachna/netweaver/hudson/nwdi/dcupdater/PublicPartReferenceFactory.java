@@ -14,17 +14,29 @@ import org.arachna.netweaver.dc.types.PublicPartReference;
  * @author Dirk Weigenand
  */
 final class PublicPartReferenceFactory {
-    private static final Map<String, String> DC_BLACKLIST = new HashMap<String, String>();
+    /**
+     * vendor sap.com.
+     */
+    private static final String SAP_COM = "sap.com";
 
     /**
      * String dividing vendor from component name.
      */
     private static final String FORWARD_SLASH = "/";
 
-    static {
-        DC_BLACKLIST.put("tc/wd/wslib", "sap.com");
-        DC_BLACKLIST.put("tc/kmc/bc.uwl/api", "sap.com");
-        DC_BLACKLIST.put("tc/sec/wssec/service", "sap.com");
+    /**
+     * blacklist for DCs missing the vendor.
+     */
+    private final Map<String, String> blackList = new HashMap<String, String>();
+
+    /**
+     * Create a new instance of <code>PublicPartReferenceFactory</code> and
+     * initialize blacklist for known DCs missing a vendor.
+     */
+    PublicPartReferenceFactory() {
+        blackList.put("tc/wd/wslib", SAP_COM);
+        blackList.put("tc/kmc/bc.uwl/api", SAP_COM);
+        blackList.put("tc/sec/wssec/service", SAP_COM);
     }
 
     /**
@@ -63,7 +75,7 @@ final class PublicPartReferenceFactory {
      */
     PublicPartReference create(final String reference) {
         PublicPartReference ppReference = null;
-        String vendor = getVendor(reference);
+        final String vendor = getVendor(reference);
 
         if (vendor != null) {
             ppReference = new PublicPartReference(vendor, getLibrary(reference));
@@ -77,8 +89,8 @@ final class PublicPartReferenceFactory {
         return ppReference;
     }
 
-    private String getLibrary(String reference) {
-        String vendor = DC_BLACKLIST.get(reference);
+    private String getLibrary(final String reference) {
+        final String vendor = blackList.get(reference);
         String library = reference;
 
         if (vendor == null) {
@@ -89,8 +101,8 @@ final class PublicPartReferenceFactory {
         return library;
     }
 
-    private String getVendor(String reference) {
-        String vendor = DC_BLACKLIST.get(reference);
+    private String getVendor(final String reference) {
+        String vendor = blackList.get(reference);
 
         if (vendor == null) {
             final int index = getVendorSeparationIndex(reference);

@@ -25,12 +25,6 @@ import org.xml.sax.SAXException;
 abstract class AbstractComponentConfigurationReader extends AbstractDefaultHandler implements
     ComponentConfigurationReader {
     /**
-     * Factory for public part references from references read from WebDynpro
-     * project properties or portal applications config files.
-     */
-    private PublicPartReferenceFactory ppRefFactory = new PublicPartReferenceFactory();
-
-    /**
      * message for IO errors.
      */
     private static final String IO_EXCEPTION_MESSAGE = "There was a problem reading %s.";
@@ -39,6 +33,12 @@ abstract class AbstractComponentConfigurationReader extends AbstractDefaultHandl
      * message regarding SAX parse(r) errors.
      */
     private static final String SAX_EXCEPTION_MESSAGE = "There was a problem parsing %s.";
+
+    /**
+     * Factory for public part references from references read from WebDynpro
+     * project properties or portal applications config files.
+     */
+    private final PublicPartReferenceFactory ppRefFactory = new PublicPartReferenceFactory();
 
     /**
      * public part references.
@@ -66,11 +66,11 @@ abstract class AbstractComponentConfigurationReader extends AbstractDefaultHandl
      * {@inheritDoc}
      */
     public final Set<PublicPartReference> read() {
-        this.references.clear();
+        references.clear();
         FileReader input = null;
 
         try {
-            final File source = new File(this.componentBase + File.separatorChar + this.getConfigurationLocation());
+            final File source = new File(componentBase + File.separatorChar + getConfigurationLocation());
 
             if (source.exists()) {
                 input = new FileReader(source);
@@ -79,25 +79,25 @@ abstract class AbstractComponentConfigurationReader extends AbstractDefaultHandl
         }
         catch (final IOException e) {
             Logger.getLogger(this.getClass().getName()).log(Level.WARNING,
-                String.format(IO_EXCEPTION_MESSAGE, this.getConfigurationLocation()), e);
+                String.format(IO_EXCEPTION_MESSAGE, getConfigurationLocation()), e);
         }
         catch (final SAXException e) {
             Logger.getLogger(this.getClass().getName()).log(Level.WARNING,
-                String.format(SAX_EXCEPTION_MESSAGE, this.getConfigurationLocation()), e);
+                String.format(SAX_EXCEPTION_MESSAGE, getConfigurationLocation()), e);
         }
         finally {
             if (input != null) {
                 try {
                     input.close();
                 }
-                catch (IOException e) {
+                catch (final IOException e) {
                     Logger.getLogger(this.getClass().getName()).log(Level.WARNING,
-                        String.format(IO_EXCEPTION_MESSAGE, this.getConfigurationLocation()), e);
+                        String.format(IO_EXCEPTION_MESSAGE, getConfigurationLocation()), e);
                 }
             }
         }
 
-        return this.references;
+        return references;
     }
 
     /**
@@ -111,7 +111,7 @@ abstract class AbstractComponentConfigurationReader extends AbstractDefaultHandl
         final PublicPartReference ppReference = ppRefFactory.create(reference);
 
         if (ppReference != null) {
-            this.references.add(ppReference);
+            references.add(ppReference);
         }
     }
 
