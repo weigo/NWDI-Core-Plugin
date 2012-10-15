@@ -28,7 +28,7 @@ public enum JdkHomeAlias {
     Jdk150Home("JDK1.5.0_HOME", "1.5"),
 
     /**
-     * JDK 1.5.0 home path.
+     * JDK 1.6.0 home path.
      */
     Jdk160Home("JDK1.6.0_HOME", "1.6");
 
@@ -38,7 +38,7 @@ public enum JdkHomeAlias {
     private static final Map<String, JdkHomeAlias> ALIASES = new HashMap<String, JdkHomeAlias>();
 
     static {
-        for (JdkHomeAlias alias : values()) {
+        for (final JdkHomeAlias alias : values()) {
             ALIASES.put(alias.toString(), alias);
         }
     }
@@ -80,7 +80,7 @@ public enum JdkHomeAlias {
      */
     @Override
     public String toString() {
-        return this.alias;
+        return alias;
     }
 
     /**
