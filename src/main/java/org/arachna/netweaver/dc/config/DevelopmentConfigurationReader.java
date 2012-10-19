@@ -4,6 +4,7 @@
 package org.arachna.netweaver.dc.config;
 
 import org.arachna.netweaver.dc.types.BuildVariant;
+import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 import org.arachna.xml.AbstractDefaultHandler;
@@ -115,6 +116,7 @@ public class DevelopmentConfigurationReader extends AbstractDefaultHandler {
             currentConfiguration.setCaption(attributes.getValue(CAPTION));
             currentConfiguration.setDescription(attributes.getValue(DESCRIPTION));
             currentConfiguration.setLocation(attributes.getValue(LOCATION));
+            currentConfiguration.setVersion(attributes.getValue("version"));
         }
         else if (COMPARTMENT.equals(localName)) {
             compartmentReader = new CompartmentReader(getXmlReader(), this, developmentComponentFactory);

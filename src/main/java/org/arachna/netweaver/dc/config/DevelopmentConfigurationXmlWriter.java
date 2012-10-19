@@ -108,6 +108,7 @@ public final class DevelopmentConfigurationXmlWriter {
         output.writeAttribute(CAPTION, configuration.getCaption());
         output.writeAttribute(DESCRIPTION, configuration.getDescription());
         output.writeAttribute(NAME, configuration.getName());
+        output.writeAttribute("version", configuration.getVersion());
         emitBuildVariant();
         emitCompartments();
         output.writeEndElement();
