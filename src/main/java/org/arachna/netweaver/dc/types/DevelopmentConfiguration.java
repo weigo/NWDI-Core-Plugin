@@ -13,8 +13,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * A class representing an NWDI development configuration description, i.e. the name of the development configuration and the compartments
- * contained therein.
+ * A class representing an NWDI development configuration description, i.e. the
+ * name of the development configuration and the compartments contained therein.
  * 
  * @author Dirk Weigenand
  */
@@ -78,7 +78,7 @@ public final class DevelopmentConfiguration {
     /**
      * version of this development configuration.
      */
-    private String version;
+    private String version = "";
 
     /**
      * Create a development configuration with the given name.
@@ -96,11 +96,13 @@ public final class DevelopmentConfiguration {
     }
 
     /**
-     * Find the start index of the workspace name in the given development configuration name.
+     * Find the start index of the workspace name in the given development
+     * configuration name.
      * 
      * @param name
      *            development configuration name.
-     * @return the start index of the workspace name in the given development configuration name.
+     * @return the start index of the workspace name in the given development
+     *         configuration name.
      */
     private int getBeginIndexOfWorkspace(final String name) {
         final int firstIndexOfUnderScore = name.indexOf('_');
@@ -109,11 +111,13 @@ public final class DevelopmentConfiguration {
     }
 
     /**
-     * Find the end index of the workspace name in the given development configuration name.
+     * Find the end index of the workspace name in the given development
+     * configuration name.
      * 
      * @param name
      *            development configuration name.
-     * @return the end index of the workspace name in the given development configuration name.
+     * @return the end index of the workspace name in the given development
+     *         configuration name.
      */
     private int getEndIndexOfWorkspace(final String name) {
         final int lastIndexOfUnderScore = name.lastIndexOf('_');
@@ -351,8 +355,9 @@ public final class DevelopmentConfiguration {
     }
 
     /**
-     * Returns the URL for the DTR this development configuration is stored on. The returned string is empty when no compartment in source
-     * state is contained in this development configuration.
+     * Returns the URL for the DTR this development configuration is stored on.
+     * The returned string is empty when no compartment in source state is
+     * contained in this development configuration.
      * 
      * @return URL for the DTR this development configuration is stored on.
      */
@@ -370,9 +375,11 @@ public final class DevelopmentConfiguration {
     }
 
     /**
-     * Get the {@link JdkHomeAlias} associated with the {@link BuildVariant} of this development configuration.
+     * Get the {@link JdkHomeAlias} associated with the {@link BuildVariant} of
+     * this development configuration.
      * 
-     * @return the JdkHomeAlias associated with the build variant of this development configuration iff there is one defined and a {@see
+     * @return the JdkHomeAlias associated with the build variant of this
+     *         development configuration iff there is one defined and a {@see
      *         #COM_SAP_JDK_HOME_PATH_KEY} build option is defined.
      * 
      *         Returns <code>null</code> otherwise.
@@ -391,8 +398,9 @@ public final class DevelopmentConfiguration {
     /**
      * Returns the source version to use for generating javadoc documentation.
      * 
-     * Uses the {@link JdkHomeAlias} defined in the development configuration. If there is no alias defined use the JDK version the ant task
-     * is run with.
+     * Uses the {@link JdkHomeAlias} defined in the development configuration.
+     * If there is no alias defined use the JDK version the ant task is run
+     * with.
      * 
      * @return java source version to use generating javadoc documentation.
      */
@@ -412,8 +420,9 @@ public final class DevelopmentConfiguration {
     }
 
     /**
-     * Accept a visitor of this development configuration. Iterate over its compartments and development components and call the respective
-     * visit method.
+     * Accept a visitor of this development configuration. Iterate over its
+     * compartments and development components and call the respective visit
+     * method.
      * 
      * @param visitor
      *            visitor for this development configuration.
@@ -445,7 +454,7 @@ public final class DevelopmentConfiguration {
      * @param version
      *            the version to set
      */
-    public void setVersion(String version) {
+    public void setVersion(final String version) {
         this.version = version;
     }
 }
