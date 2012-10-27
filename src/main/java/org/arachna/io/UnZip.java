@@ -9,7 +9,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -42,7 +41,7 @@ public final class UnZip {
      *            name of file to be unzipped.
      */
     public UnZip(final String targetDirectory, final String zipFileName) {
-        this.targetDirectory = this.getTargetDirectory(targetDirectory);
+        this.targetDirectory = getTargetDirectory(targetDirectory);
         this.zipFileName = zipFileName;
     }
 
@@ -75,14 +74,14 @@ public final class UnZip {
     public void execute() throws IOException {
         validateTargetDirectory();
 
-        final ZipFile archive = new ZipFile(this.zipFileName);
+        final ZipFile archive = new ZipFile(zipFileName);
         final Enumeration<? extends ZipEntry> entries = archive.entries();
         ZipEntry entry;
 
         while (entries.hasMoreElements()) {
             entry = entries.nextElement();
 
-            final String pathName = this.targetDirectory.getAbsolutePath() + File.separatorChar + entry.getName();
+            final String pathName = targetDirectory.getAbsolutePath() + File.separatorChar + entry.getName();
 
             if (entry.isDirectory()) {
                 createDirectory(new File(pathName));
@@ -91,8 +90,7 @@ public final class UnZip {
                 final File target = new File(pathName);
                 createDirectory(target.getParentFile());
 
-                final OutputStream output = new FileOutputStream(target);
-                Util.copyStreamAndClose(archive.getInputStream(entry), output);
+                Util.copyStreamAndClose(archive.getInputStream(entry), new FileOutputStream(target));
             }
         }
     }
@@ -116,11 +114,11 @@ public final class UnZip {
      *             if the target directory does not exist or is not directory.
      */
     private void validateTargetDirectory() throws IOException {
-        if (!this.targetDirectory.exists()) {
-            throw new FileNotFoundException("directory " + this.targetDirectory.getAbsolutePath() + " does not exist!");
+        if (!targetDirectory.exists()) {
+            throw new FileNotFoundException("directory " + targetDirectory.getAbsolutePath() + " does not exist!");
         }
-        else if (!this.targetDirectory.isDirectory()) {
-            throw new IOException(this.targetDirectory.getAbsolutePath() + " is not a directory!");
+        else if (!targetDirectory.isDirectory()) {
+            throw new IOException(targetDirectory.getAbsolutePath() + " is not a directory!");
         }
     }
 }
