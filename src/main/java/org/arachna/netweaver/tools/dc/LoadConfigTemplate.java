@@ -9,20 +9,29 @@ import java.util.Map;
 import org.arachna.netweaver.dc.types.JdkHomeAlias;
 
 /**
- * Template for generating <code>loadconfig</code> and <code>timing</code> commands.
+ * Template for generating <code>loadconfig</code> and <code>timing</code>
+ * commands.
  * 
  * @author Dirk Weigenand
  */
 enum LoadConfigTemplate {
     /**
-     * template for connecting and disconnecting a dctool to/from the NWDI.
+     * template for connecting and disconnecting a dctool to/from the NWDI
+     * (NetWeaver 7.0).
      */
-    V70("loadconfig -u %s -p %s -c \"%s\" -r \"%s\";\n", "exectime -m on;", "spool spool.txt;", "tracefile tracefile.txt;", "exit;"), V71(
-        "loadconfig -u %s -p %s -v \"%s\" -l \"%s\"", "timing on", "spool spool.txt", "tracefile tracefile.txt", "exit");
+    V70("loadconfig -u %s -p %s -c \"%s\" -r \"%s\";\n", "exectime -m on;", "spool spool.txt;",
+        "tracefile tracefile.txt;", "exit;"),
+    /**
+     * template for connecting and disconnecting a dctool to/from the NWDI
+     * (NetWeaver 7.1 and onwards).
+     */
+    V71("loadconfig -u %s -p %s -v \"%s\" -l \"%s\"", "timing on", "spool spool.txt", "tracefile tracefile.txt", "exit");
 
     /**
-     * mapping of {@link JdkHomeAlias}es to template matching the respective NetWeaver version.
+     * mapping of {@link JdkHomeAlias}es to template matching the respective
+     * NetWeaver version.
      */
+    @SuppressWarnings("serial")
     private static final Map<JdkHomeAlias, LoadConfigTemplate> VALUES =
         new HashMap<JdkHomeAlias, LoadConfigTemplate>() {
             {
@@ -59,13 +68,15 @@ enum LoadConfigTemplate {
     private final String tracefileCommand;
 
     /**
-     * Create a <code>LoadConfigTemplate</code> with the given template strings for <code>loadconfig</code> and <code>timing</code>
-     * commands.
+     * Create a <code>LoadConfigTemplate</code> with the given template strings
+     * for <code>loadconfig</code> and <code>timing</code> commands.
      * 
      * @param loadConfigCommand
-     *            template string for generation of a <code>loadconfig</code> command.
+     *            template string for generation of a <code>loadconfig</code>
+     *            command.
      * @param timingCommand
-     *            template string for generation of a <code>timing</code> command.
+     *            template string for generation of a <code>timing</code>
+     *            command.
      * @param spoolCommand
      *            command to enable writing into a spool file.
      * @param tracefileCommand

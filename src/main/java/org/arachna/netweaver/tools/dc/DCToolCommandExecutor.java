@@ -20,7 +20,6 @@ import org.arachna.netweaver.tools.AbstractDIToolExecutor;
 import org.arachna.netweaver.tools.DIToolCommandBuilder;
 import org.arachna.netweaver.tools.DIToolCommandExecutionResult;
 import org.arachna.netweaver.tools.DIToolDescriptor;
-import org.arachna.netweaver.tools.dc.commands.CommandFactory;
 
 /**
  * Execute a DC Tool.

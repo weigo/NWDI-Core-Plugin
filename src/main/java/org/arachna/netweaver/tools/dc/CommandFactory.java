@@ -1,7 +1,7 @@
 /**
  *
  */
-package org.arachna.netweaver.tools.dc.commands;
+package org.arachna.netweaver.tools.dc;
 
 import java.util.Collection;
 
@@ -42,8 +42,6 @@ public final class CommandFactory {
      * Creates a DC tool command builder for building synchronizing development
      * components commands.
      * 
-     * @param configuration
-     *            development configuration to synchronize.
      * @param dcFactory
      *            registry for development components
      * @param syncSources

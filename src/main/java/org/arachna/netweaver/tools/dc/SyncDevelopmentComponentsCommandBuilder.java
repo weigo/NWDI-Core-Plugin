@@ -1,7 +1,7 @@
 /**
  *
  */
-package org.arachna.netweaver.tools.dc.commands;
+package org.arachna.netweaver.tools.dc;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,7 +21,8 @@ import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 import org.arachna.netweaver.dc.types.PublicPartReference;
 
 /**
- * Builder for DCTool synchronize commands for a development configurations development components.
+ * Builder for DCTool synchronize commands for a development configurations
+ * development components.
  * 
  * @author Dirk Weigenand
  */
@@ -56,7 +57,8 @@ final class SyncDevelopmentComponentsCommandBuilder extends AbstractDCToolComman
      * create a builder for development component listing and syncing commands.
      * 
      * @param developmentConfiguration
-     *            development configuration to synchronize development components for.
+     *            development configuration to synchronize development
+     *            components for.
      * @param dcFactory
      *            registry for development components
      * @param syncSources
@@ -76,7 +78,8 @@ final class SyncDevelopmentComponentsCommandBuilder extends AbstractDCToolComman
     /*
      * (non-Javadoc)
      * 
-     * @see org.arachna.netweaver.dc.analyzer.dctool.DCToolCommandBuilder#execute ()
+     * @see
+     * org.arachna.netweaver.dc.analyzer.dctool.DCToolCommandBuilder#execute ()
      */
     @Override
     protected List<String> executeInternal() {
@@ -95,7 +98,8 @@ final class SyncDevelopmentComponentsCommandBuilder extends AbstractDCToolComman
     /**
      * Create commands for synchronizing DCs that need to be rebuilt.
      * 
-     * @return collection of commands for synchronizing DCs that need to be rebuilt.
+     * @return collection of commands for synchronizing DCs that need to be
+     *         rebuilt.
      */
     protected Collection<String> synchronizeDCsNeedingRebuild() {
         final DevelopmentConfiguration developmentConfiguration = getDevelopmentConfiguration();
@@ -122,7 +126,8 @@ final class SyncDevelopmentComponentsCommandBuilder extends AbstractDCToolComman
      * Create command for synchronizing DCs in archive mode.
      * 
      * @param compartment
-     *            the compartment whose components should be synchronized in archive mode
+     *            the compartment whose components should be synchronized in
+     *            archive mode
      * @return command for synchronizing DCs in inactive mode.
      */
     protected String createSyncDcsInInActiveModeCommand(final Compartment compartment) {
@@ -132,8 +137,9 @@ final class SyncDevelopmentComponentsCommandBuilder extends AbstractDCToolComman
     /**
      * Create commands for synchronizing DCs in archive mode.
      * 
-     * When the property {@see #cleanCopy} is <code>false</code> only compartments that do not match the regular
-     * expression of compartments to ignore are synchronized.
+     * When the property {@see #cleanCopy} is <code>false</code> only
+     * compartments that do not match the regular expression of compartments to
+     * ignore are synchronized.
      * 
      * @return collection of commands for synchronizing DCs in archive mode.
      */
@@ -170,7 +176,8 @@ final class SyncDevelopmentComponentsCommandBuilder extends AbstractDCToolComman
      * @param usedDCs
      *            collect used DCs that should be synchronized here.
      * @param component
-     *            look at used DCs of this component to determine which should be synchronized.
+     *            look at used DCs of this component to determine which should
+     *            be synchronized.
      */
     protected void collectUsedDCs(final Set<DevelopmentComponent> usedDCs, final DevelopmentComponent component) {
         DevelopmentComponent usedDC;
@@ -197,20 +204,24 @@ final class SyncDevelopmentComponentsCommandBuilder extends AbstractDCToolComman
      * @return whether the DC should be included in DCs to be synchronized.
      */
     protected boolean isUsedDCinArchiveStateAndNoBuildPlugin(final DevelopmentComponent usedDC) {
-        if (usedDC == null) {
-            return false;
+        boolean result = false;
+
+        if (usedDC != null) {
+            final Compartment compartment = usedDC.getCompartment();
+
+            if (compartment != null) {
+                result =
+                    CompartmentState.Archive.equals(compartment.getState())
+                        && !BUILD_INFRASTRUCTURE_COMPARTMENTS.contains(compartment.getName());
+            }
+            else {
+                Logger.getLogger(this.getClass().getName()).log(Level.INFO,
+                    String.format("%s has no compartment!", usedDC.toString()));
+            }
+
         }
 
-        Compartment compartment = usedDC.getCompartment();
-
-        if (compartment == null) {
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO,
-                String.format("%s has no compartment!", usedDC.toString()));
-            return false;
-        }
-
-        return CompartmentState.Archive.equals(compartment.getState())
-            && !BUILD_INFRASTRUCTURE_COMPARTMENTS.contains(compartment.getName());
+        return result;
     }
 
     /**

@@ -1,7 +1,7 @@
 /**
  *
  */
-package org.arachna.netweaver.tools.dc.commands;
+package org.arachna.netweaver.tools.dc;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,8 +36,10 @@ final class BuildDevelopmentComponentsCommandBuilder extends AbstractDCToolComma
         V71("builddc -c %s -n %s -v %s");
 
         /**
-         * mapping of {@link JdkHomeAlias}es to template matching the respective NetWeaver version.
+         * mapping of {@link JdkHomeAlias}es to template matching the respective
+         * NetWeaver version.
          */
+        @SuppressWarnings("serial")
         private static final Map<JdkHomeAlias, BuildDevelopmentComponentsCommandTemplate> VALUES =
             new HashMap<JdkHomeAlias, BuildDevelopmentComponentsCommandTemplate>() {
                 {
@@ -99,14 +101,17 @@ final class BuildDevelopmentComponentsCommandBuilder extends AbstractDCToolComma
     private final BuildDevelopmentComponentsCommandTemplate template;
 
     /**
-     * Creates a <code>DevelopmentComponentBuilder</code> instance for the given development components.
+     * Creates a <code>DevelopmentComponentBuilder</code> instance for the given
+     * development components.
      * 
      * @param config
-     *            development configuration to use for executing dc tool commands.
+     *            development configuration to use for executing dc tool
+     *            commands.
      * @param components
      *            development components to create build dc commands for.
      */
-    public BuildDevelopmentComponentsCommandBuilder(final DevelopmentConfiguration config, final Collection<DevelopmentComponent> components) {
+    public BuildDevelopmentComponentsCommandBuilder(final DevelopmentConfiguration config,
+        final Collection<DevelopmentComponent> components) {
         super(config);
         template = BuildDevelopmentComponentsCommandTemplate.fromJdkHomeAlias(config.getJdkHomeAlias());
         this.components.addAll(components);
@@ -142,7 +147,7 @@ final class BuildDevelopmentComponentsCommandBuilder extends AbstractDCToolComma
      * @return the created builddc command
      */
     private String createBuildDcCommand(final DevelopmentComponent component) {
-        return String.format(template.getBuildCommandTemplate(), component.getCompartment().getName(), component.getName(),
-            component.getVendor());
+        return String.format(template.getBuildCommandTemplate(), component.getCompartment().getName(),
+            component.getName(), component.getVendor());
     }
 }

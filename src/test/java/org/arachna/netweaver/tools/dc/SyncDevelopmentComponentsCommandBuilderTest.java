@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.arachna.netweaver.tools.dc.commands;
+package org.arachna.netweaver.tools.dc;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -16,6 +16,7 @@ import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 import org.arachna.netweaver.dc.types.JdkHomeAlias;
 import org.arachna.netweaver.dc.types.PublicPartReference;
+import org.arachna.netweaver.tools.dc.SyncDevelopmentComponentsCommandBuilder;
 import org.junit.Before;
 import org.junit.Test;
 

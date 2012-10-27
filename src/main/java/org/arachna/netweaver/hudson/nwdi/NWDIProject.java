@@ -72,13 +72,21 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
     private static final float THOUSAND_MILLI_SECONDS = 1000f;
 
     /**
-     * parameter name for project configuration controlling whether the workspace should be clean before building.
+     * parameter name for project configuration controlling whether the
+     * workspace should be clean before building.
      */
     private static final String PARAMETER_CLEAN_COPY = "cleanCopy";
 
     /**
-     * Store the content of the '.confdef' configuration file for a development configuration.
+     * Store the content of the '.confdef' configuration file for a development
+     * configuration.
+     * 
+     * @deprecated Used to store the content of the development configuration
+     *             file (<code>.dcdef</code>). Superseded by {@see
+     *             #buildSpaceName} (configuration is now downloaded from cbs
+     *             each time the DTR is polled or a build starts).
      */
+    @Deprecated
     private transient String confDef;
 
     /**
@@ -113,7 +121,8 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
      * Create an instance of a NWDI project.
      * 
      * @param parent
-     *            the parent <code>ItemGroup</code> in the project configuration page.
+     *            the parent <code>ItemGroup</code> in the project configuration
+     *            page.
      * @param name
      *            project name
      */
@@ -122,7 +131,8 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
     }
 
     /**
-     * Create an instance of a NWDI project using the given project name and configuration.
+     * Create an instance of a NWDI project using the given project name and
+     * configuration.
      * 
      * @param name
      *            project name.
@@ -168,7 +178,8 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
     /*
      * (non-Javadoc)
      * 
-     * @see hudson.model.AbstractProject#checkout(hudson.model.AbstractBuild, hudson.Launcher, hudson.model.BuildListener, java.io.File)
+     * @see hudson.model.AbstractProject#checkout(hudson.model.AbstractBuild,
+     * hudson.Launcher, hudson.model.BuildListener, java.io.File)
      */
     @Override
     public boolean checkout(final AbstractBuild build, final Launcher launcher, final BuildListener listener,
@@ -186,7 +197,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
                 .append(String.format(" (%f sec.).\n", (System.currentTimeMillis() - start) / THOUSAND_MILLI_SECONDS));
         }
 
-        FilePath dtcFolder = nwdiBuild.getDtcFolder();
+        final FilePath dtcFolder = nwdiBuild.getDtcFolder();
 
         if (!dtcFolder.exists()) {
             dtcFolder.mkdirs();
@@ -194,8 +205,9 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
 
         updateDevelopmentConfiguration(logger, dtcFolder);
 
-        DevelopmentConfiguration developmentConfiguration = nwdiBuild.getDevelopmentConfiguration();
-        logger.append(String.format("New development configuration version is: %s.\n", developmentConfiguration.getVersion()));
+        final DevelopmentConfiguration developmentConfiguration = nwdiBuild.getDevelopmentConfiguration();
+        logger.append(String.format("New development configuration version is: %s.\n",
+            developmentConfiguration.getVersion()));
         logger.append("Updating DTR client configuration...\n");
         new DtrConfigCreator(build.getWorkspace(), developmentConfiguration).execute();
 
@@ -214,12 +226,9 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
      * @throws InterruptedException
      *             when the operation was interrupted
      */
-    void updateDevelopmentConfiguration(final PrintStream logger, FilePath dtcFolder) throws IOException, InterruptedException {
+    void updateDevelopmentConfiguration(final PrintStream logger, final FilePath dtcFolder) throws IOException,
+        InterruptedException {
         logger.append("Updating development configuration...\n");
-        System.err.println("Updating development configuration...");
-        Exception e = new Exception();
-        e.fillInStackTrace();
-        e.printStackTrace(System.err);
         getDescriptor().createCBSToolExecutor(dtcFolder).updateDevelopmentConfiguration(buildSpaceName, ".confdef");
     }
 
@@ -320,7 +329,8 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
     }
 
     /**
-     * Descriptor for NWDIProjects. Contains the global configuration commonly used for different NWDI tracks.
+     * Descriptor for NWDIProjects. Contains the global configuration commonly
+     * used for different NWDI tracks.
      * 
      * @author Dirk Weigenand
      */
@@ -400,7 +410,8 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
         private String cbsUrl;
 
         /**
-         * Create descriptor for NWDI-Projects and load global configuration data.
+         * Create descriptor for NWDI-Projects and load global configuration
+         * data.
          */
         public DescriptorImpl() {
             load();
@@ -479,9 +490,11 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
         }
 
         /**
-         * Returns the paths to JDK installations to be used for building tracks.
+         * Returns the paths to JDK installations to be used for building
+         * tracks.
          * 
-         * @return the paths to JDK installations to be used for building tracks.
+         * @return the paths to JDK installations to be used for building
+         *         tracks.
          */
         public String getJdkHomePaths() {
             return jdkHomePaths;
@@ -491,7 +504,8 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
          * Set the paths to JDK installations to be used for building tracks.
          * 
          * @param jdkHomePaths
-         *            the paths to JDK installations to be used for building tracks.
+         *            the paths to JDK installations to be used for building
+         *            tracks.
          */
         public void setJdkHomePaths(final String jdkHomePaths) {
             this.jdkHomePaths = jdkHomePaths;
@@ -552,7 +566,8 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
         }
 
         /**
-         * Verify that the given URL can be reached and using the credentials for user and password can be used to access the NWDI.
+         * Verify that the given URL can be reached and using the credentials
+         * for user and password can be used to access the NWDI.
          * 
          * @param value
          *            URL to CBS
@@ -602,11 +617,13 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
         }
 
         /**
-         * Validate that the given <code>FilePath</code> contains a 'dc' sub folder.
+         * Validate that the given <code>FilePath</code> contains a 'dc' sub
+         * folder.
          * 
          * @param folder
          *            the 'tools' folder of a NWDI tool library installation.
-         * @return the validation result <code>FormValidation.ok()</code> when the 'dc' sub folder exists,
+         * @return the validation result <code>FormValidation.ok()</code> when
+         *         the 'dc' sub folder exists,
          *         <code>FormValidation.error()</code> otherwise.
          * @throws IOException
          *             when an error occurred accessing the folder.
@@ -677,7 +694,8 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
         }
 
         /**
-         * Return a {@link ListBoxModel} containing names of build spaces to choose from.
+         * Return a {@link ListBoxModel} containing names of build spaces to
+         * choose from.
          * 
          * @return list of (development) build spaces in NWDI.
          */
@@ -731,13 +749,15 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
         /**
          * Create a {@link CBSToolCommandExecutor}.
          * 
-         * The executor is set up with a dummy development configuration and is executed in the temporary directory indicated by the system
-         * property 'java.io.tmpdir'.
+         * The executor is set up with a dummy development configuration and is
+         * executed in the temporary directory indicated by the system property
+         * 'java.io.tmpdir'.
          * 
-         * @return a <code>CBSToolCommandExecutor</code> that can be used to execute commands not related to a certain development
+         * @return a <code>CBSToolCommandExecutor</code> that can be used to
+         *         execute commands not related to a certain development
          *         configuration.
          */
-        private CBSToolCommandExecutor createCBSToolExecutor(FilePath workspace) {
+        private CBSToolCommandExecutor createCBSToolExecutor(final FilePath workspace) {
             final DevelopmentConfiguration configuration = new DevelopmentConfiguration("xxx");
             configuration.setCmsUrl(cbsUrl);
             final DIToolDescriptor descriptor =
@@ -794,7 +814,8 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
     /**
      * Return whether the workspace should be cleaned before building.
      * 
-     * @return whether the workspace should be cleaned before building ( <code>true</code> yes, leave it as it is otherwise).
+     * @return whether the workspace should be cleaned before building (
+     *         <code>true</code> yes, leave it as it is otherwise).
      */
     public boolean isCleanCopy() {
         return cleanCopy;
@@ -804,7 +825,8 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
      * Indicate whether the workspace should be cleaned before building.
      * 
      * @param cleanCopy
-     *            whether the workspace should be cleaned before building ( <code>true</code> yes, leave it as it is otherwise).
+     *            whether the workspace should be cleaned before building (
+     *            <code>true</code> yes, leave it as it is otherwise).
      */
     public void setCleanCopy(final boolean cleanCopy) {
         this.cleanCopy = cleanCopy;

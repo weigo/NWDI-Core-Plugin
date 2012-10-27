@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.arachna.netweaver.tools.dc.commands;
+package org.arachna.netweaver.tools.dc;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,7 +13,7 @@ import org.arachna.netweaver.dc.types.JdkHomeAlias;
  * 
  * @author Dirk Weigenand
  */
-public enum SyncDcCommandTemplate {
+enum SyncDcCommandTemplate {
     /**
      * Template for NW 7.0.
      */
@@ -30,6 +30,7 @@ public enum SyncDcCommandTemplate {
      * mapping from JdkHomeAlias to template used for generating DC tool
      * commands for synchronizing development components.
      */
+    @SuppressWarnings("serial")
     private static final Map<JdkHomeAlias, SyncDcCommandTemplate> TEMPLATES =
         new HashMap<JdkHomeAlias, SyncDcCommandTemplate>() {
             {
