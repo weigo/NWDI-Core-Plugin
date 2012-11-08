@@ -114,16 +114,16 @@ Enter the absolute path to the respective locations of the DI command tool insta
 Enter a list of paths to JKD installations on your Jenkins server. SAP defines several constants that identify
 the different JDK versions to use:
 
-* JDK_1_3_1_HOME,
-* JDK_1_4_2_HOME,
-* JDK_1_5_0_HOME and
-* JDK_1_6_0_HOME.
+* JDK1.3.1_HOME,
+* JDK1.4.2_HOME,
+* JDK1.5.0_HOME and
+* JDK1.6.0_HOME.
 
 Enter a semicolon separated list of key value pairs of JDK installation Jenkins should use to build your tracks.
 The list should read like this:
 
 ```
-JDK_1_4_2_HOME=/opt/jdk1.4.2;JDK_1_5_0_HOME=/opt/jdk1.5.0_01;JDK_1_6_0_HOME=/opt/jdk1.6.0_35
+JDK1.4.2_HOME=/opt/jdk1.4.2;JDK1.5.0_HOME=/opt/jdk1.5.0_01;JDK1.6.0_HOME=/opt/jdk1.6.0_35
 ```
 
 #### NWDI-User and password
@@ -132,4 +132,4 @@ Enter the credentials of a user to be used to communicate with the NWDI (CBS, DT
 
 #### CBS URL
 
-Enter the URL to your NWDI server (a standard installation will use http://\<server\>:53000).
+Enter the URL to your NWDI server (a standard installation will use http://\<server\>:50000).
