@@ -3,10 +3,10 @@
 >
   <!-- This jelly script is used for per-project configuration. See global.jelly for a general discussion about jelly script. -->
   <f:section title="${%NWDI-Build}">
-    <f:entry title="${%development.buildSpaceName}" description="${%select.buildspace}">
+    <f:entry title="${%name of build space to build}" description="${%Choose the build space/track to be built in this project.}">
       <f:select name="buildSpaceName" value="${it.buildSpaceName}" field="buildSpaceName" clazz="required" />
     </f:entry>
-    <f:entry title="${%clean.copy}" description="${%delete.before.build}" field="cleanCopy">
+    <f:entry title="${%clean workspace}" description="${%Wipe workspace before building the track.}" field="cleanCopy">
       <f:checkbox default="false" value="${it.cleanCopy}" clazz="required" />
     </f:entry>
   </f:section>
