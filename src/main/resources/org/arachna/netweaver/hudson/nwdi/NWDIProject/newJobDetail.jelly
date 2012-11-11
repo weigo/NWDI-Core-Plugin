@@ -23,5 +23,5 @@ THE SOFTWARE.
 -->
 
 <div>
-  ${%body}
+  ${%This profile allows you to build a track stored in the SAP NetWeaver development infrastructure.}
 </div>
