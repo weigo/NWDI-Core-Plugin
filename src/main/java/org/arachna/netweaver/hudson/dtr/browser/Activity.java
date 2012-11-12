@@ -7,7 +7,9 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -16,11 +18,6 @@ import java.util.Set;
  * @author Dirk Weigenand
  */
 public final class Activity {
-    /**
-     * Attribute 'path' in request URL for this activity.
-     */
-    private static final String PATH_REQUEST_ATTRIBUTE = "path=";
-
     /**
      * relative URL to DTR where the contents of this activity can be queried.
      */
@@ -32,14 +29,12 @@ public final class Activity {
     private final Principal principal;
 
     /**
-     * short description of activity as given by principal that created this
-     * activity.
+     * short description of activity as given by principal that created this activity.
      */
     private final String comment;
 
     /**
-     * long description of activity as given by principal that created this
-     * activity.
+     * long description of activity as given by principal that created this activity.
      */
     private String description;
 
@@ -51,20 +46,23 @@ public final class Activity {
     /**
      * Resources associated with this activity.
      */
-    private final Set<ActivityResource> resources = new HashSet<ActivityResource>();
+    private final Set<ActivityResource> resources = new LinkedHashSet<ActivityResource>();
 
     /**
-     * Create an instance of an <code>Activity</code> using the principal that
-     * created it, its description and checkin date. Also contains the relative
-     * URL where the content of the activity can be browsed.
+     * Map URL param names to their respective values.
+     */
+    private final Map<String, String> activityUrlParams = new LinkedHashMap<String, String>();
+
+    /**
+     * Create an instance of an <code>Activity</code> using the principal that created it, its description and checkin
+     * date. Also contains the relative URL where the content of the activity can be browsed.
      * 
      * @param activityUrl
      *            relative URL where the content of the activity can be browsed.
      * @param principal
      *            user that created the activity.
      * @param comment
-     *            the short description of the activity as was given by the user
-     *            creating it.
+     *            the short description of the activity as was given by the user creating it.
      * @param checkinTime
      *            time the activity was checked into the DTR.
      */
@@ -73,6 +71,26 @@ public final class Activity {
         this.principal = principal;
         this.comment = comment;
         this.checkinTime = cloneDate(checkinTime);
+
+        parseActivityUrlParameters();
+    }
+
+    /**
+     * Parse parameters of activity URL and store them into map for easier use later.
+     * 
+     * @param activityUrl
+     *            URL in DTR for this activity.
+     */
+    private void parseActivityUrlParameters() {
+        final int paramSpecStartIndex = activityUrl == null ? -1 : activityUrl.indexOf('?');
+
+        if (paramSpecStartIndex > -1) {
+            final String paramSpecs = activityUrl.substring(paramSpecStartIndex);
+            for (final String parameterSpec : paramSpecs.split("&")) {
+                final String[] parameter = parameterSpec.split("=");
+                this.activityUrlParams.put(parameter[0], parameter[1]);
+            }
+        }
     }
 
     /**
@@ -137,23 +155,12 @@ public final class Activity {
     }
 
     /**
-     * Get the Id of this activity.
-     * 
-     * @return Id of this activity
-     */
-    public String getActivityId() {
-        return getActivityUrl().substring(getActivityUrl().lastIndexOf('/'));
-    }
-
-    /**
-     * Returns the path part of the activity url (i.e. the string after
-     * '&path=').
+     * Returns the path part of the activity url (i.e. the string after '&path=').
      * 
      * @return the path part of the activity url
      */
     public String getActivityPath() {
-        return getActivityUrl().substring(
-            getActivityUrl().indexOf(PATH_REQUEST_ATTRIBUTE) + PATH_REQUEST_ATTRIBUTE.length());
+        return this.activityUrlParams.get("path");
     }
 
     /*
@@ -168,8 +175,7 @@ public final class Activity {
     }
 
     /**
-     * Add the given resource to this activity's resources. If the given
-     * resource is <code>null</code> it is ignored.
+     * Add the given resource to this activity's resources. If the given resource is <code>null</code> it is ignored.
      * 
      * @param resource
      *            resource to add to this activity's resources.
@@ -196,7 +202,7 @@ public final class Activity {
      */
     @Override
     public int hashCode() {
-        return getActivityId().hashCode();
+        return getActivityPath().hashCode();
     }
 
     /*
@@ -222,5 +228,4 @@ public final class Activity {
 
         return hashCode() == other.hashCode();
     }
-
 }

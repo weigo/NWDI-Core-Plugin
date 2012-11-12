@@ -58,7 +58,7 @@ public final class DtrChangeLogEntry extends Entry {
     /**
      * Id of the activity.
      */
-    private String activityId;
+    private String activityUrl;
 
     /**
      * the time the activity was checked in.
@@ -72,7 +72,7 @@ public final class DtrChangeLogEntry extends Entry {
      *            activity to use creating the change log.
      */
     public DtrChangeLogEntry(final Activity activity) {
-        this(activity.getPrincipal().getUser(), activity.getComment(), activity.getActivityId(), activity
+        this(activity.getPrincipal().getUser(), activity.getComment(), activity.getActivityUrl(), activity
             .getCheckinTime());
         setDescription(activity.getDescription());
 
@@ -87,15 +87,15 @@ public final class DtrChangeLogEntry extends Entry {
      * @param principal
      *            user that created the activity.
      * @param msg
-     *            checkin message.
-     * @param id
-     *            Id of the activity.
+     *            check-in message.
+     * @param activityUrl
+     *            DTR-URL to browse the activity.
      * @param checkInTime
      *            time the activity was checked in.
      */
-    public DtrChangeLogEntry(final String principal, final String msg, final String id, final Date checkInTime) {
+    public DtrChangeLogEntry(final String principal, final String msg, final String activityUrl, final Date checkInTime) {
         user = principal;
-        activityId = id;
+        this.activityUrl = activityUrl;
         this.checkInTime = checkInTime;
         setMsg(msg);
     }
@@ -117,8 +117,7 @@ public final class DtrChangeLogEntry extends Entry {
     }
 
     /**
-     * Add the given {@link ActivityResource} as an {@link Item} to this
-     * changelog entry.
+     * Add the given {@link ActivityResource} as an {@link Item} to this changelog entry.
      * 
      * @param resource
      *            <code>ActivityResource</code> to add to change log.
@@ -138,11 +137,9 @@ public final class DtrChangeLogEntry extends Entry {
     }
 
     /**
-     * Get paths (to resources) affected by the recent activities depicted by
-     * this change log.
+     * Get paths (to resources) affected by the recent activities depicted by this change log.
      * 
-     * @return paths (to resources) affected by the recent activities depicted
-     *         by this change log.
+     * @return paths (to resources) affected by the recent activities depicted by this change log.
      */
     @Override
     public Collection<String> getAffectedPaths() {
@@ -183,16 +180,6 @@ public final class DtrChangeLogEntry extends Entry {
     }
 
     /**
-     * Returns the activity ID associated with this entry.
-     * 
-     * @return the activity ID associated with this entry.
-     */
-    public String getVersion() {
-        // FIXME: Aktivitäts-ID herausfinden
-        return activityId.substring(activityId.lastIndexOf('_') + 1);
-    }
-
-    /**
      * Returns the time this activity was checked in.
      * 
      * @return the time this activity was checked in.
@@ -207,14 +194,6 @@ public final class DtrChangeLogEntry extends Entry {
      */
     void setMsg(final String msg) {
         this.msg = msg == null ? "" : msg;
-    }
-
-    /**
-     * @param activityId
-     *            the activityId to set
-     */
-    void setVersion(final String activityId) {
-        this.activityId = activityId;
     }
 
     /**
@@ -245,17 +224,22 @@ public final class DtrChangeLogEntry extends Entry {
     }
 
     /**
-     * Returns the URL that can be used to display information about this
-     * activity.
+     * Returns the URL that can be used to display information about this activity.
      * 
      * @param dtrUrl
      *            URL to DTR.
-     * @return the URL that can be used to display information about this
-     *         activity.
+     * @return the URL that can be used to display information about this activity.
      */
-    public String getActivityUrl(final String dtrUrl) {
-        return String.format("%s/dtr/system-tools/reports/ResourceDetails?technical=false&path=/act%s", dtrUrl,
-            activityId);
+    public String getActivityUrl() {
+        return activityUrl;
+    }
+
+    /**
+     * @param activityUrl
+     *            the activityUrl to set
+     */
+    public void setActivityUrl(final String activityUrl) {
+        this.activityUrl = activityUrl;
     }
 
     /**
@@ -283,8 +267,7 @@ public final class DtrChangeLogEntry extends Entry {
     }
 
     /**
-     * An <code>Item</code> represents a resource associated with an activity an
-     * is used to visualize it.
+     * An <code>Item</code> represents a resource associated with an activity an is used to visualize it.
      * 
      * @author Dirk Weigenand
      */
