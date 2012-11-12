@@ -5,9 +5,9 @@ package org.arachna.netweaver.hudson.nwdi;
 
 import hudson.Util;
 import hudson.model.User;
+import hudson.scm.EditType;
 import hudson.scm.ChangeLogSet;
 import hudson.scm.ChangeLogSet.Entry;
-import hudson.scm.EditType;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -72,9 +72,9 @@ public final class DtrChangeLogEntry extends Entry {
      *            activity to use creating the change log.
      */
     public DtrChangeLogEntry(final Activity activity) {
-        this(activity.getPrincipal().getUser(), activity.getComment(), activity.getActivityUrl(), activity
+        this(activity.getPrincipal().getUser(), activity.getComment(), activity.getActivityId(), activity
             .getCheckinTime());
-        this.setDescription(activity.getDescription());
+        setDescription(activity.getDescription());
 
         for (final ActivityResource resource : activity.getResources()) {
             createAndAddItem(resource);
@@ -94,10 +94,10 @@ public final class DtrChangeLogEntry extends Entry {
      *            time the activity was checked in.
      */
     public DtrChangeLogEntry(final String principal, final String msg, final String id, final Date checkInTime) {
-        this.user = principal;
-        this.activityId = id;
+        user = principal;
+        activityId = id;
         this.checkInTime = checkInTime;
-        this.setMsg(msg);
+        setMsg(msg);
     }
 
     /**
@@ -113,7 +113,7 @@ public final class DtrChangeLogEntry extends Entry {
      */
     void add(final Item item) {
         item.setParent(this);
-        this.items.add(item);
+        items.add(item);
     }
 
     /**
@@ -148,7 +148,7 @@ public final class DtrChangeLogEntry extends Entry {
     public Collection<String> getAffectedPaths() {
         final Set<String> affectedPaths = new HashSet<String>();
 
-        for (final Item item : this.items) {
+        for (final Item item : items) {
             affectedPaths.add(item.getPath());
         }
 
@@ -161,7 +161,7 @@ public final class DtrChangeLogEntry extends Entry {
      * @return the {@link Item}s associated with this entry.
      */
     public Collection<Item> getItems() {
-        return this.items;
+        return items;
     }
 
     /**
@@ -171,7 +171,7 @@ public final class DtrChangeLogEntry extends Entry {
      */
     @Override
     public User getAuthor() {
-        return User.get(this.user, true);
+        return User.get(user, true);
     }
 
     /**
@@ -179,7 +179,7 @@ public final class DtrChangeLogEntry extends Entry {
      */
     @Override
     public String getMsg() {
-        return Util.xmlEscape(this.msg);
+        return Util.xmlEscape(msg);
     }
 
     /**
@@ -189,7 +189,7 @@ public final class DtrChangeLogEntry extends Entry {
      */
     public String getVersion() {
         // FIXME: Aktivitäts-ID herausfinden
-        return this.activityId.substring(this.activityId.lastIndexOf('_') + 1);
+        return activityId.substring(activityId.lastIndexOf('_') + 1);
     }
 
     /**
@@ -198,7 +198,7 @@ public final class DtrChangeLogEntry extends Entry {
      * @return the time this activity was checked in.
      */
     public Date getCheckInTime() {
-        return this.checkInTime;
+        return checkInTime;
     }
 
     /**
@@ -248,12 +248,14 @@ public final class DtrChangeLogEntry extends Entry {
      * Returns the URL that can be used to display information about this
      * activity.
      * 
+     * @param dtrUrl
+     *            URL to DTR.
      * @return the URL that can be used to display information about this
      *         activity.
      */
-    public String getActivityUrl() {
-        return String.format("%s/dtr/system-tools/reports/ResourceDetails?technical=false&path=/act%s", "",
-            this.activityId);
+    public String getActivityUrl(final String dtrUrl) {
+        return String.format("%s/dtr/system-tools/reports/ResourceDetails?technical=false&path=/act%s", dtrUrl,
+            activityId);
     }
 
     /**
@@ -262,7 +264,7 @@ public final class DtrChangeLogEntry extends Entry {
      * @return the long description of this DtrChangeLogEntry
      */
     public String getDescription() {
-        return Util.xmlEscape(this.description);
+        return Util.xmlEscape(description);
     }
 
     /**
@@ -360,7 +362,7 @@ public final class DtrChangeLogEntry extends Entry {
         public EditType getEditType() {
             EditType editType = EditType.EDIT;
 
-            if (this.action.equals(Action.Delete)) {
+            if (action.equals(Action.Delete)) {
                 editType = EditType.DELETE;
             }
             else if (action.equals(Action.Add)) {
@@ -397,7 +399,7 @@ public final class DtrChangeLogEntry extends Entry {
         private static final Map<String, Action> ACTIONS = new HashMap<String, Action>();
 
         static {
-            for (Action action : values()) {
+            for (final Action action : values()) {
                 ACTIONS.put(action.toString(), action);
             }
         }
@@ -422,7 +424,7 @@ public final class DtrChangeLogEntry extends Entry {
          */
         @Override
         public String toString() {
-            return this.name;
+            return name;
         }
 
         /**

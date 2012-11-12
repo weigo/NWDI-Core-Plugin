@@ -1,0 +1,129 @@
+<html>
+<head>
+<link rel='stylesheet' type='text/css' href='/dtr/static/css/dtr.css'>
+<script type='text/javascript' src='/dtr/static/js/webUI_common.js'></script>
+</head>
+<body>
+	<table background=/dtr/static/img/line.gif width=100% cellpadding=0px
+		cellspacing=0px border=0px border-collapse=collapse>
+		<tbody style="background-color: transparent">
+			<tr>
+				<td width=270px height=62px align=left valign=top><img
+					src=/dtr/static/img/HeaderLeft.gif alt=image width=271 height=50>
+				</td>
+				<td width=auto height=62px align=right valign=top><img
+					src=/dtr/static/img/HeaderRight.jpg alt=image width=501 height=50>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	<table width=100% cellspacing=0 cellpadding=0 border=0 height=25>
+		<tr>
+			<td align=left height=23><font face="Arial, Verdana, Helvetica"
+				size="2" color="#003366"><b>Activity Search</b></font></td>
+			<td align=right height=23><a
+				href="/dtr/system-tools/reports/ActivityQuery?wspPath=/ws/XMPL/arachna.org_KM_SUPPORT/dev/inactive/"><img
+					src="/dtr/static/img/ACTIVITY.gif" border=0 alt="Activity Search"
+					title="Activity Search"></a>&nbsp;<a
+				href="/dtr/system-tools/reports/FileQuery"><img
+					src="/dtr/static/img/SEARCH.gif" border=0 alt="File/Folder Search"
+					title="File/Folder Search"></a>&nbsp;<a
+				href="/dtr/system-tools/reports/WorkspaceIntegrations?showMoreOptions=true&wspPath=/ws/XMPL/arachna.org_KM_SUPPORT/dev/inactive/"><img
+					src="/dtr/static/img/WSP_INT.gif" border=0
+					alt="Workspace Integrations" title="Workspace Integrations"></a>&nbsp;<a
+				href="/dtr/system-tools/reports/WorkspaceComparison?leftWsp=/ws/XMPL/arachna.org_KM_SUPPORT/dev/inactive/"><img
+					src="/dtr/static/img/WSP_COMP.gif" border=0
+					alt="Workspace Comparison" title="Workspace Comparison"></a>&nbsp;<a
+				href="/dtr/system-tools/reports/VersionSetComparison?leftVersionSet=/ws/XMPL/arachna.org_KM_SUPPORT/dev/inactive/"><img
+					src="/dtr/static/img/VS_COMP.gif" border=0
+					alt="VersionSet Comparison" title="VersionSet Comparison"></a>&nbsp;<a
+				href="/dtr/system-tools/reports/CollisionQuery?wspPath=/ws/XMPL/arachna.org_KM_SUPPORT/dev/inactive/"><img
+					src="/dtr/static/img/CONFLICT.gif" border=0 alt="Conflict Search"
+					title="Conflict Search"></a>&nbsp;<a
+				href="/dtr/system-tools/reports/ResourceDetails?technical=false"><img
+					src="/dtr/static/img/RES_LOOKUP.gif" border=0 alt="Resource Lookup"
+					title="Resource Lookup"></a>&nbsp;<a href="/dtr"><img
+					src="/dtr/static/img/REP_BROW.gif" border=0
+					alt="Repository Browser" title="Repository Browser"></a>&nbsp;<a
+				href="/dtr/system-tools/ShowOpenActivities"><img
+					src="/dtr/static/img/open_activities.gif" border=0
+					alt="My open activities" title="My open activities"></a></td>
+		</tr>
+		<tr bgcolor=b9cee3>
+			<td colspan=2 height=2><img width=1 height=1 border=0 alt=""></td>
+		</tr>
+	</table>
+	<font face="Arial, Verdana, Helvetica" size="2" color="#000000"><form
+			action="" method=get name=mainform>
+			<label><b>Workspace</b> (Example: /ws/folder/workspace1/)<br>
+			<input type=text name=wspPath
+				value="/ws/XMPL/arachna.org_KM_SUPPORT/dev/inactive/" size=100></label><a
+				href="javascript:showPopup%28%27/dtr/system-tools/WorkspaceOrVcrList%3FfieldName%3Ddocument.mainform.wspPath%27%2C%20document.mainform.wspPath%29"
+				title="Click to browse and select a workspace"><img
+				src="/dtr/static/img/BROWSER.gif" border=0 alt="Browse..."
+				title="Browse..."></a><br>
+			<label><b>User</b><br>
+			<input type=text name=user value="" size=30></label><br>
+			<label><input type=checkbox name=openedOnly class=checkbox>Opened
+				only</label><br>
+			<label><input type=checkbox name=closedOnly class=checkbox
+				checked>Closed only</label><br>
+			<label>From ISN&nbsp;<input type=text name=isnFrom value=""
+				size=6></label>&nbsp;&nbsp;<label>to ISN&nbsp;<input
+				type=text name=isnTo value="" size=6></label><br>
+			<label><input type=checkbox name=nonEmptyOnly class=checkbox
+				checked>Non empty only</label><br>
+			<label><input type=checkbox name=includePropLists
+				class=checkbox>Include propagation lists</label><br>
+			<label><input type=checkbox name=propListsOnly class=checkbox>Propagation
+				lists only</label><br>
+			<label>Folder Path<br>
+			<input type=text name=folderPath value="" size=100></label><br>
+			<input type=submit name=command value="Show" class=submit>
+		</form>
+		<HR width="100%" SIZE="2" color="#003366">
+		<table width="100%" cellspacing=2 cellpadding=2>
+			<tr>
+				<th>Activity/Propagation List</th>
+				<th>State</th>
+				<th>Owner</th>
+				<th>Last Modification</th>
+				<th>Integrations</th>
+			</tr>
+			<tr>
+				<td><a
+					href="/dtr/system-tools/reports/ResourceDetails?path=/act/default_w_XMPL_arachna_2e_org_KM_SUPPORT_dev_inactive_u_weigo_t_2012_11_08_21_29_24_GMT_5dead0ab-29eb-11e2-9d6a-00e04da4ba37&technical=false">add
+						DC for KM helper classes.</a></td>
+				<td>closed</td>
+				<td><a
+					href="/dtr/system-tools/reports/ResourceDetails?path=/principals/weigo&technical=false">/principals/weigo</a></td>
+				<td>10.11.2012 23:27:35 GMT</td>
+				<td><a
+					href="/dtr/system-tools/reports/ResourceSetDetails?name=integration-set&path=/act/default_w_XMPL_arachna_2e_org_KM_SUPPORT_dev_inactive_u_weigo_t_2012_11_08_21_29_24_GMT_5dead0ab-29eb-11e2-9d6a-00e04da4ba37&namespace=http://xml.sap.com/2002/12/dtr/xcm"
+					target=_blank>show...</a></td>
+			</tr>
+			<tr>
+				<td><a
+					href="/dtr/system-tools/reports/ResourceDetails?path=/act/config__u_weigo_t_20121108-223108-CET_9bb16a36-29eb-11e2-bbae-00e04da4ba37&technical=false">config__u_weigo_t_20121108-223108-CET_9bb16a36-29eb-11e2-bbae-00e04da4ba37</a></td>
+				<td>closed</td>
+				<td><a
+					href="/dtr/system-tools/reports/ResourceDetails?path=/principals/weigo&technical=false">/principals/weigo</a></td>
+				<td>08.11.2012 21:31:10 GMT</td>
+				<td><a
+					href="/dtr/system-tools/reports/ResourceSetDetails?name=integration-set&path=/act/config__u_weigo_t_20121108-223108-CET_9bb16a36-29eb-11e2-bbae-00e04da4ba37&namespace=http://xml.sap.com/2002/12/dtr/xcm"
+					target=_blank>show...</a></td>
+			</tr>
+			<tr>
+				<td><a
+					href="/dtr/system-tools/reports/ResourceDetails?path=/act/config__u_weigo_t_20121031-214943-CET_7f301e9b-239c-11e2-85ad-00e04da4ba37&technical=false">config__u_weigo_t_20121031-214943-CET_7f301e9b-239c-11e2-85ad-00e04da4ba37</a></td>
+				<td>closed</td>
+				<td><a
+					href="/dtr/system-tools/reports/ResourceDetails?path=/principals/weigo&technical=false">/principals/weigo</a></td>
+				<td>31.10.2012 20:49:45 GMT</td>
+				<td><a
+					href="/dtr/system-tools/reports/ResourceSetDetails?name=integration-set&path=/act/config__u_weigo_t_20121031-214943-CET_7f301e9b-239c-11e2-85ad-00e04da4ba37&namespace=http://xml.sap.com/2002/12/dtr/xcm"
+					target=_blank>show...</a></td>
+			</tr>
+		</table></font>
+</body>
+</html>

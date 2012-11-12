@@ -31,7 +31,7 @@ final class ActivityListParser extends AbstractResourceParser {
      * XPath expression for extracting activities.
      */
     private static final String XPATH =
-        "//a[starts-with(@href, '/dtr/system-tools/reports/ResourceDetails?technical=false&path=/act/')]/../..";
+        "//a[starts-with(@href, '/dtr/system-tools/reports/ResourceDetails?') and contains(@href, 'path=/act/')]/../..";
 
     /**
      * List of extracted activities.
@@ -39,7 +39,8 @@ final class ActivityListParser extends AbstractResourceParser {
     private final List<Activity> activities = new ArrayList<Activity>();
 
     /**
-     * {@link ActivityFilter} to use when parsing activities. Initialized with an accept all filter.
+     * {@link ActivityFilter} to use when parsing activities. Initialized with
+     * an accept all filter.
      */
     private ActivityFilter activityFilter = new ActivityFilter() {
         @Override
@@ -98,7 +99,8 @@ final class ActivityListParser extends AbstractResourceParser {
     }
 
     /**
-     * Initialize XPath expression used later on to extract details of activities.
+     * Initialize XPath expression used later on to extract details of
+     * activities.
      */
     private void setUpXPaths() {
         try {
@@ -113,13 +115,15 @@ final class ActivityListParser extends AbstractResourceParser {
     }
 
     /**
-     * Create an instance of an {@link Activity} from the given {@link org.w3c.dom.Node}.
+     * Create an instance of an {@link Activity} from the given
+     * {@link org.w3c.dom.Node}.
      * 
      * @param node
      *            the node the activity's data should be read from.
      * @return the activity extracted from the given node.
      * @throws JaxenException
-     *             when there was an error evaluating the XPath expressions used to extract the data
+     *             when there was an error evaluating the XPath expressions used
+     *             to extract the data
      * @throws ParseException
      *             when there was an error parsing the activity's date.
      */
@@ -134,10 +138,11 @@ final class ActivityListParser extends AbstractResourceParser {
      *            the node the short description should be read from.
      * @return the short description extracted from the given node.
      * @throws JaxenException
-     *             when there was an error evaluating the XPath expressions used to extract the data
+     *             when there was an error evaluating the XPath expressions used
+     *             to extract the data
      */
     private String getComment(final Node node) throws JaxenException {
-        return this.commentXPath.stringValueOf(node);
+        return commentXPath.stringValueOf(node);
     }
 
     /**
@@ -147,12 +152,13 @@ final class ActivityListParser extends AbstractResourceParser {
      *            the node the activity's check in date should be read from.
      * @return the check in date extracted from the given node.
      * @throws JaxenException
-     *             when there was an error evaluating the XPath expressions used to extract the data
+     *             when there was an error evaluating the XPath expressions used
+     *             to extract the data
      * @throws ParseException
      *             when there was an error parsing the activity's date.
      */
     private Date getCheckInDate(final Node node) throws JaxenException, ParseException {
-        return this.dateParser.parse(this.checkInDateXPath.stringValueOf(node));
+        return dateParser.parse(checkInDateXPath.stringValueOf(node));
     }
 
     /**
@@ -162,10 +168,11 @@ final class ActivityListParser extends AbstractResourceParser {
      *            the node the UME princiapl's name should be read from.
      * @return the UME principal's name extracted from the given node.
      * @throws JaxenException
-     *             when there was an error evaluating the XPath expressions used to extract the data
+     *             when there was an error evaluating the XPath expressions used
+     *             to extract the data
      */
     private Principal getPrincipal(final Node node) throws JaxenException {
-        return new Principal(this.principalXPath.stringValueOf(node).replace("/principals/", ""));
+        return new Principal(principalXPath.stringValueOf(node).replace("/principals/", ""));
     }
 
     /**
@@ -175,10 +182,11 @@ final class ActivityListParser extends AbstractResourceParser {
      *            the node the activity's url should be read from.
      * @return the activity's url extracted from the given node.
      * @throws JaxenException
-     *             when there was an error evaluating the XPath expressions used to extract the data
+     *             when there was an error evaluating the XPath expressions used
+     *             to extract the data
      */
     private String getActivityUrl(final Node node) throws JaxenException {
-        return this.activityXPath.stringValueOf(node);
+        return activityXPath.stringValueOf(node);
     }
 
     /**
@@ -197,15 +205,15 @@ final class ActivityListParser extends AbstractResourceParser {
                 node = (Node)returnValue;
                 activity = createActivity(node);
 
-                if (activity != null && this.activityFilter.accept(activity)) {
-                    this.activities.add(activity);
+                if (activity != null && activityFilter.accept(activity)) {
+                    activities.add(activity);
                 }
             }
         }
-        catch (ParseException e) {
+        catch (final ParseException e) {
             throw new RuntimeException(e);
         }
-        catch (JaxenException e) {
+        catch (final JaxenException e) {
             throw new RuntimeException(e);
         }
     }
@@ -221,6 +229,6 @@ final class ActivityListParser extends AbstractResourceParser {
      * @return the list of extracted activities.
      */
     List<Activity> getActivities() {
-        return this.activities;
+        return activities;
     }
 }

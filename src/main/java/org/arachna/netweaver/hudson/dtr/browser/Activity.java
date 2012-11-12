@@ -10,8 +10,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.arachna.netweaver.dc.types.Compartment;
-
 /**
  * Represents an activity in the DTR.
  * 
@@ -34,12 +32,14 @@ public final class Activity {
     private final Principal principal;
 
     /**
-     * short description of activity as given by principal that created this activity.
+     * short description of activity as given by principal that created this
+     * activity.
      */
     private final String comment;
 
     /**
-     * long description of activity as given by principal that created this activity.
+     * long description of activity as given by principal that created this
+     * activity.
      */
     private String description;
 
@@ -54,30 +54,25 @@ public final class Activity {
     private final Set<ActivityResource> resources = new HashSet<ActivityResource>();
 
     /**
-     * @deprecated
-     */
-    @Deprecated
-    private transient Compartment compartment;
-
-    /**
-     * Create an instance of an <code>Activity</code> using the principal that created it, its description and checkin date. Also contains
-     * the relative URL where the content of the activity can be browsed.
+     * Create an instance of an <code>Activity</code> using the principal that
+     * created it, its description and checkin date. Also contains the relative
+     * URL where the content of the activity can be browsed.
      * 
      * @param activityUrl
      *            relative URL where the content of the activity can be browsed.
      * @param principal
      *            user that created the activity.
      * @param comment
-     *            the short description of the activity as was given by the user creating it.
+     *            the short description of the activity as was given by the user
+     *            creating it.
      * @param checkinTime
      *            time the activity was checked into the DTR.
      */
-    Activity(final String activityUrl, final Principal principal, final String comment,
-        final Date checkinTime) {
+    Activity(final String activityUrl, final Principal principal, final String comment, final Date checkinTime) {
         this.activityUrl = activityUrl;
         this.principal = principal;
         this.comment = comment;
-        this.checkinTime = this.cloneDate(checkinTime);
+        this.checkinTime = cloneDate(checkinTime);
     }
 
     /**
@@ -108,14 +103,14 @@ public final class Activity {
      * @return the activityUrl
      */
     public String getActivityUrl() {
-        return this.activityUrl;
+        return activityUrl;
     }
 
     /**
      * @return the principal
      */
     public Principal getPrincipal() {
-        return this.principal;
+        return principal;
     }
 
     /**
@@ -124,21 +119,21 @@ public final class Activity {
      * @return the short description of this activity.
      */
     public String getComment() {
-        return this.comment;
+        return comment;
     }
 
     /**
      * @return the description
      */
     public String getDescription() {
-        return this.description;
+        return description;
     }
 
     /**
      * @return the checkinTime
      */
     public Date getCheckinTime() {
-        return this.cloneDate(this.checkinTime);
+        return cloneDate(checkinTime);
     }
 
     /**
@@ -147,17 +142,18 @@ public final class Activity {
      * @return Id of this activity
      */
     public String getActivityId() {
-        return this.getActivityUrl().substring(this.getActivityUrl().lastIndexOf('/'));
+        return getActivityUrl().substring(getActivityUrl().lastIndexOf('/'));
     }
 
     /**
-     * Returns the path part of the activity url (i.e. the string after '&path=').
+     * Returns the path part of the activity url (i.e. the string after
+     * '&path=').
      * 
      * @return the path part of the activity url
      */
     public String getActivityPath() {
-        return this.getActivityUrl().substring(
-            this.getActivityUrl().indexOf(PATH_REQUEST_ATTRIBUTE) + PATH_REQUEST_ATTRIBUTE.length());
+        return getActivityUrl().substring(
+            getActivityUrl().indexOf(PATH_REQUEST_ATTRIBUTE) + PATH_REQUEST_ATTRIBUTE.length());
     }
 
     /*
@@ -167,19 +163,20 @@ public final class Activity {
      */
     @Override
     public String toString() {
-        return "Activity [checkinTime=" + this.checkinTime + ", principal=" + this.principal + ",\ndescription="
-            + this.description + ",\nactivityUrl=" + this.activityUrl + "]";
+        return "Activity [checkinTime=" + checkinTime + ", principal=" + principal + ",\ndescription=" + description
+            + ",\nactivityUrl=" + activityUrl + "]";
     }
 
     /**
-     * Add the given resource to this activity's resources. If the given resource is <code>null</code> it is ignored.
+     * Add the given resource to this activity's resources. If the given
+     * resource is <code>null</code> it is ignored.
      * 
      * @param resource
      *            resource to add to this activity's resources.
      */
     void add(final ActivityResource resource) {
         if (resource != null) {
-            this.resources.add(resource);
+            resources.add(resource);
         }
     }
 
@@ -189,7 +186,7 @@ public final class Activity {
      * @return an unmodifiable collection of this activity's resources.
      */
     public Collection<ActivityResource> getResources() {
-        return Collections.unmodifiableCollection(this.resources);
+        return Collections.unmodifiableCollection(resources);
     }
 
     /*
@@ -199,7 +196,7 @@ public final class Activity {
      */
     @Override
     public int hashCode() {
-        return this.getActivityId().hashCode();
+        return getActivityId().hashCode();
     }
 
     /*
@@ -223,7 +220,7 @@ public final class Activity {
 
         final Activity other = (Activity)obj;
 
-        return this.hashCode() == other.hashCode();
+        return hashCode() == other.hashCode();
     }
 
 }
