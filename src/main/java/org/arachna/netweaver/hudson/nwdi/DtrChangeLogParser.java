@@ -66,7 +66,7 @@ public final class DtrChangeLogParser extends ChangeLogParser {
         /**
          * changeset 'version' attribute.
          */
-        private static final String VERSION = "version";
+        private static final String ACTIVITY_URL = "activityUrl";
 
         /**
          * 'item' element.
@@ -114,8 +114,7 @@ public final class DtrChangeLogParser extends ChangeLogParser {
         private DtrChangeLogEntry.Action currentItemAction;
 
         /**
-         * Create an instance of a {@link InternalDtrChangeLogParser} using the
-         * given changeset.
+         * Create an instance of a {@link InternalDtrChangeLogParser} using the given changeset.
          * 
          * @param changeSet
          *            the changeset to add the read entries to.
@@ -128,8 +127,7 @@ public final class DtrChangeLogParser extends ChangeLogParser {
         /*
          * (non-Javadoc)
          * 
-         * @see org.xml.sax.helpers.DefaultHandler#endElement(java.lang.String,
-         * java.lang.String, java.lang.String)
+         * @see org.xml.sax.helpers.DefaultHandler#endElement(java.lang.String, java.lang.String, java.lang.String)
          */
         @Override
         public void endElement(final String uri, final String localName, final String qName) throws SAXException {
@@ -163,16 +161,15 @@ public final class DtrChangeLogParser extends ChangeLogParser {
         /*
          * (non-Javadoc)
          * 
-         * @see
-         * org.xml.sax.helpers.DefaultHandler#startElement(java.lang.String,
-         * java.lang.String, java.lang.String, org.xml.sax.Attributes)
+         * @see org.xml.sax.helpers.DefaultHandler#startElement(java.lang.String, java.lang.String, java.lang.String,
+         * org.xml.sax.Attributes)
          */
         @Override
         public void startElement(final String uri, final String localName, final String qName,
             final Attributes attributes) throws SAXException {
             if (CHANGESET.equals(localName)) {
                 currentChangeLogEntry = new DtrChangeLogEntry();
-                currentChangeLogEntry.setVersion(attributes.getValue(VERSION));
+                currentChangeLogEntry.setActivityUrl(attributes.getValue(ACTIVITY_URL));
             }
             else if (ITEM.equals(localName)) {
                 currentItemAction = DtrChangeLogEntry.Action.fromString(attributes.getValue(ACTION));

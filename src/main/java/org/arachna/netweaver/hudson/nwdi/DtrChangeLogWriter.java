@@ -3,6 +3,8 @@
  */
 package org.arachna.netweaver.hudson.nwdi;
 
+import hudson.Util;
+
 import java.io.IOException;
 import java.io.Writer;
 import java.text.SimpleDateFormat;
@@ -26,8 +28,7 @@ public class DtrChangeLogWriter {
     private final DtrChangeLogSet changeSet;
 
     /**
-     * Create an instance of a <code></code> using the given
-     * {@link DtrChangeLogSet} and writer.
+     * Create an instance of a <code></code> using the given {@link DtrChangeLogSet} and writer.
      * 
      * @param changeSet
      *            change set to persist to XML.
@@ -40,11 +41,9 @@ public class DtrChangeLogWriter {
     }
 
     /**
-     * Write the change set as XML into the writer given when this writer was
-     * created.
+     * Write the change set as XML into the writer given when this writer was created.
      * 
-     * Closes the writer at the end, so calling it more than once will result in
-     * an exception.
+     * Closes the writer at the end, so calling it more than once will result in an exception.
      * 
      * @throws IOException
      *             when an error occurs writing the XML.
@@ -55,7 +54,8 @@ public class DtrChangeLogWriter {
         final SimpleDateFormat format = new SimpleDateFormat(DtrChangeLogEntry.DATE_FORMAT_SPEC);
 
         for (final DtrChangeLogEntry entry : this.changeSet) {
-            changeLog.write(String.format("\t<changeset version=\"%s\">\n", entry.getVersion()));
+            changeLog
+                .write(String.format("\t<changeset activityUrl=\"%s\">\n", Util.xmlEscape(entry.getActivityUrl())));
             changeLog.write(String.format("\t\t<date>%s</date>\n", format.format(entry.getCheckInTime())));
             changeLog.write(String.format("\t\t<user>%s</user>\n", entry.getAuthor()));
             changeLog.write(String.format("\t\t<comment>%s</comment>\n", entry.getMsg()));
