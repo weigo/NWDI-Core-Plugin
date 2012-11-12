@@ -219,13 +219,32 @@ public class NWDIScm extends SCM {
             "Comparing base line activities with activities accumulated since last build (#%s).\n",
             lastBuild.getNumber()));
         final List<Activity> activities =
-            getActivities(logger, getDtrBrowser(lastBuild.getDevelopmentConfiguration()), lastBuild.getTime(),
-                new DevelopmentComponentFactory());
+            getActivities(logger, getDtrBrowser(lastBuild.getDevelopmentConfiguration()),
+                getCreationDate(revisionState), new DevelopmentComponentFactory());
 
         final Change changeState = activities.isEmpty() ? Change.NONE : Change.SIGNIFICANT;
         logger.append(String.format("Found changes: %s.\n", changeState.toString()));
 
         return new PollingResult(revisionState, new NWDIRevisionState(activities), changeState);
+    }
+
+    /**
+     * Get the creation date from the given {@link SCMRevisionState}.
+     * 
+     * @param revisionState
+     *            an <code>SCMRevisionState</code> object
+     * @return the date/time when the given SCM revision state was computed iff it's type is {@link NWDIRevisionState}, <code>null</code>
+     *         otherwise.
+     */
+    private Date getCreationDate(final SCMRevisionState revisionState) {
+        Date creationDate = null;
+
+        if (NWDIRevisionState.class.equals(revisionState.getClass())) {
+            final NWDIRevisionState baseRevision = (NWDIRevisionState)revisionState;
+            creationDate = baseRevision.getCreationDate();
+        }
+
+        return creationDate;
     }
 
     /**
