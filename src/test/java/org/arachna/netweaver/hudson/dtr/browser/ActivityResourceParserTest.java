@@ -40,27 +40,27 @@ public class ActivityResourceParserTest {
      */
     @Before
     public void setUp() {
-        this.developmentComponentFactory = new DevelopmentComponentFactory();
-        this.activity = new Activity("URL", new Principal("name"), "description", new Date());
-        this.activityResourceParser = new ActivityResourceParser(this.developmentComponentFactory, this.activity);
+        developmentComponentFactory = new DevelopmentComponentFactory();
+        activity = new Activity(null, new Principal("name"), "description", new Date());
+        activityResourceParser = new ActivityResourceParser(developmentComponentFactory, activity);
     }
 
     @Test
     public void testActivityResourceExctraction() {
-        final Collection<ActivityResource> resources = this.getActivityResources("ResourceList.html");
+        final Collection<ActivityResource> resources = getActivityResources("ResourceList.html");
         assertNotNull(resources);
         final DevelopmentComponent component =
-            this.developmentComponentFactory.get("example.com", "example/development/component");
+            developmentComponentFactory.get("example.com", "example/development/component");
 
         for (final ActivityResource resource : resources) {
-            assertEquals(this.activity, resource.getActivity());
+            assertEquals(activity, resource.getActivity());
             assertEquals(component, resource.getDevelopmentComponent());
         }
     }
 
     @Test
     public void testActivityResourceExctractionWithNonDCResources() {
-        final Collection<ActivityResource> resources = this.getActivityResources("NonDCResourceDetails.htm");
+        final Collection<ActivityResource> resources = getActivityResources("NonDCResourceDetails.htm");
         assertNotNull(resources);
         assertEquals(0, resources.size());
     }
@@ -71,8 +71,8 @@ public class ActivityResourceParserTest {
     private Collection<ActivityResource> getActivityResources(final String resourceName) {
         final InputStream input = this.getClass().getResourceAsStream(resourceName);
 
-        this.activityResourceParser.parse(input);
+        activityResourceParser.parse(input);
 
-        return this.activity.getResources();
+        return activity.getResources();
     }
 }
