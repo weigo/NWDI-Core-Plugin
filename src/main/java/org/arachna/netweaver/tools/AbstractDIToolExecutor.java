@@ -18,10 +18,10 @@ import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 import org.arachna.netweaver.dc.types.JdkHomeAlias;
+import org.arachna.netweaver.hudson.nwdi.Messages;
 
 /**
  * Base class for executors of NWDI tools (cbstool, dctool, etc.).
@@ -112,22 +112,10 @@ public abstract class AbstractDIToolExecutor {
         final ByteArrayOutputStream result = new ByteArrayOutputStream();
         final ForkOutputStream tee = new ForkOutputStream(launcher.getListener().getLogger(), result);
         starter.stdout(tee);
-        final ByteArrayOutputStream stderr = new ByteArrayOutputStream();
-        starter.stderr(stderr);
 
         final int exitCode = starter.join();
-        System.err.println(stderr.toString());
 
-        final DIToolCommandExecutionResult executionResult =
-            new DIToolCommandExecutionResult(result.toString(), exitCode);
-
-        if (!executionResult.isExitCodeOk()) {
-            Logger.getLogger("NWDI-Core-Plugin").fine(
-                String.format("Executing the following commands using %s failed!\n%s\n", toolCommand.toString(),
-                    commands.toString()));
-        }
-
-        return executionResult;
+        return new DIToolCommandExecutionResult(result.toString(), exitCode);
     }
 
     /**
@@ -236,9 +224,8 @@ public abstract class AbstractDIToolExecutor {
      *            message to log.
      */
     protected final void duration(final long start, final String message) {
-        final long duration = System.currentTimeMillis() - start;
-
-        log(String.format("%s (%f sec).\n", message, duration / A_THOUSAND_MSECS));
+        log(Messages.NWDIProject_duration_template(message,
+            String.format("%f", (System.currentTimeMillis() - start) / A_THOUSAND_MSECS)));
     }
 
     /**
@@ -255,7 +242,7 @@ public abstract class AbstractDIToolExecutor {
      *            the message to log.
      */
     protected final void log(final String message) {
-        logger.append(message);
+        logger.println(message);
     }
 
     protected final String getNwdiToolLibrary() {

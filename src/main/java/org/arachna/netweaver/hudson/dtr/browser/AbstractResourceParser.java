@@ -13,13 +13,15 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 /**
- * Base class for resource parsers. Implements logic common to all parsers extracting information read from the DTR.
+ * Base class for resource parsers. Implements logic common to all parsers
+ * extracting information read from the DTR.
  * 
  * @author Dirk Weigenand
  */
 abstract class AbstractResourceParser {
     /**
-     * Parses the given <code>InputStream</code> and updates the activities details.
+     * Parses the given <code>InputStream</code> and updates the activities
+     * details.
      * 
      * @param content
      *            of the activities detail HTML page.
@@ -29,14 +31,14 @@ abstract class AbstractResourceParser {
 
         try {
             content.close();
-            final DOMXPath xPath = new DOMXPath(this.getXPath());
+            final DOMXPath xPath = new DOMXPath(getXPath());
 
-            this.parseInternal(xPath.selectNodes(document));
+            parseInternal(xPath.selectNodes(document));
         }
         catch (final JaxenException e) {
             throw new RuntimeException(e);
         }
-        catch (IOException e) {
+        catch (final IOException e) {
             throw new RuntimeException(e);
         }
     }

@@ -11,7 +11,7 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.conn.BasicClientConnectionManager;
+import org.apache.http.impl.conn.PoolingClientConnectionManager;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 
@@ -24,7 +24,7 @@ final class DtrHttpClient {
     /**
      * HTTP client to use for requests.
      */
-    private final DefaultHttpClient httpClient = new DefaultHttpClient(new BasicClientConnectionManager());
+    private final DefaultHttpClient httpClient = new DefaultHttpClient(new PoolingClientConnectionManager());
 
     /**
      * Context to use for conversations.
@@ -43,7 +43,7 @@ final class DtrHttpClient {
         validateArgument(dtrUser, "DTR user");
         validateArgument(password, "password");
 
-        this.httpClient.getCredentialsProvider().setCredentials(AuthScope.ANY,
+        httpClient.getCredentialsProvider().setCredentials(AuthScope.ANY,
             new UsernamePasswordCredentials(dtrUser, password));
     }
 
@@ -73,7 +73,7 @@ final class DtrHttpClient {
      */
     InputStream getContent(final String queryUrl) throws IOException {
         final HttpGet httpget = new HttpGet(queryUrl);
-        final HttpResponse response = this.httpClient.execute(httpget, this.localContext);
+        final HttpResponse response = httpClient.execute(httpget, localContext);
 
         return response.getEntity().getContent();
     }
@@ -82,6 +82,6 @@ final class DtrHttpClient {
      * Shut down the underlying {@link DefaultHTTPClient}'s connection manager.
      */
     public void close() {
-        this.httpClient.getConnectionManager().shutdown();
+        httpClient.getConnectionManager().shutdown();
     }
 }

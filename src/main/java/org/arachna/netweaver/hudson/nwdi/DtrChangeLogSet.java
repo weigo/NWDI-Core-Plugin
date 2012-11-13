@@ -30,7 +30,7 @@ public final class DtrChangeLogSet extends ChangeLogSet<DtrChangeLogEntry> {
     private final List<DtrChangeLogEntry> entries = new ArrayList<DtrChangeLogEntry>();
 
     /**
-     * Creat an instance of a <code>DtrChangeLogSet</code>.
+     * Create an instance of a <code>DtrChangeLogSet</code>.
      * 
      * @param build
      *            the build for which to create the change log.

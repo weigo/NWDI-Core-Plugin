@@ -12,6 +12,8 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
+
 /**
  * Represents an activity in the DTR.
  * 
@@ -29,12 +31,14 @@ public final class Activity {
     private final Principal principal;
 
     /**
-     * short description of activity as given by principal that created this activity.
+     * short description of activity as given by principal that created this
+     * activity.
      */
     private final String comment;
 
     /**
-     * long description of activity as given by principal that created this activity.
+     * long description of activity as given by principal that created this
+     * activity.
      */
     private String description;
 
@@ -54,15 +58,17 @@ public final class Activity {
     private final Map<String, String> activityUrlParams = new LinkedHashMap<String, String>();
 
     /**
-     * Create an instance of an <code>Activity</code> using the principal that created it, its description and checkin
-     * date. Also contains the relative URL where the content of the activity can be browsed.
+     * Create an instance of an <code>Activity</code> using the principal that
+     * created it, its description and checkin date. Also contains the relative
+     * URL where the content of the activity can be browsed.
      * 
      * @param activityUrl
      *            relative URL where the content of the activity can be browsed.
      * @param principal
      *            user that created the activity.
      * @param comment
-     *            the short description of the activity as was given by the user creating it.
+     *            the short description of the activity as was given by the user
+     *            creating it.
      * @param checkinTime
      *            time the activity was checked into the DTR.
      */
@@ -76,19 +82,17 @@ public final class Activity {
     }
 
     /**
-     * Parse parameters of activity URL and store them into map for easier use later.
-     * 
-     * @param activityUrl
-     *            URL in DTR for this activity.
+     * Parse parameters of activity URL and store them into map for easier use
+     * later.
      */
     private void parseActivityUrlParameters() {
-        final int paramSpecStartIndex = activityUrl == null ? -1 : activityUrl.indexOf('?');
+        final int paramSpecStartIndex = StringUtils.isBlank(activityUrl) ? -1 : activityUrl.indexOf('?') + 1;
 
         if (paramSpecStartIndex > -1) {
             final String paramSpecs = activityUrl.substring(paramSpecStartIndex);
             for (final String parameterSpec : paramSpecs.split("&")) {
                 final String[] parameter = parameterSpec.split("=");
-                this.activityUrlParams.put(parameter[0], parameter[1]);
+                activityUrlParams.put(parameter[0], parameter[1]);
             }
         }
     }
@@ -155,12 +159,13 @@ public final class Activity {
     }
 
     /**
-     * Returns the path part of the activity url (i.e. the string after '&path=').
+     * Returns the path part of the activity url (i.e. the string after
+     * '&path=').
      * 
      * @return the path part of the activity url
      */
     public String getActivityPath() {
-        return this.activityUrlParams.get("path");
+        return activityUrlParams.get("path");
     }
 
     /*
@@ -175,7 +180,8 @@ public final class Activity {
     }
 
     /**
-     * Add the given resource to this activity's resources. If the given resource is <code>null</code> it is ignored.
+     * Add the given resource to this activity's resources. If the given
+     * resource is <code>null</code> it is ignored.
      * 
      * @param resource
      *            resource to add to this activity's resources.

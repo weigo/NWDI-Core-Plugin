@@ -128,12 +128,13 @@ public class NWDIScm extends SCM {
             final NWDIBuild lastSuccessfulBuild = currentBuild.getParent().getLastSuccessfulBuild();
 
             if (lastSuccessfulBuild != null) {
-                logger.append(String.format("Getting activities from DTR (since last successful build #%s).\n",
-                    lastSuccessfulBuild.getNumber()));
+                logger.append(Messages.NWDIScm_get_activities_from_dtr(lastSuccessfulBuild.getNumber()));
             }
             else {
-                logger.append("Getting all activities from DTR.\n");
+                logger.append(Messages.NWDIScm_get_all_activities_from_dtr());
             }
+
+            logger.append("\n");
 
             activities.addAll(getActivities(logger, getDtrBrowser(config),
                 lastSuccessfulBuild != null ? lastSuccessfulBuild.getAction(NWDIRevisionState.class).getCreationDate()
@@ -191,7 +192,7 @@ public class NWDIScm extends SCM {
     @Override
     public SCMRevisionState calcRevisionsFromBuild(final AbstractBuild<?, ?> build, final Launcher launcher,
         final TaskListener listener) throws IOException, InterruptedException {
-        listener.getLogger().append(String.format("Calculating revisions from build #%s.\n", build.getNumber()));
+        listener.getLogger().println(Messages.NWDIScm_calculating_revisions_from_build(build.getNumber()));
 
         final NWDIRevisionState lastRevision = build.getAction(NWDIRevisionState.class);
 
@@ -215,15 +216,16 @@ public class NWDIScm extends SCM {
         final PrintStream logger = listener.getLogger();
         nwdiProject.updateDevelopmentConfiguration(logger, path.child(".dtc"));
 
-        logger.append(String.format(
-            "Comparing base line activities with activities accumulated since last build (#%s).\n",
-            lastBuild.getNumber()));
+        logger
+            .println(Messages
+                .NWDIScm_comparing_base_line_activities_with_activities_accumulated_since_last_build(lastBuild
+                    .getNumber()));
         final List<Activity> activities =
             getActivities(logger, getDtrBrowser(lastBuild.getDevelopmentConfiguration()),
                 getCreationDate(revisionState), new DevelopmentComponentFactory());
 
         final Change changeState = activities.isEmpty() ? Change.NONE : Change.SIGNIFICANT;
-        logger.append(String.format("Found changes: %s.\n", changeState.toString()));
+        logger.append(Messages.NWDIScm_found_changes(changeState.toString()));
 
         return new PollingResult(revisionState, new NWDIRevisionState(activities), changeState);
     }
@@ -233,7 +235,8 @@ public class NWDIScm extends SCM {
      * 
      * @param revisionState
      *            an <code>SCMRevisionState</code> object
-     * @return the date/time when the given SCM revision state was computed iff it's type is {@link NWDIRevisionState}, <code>null</code>
+     * @return the date/time when the given SCM revision state was computed iff
+     *         it's type is {@link NWDIRevisionState}, <code>null</code>
      *         otherwise.
      */
     private Date getCreationDate(final SCMRevisionState revisionState) {
@@ -321,11 +324,12 @@ public class NWDIScm extends SCM {
 
         if (since == null) {
             activities.addAll(browser.getActivities());
-            duration(logger, startGetActivities, "Determine activities");
+            duration(logger, startGetActivities, Messages.NWDIScm_determine_activities());
         }
         else {
             activities.addAll(browser.getActivities(since));
-            duration(logger, startGetActivities, String.format("Determine activities since %1$tF %<tT", since));
+            duration(logger, startGetActivities,
+                Messages.NWDIScm_determine_activities_since(String.format("%1$tF %<tT", since)));
         }
 
         final long start = System.currentTimeMillis();
@@ -341,15 +345,15 @@ public class NWDIScm extends SCM {
             }
         }
 
-        duration(logger, start, "Determine affected DCs for activities");
-        duration(logger, startGetActivities, String.format("Read %s activities", activities.size()));
+        duration(logger, start, Messages.NWDIScm_determine_affected_dcs_for_activities());
+        duration(logger, startGetActivities, Messages.NWDIScm_read_countof_activities(activities.size()));
 
         return activities;
     }
 
     /**
      * Returns an instance of {@link DtrBrowser} using the given development
-     * configuration and development component factory.
+     * configuration.
      * 
      * @param config
      *            the development configuration to be used to connect to the
@@ -374,6 +378,8 @@ public class NWDIScm extends SCM {
     private void duration(final PrintStream logger, final long start, final String message) {
         final long duration = System.currentTimeMillis() - start;
 
-        logger.append(String.format("%s (%f sec).\n", message, duration / A_THOUSAND_MSECS));
+        logger
+            .append(Messages.NWDIProject_duration_template(message, String.format("%f", duration / A_THOUSAND_MSECS)))
+            .append('\n');
     }
 }

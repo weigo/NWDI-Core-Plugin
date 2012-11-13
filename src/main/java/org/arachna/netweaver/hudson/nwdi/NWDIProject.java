@@ -78,18 +78,6 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
     private static final String PARAMETER_CLEAN_COPY = "cleanCopy";
 
     /**
-     * Store the content of the '.confdef' configuration file for a development
-     * configuration.
-     * 
-     * @deprecated Used to store the content of the development configuration
-     *             file (<code>.dcdef</code>). Superseded by {@see
-     *             #buildSpaceName} (configuration is now downloaded from cbs
-     *             each time the DTR is polled or a build starts).
-     */
-    @Deprecated
-    private transient String confDef;
-
-    /**
      * Name of build space in NWDI.
      */
     private String buildSpaceName;
@@ -190,11 +178,10 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
 
         if (cleanCopy) {
             final long start = System.currentTimeMillis();
-            // FIXME: add I18N for message
-            logger.append("Wiping workspace...");
+            logger.append(Messages.NWDIProject_wipe_workspace());
             build.getWorkspace().deleteContents();
-            logger
-                .append(String.format(" (%f sec.).\n", (System.currentTimeMillis() - start) / THOUSAND_MILLI_SECONDS));
+            logger.println(Messages.NWDIProject_duration_template("",
+                String.format("%f", (System.currentTimeMillis() - start) / THOUSAND_MILLI_SECONDS)));
         }
 
         final FilePath dtcFolder = nwdiBuild.getDtcFolder();
@@ -206,9 +193,9 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
         updateDevelopmentConfiguration(logger, dtcFolder);
 
         final DevelopmentConfiguration developmentConfiguration = nwdiBuild.getDevelopmentConfiguration();
-        logger.append(String.format("New development configuration version is: %s.\n",
-            developmentConfiguration.getVersion()));
-        logger.append("Updating DTR client configuration...\n");
+        logger
+            .println(Messages.NWDIProject_new_development_configuration_version(developmentConfiguration.getVersion()));
+        logger.println(Messages.NWDIProject_updating_dtr_client_configuration());
         new DtrConfigCreator(build.getWorkspace(), developmentConfiguration).execute();
 
         return super.checkout(build, launcher, listener, changelogFile);
@@ -228,7 +215,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
      */
     void updateDevelopmentConfiguration(final PrintStream logger, final FilePath dtcFolder) throws IOException,
         InterruptedException {
-        logger.append("Updating development configuration...\n");
+        logger.println(Messages.NWDIProject_updating_development_configuration());
         getDescriptor().createCBSToolExecutor(dtcFolder).updateDevelopmentConfiguration(buildSpaceName, ".confdef");
     }
 
@@ -397,14 +384,6 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
         private String jdkHomePaths;
 
         /**
-         * Options that should be passed to the JDK executing the DC tool.
-         * 
-         * @deprecated
-         */
-        @Deprecated
-        private transient String jdkOpts;
-
-        /**
          * URL to CBS.
          */
         private String cbsUrl;
@@ -512,21 +491,6 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
         }
 
         /**
-         * @return the jdkOpts
-         */
-        String getJdkOpts() {
-            return jdkOpts;
-        }
-
-        /**
-         * @param jdkOpts
-         *            the jdkOpts to set
-         */
-        void setJdkOpts(final String jdkOpts) {
-            this.jdkOpts = jdkOpts;
-        }
-
-        /**
          * {@inheritDoc}
          */
         @Override
@@ -583,12 +547,16 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
         }
 
         /**
-         * @param value
-         * @return
+         * Validate that the given folder name contains the NWDI tools.
+         * 
+         * @param folderName
+         *            name of folder that should be checked for NWDI tools.
+         * @return the validation result containing error messages when
+         *         validation fails.
          */
-        private FormValidation validateNwdiToolLibraryFolder(final String value) {
+        private FormValidation validateNwdiToolLibraryFolder(final String folderName) {
             FormValidation result = FormValidation.ok();
-            final String nwdiToolLibFolder = Util.fixEmptyAndTrim(value);
+            final String nwdiToolLibFolder = Util.fixEmptyAndTrim(folderName);
 
             if (nwdiToolLibFolder == null) {
                 result = FormValidation.error(Messages.NWDIProject_NwdiToolLibFolder_missing());
@@ -598,7 +566,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
 
                 try {
                     if (!folder.exists()) {
-                        result = FormValidation.error(Messages.NWDIProject_NwdiToolLibFolder_nonexistant(value));
+                        result = FormValidation.error(Messages.NWDIProject_NwdiToolLibFolder_nonexistant(folderName));
                     }
                     else {
                         // look for a 'dc' sub folder in the tools folder
@@ -702,13 +670,21 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
         public ListBoxModel doFillBuildSpaceNameItems() {
             final ListBoxModel items = new ListBoxModel();
             for (final String buildSpaceName : getBuildSpaceNames()) {
-                // build space names are of the form: [A-Z0-9]{3}_[A-Z-a-z0-9]_D
+                // build space names are of the form:
+                // [A-Z0-9]{3}_[A-Z-a-z0-9]+_D
                 items.add(buildSpaceName.split("_")[1], buildSpaceName);
             }
 
             return items;
         }
 
+        /**
+         * determine the NWDI tool library folder to use (the 71+ one will be
+         * preferred).
+         * 
+         * @return the NWDI tool library folder to use for cbstool/dctool
+         *         execution.
+         */
         private String getNwdiToolLibraryFolder() {
             String nwdiToolLibraryFolder = getNwdiToolLibFolder71();
 
@@ -753,11 +729,13 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
          * executed in the temporary directory indicated by the system property
          * 'java.io.tmpdir'.
          * 
+         * @param folder
+         *            the folder the cbstool shall be executed in
          * @return a <code>CBSToolCommandExecutor</code> that can be used to
          *         execute commands not related to a certain development
          *         configuration.
          */
-        private CBSToolCommandExecutor createCBSToolExecutor(final FilePath workspace) {
+        private CBSToolCommandExecutor createCBSToolExecutor(final FilePath folder) {
             final DevelopmentConfiguration configuration = new DevelopmentConfiguration("xxx");
             configuration.setCmsUrl(cbsUrl);
             final DIToolDescriptor descriptor =
@@ -767,7 +745,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
                 Jenkins.getInstance().createLauncher(
                     new LogTaskListener(Logger.getLogger(this.getClass().getName()), Level.ALL));
 
-            return new CBSToolCommandExecutor(launcher, workspace, descriptor, configuration);
+            return new CBSToolCommandExecutor(launcher, folder, descriptor, configuration);
         }
 
         /**
