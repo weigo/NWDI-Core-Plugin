@@ -13,15 +13,13 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 /**
- * Base class for resource parsers. Implements logic common to all parsers
- * extracting information read from the DTR.
+ * Base class for resource parsers. Implements logic common to all parsers extracting information read from the DTR.
  * 
  * @author Dirk Weigenand
  */
 abstract class AbstractResourceParser {
     /**
-     * Parses the given <code>InputStream</code> and updates the activities
-     * details.
+     * Parses the given <code>InputStream</code> and updates the activities details.
      * 
      * @param content
      *            of the activities detail HTML page.
@@ -33,7 +31,13 @@ abstract class AbstractResourceParser {
             content.close();
             final DOMXPath xPath = new DOMXPath(getXPath());
 
-            parseInternal(xPath.selectNodes(document));
+            final List selectedNodes = xPath.selectNodes(document);
+
+            if (selectedNodes.size() < getExpectedNodeLen()) {
+                throw new IllegalStateException(String.format("%s did not yield expected node count!", getXPath()));
+            }
+
+            parseInternal(selectedNodes);
         }
         catch (final JaxenException e) {
             throw new RuntimeException(e);
@@ -73,4 +77,12 @@ abstract class AbstractResourceParser {
      * @return XPath to use extracting resources.
      */
     abstract String getXPath();
+
+    /**
+     * Return the minimum count of nodes one can expect when applying the XPath expression returned by {@see
+     * #getXPath()}.
+     * 
+     * @return minimum count of nodes selected by getXPath().
+     */
+    abstract int getExpectedNodeLen();
 }

@@ -25,8 +25,7 @@ final class JdkHomePathsParser {
     private final Set<String> invalidJdkHomeNames = new TreeSet<String>();
 
     /**
-     * Create an instance of {@link JdkHomePathsParser} with the given path
-     * specifications.
+     * Create an instance of {@link JdkHomePathsParser} with the given path specifications.
      * 
      * @param pathSpec
      *            JDK home path specifications.
@@ -49,7 +48,7 @@ final class JdkHomePathsParser {
 
             final JdkHomeAlias alias = JdkHomeAlias.fromString(parts[0].trim());
 
-            if (alias != null) {
+            if (alias != null && parts.length > 1) {
                 paths.add(alias, parts[1].trim());
             }
             else {
@@ -63,8 +62,8 @@ final class JdkHomePathsParser {
     /**
      * Indicate that there were invalid JDK home aliases found during parsing.
      * 
-     * @return <code>boolean</code> when there were invalid JDK home aliases
-     *         found during parsing, <code>false</code> otherwise.
+     * @return <code>boolean</code> when there were invalid JDK home aliases found during parsing, <code>false</code>
+     *         otherwise.
      */
     boolean hasInvalidJdkHomeNames() {
         return !invalidJdkHomeNames.isEmpty();

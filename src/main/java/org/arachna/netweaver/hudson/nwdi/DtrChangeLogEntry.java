@@ -19,6 +19,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.arachna.netweaver.hudson.dtr.browser.Activity;
@@ -77,7 +78,13 @@ public final class DtrChangeLogEntry extends Entry {
         setDescription(activity.getDescription());
 
         for (final ActivityResource resource : activity.getResources()) {
-            createAndAddItem(resource);
+            if (resource != null) {
+                createAndAddItem(resource);
+            }
+            else {
+                Logger.getLogger(getClass().getName()).fine(
+                    String.format("Null resource for activity %s!", activity.getActivityUrl()));
+            }
         }
     }
 

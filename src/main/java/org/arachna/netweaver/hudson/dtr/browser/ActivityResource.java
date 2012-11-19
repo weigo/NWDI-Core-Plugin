@@ -46,7 +46,7 @@ public class ActivityResource {
     /**
      * signifies whether this resources last modification was a deletion.
      */
-    private Boolean deleted;
+    private Boolean deleted = Boolean.FALSE;
 
     /**
      * sequence in DTR (version???).
@@ -59,8 +59,7 @@ public class ActivityResource {
      * @param activity
      *            {@link Activity} this resource is associated with.
      * @param developmentComponent
-     *            {@link org.arachna.netweaver.dc.types.DevelopmentComponent}
-     *            this resource belongs to.
+     *            {@link org.arachna.netweaver.dc.types.DevelopmentComponent} this resource belongs to.
      * @param path
      *            path of resource in the containing development component.
      * @param id

@@ -34,8 +34,7 @@ public class ActivityDetailParserTest {
      */
     @Before
     public void setUp() throws Exception {
-        this.activity =
-            new Activity(null, null, null, Calendar.getInstance().getTime());
+        this.activity = new Activity("", null, null, Calendar.getInstance().getTime());
         this.parser = new ActivityDetailParser(activity);
         this.parser.parse(this.getClass().getResourceAsStream("ResourceDetails.htm"));
     }
@@ -49,7 +48,8 @@ public class ActivityDetailParserTest {
     }
 
     /**
-     * Test method for {@link org.arachna.netweaver.hudson.dtr.browser.ActivityDetailParser#parse(java.io.InputStream)} .
+     * Test method for {@link org.arachna.netweaver.hudson.dtr.browser.ActivityDetailParser#parse(java.io.InputStream)}
+     * .
      */
     @Test
     public final void testParseLongDescription() {

@@ -51,4 +51,12 @@ final class ActivityDetailParser extends AbstractResourceParser {
     String getXPath() {
         return XPATH;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    int getExpectedNodeLen() {
+        return LONG_DESCRIPTION;
+    }
 }
