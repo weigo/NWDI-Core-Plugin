@@ -12,8 +12,8 @@ import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.w3c.dom.Node;
 
 /**
- * A parser for {@link ActivityResource}s. Parses a DTR HTML report of a
- * specific activity and returns the found resources.
+ * A parser for {@link ActivityResource}s. Parses a DTR HTML report of a specific activity and returns the found
+ * resources.
  * 
  * @author Dirk Weigenand
  */
@@ -58,8 +58,7 @@ public final class ActivityResourceParser extends AbstractResourceParser {
      * Create an instance of an <code>ActivityResourceParser</code>.
      * 
      * @param developmentComponentFactory
-     *            registry to use for creating/getting development components
-     *            changed in the given activity.
+     *            registry to use for creating/getting development components changed in the given activity.
      * @param activity
      *            activity to associate with the parsed resources.
      */
@@ -82,8 +81,7 @@ public final class ActivityResourceParser extends AbstractResourceParser {
     }
 
     /**
-     * Parses a DTR HTML report of a specific activity and updates the activity
-     * with the found resources.
+     * Parses a DTR HTML report of a specific activity and updates the activity with the found resources.
      * 
      * @param nodes
      *            DOM nodes representing the extracted resources.
@@ -115,13 +113,11 @@ public final class ActivityResourceParser extends AbstractResourceParser {
     }
 
     /**
-     * Checks whether the given resource path belongs to a development component
-     * (i.e. it starts with '/DCs').
+     * Checks whether the given resource path belongs to a development component (i.e. it starts with '/DCs').
      * 
      * @param resourcePath
      *            resource path to check
-     * @return <code>true</code> iff the given resource path starts with '/DCs',
-     *         <code>false</code> otherwise.
+     * @return <code>true</code> iff the given resource path starts with '/DCs', <code>false</code> otherwise.
      */
     private boolean isResourcePathDevelopmentComponentResource(final String resourcePath) {
         return resourcePath != null && developmentComponentNamePattern.matcher(resourcePath).matches();
@@ -142,8 +138,7 @@ public final class ActivityResourceParser extends AbstractResourceParser {
      * Return the development component name encoded in the given resource path.
      * 
      * @param resourcePath
-     *            path to resource the development component name should be
-     *            extracted from.
+     *            path to resource the development component name should be extracted from.
      * @return development component name encoded in the given resource path.
      */
     private String getDevelopmentComponentName(final String resourcePath) {
@@ -151,13 +146,11 @@ public final class ActivityResourceParser extends AbstractResourceParser {
     }
 
     /**
-     * Return the path to the respective resource encoded in the given resource
-     * path.
+     * Return the path to the respective resource encoded in the given resource path.
      * 
      * @param resourcePath
      *            path to resource the resource name should be extracted from.
-     * @return path to the respective resource encoded in the given resource
-     *         path.
+     * @return path to the respective resource encoded in the given resource path.
      */
     private String getResourcePath(final String resourcePath) {
         return extractPatternMatch(resourcePathPattern, resourcePath);
@@ -188,5 +181,13 @@ public final class ActivityResourceParser extends AbstractResourceParser {
         matcher.find();
 
         return matcher.group(1);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    int getExpectedNodeLen() {
+        return 0;
     }
 }

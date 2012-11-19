@@ -30,8 +30,7 @@ final class DevelopmentComponentCollector {
     /**
      * template for querying details of a activity.
      */
-    private static final String ACTIVITY_DETAIL_QUERY_TEMPLATE =
-        "%s/dtr/system-tools/reports/ResourceDetails?technical=false&path=%s";
+    private static final String ACTIVITY_DETAIL_QUERY_TEMPLATE = "%s/dtr/system-tools/reports/ResourceDetails?technical=false&path=%s";
 
     /**
      * Template for querying resources of an activity.
@@ -42,8 +41,7 @@ final class DevelopmentComponentCollector {
     /**
      * Template for querying details of a resource of an activity.
      */
-    private static final String RESOURCE_DETAIL_QUERY_TEMPLATE =
-        "%s/dtr/system-tools/reports/ResourceDetails?technical=false&path=/vh/%s";
+    private static final String RESOURCE_DETAIL_QUERY_TEMPLATE = "%s/dtr/system-tools/reports/ResourceDetails?technical=false&path=/vh/%s";
     /**
      * Logger to use.
      */
@@ -77,8 +75,7 @@ final class DevelopmentComponentCollector {
      *            create and register development components that are related to
      *            an activity in the DTR.
      */
-    public DevelopmentComponentCollector(final DtrHttpClient dtrHttpClient, final String dtrUrl,
-        final DevelopmentComponentFactory dcFactory) {
+    public DevelopmentComponentCollector(final DtrHttpClient dtrHttpClient, final String dtrUrl, final DevelopmentComponentFactory dcFactory) {
         this.dtrHttpClient = dtrHttpClient;
         this.dtrUrl = dtrUrl;
         this.dcFactory = dcFactory;
@@ -123,9 +120,19 @@ final class DevelopmentComponentCollector {
             createActivityResources(activity);
 
             for (final ActivityResource resource : activity.getResources()) {
-                new ResourceDetailsParser(resource).parse(dtrHttpClient.getContent(String.format(
-                    RESOURCE_DETAIL_QUERY_TEMPLATE, dtrUrl, resource.getId())));
-                components.add(resource.getDevelopmentComponent());
+                final String queryURL = String.format(RESOURCE_DETAIL_QUERY_TEMPLATE, dtrUrl, resource.getId());
+
+                try {
+                    new ResourceDetailsParser(resource).parse(dtrHttpClient.getContent(queryURL));
+                    components.add(resource.getDevelopmentComponent());
+                }
+                catch (final IllegalStateException ise) {
+                    // This means that the resource was deleted from the DTR.
+                    // Verify this using the URL printed below.
+                    LOGGER.log(Level.FINE, String.format(
+                        "Resource read from %s\ndoes not match current XPath expression for resource extraction:\n%s\n", queryURL,
+                        ise.getMessage()));
+                }
             }
         }
         catch (final ClientProtocolException e) {
@@ -152,7 +159,15 @@ final class DevelopmentComponentCollector {
     private void createActivityResources(final Activity activity) throws IOException {
         final ActivityResourceParser activityResourceParser = new ActivityResourceParser(dcFactory, activity);
         final String queryURL = String.format(RESOURCE_QUERY_TEMPLATE, dtrUrl, activity.getActivityPath());
-        activityResourceParser.parse(dtrHttpClient.getContent(queryURL));
+
+        try {
+            activityResourceParser.parse(dtrHttpClient.getContent(queryURL));
+        }
+        catch (final IllegalStateException ise) {
+            System.err
+                .println(String.format("Resource read from %s\ndoes not match current XPath expression for resource extraction:\n%s\n",
+                    queryURL, ise.getMessage()));
+        }
     }
 
     /**

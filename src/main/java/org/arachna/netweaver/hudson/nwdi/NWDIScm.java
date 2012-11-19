@@ -75,9 +75,8 @@ public class NWDIScm extends SCM {
      * @param password
      *            password to use for authentication.
      * @param cleanCopy
-     *            indicate whether only changed development components should be
-     *            loaded from the NWDI or all that are contained in the
-     *            indicated CBS workspace
+     *            indicate whether only changed development components should be loaded from the NWDI or all that are
+     *            contained in the indicated CBS workspace
      */
     public NWDIScm(final boolean cleanCopy, final String dtrUser, final String password) {
         super();
@@ -139,7 +138,6 @@ public class NWDIScm extends SCM {
             activities.addAll(getActivities(logger, getDtrBrowser(config),
                 lastSuccessfulBuild != null ? lastSuccessfulBuild.getAction(NWDIRevisionState.class).getCreationDate()
                     : null, dcFactory));
-
             final boolean cleanCopy = currentBuild.getPreviousBuild() == null || this.cleanCopy;
 
             setNeedsRebuildPropertyOnAllDevelopmentComponentsInSourceState(config, cleanCopy);
@@ -166,14 +164,12 @@ public class NWDIScm extends SCM {
     }
 
     /**
-     * Set the needsRebuild property on all development components in source
-     * state if a clean build was requested.
+     * Set the needsRebuild property on all development components in source state if a clean build was requested.
      * 
      * @param config
      *            the development configuration containing the DCs
      * @param cleanCopy
-     *            <code>true</code> when a clean build was requested,
-     *            <code>false</code> otherwise.
+     *            <code>true</code> when a clean build was requested, <code>false</code> otherwise.
      */
     private void setNeedsRebuildPropertyOnAllDevelopmentComponentsInSourceState(final DevelopmentConfiguration config,
         final boolean cleanCopy) {
@@ -235,9 +231,8 @@ public class NWDIScm extends SCM {
      * 
      * @param revisionState
      *            an <code>SCMRevisionState</code> object
-     * @return the date/time when the given SCM revision state was computed iff
-     *         it's type is {@link NWDIRevisionState}, <code>null</code>
-     *         otherwise.
+     * @return the date/time when the given SCM revision state was computed iff it's type is {@link NWDIRevisionState},
+     *         <code>null</code> otherwise.
      */
     private Date getCreationDate(final SCMRevisionState revisionState) {
         Date creationDate = null;
@@ -303,8 +298,7 @@ public class NWDIScm extends SCM {
     }
 
     /**
-     * Get list of activities since last run. If <code>lastRun</code> is
-     * <code>null</code> all activities will be read.
+     * Get list of activities since last run. If <code>lastRun</code> is <code>null</code> all activities will be read.
      * 
      * @param logger
      *            the logger to use.
@@ -314,8 +308,7 @@ public class NWDIScm extends SCM {
      *            since when to get activities.
      * @param dcFactory
      *            registry for development components.
-     * @return a list of {@link Activity} objects that were checked in since the
-     *         last run or all activities.
+     * @return a list of {@link Activity} objects that were checked in since the last run or all activities.
      */
     private List<Activity> getActivities(final PrintStream logger, final DtrBrowser browser, final Date since,
         final DevelopmentComponentFactory dcFactory) {
@@ -352,12 +345,10 @@ public class NWDIScm extends SCM {
     }
 
     /**
-     * Returns an instance of {@link DtrBrowser} using the given development
-     * configuration.
+     * Returns an instance of {@link DtrBrowser} using the given development configuration.
      * 
      * @param config
-     *            the development configuration to be used to connect to the
-     *            DTR.
+     *            the development configuration to be used to connect to the DTR.
      * @return the {@link DtrBrowser} for browsing the DTR for activities.
      */
     private DtrBrowser getDtrBrowser(final DevelopmentConfiguration config) {
@@ -365,8 +356,7 @@ public class NWDIScm extends SCM {
     }
 
     /**
-     * Determine the time in seconds passed since the given start time and log
-     * it using the message given.
+     * Determine the time in seconds passed since the given start time and log it using the message given.
      * 
      * @param logger
      *            the logger to use.
