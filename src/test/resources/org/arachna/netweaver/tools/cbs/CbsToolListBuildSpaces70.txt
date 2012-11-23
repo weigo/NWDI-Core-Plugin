@@ -1,0 +1,10 @@
+:cbs> CBS proxy successfully created CBS http://localhost:50000/tc.CBS.Appl/archiveapi2/
+
+:cbs>Build spaces of CBS http://localhost:50000/tc.CBS.Appl/archiveapi2/ :
+
+DI0_Example_D
+DI0_Example_C
+DI0_Example1_D
+DI0_Example1_C
+
+:cbs>Bye.

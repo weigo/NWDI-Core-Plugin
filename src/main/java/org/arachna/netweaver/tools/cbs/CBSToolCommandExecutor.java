@@ -11,10 +11,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
@@ -89,18 +85,7 @@ public final class CBSToolCommandExecutor extends AbstractDIToolExecutor {
         final DIToolCommandExecutionResult result =
             execute(new ListBuildSpaces(config.getCmsUrl(), getDiToolDescriptor()));
 
-        final List<String> buildSpaces = new LinkedList<String>();
-        final Pattern buildSpaceRegex = Pattern.compile("^\\d+\\s+([A-Z]{2}[0-9]_[a-zA-Z][a-zA-Z0-9]+_D)");
-
-        for (final String output : result.getOutput().split("\n")) {
-            final Matcher matcher = buildSpaceRegex.matcher(output.trim());
-
-            if (matcher.matches()) {
-                buildSpaces.add(matcher.group(1));
-            }
-        }
-
-        return buildSpaces;
+        return new BuildSpaceParser(result.getOutput()).parse();
     }
 
     /**
@@ -115,7 +100,9 @@ public final class CBSToolCommandExecutor extends AbstractDIToolExecutor {
      * @return result object containing result state and output of the executed
      *         command.
      * @throws IOException
+     *             re-thrown from executing the CBS tool via the launcher.
      * @throws InterruptedException
+     *             when the command execution was interrupted.
      */
     public DIToolCommandExecutionResult updateDevelopmentConfiguration(final String buildSpace, final String path)
         throws IOException, InterruptedException {
@@ -124,12 +111,12 @@ public final class CBSToolCommandExecutor extends AbstractDIToolExecutor {
     }
 
     /**
-     * Generate the fully qualified command to be used to execute the dc tool.
+     * Generate the fully qualified command to be used to execute the cbstool.
      * 
      * @param isUnix
      *            indicate whether the platform to run on is Unix(oid) or
      *            Windows.
-     * @return fully qualified command to be used to execute the dc tool.
+     * @return fully qualified command to be used to execute the cbstool.
      */
     @Override
     protected String getCommandName(final boolean isUnix) {
@@ -137,9 +124,9 @@ public final class CBSToolCommandExecutor extends AbstractDIToolExecutor {
     }
 
     /**
-     * Generate platform dependent path to dc tool.
+     * Generate platform dependent path to cbstool.
      * 
-     * @return platform dependent path to dc tool.
+     * @return platform dependent path to cbstool.
      */
     @Override
     protected File getToolPath() {

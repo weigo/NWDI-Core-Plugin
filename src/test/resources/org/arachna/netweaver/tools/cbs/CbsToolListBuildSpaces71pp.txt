@@ -1,0 +1,10 @@
+cbs> connect -c http://localhost:50000 -u bob.d.veloper -p secret
+CBS proxy successfully created CBS http://localhost:50000/tc.CBS.Appl/archiveapi2/
+cbs>listbuildspaces
+#   Build space
+1   DI0_Example_D
+2   DI0_Example_C
+3   DI0_Example1_D
+4   DI0_Example1_C
+
+cbs>Bye.
