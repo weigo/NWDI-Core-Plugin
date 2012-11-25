@@ -4,7 +4,6 @@
 package org.arachna.netweaver.tools.cbs;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.arachna.netweaver.tools.DIToolCommandBuilder;
@@ -27,7 +26,8 @@ abstract class AbstractCBSToolCommandExecutor implements DIToolCommandBuilder {
     private final DIToolDescriptor diToolDescriptor;
 
     /**
-     * Create a new command builder using the given CBS url and descriptor instance for DI tools (for authentication with the NWDI).
+     * Create a new command builder using the given CBS url and descriptor
+     * instance for DI tools (for authentication with the NWDI).
      * 
      * @param cbsUrl
      *            URL to CBS.
@@ -40,8 +40,8 @@ abstract class AbstractCBSToolCommandExecutor implements DIToolCommandBuilder {
     }
 
     /**
-     * Return the concrete CBS tool command to be executed. Connecting to the CBS and timing and tracing commands are added in the base
-     * class.
+     * Return the concrete CBS tool command to be executed. Connecting to the
+     * CBS and timing and tracing commands are added in the base class.
      * 
      * @return a list of CBS tool commands to be executed.
      */
@@ -52,9 +52,9 @@ abstract class AbstractCBSToolCommandExecutor implements DIToolCommandBuilder {
      */
     @Override
     public List<String> execute() {
-        final List<String> commands = new ArrayList<String>(Arrays.asList("timing on", "tracefile tracefile.txt", "spool spool.txt"));
+        final List<String> commands = new ArrayList<String>();
 
-        commands.add(String.format("connect -cbsurl %s -u %s -p %s", cbsUrl, diToolDescriptor.getUser(),
+        commands.add(String.format("connect -c %s -u %s -p %s", cbsUrl, diToolDescriptor.getUser(),
             diToolDescriptor.getPassword()));
         commands.addAll(executeInternal());
         commands.add("exit");
