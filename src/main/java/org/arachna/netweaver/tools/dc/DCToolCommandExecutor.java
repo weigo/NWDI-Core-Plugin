@@ -120,14 +120,11 @@ public final class DCToolCommandExecutor extends AbstractDIToolExecutor {
     /**
      * Generate the fully qualified command to be used to execute the dc tool.
      * 
-     * @param isUnix
-     *            indicate whether the platform to run on is Unix(oid) or
-     *            Windows.
      * @return fully qualified command to be used to execute the dc tool.
      */
     @Override
-    protected String getCommandName(final boolean isUnix) {
-        return isUnix ? "dctool.sh" : "dctool.bat";
+    protected String getCommandName() {
+        return isUnix() ? "dctool.sh" : "dctool.bat";
     }
 
     /**

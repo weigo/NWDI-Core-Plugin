@@ -104,10 +104,10 @@ public abstract class AbstractDIToolExecutor {
         final ProcStarter starter = launcher.launch();
         starter.pwd(workspace);
         starter.envs(createEnvironment());
-        final ArgumentListBuilder toolCommand = createToolCommand(launcher.isUnix());
+        final ArgumentListBuilder toolCommand = createToolCommand();
         starter.cmds(toolCommand);
         final List<String> commands = commandBuilder.execute();
-        starter.stdin(createCommandInputStream(commands, launcher.isUnix()));
+        starter.stdin(createCommandInputStream(commands));
 
         final ByteArrayOutputStream result = new ByteArrayOutputStream();
         final ForkOutputStream tee = new ForkOutputStream(launcher.getListener().getLogger(), result);
@@ -124,14 +124,11 @@ public abstract class AbstractDIToolExecutor {
      * 
      * @param commands
      *            list of NWDI tool commands
-     * @param isUnix
-     *            indicates whether we run on a Unix OS (<code>true</code>) or
-     *            not (<code>false</code>).
      * @return <code>InputStream</code> containing the given NWDI tool commands.
      */
-    private InputStream createCommandInputStream(final List<String> commands, final boolean isUnix) {
+    private InputStream createCommandInputStream(final List<String> commands) {
         final StringBuilder cmds = new StringBuilder();
-        final String separator = isUnix ? "\n" : "\r\n";
+        final String separator = isUnix() ? "\n" : "\r\n";
 
         for (final String cmd : commands) {
             cmds.append(cmd).append(separator);
@@ -143,16 +140,14 @@ public abstract class AbstractDIToolExecutor {
     /**
      * Creates the command line for tool execution.
      * 
-     * @param isUnix
-     *            indicate whether to run on a unixoid OS or Windows.
      * @return the created command line.
      */
-    private ArgumentListBuilder createToolCommand(final boolean isUnix) {
+    private ArgumentListBuilder createToolCommand() {
         final ArgumentListBuilder args = new ArgumentListBuilder();
 
-        args.add(getFullyQualifiedToolCommand(isUnix));
+        args.add(getFullyQualifiedToolCommand());
 
-        if (!isUnix) {
+        if (!isUnix()) {
             args.prepend("cmd.exe", "/C");
             args.add("&&", "exit", "%%ERRORLEVEL%%");
         }
@@ -161,27 +156,40 @@ public abstract class AbstractDIToolExecutor {
     }
 
     /**
+     * Determines whether this executor runs on Unix or not.
+     * 
+     * @return <code>true</code> iff this launcher runs on Unix,
+     *         <code>false</code> otherwise.
+     */
+    protected boolean isUnix() {
+        return launcher.isUnix();
+    }
+
+    /**
      * Generate the fully qualified command to be used to execute the dc tool.
      * 
-     * @param isUnix
-     *            indicate whether the platform to run on is Unix(oid) or
-     *            Windows.
      * @return fully qualified command to be used to execute the dc tool.
      */
-    private String getFullyQualifiedToolCommand(final boolean isUnix) {
-        return new File(getToolPath(), getCommandName(isUnix)).getAbsolutePath();
+    private String getFullyQualifiedToolCommand() {
+        return getToolCommand().getAbsolutePath();
+    }
+
+    /**
+     * Get a file instance for the tool command to use.
+     * 
+     * @return a file instance pointing to the tool command to use.
+     */
+    protected final File getToolCommand() {
+        return new File(getToolPath(), getCommandName());
     }
 
     /**
      * Determine the name of the command to be executed. I.e. the name of the
      * shell script or batch file.
      * 
-     * @param isUnix
-     *            <code>true</code> if command is executed on a unix system,
-     *            <code>false</code> otherwise.
      * @return the name of the shell script or batch file to be executed.
      */
-    protected abstract String getCommandName(boolean isUnix);
+    protected abstract String getCommandName();
 
     /**
      * Get the path to the tool to be executed.

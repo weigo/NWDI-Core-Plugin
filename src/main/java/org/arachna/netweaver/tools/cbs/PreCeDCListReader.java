@@ -14,16 +14,26 @@ import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 
 /**
- * Parse output of a 'listdcs' command from a SAP NW CE CBS tool.
+ * Parse output of a 'listdcs' command from a SAP NW CBS tool (pre CE version).
  * 
  * @author Dirk Weigenand
  */
-class DCListReader extends AbstractDCListReader {
+final class PreCeDCListReader extends AbstractDCListReader {
+    /**
+     * template for regexp to recognize compartments for a given build space.
+     */
+    private static final String COMPARTMENT_RX_TEMPLATE = "^.*?compartment '(.*?)' of build space '%s'$";
+
     /**
      * regular expression for parsing a line listing a DC and it's enclosing
      * compartment.
      */
-    private final Pattern regexp = Pattern.compile("^\\d+\\s+(.*?)\\s+(.*?)\\s+(.*?)\\s+.*?$");
+    private final Pattern dcRegexp = Pattern.compile("^[0-9]+\\s+DC name:\\s+(.*?)\\s+DC vendor:\\s+(.*?)\\s*");
+
+    /**
+     * regexp to recognize compartments for a given build space.
+     */
+    private final Pattern compartmentRegex;
 
     /**
      * Create a new instance of a DCListReader using the given development
@@ -34,8 +44,9 @@ class DCListReader extends AbstractDCListReader {
      * @param dcFactory
      *            registry for read development components.
      */
-    DCListReader(final DevelopmentConfiguration config, final DevelopmentComponentFactory dcFactory) {
+    PreCeDCListReader(final DevelopmentConfiguration config, final DevelopmentComponentFactory dcFactory) {
         super(config, dcFactory);
+        compartmentRegex = Pattern.compile(String.format(COMPARTMENT_RX_TEMPLATE, config.getName()));
     }
 
     /**
@@ -50,20 +61,26 @@ class DCListReader extends AbstractDCListReader {
     void execute(final Reader reader) {
         final BufferedReader buffer = new BufferedReader(reader);
         String line;
+        Compartment compartment = null;
 
         try {
             while ((line = buffer.readLine()) != null) {
-                final Matcher matcher = regexp.matcher(line);
+                Matcher matcher = compartmentRegex.matcher(line);
 
                 if (matcher.matches()) {
-                    final Compartment compartment = config.getCompartment(matcher.group(1));
-                    compartment.add(dcFactory.create(matcher.group(3), matcher.group(2)));
+                    compartment = config.getCompartment(matcher.group(1));
+                    continue;
+                }
+
+                matcher = dcRegexp.matcher(line);
+
+                if (matcher.matches()) {
+                    compartment.add(dcFactory.create(matcher.group(2), matcher.group(1)));
                 }
             }
         }
         catch (final IOException e) {
             throw new IllegalStateException(e);
-
         }
     }
 }

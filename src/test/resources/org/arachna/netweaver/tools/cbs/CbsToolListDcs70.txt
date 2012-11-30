@@ -1,0 +1,16 @@
+:cbs>1  DCs in compartment 'arachna.org_KM_SUPPORT_1' of build space 'DI0_XMPL_D'
+1 DC name: kmhelper                                 DC vendor: arachna.org         
+
+
+:cbs>1  DCs in compartment 'arachna.org_SPRING_JPA_SUPPORT_1' of build space 'DI0_XMPL_D'
+1 DC name: orpersistence                            DC vendor: arachna.org         
+
+
+:cbs>4  DCs in compartment 'example.org_UNIT_TEST_SUPPORT_1' of build space 'DI0_XMPL_D'
+1 DC name: sc/unit/test/support                     DC vendor: example.org         
+2 DC name: junit                                    DC vendor: junit.org           
+3 DC name: mockito                                  DC vendor: mockito.org         
+4 DC name: hamcrest                                 DC vendor: hamcrest.org        
+
+
+:cbs>

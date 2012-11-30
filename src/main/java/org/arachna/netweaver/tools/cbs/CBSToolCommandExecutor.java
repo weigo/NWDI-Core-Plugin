@@ -6,10 +6,13 @@ package org.arachna.netweaver.tools.cbs;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.Launcher.ProcStarter;
+import hudson.Util;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.Collection;
 
 import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
@@ -63,12 +66,47 @@ public final class CBSToolCommandExecutor extends AbstractDIToolExecutor {
         final DevelopmentConfiguration config = getDevelopmentConfiguration();
 
         log(Messages.CBSToolCommandExecutor_listing_development_components(config.getName()));
-        final DIToolCommandExecutionResult result =
-            execute(new DCLister(config.getCmsUrl(), config.getName(), getDiToolDescriptor()));
-        new DCListReader(config, dcFactory).execute(new StringReader(result.getOutput()));
+
+        DIToolCommandExecutionResult result = null;
+
+        switch (getCbsToolVersion()) {
+        case CE:
+            result = execute(new DCLister(config, getDiToolDescriptor()));
+            new DCListReader(config, dcFactory).execute(new StringReader(result.getOutput()));
+            break;
+
+        case PRE_CE:
+            result = execute(new ListCompartments(config.getCmsUrl(), config.getName(), getDiToolDescriptor()));
+
+            if (result.isExitCodeOk()) {
+                result = execute(new PreCeDCLister(config, getDiToolDescriptor()));
+                new PreCeDCListReader(config, dcFactory).execute(new StringReader(result.getOutput()));
+            }
+
+            break;
+        }
+
         duration(startListDcs, Messages.CBSToolCommandExecutor_report_count_of_dcs_read(dcFactory.getAll().size()));
 
         return result;
+    }
+
+    /**
+     * Determine the version of the CBS tool to use.
+     * 
+     * @return the {@link CbsToolVersion} to use.
+     */
+    protected CbsToolVersion getCbsToolVersion() {
+        final StringWriter scriptContent = new StringWriter();
+
+        try {
+            Util.copyStream(new FileReader(getToolCommand()), scriptContent);
+        }
+        catch (final IOException e) {
+            throw new IllegalStateException(e);
+        }
+
+        return CbsToolVersion.fromString(scriptContent.toString());
     }
 
     /**
@@ -113,14 +151,11 @@ public final class CBSToolCommandExecutor extends AbstractDIToolExecutor {
     /**
      * Generate the fully qualified command to be used to execute the cbstool.
      * 
-     * @param isUnix
-     *            indicate whether the platform to run on is Unix(oid) or
-     *            Windows.
      * @return fully qualified command to be used to execute the cbstool.
      */
     @Override
-    protected String getCommandName(final boolean isUnix) {
-        return isUnix ? "cbstool.sh" : "cbstool.bat";
+    protected String getCommandName() {
+        return isUnix() ? "cbstool.sh" : "cbstool.bat";
     }
 
     /**

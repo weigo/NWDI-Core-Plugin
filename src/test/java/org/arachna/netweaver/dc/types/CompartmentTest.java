@@ -33,8 +33,10 @@ public class CompartmentTest {
      */
     @Before
     public void setUp() {
-        this.firstCompartment = new Compartment("Compartment", CompartmentState.Source, "example.com", "description", "Softwarecomponent");
-        this.secondCompartment = new Compartment("Compartment", CompartmentState.Source, "example.com", "description", "Softwarecomponent");
+        firstCompartment =
+            new Compartment("Compartment", CompartmentState.Source, "example.com", "description", "Softwarecomponent");
+        secondCompartment =
+            new Compartment("Compartment", CompartmentState.Source, "example.com", "description", "Softwarecomponent");
     }
 
     /**
@@ -42,12 +44,14 @@ public class CompartmentTest {
      */
     @After
     public void tearDown() {
-        this.firstCompartment = null;
-        this.secondCompartment = null;
+        firstCompartment = null;
+        secondCompartment = null;
     }
 
     /**
-     * Test method for {@link org.arachna.netweaver.dc.types.Compartment#equals(java.lang.Object)} .
+     * Test method for
+     * {@link org.arachna.netweaver.dc.types.Compartment#equals(java.lang.Object)}
+     * .
      */
     @Test
     public final void testEqualsAllSameAttributesWithNoDevelopmentConfiguration() {
@@ -55,50 +59,70 @@ public class CompartmentTest {
     }
 
     /**
-     * Test method for {@link org.arachna.netweaver.dc.types.Compartment#equals(java.lang.Object)} .
+     * Test method for
+     * {@link org.arachna.netweaver.dc.types.Compartment#equals(java.lang.Object)}
+     * .
      */
     @Test
     public final void testEqualsAllSameAttributesWithDifferentDevelopmentConfigurationObjects() {
-        this.firstCompartment.setDevelopmentConfiguration(new DevelopmentConfiguration("config"));
-        this.secondCompartment.setDevelopmentConfiguration(new DevelopmentConfiguration("config"));
+        firstCompartment.setDevelopmentConfiguration(new DevelopmentConfiguration("config"));
+        secondCompartment.setDevelopmentConfiguration(new DevelopmentConfiguration("config"));
 
-        assertThat(this.firstCompartment, is(equalTo(this.secondCompartment)));
+        assertThat(firstCompartment, is(equalTo(secondCompartment)));
     }
 
     /**
-     * Test method for {@link org.arachna.netweaver.dc.types.Compartment#equals(java.lang.Object)} .
+     * Test method for
+     * {@link org.arachna.netweaver.dc.types.Compartment#equals(java.lang.Object)}
+     * .
      */
     @Test
     public final void testEqualsAllSameAttributesWithSameDevelopmentConfiguration() {
         final DevelopmentConfiguration developmentConfiguration = new DevelopmentConfiguration("config");
 
-        this.firstCompartment.setDevelopmentConfiguration(developmentConfiguration);
-        this.secondCompartment.setDevelopmentConfiguration(developmentConfiguration);
+        firstCompartment.setDevelopmentConfiguration(developmentConfiguration);
+        secondCompartment.setDevelopmentConfiguration(developmentConfiguration);
 
-        assertThat(this.firstCompartment, is(equalTo(this.secondCompartment)));
+        assertThat(firstCompartment, is(equalTo(secondCompartment)));
     }
 
     /**
-     * Test method for {@link org.arachna.netweaver.dc.types.Compartment#equals(java.lang.Object)} .
+     * Test method for
+     * {@link org.arachna.netweaver.dc.types.Compartment#equals(java.lang.Object)}
+     * .
      */
     @Test
     public final void testEqualsAllSameAttributesWithThisDevelopmentConfigurationIsNull() {
-        this.secondCompartment.setDevelopmentConfiguration(new DevelopmentConfiguration("secondConfig"));
+        secondCompartment.setDevelopmentConfiguration(new DevelopmentConfiguration("secondConfig"));
 
-        assertThat(this.firstCompartment, is(not(equalTo(this.secondCompartment))));
-        assertThat(this.secondCompartment, is(not(equalTo(this.firstCompartment))));
+        assertThat(firstCompartment, is(not(equalTo(secondCompartment))));
+        assertThat(secondCompartment, is(not(equalTo(firstCompartment))));
     }
 
     /**
-     * Test method for {@link org.arachna.netweaver.dc.types.Compartment#equals(java.lang.Object)} .
+     * Test method for
+     * {@link org.arachna.netweaver.dc.types.Compartment#equals(java.lang.Object)}
+     * .
      */
     @Test
     public final void testEqualsWithDifferentCompartmentNames() {
-        this.firstCompartment =
-                new Compartment("First Compartment", CompartmentState.Source, "example.com", "description", "Softwarecomponent");
-        this.secondCompartment =
-                new Compartment("Second Compartment", CompartmentState.Source, "example.com", "description", "Softwarecomponent");
-        assertThat(this.firstCompartment, is(not(equalTo(this.secondCompartment))));
-        assertThat(this.secondCompartment, is(not(equalTo(this.firstCompartment))));
+        firstCompartment =
+            new Compartment("First Compartment", CompartmentState.Source, "example.com", "description",
+                "Softwarecomponent");
+        secondCompartment =
+            new Compartment("Second Compartment", CompartmentState.Source, "example.com", "description",
+                "Softwarecomponent");
+        assertThat(firstCompartment, is(not(equalTo(secondCompartment))));
+        assertThat(secondCompartment, is(not(equalTo(firstCompartment))));
+    }
+
+    @Test
+    public void assertCreateFromDescriptor() {
+        final String compartmentDescriptor = "sap.com_SAP_BUILDT_1";
+        final Compartment compartment = Compartment.create(compartmentDescriptor, CompartmentState.Source);
+
+        assertThat(compartment.getName(), equalTo(compartmentDescriptor));
+        assertThat(compartment.getVendor(), equalTo("sap.com"));
+        assertThat(compartment.getSoftwareComponent(), equalTo("SAP_BUILDT"));
     }
 }

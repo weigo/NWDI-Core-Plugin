@@ -500,4 +500,24 @@ public final class Compartment {
         return new Compartment(String.format("%s_%s_1", vendor, name), state, vendor, caption, name);
 
     }
+
+    /**
+     * Factory method for compartments.
+     * 
+     * @param compartmentDescriptor
+     *            descriptor of a software component, i.e.:
+     *            'sap.com_SAP_BUILDT_1'
+     * @param state
+     *            {@see CompartmentState#Archive} and {@see
+     *            CompartmentState#Source}.
+     * @return new compartment.
+     */
+    public static Compartment create(final String compartmentDescriptor, final CompartmentState state) {
+        final int vendorEnd = compartmentDescriptor.indexOf('_');
+        final String vendor = compartmentDescriptor.substring(0, vendorEnd);
+        final int nameEnd = compartmentDescriptor.lastIndexOf('_');
+        final String name = compartmentDescriptor.substring(vendorEnd + 1, nameEnd);
+
+        return new Compartment(compartmentDescriptor, state, vendor, "", name);
+    }
 }

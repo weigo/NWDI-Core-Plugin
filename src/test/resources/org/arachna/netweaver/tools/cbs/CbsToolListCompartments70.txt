@@ -1,0 +1,13 @@
+:cbs>listcompartments -b DI0_XMPL_D
+Compartments of build space 'DI0_XMPL_D':
+
+arachna.org_KM_SUPPORT_1                (source  state)
+arachna.org_SPRING_JPA_SUPPORT_1        (source  state)
+example.org_UNIT_TEST_SUPPORT_1         (source  state)
+sap.com_ENGFACADE_1                     (archive state)
+sap.com_KMC-CM_1                        (archive state)
+sap.com_SAP_BUILDT_1                    (archive state)
+springsource.org_SPRING_FRAMEWORK_1     (source  state)
+
+
+:cbs>

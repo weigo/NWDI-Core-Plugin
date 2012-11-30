@@ -3,9 +3,6 @@
  */
 package org.arachna.netweaver.dc.types;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Enumeration for statuus of a {@link Compartment} objects.
  * 
@@ -16,17 +13,6 @@ public enum CompartmentState {
      * initialize states.
      */
     Source("source state"), Archive("archive state");
-
-    /**
-     * Map for acceptable Compartment states.
-     */
-    private static final Map<String, CompartmentState> STATES = new HashMap<String, CompartmentState>();
-
-    static {
-        for (final CompartmentState type : values()) {
-            STATES.put(type.toString(), type);
-        }
-    }
 
     /**
      * Status.
@@ -45,7 +31,7 @@ public enum CompartmentState {
 
     @Override
     public String toString() {
-        return this.state;
+        return state;
     }
 
     /**
@@ -58,12 +44,12 @@ public enum CompartmentState {
      * @return CompartmentState for given stateName
      */
     public static CompartmentState fromString(final String stateName) {
-        final CompartmentState state = STATES.get(stateName);
-
-        if (state == null) {
-            throw new IllegalArgumentException("Illegal component state: '" + stateName + "'!");
+        for (final CompartmentState state : values()) {
+            if (state.state.equals(stateName)) {
+                return state;
+            }
         }
 
-        return state;
+        throw new IllegalArgumentException("Illegal component state: '" + stateName + "'!");
     }
 }
