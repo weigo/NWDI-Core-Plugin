@@ -3,9 +3,6 @@
  */
 package org.arachna.netweaver.tools.cbs;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.Reader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -19,6 +16,16 @@ import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
  * @author Dirk Weigenand
  */
 class DCListReader extends AbstractDCListReader {
+    /**
+     * group index of regexp for DC name.
+     */
+    private static final int DC_INDEX = 2;
+
+    /**
+     * group index of regexp for vendor.
+     */
+    private static final int VENDOR_INDEX = 3;
+
     /**
      * regular expression for parsing a line listing a DC and it's enclosing
      * compartment.
@@ -39,31 +46,15 @@ class DCListReader extends AbstractDCListReader {
     }
 
     /**
-     * Read the output of the CBS tool 'listdcs' command and parse the
-     * compartments and development components and add them to the development
-     * configuration/development component factory.
-     * 
-     * @param reader
-     *            output of the CBS tool 'listdcs' command.
+     * {@inheritDoc}
      */
     @Override
-    void execute(final Reader reader) {
-        final BufferedReader buffer = new BufferedReader(reader);
-        String line;
+    protected void process(final String line) {
+        final Matcher matcher = regexp.matcher(line);
 
-        try {
-            while ((line = buffer.readLine()) != null) {
-                final Matcher matcher = regexp.matcher(line);
-
-                if (matcher.matches()) {
-                    final Compartment compartment = config.getCompartment(matcher.group(1));
-                    compartment.add(dcFactory.create(matcher.group(3), matcher.group(2)));
-                }
-            }
-        }
-        catch (final IOException e) {
-            throw new IllegalStateException(e);
-
+        if (matcher.matches()) {
+            final Compartment compartment = config.getCompartment(matcher.group(1));
+            compartment.add(dcFactory.create(matcher.group(VENDOR_INDEX), matcher.group(DC_INDEX)));
         }
     }
 }

@@ -3,6 +3,8 @@
  */
 package org.arachna.netweaver.tools.cbs;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.Reader;
 
 import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
@@ -46,5 +48,25 @@ abstract class AbstractDCListReader {
      * @param reader
      *            output of the CBS tool 'listdcs' command.
      */
-    abstract void execute(final Reader reader);
+    void execute(final Reader reader) {
+        final BufferedReader buffer = new BufferedReader(reader);
+        String line;
+
+        try {
+            while ((line = buffer.readLine()) != null) {
+                process(line);
+            }
+        }
+        catch (final IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    /**
+     * Process a line of output from the CBS tool 'listdcs' command.
+     * 
+     * @param line
+     *            line of output from the CBS tool 'listdcs' command.
+     */
+    protected abstract void process(final String line);
 }

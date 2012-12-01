@@ -3,9 +3,6 @@
  */
 package org.arachna.netweaver.tools.cbs;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.Reader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,6 +32,8 @@ final class PreCeDCListReader extends AbstractDCListReader {
      */
     private final Pattern compartmentRegex;
 
+    private Compartment compartment = null;
+
     /**
      * Create a new instance of a DCListReader using the given development
      * configuration and development component registry.
@@ -50,37 +49,20 @@ final class PreCeDCListReader extends AbstractDCListReader {
     }
 
     /**
-     * Read the output of the CBS tool 'listdcs' command and parse the
-     * compartments and development components and add them to the development
-     * configuration/development component factory.
-     * 
-     * @param reader
-     *            output of the CBS tool 'listdcs' command.
+     * {@inheritDoc}
      */
     @Override
-    void execute(final Reader reader) {
-        final BufferedReader buffer = new BufferedReader(reader);
-        String line;
-        Compartment compartment = null;
+    protected void process(final String line) {
+        Matcher matcher = compartmentRegex.matcher(line);
 
-        try {
-            while ((line = buffer.readLine()) != null) {
-                Matcher matcher = compartmentRegex.matcher(line);
-
-                if (matcher.matches()) {
-                    compartment = config.getCompartment(matcher.group(1));
-                    continue;
-                }
-
-                matcher = dcRegexp.matcher(line);
-
-                if (matcher.matches()) {
-                    compartment.add(dcFactory.create(matcher.group(2), matcher.group(1)));
-                }
-            }
+        if (matcher.matches()) {
+            compartment = config.getCompartment(matcher.group(1));
         }
-        catch (final IOException e) {
-            throw new IllegalStateException(e);
+
+        matcher = dcRegexp.matcher(line);
+
+        if (matcher.matches()) {
+            compartment.add(dcFactory.create(matcher.group(2), matcher.group(1)));
         }
     }
 }
