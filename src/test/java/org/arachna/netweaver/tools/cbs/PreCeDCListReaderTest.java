@@ -19,8 +19,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * @author Dirk Weigenand
+ * Unit test for {@link PreCeDCListReader}.
  * 
+ * @author Dirk Weigenand
  */
 public class PreCeDCListReaderTest {
     /**

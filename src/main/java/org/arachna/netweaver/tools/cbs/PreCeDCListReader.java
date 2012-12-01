@@ -32,7 +32,10 @@ final class PreCeDCListReader extends AbstractDCListReader {
      */
     private final Pattern compartmentRegex;
 
-    private Compartment compartment = null;
+    /**
+     * the compartment currently processed.
+     */
+    private Compartment compartment;
 
     /**
      * Create a new instance of a DCListReader using the given development
