@@ -128,9 +128,8 @@ public final class DevelopmentComponentUpdater {
      * of development component.
      */
     private void readProperties() {
-        AbstractComponentConfigurationReader reader = null;
+        ComponentConfigurationReader reader = null;
 
-        // TODO: Replace TypeCode with...
         if (DevelopmentComponentType.WebDynpro.equals(currentComponent.getType())) {
             reader = new WebDynproProjectPropertiesReader(componentBase);
         }
