@@ -72,6 +72,7 @@ final class PublicPartReferenceFactory {
      * 
      * @param reference
      *            public part references read from the configuration file.
+     * @return the newly created <code>PublicPartReference</code>.
      */
     PublicPartReference create(final String reference) {
         PublicPartReference ppReference = null;
@@ -89,6 +90,14 @@ final class PublicPartReferenceFactory {
         return ppReference;
     }
 
+    /**
+     * Extract the DC name from the given reference.
+     * 
+     * @param reference
+     *            reference to extract DC name from.
+     * @return the reference itself iff it is not listed in the list of SAP DCs
+     *         without vendors, the name of the DC otherwise.
+     */
     private String getLibrary(final String reference) {
         final String vendor = blackList.get(reference);
         String library = reference;
@@ -101,6 +110,15 @@ final class PublicPartReferenceFactory {
         return library;
     }
 
+    /**
+     * Determine the vendor from the given public part reference.
+     * 
+     * @param reference
+     *            public part reference to determine vendor name from.
+     * @return either the vendor stored in the list of known SAP DCs without
+     *         vendor or the vendor extracted from the given public part
+     *         reference.
+     */
     private String getVendor(final String reference) {
         String vendor = blackList.get(reference);
 
