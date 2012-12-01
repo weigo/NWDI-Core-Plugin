@@ -69,21 +69,23 @@ public final class CBSToolCommandExecutor extends AbstractDIToolExecutor {
 
         DIToolCommandExecutionResult result = null;
 
-        switch (getCbsToolVersion()) {
-        case CE:
+        final CbsToolVersion cbsToolVersion = getCbsToolVersion();
+
+        if (cbsToolVersion == null) {
+            throw new IllegalStateException("The cbstool version could not be determined!");
+        }
+
+        if (CbsToolVersion.CE.equals(cbsToolVersion)) {
             result = execute(new DCLister(config, getDiToolDescriptor()));
             new DCListReader(config, dcFactory).execute(new StringReader(result.getOutput()));
-            break;
-
-        case PRE_CE:
+        }
+        else if (CbsToolVersion.PRE_CE.equals(cbsToolVersion)) {
             result = execute(new ListCompartments(config.getCmsUrl(), config.getName(), getDiToolDescriptor()));
 
             if (result.isExitCodeOk()) {
                 result = execute(new PreCeDCLister(config, getDiToolDescriptor()));
                 new PreCeDCListReader(config, dcFactory).execute(new StringReader(result.getOutput()));
             }
-
-            break;
         }
 
         duration(startListDcs, Messages.CBSToolCommandExecutor_report_count_of_dcs_read(dcFactory.getAll().size()));
