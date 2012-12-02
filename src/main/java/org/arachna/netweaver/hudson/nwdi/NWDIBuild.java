@@ -38,7 +38,6 @@ import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 import org.arachna.netweaver.hudson.dtr.browser.Activity;
 import org.arachna.netweaver.hudson.dtr.browser.ActivityResource;
-import org.arachna.netweaver.hudson.dtr.browser.DtrBrowser;
 import org.arachna.netweaver.hudson.nwdi.confdef.ConfDefReader;
 import org.arachna.netweaver.hudson.util.FilePathHelper;
 import org.arachna.netweaver.tools.DIToolCommandExecutionResult;
@@ -201,7 +200,8 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
 
     /**
      * Calculate the set of development components to build from activities
-     * determined earlier by the {@link DtrBrowser}.
+     * determined earlier by the
+     * {@link org.arachna.netweaver.hudson.dtr.browser.DtrBrowser}.
      * 
      * @return the set of development components to build as determined by
      *         activities in the DTR.

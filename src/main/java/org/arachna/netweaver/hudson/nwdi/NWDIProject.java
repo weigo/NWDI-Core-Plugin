@@ -52,7 +52,6 @@ import net.sf.json.JSONObject;
 
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 import org.arachna.netweaver.dc.types.JdkHomePaths;
-import org.arachna.netweaver.tools.AbstractDIToolExecutor;
 import org.arachna.netweaver.tools.DIToolDescriptor;
 import org.arachna.netweaver.tools.cbs.CBSToolCommandExecutor;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -701,7 +700,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
          * for the given development configuration.
          * 
          * @return a new {@link DIToolDescriptor} configured to run an
-         *         {@link AbstractDIToolExecutor}.
+         *         {@link org.arachna.netweaver.tools.AbstractDIToolExecutor}.
          */
         public DIToolDescriptor getDIToolDescriptor() {
             return new DIToolDescriptor(getUser(), getPassword(), getNwdiToolLibraryFolder(), getCbsUrl(),
