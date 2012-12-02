@@ -102,7 +102,8 @@ public final class CBSToolCommandExecutor extends AbstractDIToolExecutor {
         final StringWriter scriptContent = new StringWriter();
 
         try {
-            Util.copyStream(new FileReader(getToolCommand()), scriptContent);
+            File tool = getToolCommand();
+            Util.copyStream(new FileReader(tool), scriptContent);
         }
         catch (final IOException e) {
             throw new IllegalStateException(e);

@@ -52,6 +52,7 @@ import net.sf.json.JSONObject;
 
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 import org.arachna.netweaver.dc.types.JdkHomePaths;
+import org.arachna.netweaver.tools.AbstractDIToolExecutor;
 import org.arachna.netweaver.tools.DIToolDescriptor;
 import org.arachna.netweaver.tools.cbs.CBSToolCommandExecutor;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -696,6 +697,18 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
         }
 
         /**
+         * Create a descriptor for use the various NWDI tools (cbstool, dctool)
+         * for the given development configuration.
+         * 
+         * @return a new {@link DIToolDescriptor} configured to run an
+         *         {@link AbstractDIToolExecutor}.
+         */
+        public DIToolDescriptor getDIToolDescriptor() {
+            return new DIToolDescriptor(getUser(), getPassword(), getNwdiToolLibraryFolder(), getCbsUrl(),
+                getConfiguredJdkHomePaths());
+        }
+
+        /**
          * List names of build spaces using the CBS tool.
          * 
          * @return a list of build spaces names retrieved from the CBS.
@@ -738,14 +751,12 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
         private CBSToolCommandExecutor createCBSToolExecutor(final FilePath folder) {
             final DevelopmentConfiguration configuration = new DevelopmentConfiguration("xxx");
             configuration.setCmsUrl(cbsUrl);
-            final DIToolDescriptor descriptor =
-                new DIToolDescriptor(getUser(), getPassword(), getNwdiToolLibraryFolder(), getCbsUrl(),
-                    getConfiguredJdkHomePaths());
+
             final Launcher launcher =
                 Jenkins.getInstance().createLauncher(
                     new LogTaskListener(Logger.getLogger(this.getClass().getName()), Level.ALL));
 
-            return new CBSToolCommandExecutor(launcher, folder, descriptor, configuration);
+            return new CBSToolCommandExecutor(launcher, folder, getDIToolDescriptor(), configuration);
         }
 
         /**

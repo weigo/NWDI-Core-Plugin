@@ -36,15 +36,12 @@ import org.arachna.netweaver.dc.types.CompartmentState;
 import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
-import org.arachna.netweaver.dc.types.JdkHomeAlias;
 import org.arachna.netweaver.hudson.dtr.browser.Activity;
 import org.arachna.netweaver.hudson.dtr.browser.ActivityResource;
 import org.arachna.netweaver.hudson.dtr.browser.DtrBrowser;
 import org.arachna.netweaver.hudson.nwdi.confdef.ConfDefReader;
 import org.arachna.netweaver.hudson.util.FilePathHelper;
-import org.arachna.netweaver.tools.AbstractDIToolExecutor;
 import org.arachna.netweaver.tools.DIToolCommandExecutionResult;
-import org.arachna.netweaver.tools.DIToolDescriptor;
 import org.arachna.netweaver.tools.cbs.CBSToolCommandExecutor;
 import org.arachna.netweaver.tools.dc.DCToolCommandExecutor;
 import org.arachna.xml.XmlReaderHelper;
@@ -327,8 +324,7 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
     DCToolCommandExecutor getDCToolExecutor(final Launcher launcher) {
         final DevelopmentConfiguration configuration = getDevelopmentConfiguration();
         final NWDIProject.DescriptorImpl descriptor = NWDIProject.DescriptorImpl.DESCRIPTOR;
-        final DIToolDescriptor dcToolDescriptor = getDCToolDescriptor(configuration, descriptor);
-        return new DCToolCommandExecutor(launcher, getWorkspace(), dcToolDescriptor, configuration);
+        return new DCToolCommandExecutor(launcher, getWorkspace(), descriptor.getDIToolDescriptor(), configuration);
     }
 
     /**
@@ -343,39 +339,7 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
     CBSToolCommandExecutor getCBSToolExecutor(final Launcher launcher) {
         final DevelopmentConfiguration configuration = getDevelopmentConfiguration();
         final NWDIProject.DescriptorImpl descriptor = NWDIProject.DescriptorImpl.DESCRIPTOR;
-        final DIToolDescriptor dcToolDescriptor = getDCToolDescriptor(configuration, descriptor);
-        return new CBSToolCommandExecutor(launcher, getWorkspace(), dcToolDescriptor, configuration);
-    }
-
-    /**
-     * Create a descriptor for use the various NWDI tools (cbstool, dctool) for
-     * the given development configuration.
-     * 
-     * @param configuration
-     *            development configuration to use for creating the descriptor.
-     * @param descriptor
-     *            the NWDIProject descriptor containing the credentials and
-     *            NWDITOOLLIB folders to use
-     * @return a new {@link DIToolDescriptor} configured to run an
-     *         {@link AbstractDIToolExecutor}.
-     */
-    DIToolDescriptor getDCToolDescriptor(final DevelopmentConfiguration configuration,
-        final NWDIProject.DescriptorImpl descriptor) {
-        final JdkHomeAlias alias = configuration.getJdkHomeAlias();
-        String nwdiToolLibraryFolder = "";
-
-        if (JdkHomeAlias.Jdk131Home.equals(alias) || JdkHomeAlias.Jdk142Home.equals(alias)) {
-            nwdiToolLibraryFolder = descriptor.getNwdiToolLibFolder();
-        }
-        else if (JdkHomeAlias.Jdk150Home.equals(alias) || JdkHomeAlias.Jdk160Home.equals(alias)) {
-            nwdiToolLibraryFolder = descriptor.getNwdiToolLibFolder71();
-        }
-        else {
-            throw new RuntimeException(String.format("Cannot map JdkHomeAlias '%s' onto a NWDITOOLLIB folder.", alias));
-        }
-
-        return new DIToolDescriptor(descriptor.getUser(), descriptor.getPassword(), nwdiToolLibraryFolder,
-            descriptor.getCbsUrl(), descriptor.getConfiguredJdkHomePaths());
+        return new CBSToolCommandExecutor(launcher, getWorkspace(), descriptor.getDIToolDescriptor(), configuration);
     }
 
     /**
@@ -425,7 +389,7 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
             }
 
             if (Result.SUCCESS.equals(result)) {
-                updateSourceCodeLocations(listener.getLogger(), antHelper);
+                updateSourceCodeLocations(antHelper);
                 writeDevelopmentConfiguration(listener.getLogger());
             }
 
@@ -529,16 +493,22 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
          *             re-thrown from {@link FilePath} operations
          */
         private void writeDevelopmentConfiguration(final PrintStream logger) throws IOException, InterruptedException {
+            Writer content = null;
+
             try {
                 final FilePath devConfXml = getWorkspace().child("DevelopmentConfiguration.xml");
-                final Writer content = new OutputStreamWriter(devConfXml.write(), DEFAULT_ENCODING);
+                content = new OutputStreamWriter(devConfXml.write(), DEFAULT_ENCODING);
                 final DevelopmentConfigurationXmlWriter xmlWriter =
                     new DevelopmentConfigurationXmlWriter(getDevelopmentConfiguration());
                 xmlWriter.write(content);
-                content.close();
             }
             catch (final XMLStreamException e) {
                 e.printStackTrace(logger);
+            }
+            finally {
+                if (content != null) {
+                    content.close();
+                }
             }
         }
 
@@ -552,14 +522,12 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
          * Those folders have to be considered too when running analysis
          * plugins.
          * 
-         * @param logger
-         *            Logger to report actions back to build.
          * @param antHelper
          *            {@link AntHelper} to compute the base location of
          *            development components.
          * @param antHelper
          */
-        private void updateSourceCodeLocations(final PrintStream logger, final AntHelper antHelper) {
+        private void updateSourceCodeLocations(final AntHelper antHelper) {
             final Collection<Compartment> compartments =
                 getDevelopmentConfiguration().getCompartments(CompartmentState.Source);
 
