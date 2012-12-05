@@ -6,5 +6,7 @@ DI0_Example_D
 DI0_Example_C
 DI0_Example1_D
 DI0_Example1_C
+JDI_THECO50_D
+JDI_THECO50_C
 
 :cbs>Bye.

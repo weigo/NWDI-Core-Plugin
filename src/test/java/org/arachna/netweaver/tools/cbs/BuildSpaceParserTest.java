@@ -49,7 +49,7 @@ public class BuildSpaceParserTest {
     @Test
     public final void testParseCbsTool70Output() throws IOException {
         initParser("CbsToolListBuildSpaces70.txt");
-        assertThat(parser.parse(), hasItems("DI0_Example_D", "DI0_Example1_D"));
+        assertThat(parser.parse(), hasItems("DI0_Example_D", "DI0_Example1_D", "JDI_THECO50_D"));
     }
 
     /**
