@@ -3,6 +3,7 @@
  */
 package org.arachna.netweaver.tools.cbs;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.MatcherAssert.assertThat;
 import hudson.Util;
@@ -10,9 +11,8 @@ import hudson.Util;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
+import java.util.Collection;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -22,54 +22,53 @@ import org.junit.Test;
  */
 public class BuildSpaceParserTest {
     /**
-     * Instance under test.
+     * build spaces that are expected to be read from sample output of
+     * listbuildspaces command.
      */
-    private BuildSpaceParser parser;
+    private static final String[] EXPECTED_BUILDSPACES = { "DI0_Example_D", "DI0_Example1_D", "JDI_THECO50_D" };
 
     /**
-     * @throws java.lang.Exception
+     * Test method for
+     * {@link org.arachna.netweaver.tools.cbs.BuildSpaceParser#parse()}.
      */
-    @Before
-    public void setUp() throws Exception {
-    }
-
-    /**
-     * @throws java.lang.Exception
-     */
-    @After
-    public void tearDown() throws Exception {
+    @Test
+    public final void testParseCbsTool70Output() {
+        final Collection<String> buildSpaces = getBuildSpaces("CbsToolListBuildSpaces70.txt");
+        assertThat(buildSpaces.size(), equalTo(EXPECTED_BUILDSPACES.length));
+        assertThat(buildSpaces, hasItems(EXPECTED_BUILDSPACES));
     }
 
     /**
      * Test method for
      * {@link org.arachna.netweaver.tools.cbs.BuildSpaceParser#parse()}.
-     * 
-     * @throws IOException
      */
     @Test
-    public final void testParseCbsTool70Output() throws IOException {
-        initParser("CbsToolListBuildSpaces70.txt");
-        assertThat(parser.parse(), hasItems("DI0_Example_D", "DI0_Example1_D", "JDI_THECO50_D"));
+    public final void testParseCbsTool71PlusPlusOutput() {
+        final Collection<String> buildSpaces = getBuildSpaces("CbsToolListBuildSpaces71pp.txt");
+        assertThat(buildSpaces.size(), equalTo(EXPECTED_BUILDSPACES.length));
+        assertThat(buildSpaces, hasItems(EXPECTED_BUILDSPACES));
     }
 
     /**
-     * Test method for
-     * {@link org.arachna.netweaver.tools.cbs.BuildSpaceParser#parse()}.
+     * Read in the given sample output of listbuildspaces command and return the
+     * names of development build spaces parsed from it.
      * 
-     * @throws IOException
+     * @param resourceName
+     *            name of sample output file.
+     * @return list of names of development build spaces.
      */
-    @Test
-    public final void testParseCbsTool71PlusPlusOutput() throws IOException {
-        initParser("CbsToolListBuildSpaces71pp.txt");
-        assertThat(parser.parse(), hasItems("DI0_Example_D", "DI0_Example1_D"));
-    }
-
-    private void initParser(final String resourceName) throws IOException {
+    private Collection<String> getBuildSpaces(final String resourceName) {
         final StringWriter result = new StringWriter();
-        Util.copyStreamAndClose(
-            new InputStreamReader(this.getClass().getResourceAsStream(
-                "/org/arachna/netweaver/tools/cbs/" + resourceName)), result);
 
-        parser = new BuildSpaceParser(result.toString());
+        try {
+            Util.copyStreamAndClose(
+                new InputStreamReader(this.getClass().getResourceAsStream(
+                    "/org/arachna/netweaver/tools/cbs/" + resourceName)), result);
+        }
+        catch (final IOException e) {
+            throw new IllegalStateException(e);
+        }
+
+        return new BuildSpaceParser(result.toString()).parse();
     }
 }

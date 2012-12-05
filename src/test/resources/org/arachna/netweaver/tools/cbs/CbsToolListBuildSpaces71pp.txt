@@ -6,5 +6,7 @@ cbs>listbuildspaces
 2   DI0_Example_C
 3   DI0_Example1_D
 4   DI0_Example1_C
+5   JDI_THECO50_D
+6   JDI_THECO50_C
 
 cbs>Bye.
