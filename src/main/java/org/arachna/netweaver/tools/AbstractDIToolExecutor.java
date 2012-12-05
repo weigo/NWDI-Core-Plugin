@@ -21,7 +21,6 @@ import java.util.Map;
 
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 import org.arachna.netweaver.dc.types.JdkHomeAlias;
-import org.arachna.netweaver.hudson.nwdi.Messages;
 
 /**
  * Base class for executors of NWDI tools (cbstool, dctool, etc.).
@@ -232,7 +231,7 @@ public abstract class AbstractDIToolExecutor {
      *            message to log.
      */
     protected final void duration(final long start, final String message) {
-        log(Messages.NWDIProject_duration_template(message,
+        log(Messages.duration_template(message,
             String.format("%f", (System.currentTimeMillis() - start) / A_THOUSAND_MSECS)));
     }
 
