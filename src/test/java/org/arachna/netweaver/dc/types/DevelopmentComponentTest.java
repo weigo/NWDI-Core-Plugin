@@ -45,7 +45,9 @@ public class DevelopmentComponentTest {
      */
     @Test
     public final void testNotEqualsNullObject() {
-        assertThat(false, is(equalTo(component.equals(null))));
+        // @CHECKSTYLE:OFF
+        assertThat(false, equalTo(component.equals(null)));
+        // @CHECKSTYLE:ON
     }
 
     /**
