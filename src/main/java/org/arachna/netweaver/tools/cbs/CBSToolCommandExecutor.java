@@ -5,7 +5,6 @@ package org.arachna.netweaver.tools.cbs;
 
 import hudson.FilePath;
 import hudson.Launcher;
-import hudson.Launcher.ProcStarter;
 import hudson.Util;
 
 import java.io.File;
@@ -17,7 +16,6 @@ import java.util.Collection;
 
 import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
-import org.arachna.netweaver.hudson.nwdi.Messages;
 import org.arachna.netweaver.tools.AbstractDIToolExecutor;
 import org.arachna.netweaver.tools.DIToolCommandExecutionResult;
 import org.arachna.netweaver.tools.DIToolDescriptor;
@@ -55,8 +53,8 @@ public final class CBSToolCommandExecutor extends AbstractDIToolExecutor {
      *            from CBS.
      * @return the result of the listdc-command operation.
      * @throws IOException
-     *             might be thrown be the {@link ProcStarter} used to execute
-     *             the DC tool commands.
+     *             might be thrown be the {@link hudson.Launcher.ProcStarter}
+     *             used to execute the DC tool commands.
      * @throws InterruptedException
      *             when the user canceled the action.
      */
@@ -102,7 +100,7 @@ public final class CBSToolCommandExecutor extends AbstractDIToolExecutor {
         final StringWriter scriptContent = new StringWriter();
 
         try {
-            File tool = getToolCommand();
+            final File tool = getToolCommand();
             Util.copyStream(new FileReader(tool), scriptContent);
         }
         catch (final IOException e) {

@@ -5,7 +5,6 @@ package org.arachna.netweaver.tools.dc;
 
 import hudson.FilePath;
 import hudson.Launcher;
-import hudson.Launcher.ProcStarter;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,7 +15,6 @@ import java.util.List;
 import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
-import org.arachna.netweaver.hudson.nwdi.Messages;
 import org.arachna.netweaver.tools.AbstractDIToolExecutor;
 import org.arachna.netweaver.tools.DIToolCommandBuilder;
 import org.arachna.netweaver.tools.DIToolCommandExecutionResult;
@@ -73,10 +71,9 @@ public final class DCToolCommandExecutor extends AbstractDIToolExecutor {
      *            synchronize in inactive or archive mode
      * @return the result of the syncdc-command operation.
      * @throws IOException
-     *             might be thrown be the {@link ProcStarter} used to execute
-     *             the DC tool commands.
+     *             re-thrown from dctool execution
      * @throws InterruptedException
-     *             when the user canceled the action.
+     *             re-thrown from dctool execution
      */
     public DIToolCommandExecutionResult synchronizeDevelopmentComponents(final DevelopmentComponentFactory dcFactory,
         final boolean cleanCopy, final boolean syncSources) throws IOException, InterruptedException {
@@ -97,10 +94,9 @@ public final class DCToolCommandExecutor extends AbstractDIToolExecutor {
      *            development components to build.
      * @return the result of the builddc operation.
      * @throws IOException
-     *             might be thrown be the {@link ProcStarter} used to execute
-     *             the DC tool commands.
+     *             re-thrown from dctool execution
      * @throws InterruptedException
-     *             when the user canceled the action.
+     *             re-thrown from dctool execution
      */
     public DIToolCommandExecutionResult buildDevelopmentComponents(
         final Collection<DevelopmentComponent> affectedComponents) throws IOException, InterruptedException {
@@ -112,6 +108,19 @@ public final class DCToolCommandExecutor extends AbstractDIToolExecutor {
         return result;
     }
 
+    /**
+     * Wrap the given builder with a {@link DCToolCommandBuilderWrapper} to
+     * supply 'loadconfig' and 'exit' commands and execute the resulting command
+     * list with the dctool.
+     * 
+     * @param builder
+     *            builder for dctool commands.
+     * @return result object with return code and output of dctool commands.
+     * @throws IOException
+     *             re-thrown from dctool execution
+     * @throws InterruptedException
+     *             re-thrown from dctool execution
+     */
     private DIToolCommandExecutionResult wrapAndExecute(final DIToolCommandBuilder builder) throws IOException,
         InterruptedException {
         return execute(new DCToolCommandBuilderWrapper(loadConfigCommandBuilder, builder));
