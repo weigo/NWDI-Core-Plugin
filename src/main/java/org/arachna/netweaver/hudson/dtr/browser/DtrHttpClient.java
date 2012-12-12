@@ -5,6 +5,7 @@ package org.arachna.netweaver.hudson.dtr.browser;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.logging.Logger;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
@@ -16,11 +17,16 @@ import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 
 /**
- * Dtr client using the <code>http</code> protocol.
+ * DTR client using the <code>http</code> protocol.
  * 
  * @author Dirk Weigenand
  */
 final class DtrHttpClient {
+    /**
+     * Logger.
+     */
+    private final Logger logger = Logger.getLogger(DtrHttpClient.class.getName());
+
     /**
      * HTTP client to use for requests.
      */
@@ -66,12 +72,14 @@ final class DtrHttpClient {
      * Get the content of the page returned by the given query.
      * 
      * @param queryUrl
-     *            url for querying activities for a given compartment.
+     *            URL for querying activities for a given compartment.
      * @return the content of the page returned by the given query.
      * @throws IOException
-     *             when an error occured reading the response.
+     *             when an error occurred reading the response.
      */
     InputStream getContent(final String queryUrl) throws IOException {
+        logger.fine(queryUrl);
+
         final HttpGet httpget = new HttpGet(queryUrl);
         final HttpResponse response = httpClient.execute(httpget, localContext);
 
