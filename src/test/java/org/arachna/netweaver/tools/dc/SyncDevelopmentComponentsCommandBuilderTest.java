@@ -144,7 +144,7 @@ public class SyncDevelopmentComponentsCommandBuilderTest {
         final List<String> commands = builder.executeInternal();
         assertThat(commands.size(), equalTo(1));
         final String expected =
-            String.format("syncdc -s %s -n %s -v %s -m archive -u;", compartment.getName(), library.getName(),
+            String.format("syncdc -s %s -n %s -v %s -m archive --syncused;", compartment.getName(), library.getName(),
                 library.getVendor());
         assertThat(commands.get(0), equalTo(expected));
     }

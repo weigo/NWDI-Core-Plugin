@@ -17,7 +17,7 @@ enum SyncDcCommandTemplate {
     /**
      * Template for NW 7.0.
      */
-    V70("syncdc -s %s -n %s -v %s -m inactive -y;", "syncdc -s %s -n %s -v %s -m archive -u;",
+    V70("syncdc -s %s -n %s -v %s -m inactive -y;", "syncdc -s %s -n %s -v %s -m archive --syncused;",
         "syncalldcs -s %s -m archive;", "syncalldcs -s %s -m inactive;", "unsyncdc -s %s -n %s -v %s;"),
 
     /**
