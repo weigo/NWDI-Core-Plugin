@@ -1,6 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
->
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.arachna.netweaver</groupId>
@@ -122,6 +121,55 @@
         </plugin>
       </plugins>
     </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>com.agilejava.docbkx</groupId>
+        <artifactId>docbkx-maven-plugin</artifactId>
+        <configuration>
+          <generateToc>1</generateToc>
+          <generateIndex>1</generateIndex>
+          <useExtensions>1</useExtensions>
+          <graphicsizeExtension>1</graphicsizeExtension>
+          <indexLinksToSection>1</indexLinksToSection>
+          <generateToc>book toc,title,figure chapter toc,title section title, appendix</generateToc>
+          <generateSectionTocLevel>3</generateSectionTocLevel>
+          <tocSectionDepth>5</tocSectionDepth>
+          <sectionAutolabel>1</sectionAutolabel>
+          <sectionLabelIncludesComponentLabel>1</sectionLabelIncludesComponentLabel>
+          <admonGraphics>1</admonGraphics>
+          <navigGraphics>1</navigGraphics>
+          <calloutDefaultcolumn>80</calloutDefaultcolumn>
+          <calloutGraphicsExtension>.png</calloutGraphicsExtension>
+          <calloutGraphicsPath>images/callouts/</calloutGraphicsPath>
+          <calloutGraphics>1</calloutGraphics>
+          <calloutsExtension>1</calloutsExtension>
+          <defaultTableWidth>100%</defaultTableWidth>
+          <xincludeSupported>true</xincludeSupported>
+          <includes>NWDI-Core-Plugin.xml</includes>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>generate-pdf</goal>
+            </goals>
+          </execution>
+        </executions>
+        <dependencies>
+          <dependency>
+            <groupId>net.sf.docbook</groupId>
+            <artifactId>docbook-xsl</artifactId>
+            <version>1.77.1</version>
+            <type>zip</type>
+            <classifier>ns-resources</classifier>
+          </dependency>
+          <dependency>
+            <groupId>net.sf.offo</groupId>
+            <artifactId>fop-hyph</artifactId>
+            <version>1.2</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+    </plugins>
   </build>
-  <groupId>org.arachna.netweaver</groupId>
 </project>

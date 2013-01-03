@@ -1,0 +1,163 @@
+<?xml version='1.0'?>
+<book xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xl="http://www.w3.org/1999/xlink" version="5.0"
+  xml:lang="en">
+  <info>
+    <title>The Jenkins NWDI-Core-Plugin guide</title>
+    <!-- graphic fileref=&quot;images/NWDI-Core-Plugin.png&quot; format=&quot;PNG&quot; / -->
+    <authorgroup>
+      <author>
+        <firstname>Dirk</firstname>
+
+        <surname>Weigenand</surname>
+        <affiliation>
+          <address>
+            <email>Dirk.Weigenand@gmx.de</email>
+          </address>
+        </affiliation>
+      </author>
+    </authorgroup>
+    <copyright>
+      <year>2010-12</year>
+      <holder>Dirk
+        Weigenand
+      </holder>
+    </copyright>
+  </info>
+  <chapter>
+    <title>Introduction</title>
+    <para>The NWDI-Core-Plugin integrates the SAP NetWeaver development
+      infrastructure (NWDI) into the Jenkins continuous integration
+      environment.
+    </para>
+    <para>The plugin adds various new capabilities to Jenkins:</para>
+    <itemizedlist>
+      <listitem>
+        <para>A new project type that lets the user configure a CBS build space (or NWDI track) to monitor for changes and build.</para>
+      </listitem>
+      <listitem>
+        <para>A new source code management system (SCM) that monitors the configured track for changes to development components.</para>
+      </listitem>
+      <listitem>
+        <para>A new type of build that synchronizes changed development components (and their dependencies) to a Jenkins workspace and
+          builds those components.
+        </para>
+      </listitem>
+    </itemizedlist>
+    <para>
+      The plugin also exposes an object model to be used by other plugins to add functionality with respect to SAP NetWeaver development
+      components to Jenkins.
+      <variablelist xml:id="vlist:NWDI-Jenkins-Plugins">
+        <info>
+          <title>Jenkins plugins based on the NWDI-Core-Plugin</title>
+        </info>
+
+        <varlistentry>
+          <term>
+            <link xl:href="https://github.com/weigo/NWDI-Checkstyle-Plugin">NWDI-Checkstyle-Plugin</link>
+          </term>
+          <listitem>
+            <para>
+              This plugins runs
+              <link xl:href="http://checkstyle.sourceforge.net/">Checkstyle</link>
+              on development components containing Java source code.
+            </para>
+            <para>
+              The results of this analysis can be visualized using the
+              <link xl:href="https://wiki.jenkins-ci.org/display/JENKINS/Checkstyle+Plugin">Jenkins Checkstyle plugin</link>
+              .
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <link xl:href="https://github.com/weigo/NWDI-Cobertura-Plugin">NWDI-Cobertura-Plugin</link>
+          </term>
+          <listitem>
+            <para>
+              This plugin enables the execution of JUnit test cases for development components. The test coverage will be recorded using
+              <link xl:href="http://cobertura.sourceforge.net">Cobertura</link>
+              .
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <link xl:href="https://github.com/weigo/NWDI-DC-Documenter-Plugin">NWDI-DC-Documenter-Plugin</link>
+          </term>
+          <listitem>
+            <para>The plugin generates an overview of a track, its software components and development components and publishes this
+              information to a confluence wiki. The generated information contains dependencies, usage of a development component (inside
+              the track). Depending on the type of development component other information is determined from the DCs meta data and content
+              (i.e. licenses of external libraries) and visualized accordingly.
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <link xl:href="https://github.com/weigo/NWDI-JavaDoc-Plugin">NWDI-JavaDoc-Plugin</link>
+          </term>
+          <listitem>
+            <para>This plugin generates JavaDoc documentation from Java sources contained in development components.
+            </para>
+            <para>
+              If requested the generated documentation can be enriched using UML class diagrams generated using
+              <link xl:href="http://www.umlgraph.org">UmlGraph</link>
+              . This feature requires the installation of
+              <link xl:href="http://www.graphviz.org">GraphViz</link>
+              .
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <link xl:href="https://github.com/weigo/NWDI-PMD-Plugin">NWDI-PMD-Plugin</link>
+          </term>
+          <listitem>
+            <para>
+              This plugin uses the copy and paste detector (CPD) of
+              <link xl:href="http://pmd.sourceforge.net">PMD</link>
+              to detect duplicated code in development components.
+            </para>
+            <para>
+              The results of this analysis can be visualized using the
+              <link xl:href="https://wiki.jenkins-ci.org/display/JENKINS/PMD+Plugin">Jenkins PMD plugin</link>
+              .
+            </para>
+          </listitem>
+        </varlistentry>
+      </variablelist>
+    </para>
+    <para>New plugins (e.g. FindBugs integration) using the provided infrastructure can easily be created using the plugins
+      mentioned above
+      as an example.
+    </para>
+  </chapter>
+  <chapter>
+    <title>Building and installing the plugin</title>
+    <para>
+      The plugin is not available through the Jenkins update center yet. To build the plugin you'll need to clone the following GitHub
+      repositories:
+      <programlisting>
+<![CDATA[
+git clone git://github.com/weigo/NWDI-config-plugin.git
+git clone git://github.com/weigo/NWDI-pom-Plugin.git
+git clone git://github.com/weigo/NWDI-Core-Plugin.git]]>
+      </programlisting>
+      and build the Maven projects:
+      <programlisting>
+<![CDATA[
+for d in NWDI-config-plugin NWDI-pom-Plugin NWDI-Core-Plugin;\
+  do (cd $d; mvn install); done]]>
+      </programlisting>
+      in 'NWDI-Core-Plugin/target' you'll find the 'NWDI-Core-Plugin.hpi' file which you should upload using the Jenkins update center
+      extended
+      settings view.
+    </para>
+  </chapter>
+  <chapter>
+    <title>Global configuration</title>
+  </chapter>
+  <chapter>
+    <title>Creating and configuring a new NWDI-Project</title>
+  </chapter>
+</book>
