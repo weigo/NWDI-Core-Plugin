@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
  * @author Dirk Weigenand
  */
 final class BuildSpaceParser {
+ 
     /**
      * Regular expression to match output of the 'listbuildspaces' cbstool
      * command.
