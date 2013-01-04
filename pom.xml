@@ -131,8 +131,7 @@
           <useExtensions>1</useExtensions>
           <graphicsizeExtension>1</graphicsizeExtension>
           <indexLinksToSection>1</indexLinksToSection>
-          <generateToc>book toc,title,figure chapter toc,title section title, appendix</generateToc>
-          <generateSectionTocLevel>3</generateSectionTocLevel>
+          <generateToc>book toc</generateToc>
           <tocSectionDepth>5</tocSectionDepth>
           <sectionAutolabel>1</sectionAutolabel>
           <sectionLabelIncludesComponentLabel>1</sectionLabelIncludesComponentLabel>

@@ -149,10 +149,100 @@ git clone git://github.com/weigo/NWDI-Core-Plugin.git]]>
 for d in NWDI-config-plugin NWDI-pom-Plugin NWDI-Core-Plugin;\
   do (cd $d; mvn install); done]]>
       </programlisting>
-      in 'NWDI-Core-Plugin/target' you'll find the 'NWDI-Core-Plugin.hpi' file which you should upload using the Jenkins update center
+      in
+      <filename class='directory'>NWDI-Core-Plugin/target</filename>
+      you'll find the
+      <filename>NWDI-Core-Plugin.hpi</filename>
+      file which you should upload using the Jenkins update center
       extended
       settings view.
     </para>
+  </chapter>
+  <chapter>
+    <title>NetWeaver DI command line tools installation</title>
+    <section>
+      <title>NetWeaver 7.0.x</title>
+      <para>
+        With NetWeaver 7.0.x the DI command tools are provided together with NetWeaver developer studio. They
+        are located in the sub
+        folder
+        <filename class='directory'>tools</filename>
+        beneath your NWDS installation folder. Copy this folder to your
+        Jenkins server.
+      </para>
+    </section>
+    <section>
+      <title>NetWeaver 7.1.+</title>
+      <para>
+        NetWeaver versions more recent than 7.0.x do not provide the DI command tools with the NetWeaver developer
+        studio. You'll need to
+        download the software component archive (SCA)
+        <filename>DICLIENTS.SCA</filename>
+        from SAP market place (enter 'DICLIENTS' as search term).
+      </para>
+      <para>
+        Unzip the SCA. In the sub folder
+        <filename class='directory'>DEPLOYARCHIVES</filename>
+        there is the SDA
+        <filename>tc~di~cmd_tools~sda.sda</filename>
+        . Extract the ZIP
+        archive
+        <filename>di_cmd_tools.zip</filename>
+        and copy it to your Jenkins Server. Unpack the archive to a location of your choice.
+      </para>
+    </section>
+    <section>
+      <title>patching dctool.(bat|sh)</title>
+      <para>
+        The batch file/shell script needs to be adapted to use the environment variable
+        <envar>JDK_PROPERTY_NAME</envar>
+        to build
+        other build variants
+        than `default`.
+      </para>
+      <para>On Unix systems please verify the encoding/line endings of the modified shell scripts. These should not contain
+        DOS line endings.
+        The interpreter to execute the shell scripts won't be found otherwise.
+      </para>
+      <section>
+        <title>NetWeaver 7.0.x</title>
+        <para>
+          The call to the Java VM (on Windows) should look like this:
+          <programlisting>
+<![CDATA[call "%JAVA_HOME%\bin\java" -classpath "%startup%" -Xmx256m -Xss20m
+  -Ddctool.jarrootdir="%NWDITOOLLIB%"
+  -Ddctool.JDK_PROPERTY_NAME="%JDK_PROPERTY_NAME%" %PARAM_JDK% %APPL% %*]]>
+          </programlisting>
+          On Unix the VM should be called like this:
+          <programlisting>
+<![CDATA["$JAVA_HOME/bin/java" -classpath "$startup" -Xmx256m -Xss20m\
+  -Ddctool.jarrootdir="$NWDITOOLLIB"\
+  -Ddctool.JDK_PROPERTY_NAME="$JDK_PROPERTY_NAME" $PARAM_JDK $APPL $*
+]]>
+          </programlisting>
+        </para>
+      </section>
+      <section>
+        <title>NetWeaver 7.1+</title>
+        <para>
+          The call to the Java VM (on Windows) should look like this:
+          <programlisting>
+<![CDATA[call "%JAVA_HOME%\bin\java" -classpath "%startup%" -Xmx256m -Xss20m
+  -Dappl.jars="%NWDITOOLLIB%"
+  -Dappl.classname=com.sap.tc.cetool.DcConsoleApplication
+  -Ddctool.JDK_PROPERTY_NAME=%JDK_PROPERTY_NAME% %PARAM_JDK% %APPL% %*
+]]>
+          </programlisting>
+          On a Unix system the shell script should call the Java VM like this:
+          <programlisting>
+<![CDATA["$JAVA_HOME/bin/java" -cp "$startup" -Xmx256m -Xss20m\
+  -Dappl.jars="$NWDITOOLLIB"\
+  -Dappl.classname=com.sap.tc.cetool.DcConsoleApplication\
+  -Ddctool.JDK_PROPERTY_NAME="$JDK_PROPERTY_NAME" $PARAM_JDK $APPL $*]]>
+          </programlisting>
+        </para>
+      </section>
+    </section>
   </chapter>
   <chapter>
     <title>Global configuration</title>
