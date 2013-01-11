@@ -6,9 +6,10 @@
     <!-- graphic fileref=&quot;images/NWDI-Core-Plugin.png&quot; format=&quot;PNG&quot; / -->
     <authorgroup>
       <author>
-        <firstname>Dirk</firstname>
-
-        <surname>Weigenand</surname>
+        <personname>
+          <firstname>Dirk</firstname>
+          <surname>Weigenand</surname>
+        </personname>
         <affiliation>
           <address>
             <email>Dirk.Weigenand@gmx.de</email>
@@ -46,7 +47,7 @@
     <para>
       The plugin also exposes an object model to be used by other plugins to add functionality with respect to SAP NetWeaver development
       components to Jenkins.
-      <variablelist xml:id="vlist:NWDI-Jenkins-Plugins">
+      <variablelist>
         <info>
           <title>Jenkins plugins based on the NWDI-Core-Plugin</title>
         </info>
@@ -246,8 +247,10 @@ for d in NWDI-config-plugin NWDI-pom-Plugin NWDI-Core-Plugin;\
   </chapter>
   <chapter>
     <title>Global configuration</title>
+    <para></para>
   </chapter>
   <chapter>
     <title>Creating and configuring a new NWDI-Project</title>
+    <para></para>
   </chapter>
 </book>
