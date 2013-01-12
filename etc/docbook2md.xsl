@@ -89,6 +89,10 @@
   <xsl:template match="d:programlisting/text()">
     <xsl:call-template name="indent" />
     <xsl:call-template name="newline" />
+<<<<<<< HEAD
+=======
+    <xsl:call-template name="newline" />
+>>>>>>> branch 'master' of https://weigo@github.com/weigo/NWDI-Core-Plugin.git
     <xsl:text>```</xsl:text>
     <xsl:call-template name="newline" />
 
@@ -126,6 +130,10 @@
     <xsl:call-template name="newline" />
     <xsl:text>```</xsl:text>
     <xsl:call-template name="newline" />
+<<<<<<< HEAD
+=======
+    <xsl:call-template name="newline" />
+>>>>>>> branch 'master' of https://weigo@github.com/weigo/NWDI-Core-Plugin.git
   </xsl:template>
 
   <!-- article/title|info -->
