@@ -18,7 +18,6 @@
 
   <xsl:template match="/">
     <xsl:text># </xsl:text>
-    <xsl:apply-templates select="d:info/d:title" />
     <xsl:apply-templates />
   </xsl:template>
 
@@ -71,6 +70,20 @@
     </xsl:choose>
   </xsl:template>
 
+  <xsl:template match="d:title">
+    <xsl:if test="not(parent::d:info/parent::d:book|parent::d:info/parent::d:article)">
+      <xsl:call-template name="newline" />
+      <xsl:call-template name="newline" />
+      <xsl:text>**</xsl:text>
+    </xsl:if>
+    <xsl:call-template name="remove-trailing-ws">
+      <xsl:with-param name="lines" select="." />
+    </xsl:call-template>
+    <xsl:if test="not(parent::d:info/parent::d:book|parent::d:info/parent::d:article)">
+      <xsl:text>**</xsl:text>
+    </xsl:if>
+    <xsl:call-template name="newline" />
+  </xsl:template>
   <!-- programlisting -->
 
   <xsl:template match="d:programlisting/text()">
@@ -119,10 +132,6 @@
 
   <xsl:template match="d:copyright|d:authorgroup" />
 
-  <xsl:template match="d:title/d:info">
-    <xsl:apply-templates />
-  </xsl:template>
-
   <!-- link -->
 
   <xsl:template match="d:link">
@@ -150,19 +159,22 @@
       <xsl:value-of select="$desc" /> <xsl:text>](</xsl:text> <xsl:value-of select="$link-url" /> <xsl:text>)</xsl:text> </xsl:otherwise> </xsl:choose> -->
   </xsl:template>
 
-  <!-- itemizedlist -->
-
   <xsl:template match="d:envar">
     <xsl:text>_</xsl:text>
     <xsl:value-of select="text()" />
     <xsl:text>_</xsl:text>
   </xsl:template>
 
+  <!-- itemizedlist -->
+
+  <xsl:template match="d:itemizedlist">
+    <xsl:call-template name="newline" />
+    <xsl:apply-templates />
+  </xsl:template>
+
   <!-- listitem -->
 
   <xsl:template match="d:listitem">
-    <!-- xsl:variable name="listlevel" select="count(ancestor-or-self::d:listitem)" /> <xsl:if test="not(parent::d:varlistentry)"> <xsl:value-of 
-      select="substring(' ', 1, $listlevel * 3)" /> </xsl:if -->
     <xsl:choose>
       <xsl:when test="parent::d:itemizedlist">
         <xsl:call-template name="newline" />
@@ -175,9 +187,11 @@
         <xsl:apply-templates />
       </xsl:when>
       <xsl:when test="parent::d:varlistentry">
+        <xsl:call-template name="newline" />
         <xsl:text>&lt;td&gt;</xsl:text>
         <xsl:apply-templates />
         <xsl:text>&lt;/td&gt;</xsl:text>
+        <xsl:call-template name="newline" />
       </xsl:when>
     </xsl:choose>
   </xsl:template>
@@ -234,9 +248,11 @@
 
   <!-- varlistentry -->
   <xsl:template match="d:varlistentry">
+    <xsl:call-template name="newline" />
     <xsl:text>&lt;tr&gt;</xsl:text>
     <xsl:apply-templates />
     <xsl:text>&lt;/tr&gt;</xsl:text>
+    <xsl:call-template name="newline" />
   </xsl:template>
 
   <!-- emphasis -->
@@ -326,8 +342,9 @@
   <!-- variablelist -->
 
   <xsl:template match="d:variablelist">
+    <xsl:apply-templates select="d:info/d:title" />
     <xsl:text>&lt;table&gt;</xsl:text>
-    <xsl:apply-templates />
+    <xsl:apply-templates select="d:varlistentry" />
     <xsl:text>&lt;/table&gt;</xsl:text>
   </xsl:template>
 
