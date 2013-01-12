@@ -54,18 +54,22 @@
     <para>
       The plugin is not available through the Jenkins update center yet. To build the plugin you'll need to clone the following GitHub
       repositories:
-      <programlisting>
+    </para>
+    <programlisting>
 <![CDATA[
 git clone git://github.com/weigo/NWDI-config-plugin.git
 git clone git://github.com/weigo/NWDI-pom-Plugin.git
 git clone git://github.com/weigo/NWDI-Core-Plugin.git]]>
-      </programlisting>
+    </programlisting>
+    <para>
       and build the Maven projects:
-      <programlisting>
+    </para>
+    <programlisting>
 <![CDATA[
 for d in NWDI-config-plugin NWDI-pom-Plugin NWDI-Core-Plugin;\
   do (cd $d; mvn install); done]]>
-      </programlisting>
+    </programlisting>
+    <para>
       in
       <filename class='directory'>NWDI-Core-Plugin/target</filename>
       you'll find the
@@ -125,39 +129,43 @@ for d in NWDI-config-plugin NWDI-pom-Plugin NWDI-Core-Plugin;\
         <title>NetWeaver 7.0.x</title>
         <para>
           The call to the Java VM (on Windows) should look like this:
-          <programlisting>
+        </para>
+        <programlisting>
 <![CDATA[call "%JAVA_HOME%\bin\java" -classpath "%startup%" -Xmx256m -Xss20m
   -Ddctool.jarrootdir="%NWDITOOLLIB%"
   -Ddctool.JDK_PROPERTY_NAME="%JDK_PROPERTY_NAME%" %PARAM_JDK% %APPL% %*]]>
-          </programlisting>
+        </programlisting>
+        <para>
           On Unix the VM should be called like this:
-          <programlisting>
+        </para>
+        <programlisting>
 <![CDATA["$JAVA_HOME/bin/java" -classpath "$startup" -Xmx256m -Xss20m\
   -Ddctool.jarrootdir="$NWDITOOLLIB"\
   -Ddctool.JDK_PROPERTY_NAME="$JDK_PROPERTY_NAME" $PARAM_JDK $APPL $*
 ]]>
-          </programlisting>
-        </para>
+        </programlisting>
       </section>
       <section>
         <title>NetWeaver 7.1+</title>
         <para>
           The call to the Java VM (on Windows) should look like this:
-          <programlisting>
+        </para>
+        <programlisting>
 <![CDATA[call "%JAVA_HOME%\bin\java" -classpath "%startup%" -Xmx256m -Xss20m
   -Dappl.jars="%NWDITOOLLIB%"
   -Dappl.classname=com.sap.tc.cetool.DcConsoleApplication
   -Ddctool.JDK_PROPERTY_NAME=%JDK_PROPERTY_NAME% %PARAM_JDK% %APPL% %*
 ]]>
-          </programlisting>
+        </programlisting>
+        <para>
           On a Unix system the shell script should call the Java VM like this:
-          <programlisting>
+        </para>
+        <programlisting>
 <![CDATA["$JAVA_HOME/bin/java" -cp "$startup" -Xmx256m -Xss20m\
   -Dappl.jars="$NWDITOOLLIB"\
   -Dappl.classname=com.sap.tc.cetool.DcConsoleApplication\
   -Ddctool.JDK_PROPERTY_NAME="$JDK_PROPERTY_NAME" $PARAM_JDK $APPL $*]]>
-          </programlisting>
-        </para>
+        </programlisting>
       </section>
     </section>
   </chapter>

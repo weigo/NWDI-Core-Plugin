@@ -24,9 +24,9 @@
   <!-- filename -->
 
   <xsl:template match="d:filename">
-    <xsl:text>**</xsl:text>
-    <xsl:value-of select="text()" />
-    <xsl:text>**</xsl:text>
+    <xsl:text> **</xsl:text>
+    <xsl:apply-templates />
+    <xsl:text>** </xsl:text>
   </xsl:template>
   <!-- imagedata -->
 
@@ -88,9 +88,9 @@
 
   <xsl:template match="d:programlisting/text()">
     <xsl:call-template name="indent" />
-    <xsl:text>
-```
-</xsl:text>
+    <xsl:call-template name="newline" />
+    <xsl:text>```</xsl:text>
+    <xsl:call-template name="newline" />
 
     <xsl:variable name="before" select="count(preceding-sibling::*)" />
     <xsl:variable name="after" select="count(following-sibling::*)" />
@@ -123,9 +123,9 @@
     </xsl:variable>
 
     <xsl:value-of select="$proglist-2" />
-    <xsl:text>
-```
-</xsl:text>
+    <xsl:call-template name="newline" />
+    <xsl:text>```</xsl:text>
+    <xsl:call-template name="newline" />
   </xsl:template>
 
   <!-- article/title|info -->
@@ -160,9 +160,9 @@
   </xsl:template>
 
   <xsl:template match="d:envar">
-    <xsl:text>_</xsl:text>
-    <xsl:value-of select="text()" />
-    <xsl:text>_</xsl:text>
+    <xsl:text> _</xsl:text>
+    <xsl:apply-templates />
+    <xsl:text>_ </xsl:text>
   </xsl:template>
 
   <!-- itemizedlist -->
@@ -351,7 +351,6 @@
   <!-- para -->
 
   <xsl:template match="d:para">
-    <!-- xsl:call-template name="indent" / -->
     <xsl:apply-templates />
     <!-- Add a newline for a para in listitem or section. This newline is always required in these two situations (and we have special handling 
       for listitem too). -->
@@ -494,23 +493,8 @@
         <xsl:with-param name="input-str" select="translate(., '&#xA;&#xD;', ' ')" />
       </xsl:call-template>
     </xsl:variable>
-    <xsl:choose>
-      <!-- Remove leading spaces in a para -->
-      <xsl:when test="parent::d:para and count(preceding-sibling::*) = 0">
-        <xsl:if test="not(parent::d:para/parent::d:listitem)">
-          <xsl:call-template name="newline" />
-        </xsl:if>
-        <xsl:call-template name="remove-leading-spaces">
-          <xsl:with-param name="text" select="$oneline" />
-        </xsl:call-template>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:call-template name="remove-trailing-ws">
-          <xsl:with-param name="lines" select="$oneline" />
-        </xsl:call-template>
-      </xsl:otherwise>
-    </xsl:choose>
-    <xsl:text> </xsl:text>
+
+    <xsl:value-of select="normalize-space($oneline)" />
   </xsl:template>
 
   <xsl:template name="remove-leading-spaces">
