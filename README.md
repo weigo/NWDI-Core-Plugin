@@ -17,16 +17,20 @@ The plugin also exposes an object model to be used by other plugins to add funct
 
 
 The plugin is not available through the Jenkins update center yet. To build the plugin you'll need to clone the following GitHub       repositories:        
+
 ```
 git clone git://github.com/weigo/NWDI-config-plugin.git
 git clone git://github.com/weigo/NWDI-pom-Plugin.git
 git clone git://github.com/weigo/NWDI-Core-Plugin.git
 ```
+
        and build the Maven projects: 
+
 ```
 for d in NWDI-config-plugin NWDI-pom-Plugin NWDI-Core-Plugin;\
   do (cd $d; mvn install); done
 ```
+
        in **NWDI-Core-Plugin/target**       you'll find the **NWDI-Core-Plugin.hpi**       file which you should upload using the Jenkins update center       extended       settings view. 
 ## NetWeaver DI command line tools installation 
 
@@ -57,12 +61,15 @@ On Unix systems please verify the encoding/line endings of the modified shell sc
 
 
 The call to the Java VM (on Windows) should look like this:            
+
 ```
 call "%JAVA_HOME%\bin\java" -classpath "%startup%" -Xmx256m -Xss20m
   -Ddctool.jarrootdir="%NWDITOOLLIB%"
   -Ddctool.JDK_PROPERTY_NAME="%JDK_PROPERTY_NAME%" %PARAM_JDK% %APPL% %*
 ```
+
            On Unix the VM should be called like this: 
+
 ```
 "$JAVA_HOME/bin/java" -classpath "$startup" -Xmx256m -Xss20m\
   -Ddctool.jarrootdir="$NWDITOOLLIB"\
@@ -70,23 +77,28 @@ call "%JAVA_HOME%\bin\java" -classpath "%startup%" -Xmx256m -Xss20m
 ```
 
 
+
 #### NetWeaver 7.1+ 
 
 
 The call to the Java VM (on Windows) should look like this:            
+
 ```
 call "%JAVA_HOME%\bin\java" -classpath "%startup%" -Xmx256m -Xss20m
   -Dappl.jars="%NWDITOOLLIB%"
   -Dappl.classname=com.sap.tc.cetool.DcConsoleApplication
   -Ddctool.JDK_PROPERTY_NAME=%JDK_PROPERTY_NAME% %PARAM_JDK% %APPL% %*
 ```
+
            On a Unix system the shell script should call the Java VM like this: 
+
 ```
 "$JAVA_HOME/bin/java" -cp "$startup" -Xmx256m -Xss20m\
   -Dappl.jars="$NWDITOOLLIB"\
   -Dappl.classname=com.sap.tc.cetool.DcConsoleApplication\
   -Ddctool.JDK_PROPERTY_NAME="$JDK_PROPERTY_NAME" $PARAM_JDK $APPL $*
 ```
+
 
 
 ## Global configuration 
@@ -118,4 +130,4 @@ call "%JAVA_HOME%\bin\java" -classpath "%startup%" -Xmx256m -Xss20m
 <td>This plugin uses the copy and paste detector (CPD) of                <a href="http://pmd.sourceforge.net">PMD </a>               to detect duplicated code in development components. The results of this analysis can be visualized using the                <a href="https://wiki.jenkins-ci.org/display/JENKINS/PMD+Plugin">Jenkins PMD plugin </a>               . </td>
 </tr>
 </table>
-New plugins (e.g. FindBugs integration) using the provided infrastructure can easily be created using the plugins       mentioned above       as an example.     
+New plugins (e.g. FindBugs integration) using the provided infrastructure can easily be created using the plugins       mentioned above       as an example.      

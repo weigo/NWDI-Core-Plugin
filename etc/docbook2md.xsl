@@ -88,9 +88,10 @@
 
   <xsl:template match="d:programlisting/text()">
     <xsl:call-template name="indent" />
-    <xsl:text>
-```
-</xsl:text>
+    <xsl:call-template name="newline" />
+    <xsl:call-template name="newline" />
+    <xsl:text>```</xsl:text>
+    <xsl:call-template name="newline" />
 
     <xsl:variable name="before" select="count(preceding-sibling::*)" />
     <xsl:variable name="after" select="count(following-sibling::*)" />
@@ -123,9 +124,10 @@
     </xsl:variable>
 
     <xsl:value-of select="$proglist-2" />
-    <xsl:text>
-```
-</xsl:text>
+    <xsl:call-template name="newline" />
+    <xsl:text>```</xsl:text>
+    <xsl:call-template name="newline" />
+    <xsl:call-template name="newline" />
   </xsl:template>
 
   <!-- article/title|info -->
@@ -351,7 +353,6 @@
   <!-- para -->
 
   <xsl:template match="d:para">
-    <!-- xsl:call-template name="indent" / -->
     <xsl:apply-templates />
     <!-- Add a newline for a para in listitem or section. This newline is always required in these two situations (and we have special handling 
       for listitem too). -->
