@@ -52,6 +52,7 @@ import net.sf.json.JSONObject;
 
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 import org.arachna.netweaver.dc.types.JdkHomePaths;
+import org.arachna.netweaver.tools.DIToolCommandExecutionResult;
 import org.arachna.netweaver.tools.DIToolDescriptor;
 import org.arachna.netweaver.tools.cbs.CBSToolCommandExecutor;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -216,7 +217,12 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
     void updateDevelopmentConfiguration(final PrintStream logger, final FilePath dtcFolder) throws IOException,
         InterruptedException {
         logger.println(Messages.NWDIProject_updating_development_configuration());
-        getDescriptor().createCBSToolExecutor(dtcFolder).updateDevelopmentConfiguration(buildSpaceName, ".confdef");
+        final DIToolCommandExecutionResult result =
+            getDescriptor().createCBSToolExecutor(dtcFolder).updateDevelopmentConfiguration(buildSpaceName, ".confdef");
+
+        if (!result.isExitCodeOk()) {
+            logger.println(result.getOutput());
+        }
     }
 
     /**
