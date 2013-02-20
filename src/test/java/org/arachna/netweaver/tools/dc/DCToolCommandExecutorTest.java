@@ -145,9 +145,6 @@ public class DCToolCommandExecutorTest {
             throw new RuntimeException(e);
             // fail(e.getMessage());
         }
-        catch (final InterruptedException e) {
-            fail(e.getMessage());
-        }
     }
 
     /**

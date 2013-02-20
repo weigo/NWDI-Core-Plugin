@@ -32,13 +32,9 @@
 
   <xsl:template match="d:imagedata">
     <xsl:if test="parent::d:imageobject[@role!='fo' or not(@role)]">
-      <xsl:text>&lt;img src="%ATTACHURL%/</xsl:text>
-      <xsl:call-template name="getfilename">
-        <xsl:with-param name="fileref">
-          <xsl:value-of select="@fileref" />
-        </xsl:with-param>
-      </xsl:call-template>
-      <xsl:text>"&gt;</xsl:text>
+      <xsl:text>![](</xsl:text>
+      <xsl:value-of select="@fileref" />
+      <xsl:text>)</xsl:text>
       <xsl:call-template name="newline" />
     </xsl:if>
   </xsl:template>
@@ -89,10 +85,6 @@
   <xsl:template match="d:programlisting/text()">
     <xsl:call-template name="indent" />
     <xsl:call-template name="newline" />
-<<<<<<< HEAD
-=======
-    <xsl:call-template name="newline" />
->>>>>>> branch 'master' of https://weigo@github.com/weigo/NWDI-Core-Plugin.git
     <xsl:text>```</xsl:text>
     <xsl:call-template name="newline" />
 
@@ -130,10 +122,6 @@
     <xsl:call-template name="newline" />
     <xsl:text>```</xsl:text>
     <xsl:call-template name="newline" />
-<<<<<<< HEAD
-=======
-    <xsl:call-template name="newline" />
->>>>>>> branch 'master' of https://weigo@github.com/weigo/NWDI-Core-Plugin.git
   </xsl:template>
 
   <!-- article/title|info -->

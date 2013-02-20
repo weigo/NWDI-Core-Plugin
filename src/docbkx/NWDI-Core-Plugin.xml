@@ -171,7 +171,22 @@ for d in NWDI-config-plugin NWDI-pom-Plugin NWDI-Core-Plugin;\
   </chapter>
   <chapter>
     <title>Global configuration</title>
-    <para></para>
+    <para>
+      After installation of the NWDI-Core-Plugin you'll find a new section
+      <emphasis>NetWeaver development infrastructure</emphasis>
+      on the Jenkins global configuration page.
+    </para>
+    <figure>
+      <info>
+        <title>global settings for the Jenkins NWDI-Core-Plugin</title>
+      </info>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="images/Jenkins-Global-Configuration-NWDI-Section.png" format="PNG" />
+        </imageobject>
+      </mediaobject>
+    </figure>
+    <para>Enter the </para>
   </chapter>
   <chapter>
     <title>Creating and configuring a new NWDI-Project</title>
