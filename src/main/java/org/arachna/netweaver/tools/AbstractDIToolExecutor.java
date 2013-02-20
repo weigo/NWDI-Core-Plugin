@@ -95,11 +95,8 @@ public abstract class AbstractDIToolExecutor {
      * @throws IOException
      *             might be thrown be the {@link ProcStarter} used to execute
      *             the DC tool commands.
-     * @throws InterruptedException
-     *             when the user canceled the action.
      */
-    public DIToolCommandExecutionResult execute(final DIToolCommandBuilder commandBuilder) throws IOException,
-        InterruptedException {
+    public DIToolCommandExecutionResult execute(final DIToolCommandBuilder commandBuilder) throws IOException {
         final ProcStarter starter = launcher.launch();
         starter.pwd(workspace);
         starter.envs(createEnvironment());
@@ -112,7 +109,14 @@ public abstract class AbstractDIToolExecutor {
         final ForkOutputStream tee = new ForkOutputStream(launcher.getListener().getLogger(), result);
         starter.stdout(tee);
 
-        final int exitCode = starter.join();
+        int exitCode = -1;
+
+        try {
+            exitCode = starter.join();
+        }
+        catch (final InterruptedException e) {
+            result.write("\nOperation has been interrupted!".getBytes());
+        }
 
         return new DIToolCommandExecutionResult(result.toString(), exitCode);
     }
