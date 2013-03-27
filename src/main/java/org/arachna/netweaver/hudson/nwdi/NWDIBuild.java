@@ -38,6 +38,7 @@ import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 import org.arachna.netweaver.hudson.dtr.browser.Activity;
 import org.arachna.netweaver.hudson.dtr.browser.ActivityResource;
+import org.arachna.netweaver.hudson.nwdi.DCBuildResultParser.BuildResults;
 import org.arachna.netweaver.hudson.nwdi.confdef.ConfDefReader;
 import org.arachna.netweaver.hudson.util.FilePathHelper;
 import org.arachna.netweaver.tools.DIToolCommandExecutionResult;
@@ -115,8 +116,7 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
         if (developmentConfiguration == null) {
             try {
                 final ConfDefReader confdefReader = new ConfDefReader();
-                new XmlReaderHelper(confdefReader).parse(new StringReader(getDtcFolder().child(".confdef")
-                    .readToString()));
+                new XmlReaderHelper(confdefReader).parse(new StringReader(getDtcFolder().child(".confdef").readToString()));
                 developmentConfiguration = confdefReader.getDevelopmentConfiguration();
             }
             catch (final SAXException e) {
@@ -417,8 +417,7 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
          * @throws InterruptedException
          *             when the build was interrupted
          */
-        private boolean build(final Collection<Builder> steps, final AntHelper antHelper) throws IOException,
-            InterruptedException {
+        private boolean build(final Collection<Builder> steps, final AntHelper antHelper) throws IOException, InterruptedException {
             for (final BuildStep bs : steps) {
                 if (AntTaskBuilder.class.isAssignableFrom(bs.getClass())) {
                     ((AntTaskBuilder)bs).setAntHelper(antHelper);
@@ -449,8 +448,9 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
             final Collection<DevelopmentComponent> affectedComponents = nwdiBuild.getAffectedDevelopmentComponents();
 
             DIToolCommandExecutionResult result = new DIToolCommandExecutionResult("", 0);
+            final boolean dryRun = Boolean.getBoolean("nwdibuild.dry.run");
 
-            if (!affectedComponents.isEmpty()) {
+            if (!dryRun && !affectedComponents.isEmpty()) {
                 logger.println(Messages.NWDIBuild_building_development_components(affectedComponents.size()));
 
                 for (final DevelopmentComponent component : affectedComponents) {
@@ -458,23 +458,35 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
                 }
 
                 result = getDCToolExecutor(launcher).buildDevelopmentComponents(affectedComponents);
+                final DCBuildResultParser buildResultParser = new DCBuildResultParser(nwdiBuild.getDevelopmentConfiguration());
+                final BuildResults buildResults = buildResultParser.parse(new StringReader(result.getOutput()));
+
+                if (buildResults.hasBuildErrors()) {
+                    // any value other than 0 signifies an error
+                    result = new DIToolCommandExecutionResult(result.getOutput(), 1);
+
+                    // for (final DevelopmentComponent dcWithFailedBuild :
+                    // buildResults.getDcsWithBuildErrors()) {
+                    // nwdiBuild.addAction(new
+                    // FailedBuildsAction(dcWithFailedBuild));
+                    // }
+                }
             }
 
-            // update the generated build.xml files project tag for the static
-            // analysis tools to recognize modules.
-            for (final DevelopmentComponent component : affectedComponents) {
-                final FilePath buildXml =
-                    nwdiBuild.getDtcFolder().child(
-                        String.format("DCs/%s/%s/_comp/gen/default/logs/build.xml", component.getVendor(),
-                            component.getName()));
+            if (result.isExitCodeOk()) {
+                // update the generated build.xml files project tag for the
+                // static analysis tools to recognize modules.
+                for (final DevelopmentComponent component : affectedComponents) {
+                    final FilePath buildXml =
+                        nwdiBuild.getDtcFolder().child(
+                            String.format("DCs/%s/%s/_comp/gen/default/logs/build.xml", component.getVendor(), component.getName()));
 
-                if (buildXml.exists()) {
-                    final String content =
-                        buildXml.readToString().replaceFirst(
-                            "project name=\"DC Build\"",
-                            String.format("project name=\"%s~%s\"", component.getVendor(),
-                                component.getName().replace('/', '~')));
-                    buildXml.write(content, DEFAULT_ENCODING);
+                    if (buildXml.exists()) {
+                        final String content =
+                            buildXml.readToString().replaceFirst("project name=\"DC Build\"",
+                                String.format("project name=\"%s~%s\"", component.getVendor(), component.getName().replace('/', '~')));
+                        buildXml.write(content, DEFAULT_ENCODING);
+                    }
                 }
             }
 
@@ -498,8 +510,7 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
             try {
                 final FilePath devConfXml = getWorkspace().child("DevelopmentConfiguration.xml");
                 content = new OutputStreamWriter(devConfXml.write(), DEFAULT_ENCODING);
-                final DevelopmentConfigurationXmlWriter xmlWriter =
-                    new DevelopmentConfigurationXmlWriter(getDevelopmentConfiguration());
+                final DevelopmentConfigurationXmlWriter xmlWriter = new DevelopmentConfigurationXmlWriter(getDevelopmentConfiguration());
                 xmlWriter.write(content);
             }
             catch (final XMLStreamException e) {
@@ -528,8 +539,7 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
          * @param antHelper
          */
         private void updateSourceCodeLocations(final AntHelper antHelper) {
-            final Collection<Compartment> compartments =
-                getDevelopmentConfiguration().getCompartments(CompartmentState.Source);
+            final Collection<Compartment> compartments = getDevelopmentConfiguration().getCompartments(CompartmentState.Source);
 
             for (final Compartment compartment : compartments) {
                 for (final DevelopmentComponent component : compartment.getDevelopmentComponents()) {
