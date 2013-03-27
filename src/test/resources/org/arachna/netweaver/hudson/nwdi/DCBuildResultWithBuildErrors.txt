@@ -1,0 +1,36 @@
+[ENVPRJ] $ cmd.exe /C C:\TEMP\di_cmd_tools\dc\dctool.bat && exit %%ERRORLEVEL%%
+dc>Started spool into spool.txt
+dc>dc>Execution time reporting switched on.
+Execution time: 0 [ms]
+dc>No archive pool provider will be created since no archive pool root has been specified.
+
+Successfully imported development configuration "DI0_Example_D".
+Configuration data is located under directory "c:\tmp\jenkins\workspace\Example\.dtc".
+Execution time: 247117 [ms]
+dc>Retrieving / updating DC meta data for compartment example.org_EXAMPLE_SC_1, this may take a while ... 
+
+Preparing DC build ...
+Start DC build ...
+"Build of DC "sc/example_sc_description" from  compartment "example.org_EXAMPLE_SC_1" based on sync mode "SYNCHED_AS_INACTIVE_SOURCE" 
+and build variant default finished with result: success.
+Finished 1 DC build(s).
+1 build(s) succeeded (or yield warnings), 0 build(s) failed.
+Execution time: 752 [ms]
+dc>Retrieving / updating DC meta data for compartment example.org_EXAMPLE_SC_1, this may take a while ... 
+Preparing DC build ...
+Start DC build ...
+"Build of DC "example/dc1" from  compartment "example.org_EXAMPLE_SC_1" based on sync mode "SYNCHED_AS_INACTIVE_SOURCE" 
+and build variant default finished with result: build error.
+Finished 1 DC build(s).
+0 build(s) succeeded (or yield warnings), 1 build(s) failed.
+Execution time: 528 [ms]
+dc>Retrieving / updating DC meta data for compartment example.org_EXAMPLE_SC_1, this may take a while ... 
+
+Preparing DC build ...
+Start DC build ...
+
+"Build of DC "example/dc2" from  compartment "example.org_EXAMPLE_SC_1" based on sync mode "SYNCHED_AS_INACTIVE_SOURCE" 
+and build variant default finished with result: build error.
+Finished 1 DC build(s).
+0 build(s) succeeded (or yield warnings), 1 build(s) failed.
+Execution time: 1357 [ms]
