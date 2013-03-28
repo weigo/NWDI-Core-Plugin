@@ -115,8 +115,7 @@ public final class Compartment {
      */
     private void validateString(final String argument, final String argumentName) {
         if (argument == null || argument.trim().length() == 0) {
-            final IllegalArgumentException iae =
-                new IllegalArgumentException(String.format(NULL_OR_EMPTY_ARGUMENT_MESSAGE, argumentName));
+            final IllegalArgumentException iae = new IllegalArgumentException(String.format(NULL_OR_EMPTY_ARGUMENT_MESSAGE, argumentName));
             iae.fillInStackTrace();
             throw iae;
         }
@@ -420,8 +419,8 @@ public final class Compartment {
      */
     @Override
     public String toString() {
-        return "Compartment [developmentConfiguration=" + developmentConfiguration + ", name=" + name
-            + ", softwareComponent=" + softwareComponent + ", state=" + state + ", vendor=" + vendor + "]";
+        return "Compartment [developmentConfiguration=" + developmentConfiguration + ", name=" + name + ", softwareComponent="
+            + softwareComponent + ", state=" + state + ", vendor=" + vendor + "]";
     }
 
     /*
@@ -450,9 +449,8 @@ public final class Compartment {
                 final Compartment other = (Compartment)obj;
 
                 result =
-                    Arrays.equals(new Object[] { developmentConfiguration, softwareComponent, name, vendor },
-                        new Object[] { other.developmentConfiguration, other.softwareComponent, other.name,
-                            other.vendor });
+                    Arrays.equals(new Object[] { developmentConfiguration, softwareComponent, name, vendor }, new Object[] {
+                        other.developmentConfiguration, other.softwareComponent, other.name, other.vendor });
             }
         }
 
@@ -482,6 +480,27 @@ public final class Compartment {
     }
 
     /**
+     * Find a development component by its name.
+     * 
+     * @param dcName
+     *            name of the DC to find
+     * @return the DC matching the given dc name or <code>null</code>, when none
+     *         could be found.
+     */
+    public DevelopmentComponent getDevelopmentComponent(final String dcName) {
+        DevelopmentComponent component = null;
+
+        for (final DevelopmentComponent dc : this.components) {
+            if (dc.getName().equals(dcName)) {
+                component = dc;
+                break;
+            }
+        }
+
+        return component;
+    }
+
+    /**
      * Factory method for compartments.
      * 
      * @param vendor
@@ -495,8 +514,7 @@ public final class Compartment {
      *            short description
      * @return new compartment.
      */
-    public static Compartment create(final String vendor, final String name, final CompartmentState state,
-        final String caption) {
+    public static Compartment create(final String vendor, final String name, final CompartmentState state, final String caption) {
         return new Compartment(String.format("%s_%s_1", vendor, name), state, vendor, caption, name);
 
     }
