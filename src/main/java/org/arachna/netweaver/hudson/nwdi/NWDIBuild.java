@@ -15,10 +15,8 @@ import hudson.tasks.Publisher;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.StringReader;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -26,11 +24,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import javax.xml.stream.XMLStreamException;
-
 import org.arachna.ant.AntHelper;
 import org.arachna.ant.ExcludesFactory;
-import org.arachna.netweaver.dc.config.DevelopmentConfigurationXmlWriter;
 import org.arachna.netweaver.dc.types.Compartment;
 import org.arachna.netweaver.dc.types.CompartmentState;
 import org.arachna.netweaver.dc.types.DevelopmentComponent;
@@ -116,7 +111,8 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
         if (developmentConfiguration == null) {
             try {
                 final ConfDefReader confdefReader = new ConfDefReader();
-                new XmlReaderHelper(confdefReader).parse(new StringReader(getDtcFolder().child(".confdef").readToString()));
+                new XmlReaderHelper(confdefReader).parse(new StringReader(getDtcFolder().child(".confdef")
+                    .readToString()));
                 developmentConfiguration = confdefReader.getDevelopmentConfiguration();
             }
             catch (final SAXException e) {
@@ -390,7 +386,6 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
 
             if (Result.SUCCESS.equals(result)) {
                 updateSourceCodeLocations(antHelper);
-                writeDevelopmentConfiguration(listener.getLogger());
             }
 
             if (Result.SUCCESS.equals(result) && !build(project.getBuilders(), antHelper)) {
@@ -417,7 +412,8 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
          * @throws InterruptedException
          *             when the build was interrupted
          */
-        private boolean build(final Collection<Builder> steps, final AntHelper antHelper) throws IOException, InterruptedException {
+        private boolean build(final Collection<Builder> steps, final AntHelper antHelper) throws IOException,
+            InterruptedException {
             for (final BuildStep bs : steps) {
                 if (AntTaskBuilder.class.isAssignableFrom(bs.getClass())) {
                     ((AntTaskBuilder)bs).setAntHelper(antHelper);
@@ -458,7 +454,8 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
                 }
 
                 result = getDCToolExecutor(launcher).buildDevelopmentComponents(affectedComponents);
-                final DCBuildResultParser buildResultParser = new DCBuildResultParser(nwdiBuild.getDevelopmentConfiguration());
+                final DCBuildResultParser buildResultParser =
+                    new DCBuildResultParser(nwdiBuild.getDevelopmentConfiguration());
                 final BuildResults buildResults = buildResultParser.parse(new StringReader(result.getOutput()));
 
                 if (buildResults.hasBuildErrors()) {
@@ -479,48 +476,21 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
                 for (final DevelopmentComponent component : affectedComponents) {
                     final FilePath buildXml =
                         nwdiBuild.getDtcFolder().child(
-                            String.format("DCs/%s/%s/_comp/gen/default/logs/build.xml", component.getVendor(), component.getName()));
+                            String.format("DCs/%s/%s/_comp/gen/default/logs/build.xml", component.getVendor(),
+                                component.getName()));
 
                     if (buildXml.exists()) {
                         final String content =
-                            buildXml.readToString().replaceFirst("project name=\"DC Build\"",
-                                String.format("project name=\"%s~%s\"", component.getVendor(), component.getName().replace('/', '~')));
+                            buildXml.readToString().replaceFirst(
+                                "project name=\"DC Build\"",
+                                String.format("project name=\"%s~%s\"", component.getVendor(), component.getName()
+                                    .replace('/', '~')));
                         buildXml.write(content, DEFAULT_ENCODING);
                     }
                 }
             }
 
             return result;
-        }
-
-        /**
-         * Saves the current development configuration as XML to the workspace
-         * folder.
-         * 
-         * @param logger
-         *            logger for logging exceptions
-         * @throws IOException
-         *             re-thrown from {@link FilePath} operations
-         * @throws InterruptedException
-         *             re-thrown from {@link FilePath} operations
-         */
-        private void writeDevelopmentConfiguration(final PrintStream logger) throws IOException, InterruptedException {
-            Writer content = null;
-
-            try {
-                final FilePath devConfXml = getWorkspace().child("DevelopmentConfiguration.xml");
-                content = new OutputStreamWriter(devConfXml.write(), DEFAULT_ENCODING);
-                final DevelopmentConfigurationXmlWriter xmlWriter = new DevelopmentConfigurationXmlWriter(getDevelopmentConfiguration());
-                xmlWriter.write(content);
-            }
-            catch (final XMLStreamException e) {
-                e.printStackTrace(logger);
-            }
-            finally {
-                if (content != null) {
-                    content.close();
-                }
-            }
         }
 
         /**
@@ -539,7 +509,8 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
          * @param antHelper
          */
         private void updateSourceCodeLocations(final AntHelper antHelper) {
-            final Collection<Compartment> compartments = getDevelopmentConfiguration().getCompartments(CompartmentState.Source);
+            final Collection<Compartment> compartments =
+                getDevelopmentConfiguration().getCompartments(CompartmentState.Source);
 
             for (final Compartment compartment : compartments) {
                 for (final DevelopmentComponent component : compartment.getDevelopmentComponents()) {
