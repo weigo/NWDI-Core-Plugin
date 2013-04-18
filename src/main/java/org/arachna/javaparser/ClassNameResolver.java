@@ -18,6 +18,11 @@ import java.util.Map;
  */
 public class ClassNameResolver {
     /**
+     * constant for java.lang package.
+     */
+    private static final String JAVA_LANG = "java.lang.";
+
+    /**
      * a class name ending with [] indicates an array.
      */
     private static final String BRACKETS = "[]";
@@ -85,7 +90,7 @@ public class ClassNameResolver {
         }
 
         if (isFromJavaLangPackage(resolvedClassName)) {
-            resolvedClassName = "java.lang." + resolvedClassName;
+            resolvedClassName = JAVA_LANG + resolvedClassName;
         }
         else if (classNameMapping.containsKey(resolvedClassName)) {
             resolvedClassName = classNameMapping.get(resolvedClassName).toString();
@@ -98,15 +103,19 @@ public class ClassNameResolver {
     }
 
     /**
-     * @param resolvedClassName
-     * @return
-     * @throws ClassNotFoundException
+     * Determine whether the given class name can be loaded from the 'java.lang'
+     * package.
+     * 
+     * @param className
+     *            the class name to resolve from the 'java.lang' package.
+     * @return <code>true</code> when the given name can be loaded from the
+     *         'java.lang' package, <code>false</code> otherwise.
      */
-    protected boolean isFromJavaLangPackage(final String resolvedClassName) {
+    protected boolean isFromJavaLangPackage(final String className) {
         boolean result = false;
 
         try {
-            result = getClass().getClassLoader().loadClass("java.lang." + resolvedClassName) != null;
+            result = getClass().getClassLoader().loadClass(JAVA_LANG + className) != null;
         }
         catch (final ClassNotFoundException e) {
             // ignore exception when constructed class could not be loaded.
