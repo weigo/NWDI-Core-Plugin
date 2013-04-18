@@ -101,8 +101,9 @@ public final class DIToolDescriptor {
      * 
      * @param alias
      *            the <code>JdkHomeAlias</code> the JavaHome folder shall be
-     *            returned.
-     * @return the registered JavaHome folder or <code>null</code>.
+     *            returned for.
+     * @return the registered JavaHome folder or the value of the system
+     *         property <code>java.home</code> if no alias was registered.
      */
     String getJavaHome(final JdkHomeAlias alias) {
         return paths.get(alias);
