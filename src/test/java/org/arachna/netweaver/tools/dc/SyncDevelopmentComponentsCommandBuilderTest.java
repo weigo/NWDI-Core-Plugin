@@ -16,7 +16,6 @@ import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 import org.arachna.netweaver.dc.types.JdkHomeAlias;
 import org.arachna.netweaver.dc.types.PublicPartReference;
-import org.arachna.netweaver.tools.dc.SyncDevelopmentComponentsCommandBuilder;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -78,8 +77,7 @@ public class SyncDevelopmentComponentsCommandBuilderTest {
         config = new DevelopmentConfiguration("DI0_Example_D");
 
         final BuildVariant buildVariant = new BuildVariant("default");
-        buildVariant.addBuildOption(DevelopmentConfiguration.COM_SAP_JDK_HOME_PATH_KEY,
-            JdkHomeAlias.Jdk131Home.toString());
+        buildVariant.addBuildOption(BuildVariant.COM_SAP_JDK_HOME_PATH_KEY, JdkHomeAlias.Jdk131Home.toString());
 
         config.setBuildVariant(buildVariant);
     }

@@ -20,12 +20,6 @@ import java.util.Set;
  */
 public final class DevelopmentConfiguration {
     /**
-     * constant for JDK to be used to build DCs.
-     */
-    // FIXME: Move to BuildOption enumeration!
-    public static final String COM_SAP_JDK_HOME_PATH_KEY = "com.sap.jdk.home_path_key";
-
-    /**
      * Location of this development configuration in the file system.
      */
     private String location;
@@ -389,7 +383,11 @@ public final class DevelopmentConfiguration {
         JdkHomeAlias alias = null;
 
         if (buildVariant != null) {
-            alias = JdkHomeAlias.fromString(buildVariant.getBuildOption(COM_SAP_JDK_HOME_PATH_KEY));
+            alias = JdkHomeAlias.fromString(buildVariant.getJdkHomePath());
+        }
+
+        if (alias == null) {
+            alias = JdkHomeAlias.fromJavaVersion();
         }
 
         return alias;

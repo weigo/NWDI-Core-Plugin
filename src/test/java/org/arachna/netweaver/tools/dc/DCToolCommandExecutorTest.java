@@ -3,7 +3,6 @@
  */
 package org.arachna.netweaver.tools.dc;
 
-import static org.junit.Assert.fail;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.Util;
@@ -69,16 +68,12 @@ public class DCToolCommandExecutorTest {
      *             test scripts
      * 
      * @throws IOException
-     *             rethrown when creating the DCToolCommandExecutor fails
+     *             re-thrown when creating the DCToolCommandExecutor fails
      * @throws InterruptedException
      */
     @Before
     public void setUp() throws IOException, InterruptedException {
         testDirectory = Util.createTempDir();
-
-        if (testDirectory == null || !testDirectory.exists()) {
-            fail("Could not create " + testDirectory.getAbsolutePath());
-        }
 
         final FilePath testFolder = new FilePath(testDirectory);
         final FilePath dctoolSh = testFolder.child("dc/dctool.sh");
@@ -101,8 +96,7 @@ public class DCToolCommandExecutorTest {
      */
     private DCToolCommandExecutor createDCToolCommandExecutor() throws IOException {
         final BuildVariant buildVariant = new BuildVariant("default");
-        buildVariant.addBuildOption(DevelopmentConfiguration.COM_SAP_JDK_HOME_PATH_KEY,
-            JdkHomeAlias.Jdk131Home.toString());
+        buildVariant.addBuildOption(BuildVariant.COM_SAP_JDK_HOME_PATH_KEY, JdkHomeAlias.Jdk131Home.toString());
 
         final JdkHomePaths paths = new JdkHomePaths();
         paths.add(JdkHomeAlias.Jdk131Home, testDirectory.getAbsolutePath());

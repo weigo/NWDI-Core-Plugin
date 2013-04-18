@@ -3,9 +3,6 @@
  */
 package org.arachna.netweaver.dc.types;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Aliases for JDK homes in NWDI.
  * 
@@ -33,17 +30,6 @@ public enum JdkHomeAlias {
     Jdk160Home("JDK1.6.0_HOME", "1.6");
 
     /**
-     * Aliases for JDK homes in NWDI.
-     */
-    private static final Map<String, JdkHomeAlias> ALIASES = new HashMap<String, JdkHomeAlias>();
-
-    static {
-        for (final JdkHomeAlias alias : values()) {
-            ALIASES.put(alias.toString(), alias);
-        }
-    }
-
-    /**
      * Name of the alias.
      */
     private String alias;
@@ -52,13 +38,6 @@ public enum JdkHomeAlias {
      * Java source version.
      */
     private String sourceVersion;
-
-    /**
-     * @return the sourceVersion
-     */
-    public String getSourceVersion() {
-        return sourceVersion;
-    }
 
     /**
      * Alias for a JDK installation.
@@ -71,6 +50,13 @@ public enum JdkHomeAlias {
     JdkHomeAlias(final String alias, final String sourceVersion) {
         this.alias = alias;
         this.sourceVersion = sourceVersion;
+    }
+
+    /**
+     * @return the sourceVersion
+     */
+    public String getSourceVersion() {
+        return sourceVersion;
     }
 
     /**
@@ -91,6 +77,30 @@ public enum JdkHomeAlias {
      * @return the alias found or <code>null</code>.
      */
     public static JdkHomeAlias fromString(final String value) {
-        return ALIASES.get(value);
+        for (final JdkHomeAlias alias : values()) {
+            if (alias.alias.equals(value)) {
+                return alias;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Get the alias for the Java version Jenkins is running in.
+     * 
+     * @return the alias matching the Java version or {@link Jdk160Home} when no
+     *         match could be found (i.e. it's running Java 7 or higher).
+     */
+    public static JdkHomeAlias fromJavaVersion() {
+        final String version = System.getProperty("java.version");
+
+        for (final JdkHomeAlias alias : values()) {
+            if (version.startsWith(alias.getSourceVersion())) {
+                return alias;
+            }
+        }
+
+        return Jdk160Home;
     }
 }
