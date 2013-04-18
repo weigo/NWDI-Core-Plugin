@@ -214,13 +214,10 @@ public abstract class AbstractDIToolExecutor {
         final JdkHomeAlias alias = developmentConfiguration.getJdkHomeAlias();
 
         if (alias != null) {
-            environment.put(JAVA_HOME, getDiToolDescriptor().getJavaHome(alias));
             environment.put("JDK_PROPERTY_NAME", alias.toString());
         }
-        else {
-            environment.put(JAVA_HOME, System.getProperty("java.home"));
 
-        }
+        environment.put(JAVA_HOME, getDiToolDescriptor().getJavaHome(alias));
 
         return environment;
     }
