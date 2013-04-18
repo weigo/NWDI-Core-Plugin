@@ -23,38 +23,6 @@ public class ClassNameResolver {
     private static final String BRACKETS = "[]";
 
     /**
-     * Mapping for classes in java.lang.
-     */
-    @SuppressWarnings("serial")
-    private static final Map<String, String> JAVA_LANG = new HashMap<String, String>() {
-        {
-            for (final String className : new String[] { "Appendable", "CharSequence", "Cloneable", "Comparable",
-                "Iterable", "Readable", "Runnable", "Thread.UncaughtExceptionHandler", "Boolean", "Byte", "Character",
-                "Character.Subset", "Character.UnicodeBlock", "Class", "ClassLoader", "Compiler", "Double", "Enum",
-                "Float", "InheritableThreadLocal", "Integer", "Long", "Math", "Number", "Object", "Package", "Process",
-                "ProcessBuilder", "Runtime", "RuntimePermission", "SecurityManager", "Short", "StackTraceElement",
-                "StrictMath", "String", "StringBuffer", "StringBuilder", "System", "Thread", "ThreadGroup",
-                "ThreadLocal", "Throwable", "Void", "Thread.State", "ArithmeticException",
-                "ArrayIndexOutOfBoundsException", "ArrayStoreException", "ClassCastException",
-                "ClassNotFoundException", "CloneNotSupportedException", "EnumConstantNotPresentException", "Exception",
-                "IllegalAccessException", "IllegalArgumentException", "IllegalMonitorStateException",
-                "IllegalStateException", "IllegalThreadStateException", "IndexOutOfBoundsException",
-                "InstantiationException", "InterruptedException", "NegativeArraySizeException", "NoSuchFieldException",
-                "NoSuchMethodException", "NullPointerException", "NumberFormatException", "RuntimeException",
-                "SecurityException", "StringIndexOutOfBoundsException", "TypeNotPresentException",
-                "UnsupportedOperationException", "AbstractMethodError", "AssertionError", "ClassCircularityError",
-                "ClassFormatError", "Error", "ExceptionInInitializerError", "IllegalAccessError",
-                "IncompatibleClassChangeError", "InstantiationError", "InternalError", "LinkageError",
-                "NoClassDefFoundError", "NoSuchFieldError", "NoSuchMethodError", "OutOfMemoryError",
-                "StackOverflowError", "ThreadDeath", "UnknownError", "UnsatisfiedLinkError",
-                "UnsupportedClassVersionError", "VerifyError", "VirtualMachineError", "Deprecated", "Override",
-                "SuppressWarnings" }) {
-                put(className, "java.lang." + className);
-            }
-        }
-    };
-
-    /**
      * mapping from class name to a {@link NameExpr}.
      */
     private final Map<String, NameExpr> classNameMapping = new HashMap<String, NameExpr>();
@@ -116,8 +84,8 @@ public class ClassNameResolver {
             isVarArgs = true;
         }
 
-        if (JAVA_LANG.containsKey(resolvedClassName)) {
-            resolvedClassName = JAVA_LANG.get(resolvedClassName);
+        if (isFromJavaLangPackage(resolvedClassName)) {
+            resolvedClassName = "java.lang." + resolvedClassName;
         }
         else if (classNameMapping.containsKey(resolvedClassName)) {
             resolvedClassName = classNameMapping.get(resolvedClassName).toString();
@@ -127,5 +95,23 @@ public class ClassNameResolver {
         }
 
         return isVarArgs ? resolvedClassName + BRACKETS : resolvedClassName;
+    }
+
+    /**
+     * @param resolvedClassName
+     * @return
+     * @throws ClassNotFoundException
+     */
+    protected boolean isFromJavaLangPackage(final String resolvedClassName) {
+        boolean result = false;
+
+        try {
+            result = getClass().getClassLoader().loadClass("java.lang." + resolvedClassName) != null;
+        }
+        catch (final ClassNotFoundException e) {
+            // ignore exception when constructed class could not be loaded.
+        }
+
+        return result;
     }
 }
