@@ -5,6 +5,8 @@ package org.arachna.netweaver.dc.types;
 
 import java.util.Arrays;
 
+import org.apache.commons.lang.StringUtils;
+
 /**
  * Reference to a development components public part.
  * 
@@ -159,21 +161,21 @@ public final class PublicPartReference {
     @Override
     public String toString() {
         final StringBuilder msg = new StringBuilder();
-        msg.append(String.format("%s:%s", this.getVendor(), this.getComponentName()));
+        msg.append(String.format("%s:%s", getVendor(), getComponentName()));
 
-        if (this.getName() != null && this.getName().trim().length() > 0) {
-            msg.append(":").append(this.getName());
+        if (!StringUtils.isEmpty(getName())) {
+            msg.append(":").append(getName());
         }
 
-        if (this.isAtBuildTime()) {
+        if (isAtBuildTime()) {
             msg.append(", at build time");
         }
 
-        if (this.isAtRunTime()) {
+        if (isAtRunTime()) {
             msg.append(", at run time");
         }
 
-        if (this.isAtDeployTime()) {
+        if (isAtDeployTime()) {
             msg.append(", at deploy time");
         }
 
@@ -187,7 +189,7 @@ public final class PublicPartReference {
      */
     @Override
     public int hashCode() {
-        return Arrays.hashCode(new Object[] { this.componentName, this.name, this.vendor });
+        return Arrays.hashCode(new Object[] { componentName, name, vendor });
     }
 
     /*
@@ -209,7 +211,6 @@ public final class PublicPartReference {
 
         final PublicPartReference other = (PublicPartReference)obj;
 
-        return Arrays.equals(new Object[] { this.componentName, this.name, this.vendor }, new Object[] {
-            other.componentName, other.name, other.vendor });
+        return hashCode() == other.hashCode();
     }
 }
