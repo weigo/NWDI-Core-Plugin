@@ -12,7 +12,9 @@ import org.xml.sax.helpers.DefaultHandler;
  * Base class for readers for the various configuration files.
  * 
  * @author Dirk Weigenand
+ * @deprecated Use Digester!
  */
+@Deprecated
 public abstract class AbstractDefaultHandler extends DefaultHandler {
     /**
      * the XMLReader object to use reading the configuration files.
@@ -59,7 +61,7 @@ public abstract class AbstractDefaultHandler extends DefaultHandler {
      */
     @Override
     public final void characters(final char[] ch, final int start, final int length) throws SAXException {
-        this.text.append(new String(ch, start, length));
+        text.append(new String(ch, start, length));
     }
 
     /**
@@ -70,8 +72,8 @@ public abstract class AbstractDefaultHandler extends DefaultHandler {
      * @return accumulated text.
      */
     protected final String getText() {
-        final String value = this.text.toString().trim();
-        this.text.setLength(0);
+        final String value = text.toString().trim();
+        text.setLength(0);
 
         return StringEscapeUtils.unescapeXml(value);
     }
@@ -82,7 +84,7 @@ public abstract class AbstractDefaultHandler extends DefaultHandler {
      * @return the xmlReader used for parsing the XML.
      */
     public final XMLReader getXmlReader() {
-        return this.xmlReader;
+        return xmlReader;
     }
 
     /**
@@ -101,6 +103,6 @@ public abstract class AbstractDefaultHandler extends DefaultHandler {
      * @return the parent {@link DefaultHandler}.
      */
     protected final DefaultHandler getParent() {
-        return this.parent;
+        return parent;
     }
 }

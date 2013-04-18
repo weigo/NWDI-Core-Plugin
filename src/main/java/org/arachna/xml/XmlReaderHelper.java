@@ -15,7 +15,9 @@ import org.xml.sax.helpers.XMLReaderFactory;
  * Helper for using {@link XMLReader}s.
  * 
  * @author Dirk Weigenand
+ * @deprecated Use Digester!
  */
+@Deprecated
 public final class XmlReaderHelper {
     /**
      * Constant for sax driver property.
@@ -73,9 +75,9 @@ public final class XmlReaderHelper {
         try {
             xmlReader = XMLReaderFactory.createXMLReader();
         }
-//CHECKSTYLE:OFF
+        // CHECKSTYLE:OFF
         catch (final RuntimeException re) {
-//CHECKSTYLE:ON
+            // CHECKSTYLE:ON
             if (re.getCause() != null && ClassNotFoundException.class.equals(re.getCause().getClass())) {
                 final String saxDriverProperty = System.getProperty(ORG_XML_SAX_DRIVER);
 
