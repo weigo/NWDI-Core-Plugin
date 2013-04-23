@@ -182,27 +182,6 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
     }
 
     /**
-     * Determine whether the given development component has been synchronized
-     * to this builds workspace.
-     * 
-     * @param component
-     *            development component that should be synchronized to this
-     *            builds workspace.
-     * @return <code>true</code> when the component was synchronized,
-     *         <code>false</code> else.
-     * @throws IOException
-     *             when the folder for the given development component could not
-     *             be determined.
-     * @throws InterruptedException
-     *             when the operation was interrupted.
-     */
-    private boolean componentExists(final DevelopmentComponent component) throws IOException, InterruptedException {
-        final FilePath dcFolder = getDtcFolder().child("DCs");
-
-        return dcFolder.child(String.format("%s/%s/_comp/.dcdef", component.getVendor(), component.getName())).exists();
-    }
-
-    /**
      * Return the {@link FilePath} object representing the <code>.dtc</code>
      * Folder.
      * 
