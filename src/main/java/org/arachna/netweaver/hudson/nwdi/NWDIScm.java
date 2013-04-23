@@ -156,7 +156,7 @@ public class NWDIScm extends SCM {
 
         updater.execute();
 
-        build.addAction(new NWDIRevisionState(activities));
+        build.addAction(new NWDIRevisionState());
         writeChangeLog(build, changelogFile, activities);
 
         return result.isExitCodeOk();
@@ -218,7 +218,7 @@ public class NWDIScm extends SCM {
         final Change changeState = activities.isEmpty() ? Change.NONE : Change.SIGNIFICANT;
         logger.println(Messages.NWDIScm_found_changes(changeState.toString()));
 
-        return new PollingResult(revisionState, new NWDIRevisionState(activities), changeState);
+        return new PollingResult(revisionState, new NWDIRevisionState(), changeState);
     }
 
     /**

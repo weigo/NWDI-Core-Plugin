@@ -6,7 +6,6 @@ package org.arachna.netweaver.hudson.nwdi;
 import hudson.scm.SCMRevisionState;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
@@ -31,8 +30,11 @@ public final class NWDIRevisionState extends SCMRevisionState implements Seriali
 
     /**
      * A collection of activities checked in since the last build.
+     * 
+     * @deprecated should be removed, only retained for backwards compatibility.
      */
-    private final transient Collection<Activity> activities = new ArrayList<Activity>();
+    @Deprecated
+    private final transient Collection<Activity> activities = null;
 
     /**
      * Date and time this instance of <code>NWDIRevisionState</code> was
@@ -49,10 +51,14 @@ public final class NWDIRevisionState extends SCMRevisionState implements Seriali
      */
     public NWDIRevisionState(final Collection<Activity> activities) {
         this(Calendar.getInstance().getTime());
+    }
 
-        if (activities != null) {
-            this.activities.addAll(activities);
-        }
+    /**
+     * Create an instance of <code>NWDIRevisionState</code> with the current
+     * date and time.
+     */
+    public NWDIRevisionState() {
+        this(Calendar.getInstance().getTime());
     }
 
     /**
