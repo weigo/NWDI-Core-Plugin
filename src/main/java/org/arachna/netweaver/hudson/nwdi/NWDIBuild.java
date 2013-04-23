@@ -31,8 +31,6 @@ import org.arachna.netweaver.dc.types.CompartmentState;
 import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
-import org.arachna.netweaver.hudson.dtr.browser.Activity;
-import org.arachna.netweaver.hudson.dtr.browser.ActivityResource;
 import org.arachna.netweaver.hudson.nwdi.DCBuildResultParser.BuildResults;
 import org.arachna.netweaver.hudson.nwdi.confdef.ConfDefReader;
 import org.arachna.netweaver.hudson.util.FilePathHelper;
@@ -51,12 +49,12 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
     /**
      * the development configuration this build will process.
      */
-    private DevelopmentConfiguration developmentConfiguration;
+    private transient DevelopmentConfiguration developmentConfiguration;
 
     /**
      * Registry for development components.
      */
-    private final DevelopmentComponentFactory dcFactory = new DevelopmentComponentFactory();
+    private final transient DevelopmentComponentFactory dcFactory = new DevelopmentComponentFactory();
 
     /**
      * development components affected by activities leading to this build.
@@ -135,29 +133,18 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
      */
     public Collection<DevelopmentComponent> getAffectedDevelopmentComponents() {
         if (affectedComponents == null) {
-            final Set<DevelopmentComponent> affectedComponents = getAffectedDevelopmentComponentsFromRevisionState();
-            affectedComponents.addAll(getDevelopmentComponentsThatNeedRebuild());
-
+            final Set<DevelopmentComponent> affectedComponents = getDevelopmentComponentsThatNeedRebuild();
             final Collection<DevelopmentComponent> components = new LinkedList<DevelopmentComponent>();
+            final AntHelper antHelper = new AntHelper(FilePathHelper.makeAbsolute(getWorkspace()), dcFactory);
 
             for (final DevelopmentComponent component : affectedComponents) {
-                try {
-                    if (componentExists(component)) {
-                        components.add(component);
-                    }
-                    else {
-                        // remove DCs from build that might have come from
-                        // activities but are deleted.
-                        dcFactory.remove(component);
-                    }
+                if (component.getCompartment() != null && new File(antHelper.getBaseLocation(component)).exists()) {
+                    components.add(component);
                 }
-                catch (final IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-                catch (final InterruptedException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                else {
+                    // remove DCs from build that might have come from
+                    // activities but are deleted.
+                    dcFactory.remove(component);
                 }
             }
 
@@ -192,34 +179,6 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
         }
 
         return components;
-    }
-
-    /**
-     * Calculate the set of development components to build from activities
-     * determined earlier by the
-     * {@link org.arachna.netweaver.hudson.dtr.browser.DtrBrowser}.
-     * 
-     * @return the set of development components to build as determined by
-     *         activities in the DTR.
-     */
-    private Set<DevelopmentComponent> getAffectedDevelopmentComponentsFromRevisionState() {
-        final Set<DevelopmentComponent> affectedComponents = new HashSet<DevelopmentComponent>();
-
-        final NWDIRevisionState revisionState = this.getAction(NWDIRevisionState.class);
-
-        for (final Activity activity : revisionState.getActivities()) {
-            for (final ActivityResource resource : activity.getResources()) {
-                final DevelopmentComponent component = resource.getDevelopmentComponent();
-
-                // ignore DCs without compartment: those were probably
-                // deleted.
-                if (component.getCompartment() != null) {
-                    affectedComponents.add(component);
-                }
-            }
-        }
-
-        return affectedComponents;
     }
 
     /**

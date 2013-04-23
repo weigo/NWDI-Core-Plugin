@@ -5,10 +5,8 @@ package org.arachna.netweaver.hudson.dtr.browser;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.http.client.ClientProtocolException;
 import org.arachna.netweaver.dc.types.Compartment;
@@ -39,6 +37,7 @@ public final class DtrBrowser {
      */
     private static final String ACTIVITY_QUERY = "%s/system-tools/reports/ActivityQuery?wspPath=/%s"
         + "&user=&closedOnly=on&isnFrom=&isnTo=&nonEmptyOnly=on&folderPath=&command=Show";
+
     /**
      * DtrHttpClient for browsing the DTR.
      */
@@ -74,15 +73,14 @@ public final class DtrBrowser {
      *            filter for NWDI activities.
      * @return list of retrieved activities (may be empty).
      */
-    public List<Activity> getActivities(final Compartment compartment, final ActivityFilter activityFilter) {
-        final List<Activity> activities = new ArrayList<Activity>();
-        final ActivityListParser activityListBrowser = new ActivityListParser(activityFilter);
-        String queryUrl = null;
+    private List<Activity> getActivities(final Compartment compartment, final ActivityFilter activityFilter) {
+        final String queryUrl =
+            String.format(ACTIVITY_QUERY, compartment.getDtrUrl(), compartment.getInactiveLocation());
 
         try {
-            queryUrl = String.format(ACTIVITY_QUERY, compartment.getDtrUrl(), compartment.getInactiveLocation());
+            final ActivityListParser activityListBrowser = new ActivityListParser(activityFilter);
             activityListBrowser.parse(dtrHttpClient.getContent(queryUrl));
-            activities.addAll(activityListBrowser.getActivities());
+            return activityListBrowser.getActivities();
         }
         catch (final ClientProtocolException e) {
             throw new RuntimeException(ERROR_COMMUNICATING_WITH_DTR, e);
@@ -93,27 +91,6 @@ public final class DtrBrowser {
         catch (final IllegalStateException ise) {
             throw new RuntimeException(String.format(ERROR_READING_ACTIVITIES, queryUrl), ise);
         }
-
-        return activities;
-    }
-
-    /**
-     * Extract changed development components from the given list of activities.
-     * 
-     * @param activities
-     *            activities the changed development components shall be
-     *            extracted from.
-     * @param dcFactory
-     *            registry for development components.
-     * @return list of changed development components associated with the given
-     *         activities.
-     */
-    public Set<DevelopmentComponent> getDevelopmentComponents(final List<Activity> activities,
-        final DevelopmentComponentFactory dcFactory) {
-        final DevelopmentComponentCollector collector =
-            new DevelopmentComponentCollector(dtrHttpClient, config.getCmsUrl(), dcFactory);
-
-        return collector.collect(activities);
     }
 
     /**
@@ -126,7 +103,7 @@ public final class DtrBrowser {
      * @return a list of activities matching the given {@link ActivityFilter} in
      *         the given workspace.
      */
-    public List<Activity> getActivities(final ActivityFilter activityFilter) {
+    private List<Activity> getActivities(final ActivityFilter activityFilter) {
         final List<Activity> activities = new ArrayList<Activity>();
 
         for (final Compartment compartment : config.getCompartments(CompartmentState.Source)) {
@@ -134,22 +111,6 @@ public final class DtrBrowser {
         }
 
         return activities;
-    }
-
-    /**
-     * Get a list of all activities in the given workspace.
-     * 
-     * @return a list of all activities in the given workspace.
-     */
-    public List<Activity> getActivities() {
-        final ActivityFilter activityFilter = new ActivityFilter() {
-            @Override
-            public boolean accept(final Activity activity) {
-                return true;
-            }
-        };
-
-        return this.getActivities(activityFilter);
     }
 
     /**
@@ -161,23 +122,38 @@ public final class DtrBrowser {
      * @return a list of activities in the given workspace.
      */
     public List<Activity> getActivities(final Date since) {
-        return this.getActivities(createActivityCheckinDateFilter(since));
-    }
+        final List<Activity> activities = this.getActivities(new ActivityCheckinDateFilter(since));
 
-    /**
-     * @param since
-     *            start date for activity filtering.
-     * @return the configured filter (with the given start date and the current
-     *         time).
-     */
-    private ActivityFilter createActivityCheckinDateFilter(final Date since) {
-        return new ActivityCheckinDateFilter(since, Calendar.getInstance().getTime());
-    }
-
-    /**
-     * Shut down the {@link DtrHttpClient}.
-     */
-    public void close() {
         dtrHttpClient.close();
+
+        return activities;
+    }
+
+    /**
+     * Determine activities from DTR that were checked in after the given date
+     * <code>since</code>. Also collect the affected resources and development
+     * components. Those components will have the property
+     * <code>needsRebuild</code> set to <code>true</code> afterwards.
+     * 
+     * @param dcFactory
+     *            registry for development components to use for when querying
+     *            development components affected by activities.
+     * @param since
+     *            date since when new activities should be detected.
+     * @return list of detected activities.
+     */
+
+    public List<Activity> getActivitiesWithResourcesAndDevelopmentComponents(
+        final DevelopmentComponentFactory dcFactory, final Date since) {
+        final List<Activity> activities = this.getActivities(new ActivityCheckinDateFilter(since));
+
+        for (final DevelopmentComponent component : new DevelopmentComponentCollector(dtrHttpClient,
+            config.getCmsUrl(), dcFactory).collect(activities)) {
+            component.setNeedsRebuild(true);
+        }
+
+        dtrHttpClient.close();
+
+        return activities;
     }
 }

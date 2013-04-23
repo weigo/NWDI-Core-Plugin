@@ -9,7 +9,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 
 import org.arachna.netweaver.hudson.dtr.browser.Activity;
@@ -21,6 +20,11 @@ import org.arachna.netweaver.hudson.dtr.browser.Activity;
  */
 public final class NWDIRevisionState extends SCMRevisionState implements Serializable {
     /**
+     * Use this as start state when no revision state could be determined yet.
+     */
+    static final NWDIRevisionState START_STATE = new NWDIRevisionState(new Date(0));
+
+    /**
      * UID for serialization.
      */
     private static final long serialVersionUID = 3469572897964624203L;
@@ -28,13 +32,13 @@ public final class NWDIRevisionState extends SCMRevisionState implements Seriali
     /**
      * A collection of activities checked in since the last build.
      */
-    private final Collection<Activity> activities = new ArrayList<Activity>();
+    private final transient Collection<Activity> activities = new ArrayList<Activity>();
 
     /**
      * Date and time this instance of <code>NWDIRevisionState</code> was
      * created.
      */
-    private final Date creationDate = Calendar.getInstance().getTime();
+    private final Date creationDate;
 
     /**
      * Create an instance of <code>NWDIRevisionState</code> with the given
@@ -44,19 +48,21 @@ public final class NWDIRevisionState extends SCMRevisionState implements Seriali
      *            the activities checked in since the last build.
      */
     public NWDIRevisionState(final Collection<Activity> activities) {
+        this(Calendar.getInstance().getTime());
+
         if (activities != null) {
             this.activities.addAll(activities);
         }
     }
 
     /**
-     * Return the collection of activities that were checked in since the last
-     * build.
+     * Create state with the given date.
      * 
-     * @return the activities that were checked in since the last build.
+     * @param creationDate
+     *            the date this state was created.
      */
-    public Collection<Activity> getActivities() {
-        return Collections.unmodifiableCollection(this.activities);
+    private NWDIRevisionState(final Date creationDate) {
+        this.creationDate = creationDate;
     }
 
     /**
@@ -67,6 +73,6 @@ public final class NWDIRevisionState extends SCMRevisionState implements Seriali
      *         created.
      */
     public Date getCreationDate() {
-        return new Date(this.creationDate.getTime());
+        return new Date(creationDate.getTime());
     }
 }

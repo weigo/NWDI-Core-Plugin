@@ -51,8 +51,13 @@ public final class DevelopmentConfiguration {
 
     /**
      * compartments contained in this development configuration.
+     * 
+     * @deprecated Not used anymore. Retain for backward compatibility with
+     *             builds saved via XStream.
      */
-    private final Set<Compartment> compartments = new HashSet<Compartment>();
+    @Deprecated
+    // FIXME: remove in a future version!
+    private final transient Set<Compartment> compartments = new HashSet<Compartment>();
 
     /**
      * Translation 'vendor:scName' to compartment.
@@ -128,7 +133,6 @@ public final class DevelopmentConfiguration {
     public void add(final Compartment compartment) {
         if (compartment != null) {
             compartment.setDevelopmentConfiguration(this);
-            compartments.add(compartment);
             compartmentMap.put(compartment.getName(), compartment);
         }
     }
@@ -160,7 +164,7 @@ public final class DevelopmentConfiguration {
      * @return the compartments
      */
     public Collection<Compartment> getCompartments() {
-        return Collections.unmodifiableCollection(compartments);
+        return Collections.unmodifiableCollection(compartmentMap.values());
     }
 
     /**
@@ -173,7 +177,7 @@ public final class DevelopmentConfiguration {
     public Collection<Compartment> getCompartments(final CompartmentState state) {
         final Collection<Compartment> compartments = new ArrayList<Compartment>();
 
-        for (final Compartment compartment : this.compartments) {
+        for (final Compartment compartment : compartmentMap.values()) {
             if (state.equals(compartment.getState())) {
                 compartments.add(compartment);
             }

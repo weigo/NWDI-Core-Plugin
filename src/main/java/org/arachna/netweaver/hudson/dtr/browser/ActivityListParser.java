@@ -39,7 +39,8 @@ final class ActivityListParser extends AbstractResourceParser {
     private final List<Activity> activities = new ArrayList<Activity>();
 
     /**
-     * {@link ActivityFilter} to use when parsing activities. Initialized with an accept all filter.
+     * {@link ActivityFilter} to use when parsing activities. Initialized with
+     * an accept all filter.
      */
     private ActivityFilter activityFilter = new ActivityFilter() {
         @Override
@@ -98,7 +99,8 @@ final class ActivityListParser extends AbstractResourceParser {
     }
 
     /**
-     * Initialize XPath expression used later on to extract details of activities.
+     * Initialize XPath expression used later on to extract details of
+     * activities.
      */
     private void setUpXPaths() {
         try {
@@ -113,13 +115,15 @@ final class ActivityListParser extends AbstractResourceParser {
     }
 
     /**
-     * Create an instance of an {@link Activity} from the given {@link org.w3c.dom.Node}.
+     * Create an instance of an {@link Activity} from the given
+     * {@link org.w3c.dom.Node}.
      * 
      * @param node
      *            the node the activity's data should be read from.
      * @return the activity extracted from the given node.
      * @throws JaxenException
-     *             when there was an error evaluating the XPath expressions used to extract the data
+     *             when there was an error evaluating the XPath expressions used
+     *             to extract the data
      * @throws ParseException
      *             when there was an error parsing the activity's date.
      */
@@ -134,7 +138,8 @@ final class ActivityListParser extends AbstractResourceParser {
      *            the node the short description should be read from.
      * @return the short description extracted from the given node.
      * @throws JaxenException
-     *             when there was an error evaluating the XPath expressions used to extract the data
+     *             when there was an error evaluating the XPath expressions used
+     *             to extract the data
      */
     private String getComment(final Node node) throws JaxenException {
         return commentXPath.stringValueOf(node);
@@ -147,7 +152,8 @@ final class ActivityListParser extends AbstractResourceParser {
      *            the node the activity's check in date should be read from.
      * @return the check in date extracted from the given node.
      * @throws JaxenException
-     *             when there was an error evaluating the XPath expressions used to extract the data
+     *             when there was an error evaluating the XPath expressions used
+     *             to extract the data
      * @throws ParseException
      *             when there was an error parsing the activity's date.
      */
@@ -162,7 +168,8 @@ final class ActivityListParser extends AbstractResourceParser {
      *            the node the UME princiapl's name should be read from.
      * @return the UME principal's name extracted from the given node.
      * @throws JaxenException
-     *             when there was an error evaluating the XPath expressions used to extract the data
+     *             when there was an error evaluating the XPath expressions used
+     *             to extract the data
      */
     private Principal getPrincipal(final Node node) throws JaxenException {
         return new Principal(principalXPath.stringValueOf(node).replace("/principals/", ""));
@@ -175,7 +182,8 @@ final class ActivityListParser extends AbstractResourceParser {
      *            the node the activity's url should be read from.
      * @return the activity's url extracted from the given node.
      * @throws JaxenException
-     *             when there was an error evaluating the XPath expressions used to extract the data
+     *             when there was an error evaluating the XPath expressions used
+     *             to extract the data
      */
     private String getActivityUrl(final Node node) throws JaxenException {
         return activityXPath.stringValueOf(node);
