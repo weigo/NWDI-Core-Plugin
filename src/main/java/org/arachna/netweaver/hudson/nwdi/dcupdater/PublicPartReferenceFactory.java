@@ -75,17 +75,8 @@ final class PublicPartReferenceFactory {
      * @return the newly created <code>PublicPartReference</code>.
      */
     PublicPartReference create(final String reference) {
-        PublicPartReference ppReference = null;
-        final String vendor = getVendor(reference);
-
-        if (vendor != null) {
-            ppReference = new PublicPartReference(vendor, getLibrary(reference));
-            ppReference.setAtRunTime(true);
-        }
-        else if (getVendorSeparationIndex(reference) > -1) {
-            ppReference = new PublicPartReference(vendor, getLibrary(reference));
-            ppReference.setAtRunTime(true);
-        }
+        final PublicPartReference ppReference = new PublicPartReference(getVendor(reference), getLibrary(reference));
+        ppReference.setAtRunTime(true);
 
         return ppReference;
     }
@@ -124,7 +115,7 @@ final class PublicPartReferenceFactory {
 
         if (vendor == null) {
             final int index = getVendorSeparationIndex(reference);
-            vendor = index > -1 ? reference.substring(0, index) : null;
+            vendor = index > -1 ? reference.substring(0, index) : "";
         }
 
         return vendor;
