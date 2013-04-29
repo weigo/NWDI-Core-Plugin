@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- MetaDataAPI generated on: Friday, May 25, 2007 3:26:31 PM CEST -->
+<ProjectProperties xmlns="http://xml.sap.com/2002/10/metamodel/webdynpro" xmlns:IDX="urn:sap.com:WebDynpro.ProjectProperties:2.0" mmRelease="6.30" mmVersion="2.0" mmTimestamp="1180099591892" name="ProjectProperties" package="" masterLanguage="de">
+    <ProjectProperties.LibraryReferences>
+        <LibraryReference libraryName="example.com~example~dc0" name="2">
+        </LibraryReference>
+        <LibraryReference libraryName="example.com~example~dc1" name="0">
+        </LibraryReference>
+        <LibraryReference libraryName="example.com~example~dc2" name="1">
+        </LibraryReference>
+    </ProjectProperties.LibraryReferences>
+    <ProjectProperties.SharingReferences>
+        <LibraryReference libraryName="PORTAL:sap.com/com.sap.km.application" name="0">
+        </LibraryReference>
+        <LibraryReference libraryName="PORTAL:sap.com/com.sap.km.cm" name="1">
+        </LibraryReference>
+    </ProjectProperties.SharingReferences>
+</ProjectProperties>

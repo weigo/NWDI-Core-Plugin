@@ -6,36 +6,55 @@ package org.arachna.netweaver.hudson.nwdi.dcupdater;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 
-import java.util.Set;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.util.Collection;
 
+import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.arachna.netweaver.dc.types.PublicPartReference;
 import org.junit.Before;
 import org.junit.Test;
 
 /**
- * @author Dirk Weigenand
+ * Unit tests for {@link WebDynproProjectPropertiesReader}.
  * 
+ * @author Dirk Weigenand
  */
-public class WebDynproProjectPropertiesReaderTest extends AbstractZipFileContentProvidingTest {
+public class WebDynproProjectPropertiesReaderTest {
     /**
-     * @throws java.lang.Exception
+     * Instance under test.
      */
-    @Override
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
-    }
+    private WebDynproProjectPropertiesReader propertiesReader;
 
-    @Override
-    protected String getResourceName() {
-        return "ProjectProperties.zip";
+    /**
+     * sample component for testing.
+     */
+    private DevelopmentComponent component;
+
+    /**
+     * set up fixture.
+     */
+    @Before
+    public void setUp() {
+        propertiesReader = new WebDynproProjectPropertiesReader();
+        component = new DevelopmentComponent("", "");
+        propertiesReader.execute(component, getProjectWDProperties());
     }
 
     @Test
     public void testReadWebDynproProjectProperties() {
-        WebDynproProjectPropertiesReader reader = new WebDynproProjectPropertiesReader(this.getBasePath());
-        final Set<PublicPartReference> publicParts = reader.read();
+        final Collection<PublicPartReference> publicParts = component.getUsedDevelopmentComponents();
 
         assertThat(publicParts, hasSize(5));
+    }
+
+    /**
+     * Get example input from class path.
+     * 
+     * @return reader object with example input.
+     */
+    private Reader getProjectWDProperties() {
+        return new InputStreamReader(this.getClass().getResourceAsStream(
+            "/org/arachna/netweaver/hudson/nwdi/dcupdater/ProjectProperties.wdproperties"));
     }
 }

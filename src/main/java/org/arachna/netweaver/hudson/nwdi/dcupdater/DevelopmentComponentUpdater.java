@@ -5,18 +5,15 @@ package org.arachna.netweaver.hudson.nwdi.dcupdater;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.nio.charset.Charset;
 
+import org.arachna.ant.AntHelper;
 import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.DevelopmentComponentType;
-import org.arachna.netweaver.dc.types.PublicPartReference;
-import org.arachna.xml.XmlReaderHelper;
-import org.xml.sax.SAXException;
 
 /**
  * Update development components with information read from the on disk
@@ -26,11 +23,6 @@ import org.xml.sax.SAXException;
  * @author Dirk Weigenand
  */
 public final class DevelopmentComponentUpdater {
-    /**
-     * Logger.
-     */
-    private static final Logger LOGGER = Logger.getLogger(DevelopmentComponentUpdater.class.getName());
-
     /**
      * template for path to the current DCs _comp folder.
      */
@@ -57,6 +49,22 @@ public final class DevelopmentComponentUpdater {
     private String componentBase;
 
     /**
+     * Reader for <code>ProjectProperties.wdproperties</code> files.
+     */
+    private final ComponentConfigurationReader wdPropertiesReader = new WebDynproProjectPropertiesReader();
+
+    /**
+     * Reader for <code>portalapp.xml</code> files.
+     */
+    private final ComponentConfigurationReader portalApplicationConfigurationReader =
+        new PortalApplicationConfigurationReader();
+
+    /**
+     * helper class.
+     */
+    private final AntHelper antHelper;
+
+    /**
      * Create an instance of <code>DevelopmentComponentUpdater</code>.
      * 
      * @param location
@@ -67,6 +75,7 @@ public final class DevelopmentComponentUpdater {
     public DevelopmentComponentUpdater(final String location, final DevelopmentComponentFactory dcFactory) {
         this.location = location;
         this.dcFactory = dcFactory;
+        antHelper = new AntHelper(location, dcFactory);
     }
 
     /**
@@ -75,76 +84,64 @@ public final class DevelopmentComponentUpdater {
      * .dcdef, Project.wdproperties, etc.)
      */
     public void execute() {
+        final DcDefinitionReader dcDefinitionReader = new DcDefinitionReader();
+
         for (final DevelopmentComponent component : dcFactory.getAll()) {
             currentComponent = component;
-
             componentBase = getComponentBaseLocation();
-            final File config = getDevelopmentComponentConfigurationFile();
 
-            if (config.exists()) {
-                updateCurrentComponent(config);
-                readPublicParts();
-                readProperties();
-            }
-        }
-    }
-
-    /**
-     * Update the current development component with information read from its
-     * development component configuration file.
-     * 
-     * @param config
-     *            configuration file to be read for updating the component.
-     */
-    private void updateCurrentComponent(final File config) {
-        Reader configReader = null;
-
-        try {
-            configReader = new InputStreamReader(new FileInputStream(config), "UTF-8");
-            new XmlReaderHelper(new DcDefinitionReader(currentComponent)).parse(configReader);
-        }
-        catch (final IOException e) {
-            LOGGER.log(Level.SEVERE, "The configuration file for " + currentComponent.getVendor() + ":"
-                + currentComponent.getName() + " could not be found!", e);
-        }
-        catch (final SAXException e) {
-            LOGGER.log(Level.SEVERE, "The configuration file for " + currentComponent.getVendor() + ":"
-                + currentComponent.getName() + " could not be parsed!", e);
-        }
-        finally {
             try {
-                if (configReader != null) {
-                    configReader.close();
-                }
+                dcDefinitionReader.execute(component, getConfigFile(component, ".dcdef"));
             }
-            catch (final IOException e) {
-                LOGGER.log(Level.WARNING, "There was an error closing " + config.getAbsolutePath() + "!", e);
+            catch (final FileNotFoundException e) {
+                // ignore
             }
+
+            readPublicParts();
+            readProperties(component);
         }
     }
 
     /**
-     * Read additional properties from configurations files specific to the type
+     * Read additional properties from configuration files specific to the type
      * of development component.
+     * 
+     * @param component
+     *            development to additional configuration files for.
      */
-    private void readProperties() {
-        ComponentConfigurationReader reader = null;
-
-        if (DevelopmentComponentType.WebDynpro.equals(currentComponent.getType())) {
-            reader = new WebDynproProjectPropertiesReader(componentBase);
-        }
-        else if (DevelopmentComponentType.PortalApplicationModule.equals(currentComponent.getType())
-            || DevelopmentComponentType.PortalApplicationStandalone.equals(currentComponent.getType())) {
-            reader = new PortalApplicationConfigurationReader(componentBase);
-        }
-
-        if (reader != null) {
-            for (final PublicPartReference newPpRef : reader.read()) {
-                if (!currentComponent.hasRuntimeReference(newPpRef)) {
-                    currentComponent.add(newPpRef);
-                }
+    private void readProperties(final DevelopmentComponent component) {
+        try {
+            if (DevelopmentComponentType.WebDynpro.equals(currentComponent.getType())) {
+                wdPropertiesReader.execute(component,
+                    getConfigFile(component, "src/packages/ProjectProperties.wdproperties"));
+            }
+            else if (DevelopmentComponentType.PortalApplicationModule.equals(currentComponent.getType())
+                || DevelopmentComponentType.PortalApplicationStandalone.equals(currentComponent.getType())) {
+                portalApplicationConfigurationReader.execute(component,
+                    getConfigFile(component, "dist/PORTAL-INF/portalapp.xml"));
             }
         }
+        catch (final FileNotFoundException e) {
+            // ignore
+        }
+    }
+
+    /**
+     * Get a reader for the given development component and configuration file
+     * name.
+     * 
+     * @param component
+     *            development component to read configuration files for.
+     * @param configFile
+     *            the configuration file name.
+     * @return a reader for the given configuration file name.
+     * @throws FileNotFoundException
+     *             when the given file could not be found.
+     */
+    private Reader getConfigFile(final DevelopmentComponent component, final String configFile)
+        throws FileNotFoundException {
+        final String absolutePath = String.format("%s/%s", antHelper.getBaseLocation(component), configFile);
+        return new InputStreamReader(new FileInputStream(absolutePath), Charset.forName("UTF-8"));
     }
 
     /**
@@ -153,15 +150,6 @@ public final class DevelopmentComponentUpdater {
      */
     private void readPublicParts() {
         currentComponent.setPublicParts(new PublicPartsReader(componentBase).read());
-    }
-
-    /**
-     * Get the configuration file object.
-     * 
-     * @return the configuration file object.
-     */
-    private File getDevelopmentComponentConfigurationFile() {
-        return new File(componentBase + File.separatorChar + ".dcdef");
     }
 
     /**

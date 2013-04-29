@@ -3,8 +3,18 @@
  */
 package org.arachna.netweaver.hudson.nwdi.dcupdater;
 
-import java.io.File;
+import java.io.IOException;
+import java.io.Reader;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
 
+import org.apache.commons.digester3.AbstractObjectCreationFactory;
+import org.apache.commons.digester3.Digester;
+import org.apache.commons.digester3.binder.AbstractRulesModule;
+import org.apache.commons.digester3.binder.DigesterLoader;
+import org.arachna.netweaver.dc.types.DevelopmentComponent;
+import org.arachna.netweaver.dc.types.PublicPartReference;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -14,12 +24,7 @@ import org.xml.sax.SAXException;
  * 
  * @author Dirk Weigenand
  */
-final class PortalApplicationConfigurationReader extends AbstractComponentConfigurationReader {
-    /**
-     * comma constant.
-     */
-    private static final String COMMA = ",";
-
+final class PortalApplicationConfigurationReader implements ComponentConfigurationReader {
     /**
      * constant for attribute 'value'.
      */
@@ -33,63 +38,116 @@ final class PortalApplicationConfigurationReader extends AbstractComponentConfig
     /**
      * constant for attribute 'SharingReference'.
      */
-    private static final String SHARING_REFERENCE_ATTRIBUTE_NAME = "SharingReference";
+    private static final String SHARING_REFERENCE_ATTRIBUTE_VALUE = "SharingReference";
 
     /**
-     * constant for element name 'property'.
+     * constant for attribute 'SharingReference'.
      */
-    private static final String PROPERTY_TAG = "property";
-    /**
-     * Prefix to references to J2EE library applications (development components
-     * of type J2EE Library).
-     */
-    private static final String SAPJ2EE_LIBRARY = "SAPJ2EE::library:";
+    private static final String PRIVATE_SHARING_REFERENCE_ATTRIBUTE_VALUE = "PrivateSharingReference";
 
     /**
-     * Create an instance of <code>PortalApplicationConfigurationReader</code>
-     * using the given <code>XMLReader</code> object as parser for the
-     * configuration file.
+     * Update the given development component from the given
+     * <code>portalapp.xml</code> file.
      * 
-     * @param componentBase
-     *            base directory of development component.
+     * @param component
+     *            development component to update from given reader.
+     * @param reader
+     *            reader object for reading the <code>portalapp.xml</code> of
+     *            the given portal component.
      */
-    public PortalApplicationConfigurationReader(final String componentBase) {
-        super(componentBase);
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.xml.sax.helpers.DefaultHandler#startElement(java.lang.String,
-     * java.lang.String, java.lang.String, org.xml.sax.Attributes)
-     */
-    @Override
-    public void startElement(final String uri, final String localName, final String qName, final Attributes attributes)
-        throws SAXException {
-        if (PROPERTY_TAG.equals(localName) && SHARING_REFERENCE_ATTRIBUTE_NAME.equals(attributes.getValue(NAME))) {
-            for (final String reference : attributes.getValue(VALUE).split(COMMA)) {
-                final String ref = reference.trim();
-
-                if (ref.startsWith(PortalApplicationConfigurationReader.SAPJ2EE_LIBRARY)) {
-                    this.addPublicPartReference(ref.substring(PortalApplicationConfigurationReader.SAPJ2EE_LIBRARY
-                        .length()));
-                }
-                else {
-                    this.addPublicPartReference(ref);
-                }
+    public void execute(final DevelopmentComponent component, final Reader reader) {
+        try {
+            final DigesterLoader digesterLoader = DigesterLoader.newLoader(new PortalAppXmlModule());
+            final Digester digester = digesterLoader.newDigester();
+            digester.push(component);
+            digester.parse(reader);
+        }
+        catch (final SAXException e) {
+            throw new RuntimeException(e);
+        }
+        catch (final IOException e) {
+            throw new RuntimeException(e);
+        }
+        finally {
+            try {
+                reader.close();
+            }
+            catch (final IOException e) {
+                throw new RuntimeException(e);
             }
         }
     }
 
     /**
-     * Return the path to the 'portalapp.xml' configuration file relative to the
-     * components base folder ('_comp').
+     * rules module for parsing a <code>.dcdef</code> development component
+     * configuration file.
      * 
-     * @return the path to the 'portalapp.xml' configuration file relative to
-     *         the components base folder ('_comp').
+     * @author Dirk Weigenand
      */
-    @Override
-    protected String getConfigurationLocation() {
-        return String.format("dist%cPORTAL-INF%cportalapp.xml", File.separatorChar, File.separatorChar);
+    class PortalAppXmlModule extends AbstractRulesModule {
+        @Override
+        protected void configure() {
+            forPattern("application/application-config/property").factoryCreate()
+                .usingFactory(new PublicPartReferenceCreationFactory()).then().setNext("addAll");
+        }
+    }
+
+    /**
+     * Factory for creating {@link PublicPartReference} objects from a
+     * <code>ProjectProperties.wdproperties</code> file.
+     * 
+     * @author Dirk Weigenand
+     */
+    class PublicPartReferenceCreationFactory extends AbstractObjectCreationFactory<Collection<PublicPartReference>> {
+        /**
+         * Factory for {@link PublicPartReference} objects.
+         */
+        private final PublicPartReferenceFactory factory = new PublicPartReferenceFactory();
+
+        /**
+         * {@inheritDoc}
+         * 
+         * Create {@link PublicPartReference} objects from the
+         * <code>SharingReference</code>s.
+         */
+        @Override
+        public Collection<PublicPartReference> createObject(final Attributes attributes) throws Exception {
+            if (hasSharingReferenceAttribute(attributes)) {
+                final Collection<PublicPartReference> references = new LinkedList<PublicPartReference>();
+
+                for (final String sharingReference : attributes.getValue(VALUE).split(",\\s*")) {
+                    final PublicPartReference publicPartReference =
+                        factory.create(SharingReferencePrefix.getReference(sharingReference));
+                    publicPartReference.setAtRunTime();
+
+                    references.add(publicPartReference);
+                }
+
+                return references;
+            }
+
+            return Collections.emptyList();
+        }
+
+        /**
+         * Determine whether the property name attribute describes a
+         * <code>SharingReference</code> or <code>PrivateSharingReference</code>
+         * .
+         * 
+         * @param attributes
+         *            SAX attributes of an application property config element.
+         * @return <code>true</code> when the property name attribute has the
+         *         value {@see #PortalApplicationConfigurationReader.
+         *         PRIVATE_SHARING_REFERENCE_ATTRIBUTE_VALUE} or {@see
+         *         #PortalApplicationConfigurationReader.
+         *         SHARING_REFERENCE_ATTRIBUTE_VALUE}
+         */
+        private boolean hasSharingReferenceAttribute(final Attributes attributes) {
+            final String nameAttribute = attributes.getValue(NAME);
+
+            return nameAttribute != null
+                && (SHARING_REFERENCE_ATTRIBUTE_VALUE.equals(nameAttribute) || PRIVATE_SHARING_REFERENCE_ATTRIBUTE_VALUE
+                    .equals(nameAttribute));
+        }
     }
 }

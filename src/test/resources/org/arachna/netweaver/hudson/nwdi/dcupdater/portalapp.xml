@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<application>
+  <application-config>
+    <property name="SharingReference" value="com.example~application, SAPJ2EE::service:com.example~service, SAPJ2EE::library:com.example~library, SAPJ2EE::interface::com.example~interface"/>
+  </application-config>
+</application>

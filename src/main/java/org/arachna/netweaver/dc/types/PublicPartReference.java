@@ -12,7 +12,7 @@ import org.apache.commons.lang.StringUtils;
  * 
  * @author Dirk Weigenand
  */
-public final class PublicPartReference {
+public class PublicPartReference {
     /**
      * name of development component this <code>PublicPartReference</code>
      * references.
@@ -27,7 +27,7 @@ public final class PublicPartReference {
     /**
      * name of referenced public part.
      */
-    private final String name;
+    private String name;
 
     /**
      * kind of reference: at build time.
@@ -56,12 +56,9 @@ public final class PublicPartReference {
      *            public part name.
      */
     public PublicPartReference(final String vendor, final String componentName, final String name) {
-        validate(vendor, "vendor");
-        validate(vendor, "componentName");
-
         this.vendor = vendor;
         this.componentName = componentName;
-        this.name = name;
+        setName(name);
     }
 
     /**
@@ -75,21 +72,6 @@ public final class PublicPartReference {
      */
     public PublicPartReference(final String vendor, final String componentName) {
         this(vendor, componentName, "");
-    }
-
-    /**
-     * Validate the given <code>argument</code> that it is not <code>null</code>
-     * or empty. Throws an {@link IllegalArgumentException} if it is.
-     * 
-     * @param argument
-     *            the value to validate.
-     * @param argumentName
-     *            the name to use in the error message.
-     */
-    protected void validate(final String argument, final String argumentName) {
-        if (argument == null || argument.trim().length() == 0) {
-            throw new IllegalArgumentException(String.format("'%s' must not be null or empty!", argumentName));
-        }
     }
 
     /**
@@ -117,8 +99,15 @@ public final class PublicPartReference {
      * @param atBuildTime
      *            the buildTime to set
      */
-    public void setAtBuildTime(final boolean atBuildTime) {
+    public void setAtBuildTime(final Boolean atBuildTime) {
         this.atBuildTime = atBuildTime;
+    }
+
+    /**
+     * Set property at build time to true.
+     */
+    public void setAtBuildTime() {
+        atBuildTime = true;
     }
 
     /**
@@ -132,8 +121,15 @@ public final class PublicPartReference {
      * @param atRunTime
      *            the runTime to set
      */
-    public void setAtRunTime(final boolean atRunTime) {
+    public void setAtRunTime(final Boolean atRunTime) {
         this.atRunTime = atRunTime;
+    }
+
+    /**
+     * Set property at run time to true.
+     */
+    public void setAtRunTime() {
+        atRunTime = true;
     }
 
     /**
@@ -156,6 +152,16 @@ public final class PublicPartReference {
      */
     public String getName() {
         return name;
+    }
+
+    /**
+     * Set the name of public part this reference points to.
+     * 
+     * @param name
+     *            the name to set
+     */
+    public void setName(final String name) {
+        this.name = name;
     }
 
     @Override
@@ -189,7 +195,7 @@ public final class PublicPartReference {
      */
     @Override
     public int hashCode() {
-        return Arrays.hashCode(new Object[] { componentName, name, vendor });
+        return Arrays.hashCode(new Object[] { componentName, getName(), vendor });
     }
 
     /*
