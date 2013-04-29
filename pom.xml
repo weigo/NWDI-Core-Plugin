@@ -96,6 +96,13 @@
       <artifactId>javaparser</artifactId>
       <version>1.0.8</version>
     </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-digester3</artifactId>
+      <version>3.2</version>
+      <type>jar</type>
+      <scope>compile</scope>
+    </dependency>
   </dependencies>
   <build>
     <pluginManagement>
@@ -139,8 +146,10 @@
           <indexLinksToSection>1</indexLinksToSection>
           <generateToc>book toc</generateToc>
           <tocSectionDepth>5</tocSectionDepth>
+          <componentLabelIncludesPartLabel>0</componentLabelIncludesPartLabel>
           <sectionAutolabel>1</sectionAutolabel>
-          <sectionLabelIncludesComponentLabel>1</sectionLabelIncludesComponentLabel>
+          <sectionLabelIncludesComponentLabel>0</sectionLabelIncludesComponentLabel>
+          <labelFromPart>0</labelFromPart>
           <admonGraphics>1</admonGraphics>
           <navigGraphics>1</navigGraphics>
           <calloutDefaultcolumn>80</calloutDefaultcolumn>
@@ -149,6 +158,8 @@
           <calloutGraphics>1</calloutGraphics>
           <calloutsExtension>1</calloutsExtension>
           <defaultTableWidth>100%</defaultTableWidth>
+          <ulinkShow>0</ulinkShow>
+          <shadeVerbatim>1</shadeVerbatim>
           <xincludeSupported>true</xincludeSupported>
           <includes>NWDI-Core-Plugin.xml</includes>
         </configuration>
