@@ -3,17 +3,13 @@
  */
 package org.arachna.netweaver.hudson.nwdi.dcupdater;
 
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.io.Reader;
 
-import org.arachna.netweaver.dc.types.PublicPartReference;
-import org.arachna.xml.AbstractDefaultHandler;
-import org.arachna.xml.XmlReaderHelper;
+import org.apache.commons.digester3.Digester;
+import org.apache.commons.digester3.binder.AbstractRulesModule;
+import org.apache.commons.digester3.binder.DigesterLoader;
+import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.xml.sax.SAXException;
 
 /**
@@ -22,103 +18,44 @@ import org.xml.sax.SAXException;
  * 
  * @author Dirk Weigenand
  */
-abstract class AbstractComponentConfigurationReader extends AbstractDefaultHandler implements
-    ComponentConfigurationReader {
+abstract class AbstractComponentConfigurationReader implements ComponentConfigurationReader {
     /**
-     * message for IO errors.
-     */
-    private static final String IO_EXCEPTION_MESSAGE = "There was a problem reading %s.";
-
-    /**
-     * message regarding SAX parse(r) errors.
-     */
-    private static final String SAX_EXCEPTION_MESSAGE = "There was a problem parsing %s.";
-
-    /**
-     * Factory for public part references from references read from WebDynpro
-     * project properties or portal applications config files.
-     */
-    private final PublicPartReferenceFactory ppRefFactory = new PublicPartReferenceFactory();
-
-    /**
-     * public part references.
-     */
-    private final Set<PublicPartReference> references = new HashSet<PublicPartReference>();
-
-    /**
-     * base directory of development component.
-     */
-    private final String componentBase;
-
-    /**
-     * Create an instance of an
-     * <code>AbstractComponentConfigurationReader</code>.
+     * Update the given development component from the given
+     * <code>portalapp.xml</code> file.
      * 
-     * @param componentBase
-     *            base directory of development component.
+     * @param component
+     *            development component to update from given reader.
+     * @param reader
+     *            reader object for reading the <code>portalapp.xml</code> of
+     *            the given portal component.
      */
-    protected AbstractComponentConfigurationReader(final String componentBase) {
-        super();
-        this.componentBase = componentBase;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public final Set<PublicPartReference> read() {
-        references.clear();
-        FileReader input = null;
-
+    public void execute(final DevelopmentComponent component, final Reader reader) {
         try {
-            final File source = new File(componentBase + File.separatorChar + getConfigurationLocation());
-
-            if (source.exists()) {
-                input = new FileReader(source);
-                new XmlReaderHelper(this).parse(input);
-            }
-        }
-        catch (final IOException e) {
-            Logger.getLogger(this.getClass().getName()).log(Level.WARNING,
-                String.format(IO_EXCEPTION_MESSAGE, getConfigurationLocation()), e);
+            final DigesterLoader digesterLoader = DigesterLoader.newLoader(getRulesModule());
+            final Digester digester = digesterLoader.newDigester();
+            digester.push(component);
+            digester.parse(reader);
         }
         catch (final SAXException e) {
-            Logger.getLogger(this.getClass().getName()).log(Level.WARNING,
-                String.format(SAX_EXCEPTION_MESSAGE, getConfigurationLocation()), e);
+            throw new RuntimeException(e);
+        }
+        catch (final IOException e) {
+            throw new RuntimeException(e);
         }
         finally {
-            if (input != null) {
-                try {
-                    input.close();
-                }
-                catch (final IOException e) {
-                    Logger.getLogger(this.getClass().getName()).log(Level.WARNING,
-                        String.format(IO_EXCEPTION_MESSAGE, getConfigurationLocation()), e);
-                }
+            try {
+                reader.close();
+            }
+            catch (final IOException e) {
+                throw new RuntimeException(e);
             }
         }
-
-        return references;
     }
 
     /**
-     * Create a {@link PublicPartReference} and add it to the internal
-     * collection of public part references read from the configuration file.
+     * Create a digester rules module.
      * 
-     * @param reference
-     *            public part references read from the configuration file.
+     * @return an implementation of {@link AbstractRulesModule}.
      */
-    protected final void addPublicPartReference(final String reference) {
-        final PublicPartReference ppReference = ppRefFactory.create(reference);
-
-        if (ppReference != null) {
-            references.add(ppReference);
-        }
-    }
-
-    /**
-     * Return the location of the configuration file to parse.
-     * 
-     * @return location of the configuration file to parse.
-     */
-    protected abstract String getConfigurationLocation();
+    abstract AbstractRulesModule getRulesModule();
 }

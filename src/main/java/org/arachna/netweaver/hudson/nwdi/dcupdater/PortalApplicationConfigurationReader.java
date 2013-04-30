@@ -3,20 +3,14 @@
  */
 package org.arachna.netweaver.hudson.nwdi.dcupdater;
 
-import java.io.IOException;
-import java.io.Reader;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 
 import org.apache.commons.digester3.AbstractObjectCreationFactory;
-import org.apache.commons.digester3.Digester;
 import org.apache.commons.digester3.binder.AbstractRulesModule;
-import org.apache.commons.digester3.binder.DigesterLoader;
-import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.arachna.netweaver.dc.types.PublicPartReference;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 
 /**
  * Read a portal applications 'portalapp.xml' configuration file and extract
@@ -24,7 +18,7 @@ import org.xml.sax.SAXException;
  * 
  * @author Dirk Weigenand
  */
-final class PortalApplicationConfigurationReader implements ComponentConfigurationReader {
+final class PortalApplicationConfigurationReader extends AbstractComponentConfigurationReader {
     /**
      * constant for attribute 'value'.
      */
@@ -46,50 +40,21 @@ final class PortalApplicationConfigurationReader implements ComponentConfigurati
     private static final String PRIVATE_SHARING_REFERENCE_ATTRIBUTE_VALUE = "PrivateSharingReference";
 
     /**
-     * Update the given development component from the given
-     * <code>portalapp.xml</code> file.
+     * Create a rules module for parsing a <code>portalapp.xml</code>
+     * development component configuration file.
      * 
-     * @param component
-     *            development component to update from given reader.
-     * @param reader
-     *            reader object for reading the <code>portalapp.xml</code> of
-     *            the given portal component.
+     * @return a rules module for parsing a <code>portalapp.xml</code>
+     *         configuration file.
      */
-    public void execute(final DevelopmentComponent component, final Reader reader) {
-        try {
-            final DigesterLoader digesterLoader = DigesterLoader.newLoader(new PortalAppXmlModule());
-            final Digester digester = digesterLoader.newDigester();
-            digester.push(component);
-            digester.parse(reader);
-        }
-        catch (final SAXException e) {
-            throw new RuntimeException(e);
-        }
-        catch (final IOException e) {
-            throw new RuntimeException(e);
-        }
-        finally {
-            try {
-                reader.close();
+    @Override
+    AbstractRulesModule getRulesModule() {
+        return new AbstractRulesModule() {
+            @Override
+            protected void configure() {
+                forPattern("application/application-config/property").factoryCreate()
+                    .usingFactory(new PublicPartReferenceCreationFactory()).then().setNext("addAll");
             }
-            catch (final IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
-    /**
-     * rules module for parsing a <code>.dcdef</code> development component
-     * configuration file.
-     * 
-     * @author Dirk Weigenand
-     */
-    class PortalAppXmlModule extends AbstractRulesModule {
-        @Override
-        protected void configure() {
-            forPattern("application/application-config/property").factoryCreate()
-                .usingFactory(new PublicPartReferenceCreationFactory()).then().setNext("addAll");
-        }
+        };
     }
 
     /**
