@@ -3,11 +3,15 @@ package org.arachna.netweaver.dc.types;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+
+import org.apache.commons.lang.StringUtils;
 
 /**
  * Represents a compartment/software component of a
@@ -49,12 +53,12 @@ public final class Compartment {
     /**
      * Compartments that are used by this compartment.
      */
-    private final Set<Compartment> usedCompartments = new HashSet<Compartment>();
+    private final Set<Compartment> usedCompartments = new LinkedHashSet<Compartment>();
 
     /**
      * {@link DevelopmentComponent}s contained in this compartment.
      */
-    private final Set<DevelopmentComponent> components = new HashSet<DevelopmentComponent>();
+    private final Set<DevelopmentComponent> components = new LinkedHashSet<DevelopmentComponent>();
 
     /**
      * Type of compartment {@link CompartmentState}.
@@ -70,6 +74,11 @@ public final class Compartment {
      * location of software component in DTR.
      */
     private String inactiveLocation;
+
+    /**
+     * Mapping of names to the respective build variants.
+     */
+    private final Map<String, BuildVariant> buildVariants = new LinkedHashMap<String, BuildVariant>();
 
     /**
      * Create a new Compartment instance with the given name and
@@ -115,7 +124,8 @@ public final class Compartment {
      */
     private void validateString(final String argument, final String argumentName) {
         if (argument == null || argument.trim().length() == 0) {
-            final IllegalArgumentException iae = new IllegalArgumentException(String.format(NULL_OR_EMPTY_ARGUMENT_MESSAGE, argumentName));
+            final IllegalArgumentException iae =
+                new IllegalArgumentException(String.format(NULL_OR_EMPTY_ARGUMENT_MESSAGE, argumentName));
             iae.fillInStackTrace();
             throw iae;
         }
@@ -130,6 +140,18 @@ public final class Compartment {
     public void add(final Compartment compartment) {
         if (compartment != null) {
             usedCompartments.add(compartment);
+        }
+    }
+
+    /**
+     * Add a compartment to this compartments dependencies.
+     * 
+     * @param compartmentName
+     *            name of used compartment.
+     */
+    public void addUsedCompartment(final String compartmentName) {
+        if (!StringUtils.isEmpty(compartmentName)) {
+            usedCompartments.add(Compartment.create(compartmentName, CompartmentState.Archive));
         }
     }
 
@@ -419,8 +441,8 @@ public final class Compartment {
      */
     @Override
     public String toString() {
-        return "Compartment [developmentConfiguration=" + developmentConfiguration + ", name=" + name + ", softwareComponent="
-            + softwareComponent + ", state=" + state + ", vendor=" + vendor + "]";
+        return "Compartment [developmentConfiguration=" + developmentConfiguration + ", name=" + name
+            + ", softwareComponent=" + softwareComponent + ", state=" + state + ", vendor=" + vendor + "]";
     }
 
     /*
@@ -449,8 +471,9 @@ public final class Compartment {
                 final Compartment other = (Compartment)obj;
 
                 result =
-                    Arrays.equals(new Object[] { developmentConfiguration, softwareComponent, name, vendor }, new Object[] {
-                        other.developmentConfiguration, other.softwareComponent, other.name, other.vendor });
+                    Arrays.equals(new Object[] { developmentConfiguration, softwareComponent, name, vendor },
+                        new Object[] { other.developmentConfiguration, other.softwareComponent, other.name,
+                            other.vendor });
             }
         }
 
@@ -490,7 +513,7 @@ public final class Compartment {
     public DevelopmentComponent getDevelopmentComponent(final String dcName) {
         DevelopmentComponent component = null;
 
-        for (final DevelopmentComponent dc : this.components) {
+        for (final DevelopmentComponent dc : components) {
             if (dc.getName().equals(dcName)) {
                 component = dc;
                 break;
@@ -514,7 +537,8 @@ public final class Compartment {
      *            short description
      * @return new compartment.
      */
-    public static Compartment create(final String vendor, final String name, final CompartmentState state, final String caption) {
+    public static Compartment create(final String vendor, final String name, final CompartmentState state,
+        final String caption) {
         return new Compartment(String.format("%s_%s_1", vendor, name), state, vendor, caption, name);
 
     }
@@ -537,5 +561,35 @@ public final class Compartment {
         final String name = compartmentDescriptor.substring(vendorEnd + 1, nameEnd);
 
         return new Compartment(compartmentDescriptor, state, vendor, "", name);
+    }
+
+    /**
+     * Add a {@link BuildVariant} to this compartment. Checks whether a build
+     * variant with this name is already registered and merges (overwrites)
+     * build options.
+     * 
+     * @param variant
+     *            the new build variant to be registered.
+     */
+    public void add(final BuildVariant variant) {
+        final BuildVariant original = buildVariants.get(variant.getName());
+
+        if (original != null) {
+            for (final String optionName : variant.getBuildOptionNames()) {
+                original.addBuildOption(optionName, variant.getBuildOption(optionName));
+            }
+        }
+        else {
+            buildVariants.put(variant.getName(), variant);
+        }
+    }
+
+    /**
+     * Get a collection of registered build variants.
+     * 
+     * @return collection of build variants registered to this compartment.
+     */
+    public Collection<BuildVariant> getBuildVariants() {
+        return buildVariants.values();
     }
 }

@@ -95,7 +95,7 @@ public class DCToolCommandExecutorTest {
      *             fails
      */
     private DCToolCommandExecutor createDCToolCommandExecutor() throws IOException {
-        final BuildVariant buildVariant = new BuildVariant("default");
+        final BuildVariant buildVariant = new BuildVariant("default", true);
         buildVariant.addBuildOption(BuildVariant.COM_SAP_JDK_HOME_PATH_KEY, JdkHomeAlias.Jdk131Home.toString());
 
         final JdkHomePaths paths = new JdkHomePaths();

@@ -7,67 +7,191 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
-import static org.junit.Assert.fail;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.collection.IsIn.isIn;
 
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.arachna.netweaver.dc.types.BuildOption;
 import org.arachna.netweaver.dc.types.BuildVariant;
 import org.arachna.netweaver.dc.types.Compartment;
+import org.arachna.netweaver.dc.types.CompartmentState;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
-import org.arachna.xml.XmlReaderHelper;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
-import org.xml.sax.SAXException;
 
 /**
- * JUnit-Test for reading '.confdef' configuration files using {@link ConfDefReader}.
+ * JUnit-Test for reading '.confdef' configuration files using
+ * {@link ConfDefReader}.
  * 
  * @author Dirk Weigenand
  */
 public final class ConfDefReaderTest {
     /**
-     * constant for property 'com.sap.jdk.javac.force_fork'.
+     * instance under test.
      */
-    private static final String COM_SAP_JDK_JAVAC_FORCE_FORK = "com.sap.jdk.javac.force_fork";
+    private ConfDefReader configurationReader;
 
     /**
-     * constant for property 'com.sap.jdk.home_path_key'.
+     * @throws java.lang.Exception
      */
-    private static final String COM_SAP_JDK_HOME_PATH_KEY = "com.sap.jdk.home_path_key";
-
-    /**
-     * Test method for reading a development configuration with a default build variant.
-     */
-    @Test
-    public void testReadDevelopmentConfigurationWithDefaultBuildVariant() {
-        final DevelopmentConfiguration configuration =
-            readDevelopmentConfiguration("DevelopmentConfigurationWithDefaultBuildVariant.confdef");
-        final BuildVariant variant = configuration.getBuildVariant();
-        assertThat(variant, notNullValue());
-        assertThat(variant.getBuildOption(COM_SAP_JDK_HOME_PATH_KEY), notNullValue());
-        assertThat(variant.getBuildOption(COM_SAP_JDK_JAVAC_FORCE_FORK), equalTo("true"));
+    @Before
+    public void setUp() {
+        configurationReader = new ConfDefReader();
     }
 
     /**
-     * Test method for reading a development configuration with a configured build variant.
+     * @throws java.lang.Exception
      */
-    @Test
-    public void testReadDevelopmentConfigurationWithConfiguredDefaultBuildVariant() {
-        final DevelopmentConfiguration configuration =
-            readDevelopmentConfiguration("DevelopmentConfigurationWithConfiguredDefaultBuildVariant.confdef");
-        final BuildVariant variant = configuration.getBuildVariant();
-        assertThat(variant, notNullValue());
-        assertThat(variant.getBuildOption(COM_SAP_JDK_HOME_PATH_KEY), equalTo("JDK1.3.1_HOME"));
-        assertThat(variant.getBuildOption(COM_SAP_JDK_JAVAC_FORCE_FORK), equalTo("true"));
-        assertThat(configuration.getBuildServer(), equalTo("http://di0db.example.com:50000"));
+    @After
+    public void tearDown() {
+        configurationReader = null;
     }
 
+    /**
+     * Test method for
+     * {@link org.arachna.netweaver.hudson.nwdi.confdef.ConfdefReader1#execute(java.io.Reader)}
+     * .
+     */
+    @Test
+    public final void testConfigurationElementRules() {
+        final DevelopmentConfiguration config =
+            getConfiguration("DevelopmentConfigurationWithConfiguredDefaultBuildVariant.confdef");
+        assertThat(config, notNullValue());
+        assertThat(config.getName(), equalTo("DI0_Example_D"));
+        assertThat(config.getWorkspace(), equalTo("Example"));
+    }
+
+    /**
+     * Test method for
+     * {@link org.arachna.netweaver.hudson.nwdi.confdef.ConfdefReader1#execute(java.io.Reader)}
+     * .
+     */
+    @Test
+    public final void testConfigurationDescriptionRule() {
+        final DevelopmentConfiguration config =
+            getConfiguration("DevelopmentConfigurationWithConfiguredDefaultBuildVariant.confdef");
+        assertThat(config, notNullValue());
+        assertThat(config.getDescription(), equalTo("Example Track_dev"));
+    }
+
+    /**
+     * Test method for
+     * {@link org.arachna.netweaver.hudson.nwdi.confdef.ConfdefReader1#execute(java.io.Reader)}
+     * .
+     */
+    @Test
+    public final void testConfigurationBuildServerRule() {
+        final DevelopmentConfiguration config =
+            getConfiguration("DevelopmentConfigurationWithConfiguredDefaultBuildVariant.confdef");
+        assertThat(config, notNullValue());
+        assertThat(config.getBuildServer(), equalTo("http://di0db.example.com:50000"));
+    }
+
+    /**
+     * Test method for
+     * {@link org.arachna.netweaver.hudson.nwdi.confdef.ConfdefReader1#execute(java.io.Reader)}
+     * .
+     */
+    @Test
+    public final void testConfigurationCompartmentRule() {
+        final DevelopmentConfiguration config =
+            getConfiguration("DevelopmentConfigurationWithConfiguredDefaultBuildVariant.confdef");
+        assertThat(config, notNullValue());
+        final String compartmentName = "example.com_EXAMPLE_SC1_1";
+        final Compartment compartment = config.getCompartment(compartmentName);
+        assertThat(compartment, notNullValue());
+
+        final Compartment expectedCompartment = Compartment.create(compartmentName, CompartmentState.Source);
+        assertThat(compartment.getName(), equalTo(expectedCompartment.getName()));
+        assertThat(compartment.getCaption(), equalTo(expectedCompartment.getCaption()));
+        assertThat(compartment.getSoftwareComponent(), equalTo(expectedCompartment.getSoftwareComponent()));
+        assertThat(compartment.getState(), equalTo(expectedCompartment.getState()));
+        assertThat(compartment.getVendor(), equalTo(expectedCompartment.getVendor()));
+    }
+
+    /**
+     * Test method for
+     * {@link org.arachna.netweaver.hudson.nwdi.confdef.ConfdefReader1#execute(java.io.Reader)}
+     * .
+     */
+    @Test
+    public final void testConfigurationCompartmentDtrUrlRule() {
+        final DevelopmentConfiguration config =
+            getConfiguration("DevelopmentConfigurationWithConfiguredDefaultBuildVariant.confdef");
+        assertThat(config, notNullValue());
+        final Compartment compartment = config.getCompartment("example.com_EXAMPLE_SC1_1");
+        assertThat(compartment, notNullValue());
+        assertThat(compartment.getDtrUrl(), equalTo("http://di0db.example.com:50000/dtr"));
+    }
+
+    /**
+     * Test method for
+     * {@link org.arachna.netweaver.hudson.nwdi.confdef.ConfdefReader1#execute(java.io.Reader)}
+     * .
+     */
+    @Test
+    public final void testConfigurationCompartmentInactiveLocationRule() {
+        final DevelopmentConfiguration config =
+            getConfiguration("DevelopmentConfigurationWithConfiguredDefaultBuildVariant.confdef");
+        assertThat(config, notNullValue());
+        final Compartment compartment = config.getCompartment("example.com_EXAMPLE_SC1_1");
+        assertThat(compartment, notNullValue());
+        assertThat(compartment.getInactiveLocation(), equalTo("ws/Example/example.com_EXAMPLE_SC1/dev/inactive/"));
+    }
+
+    /**
+     * Test method for
+     * {@link org.arachna.netweaver.hudson.nwdi.confdef.ConfdefReader1#execute(java.io.Reader)}
+     * .
+     */
+    @Test
+    public final void testConfigurationCompartmentDependenciesRule() {
+        final DevelopmentConfiguration config =
+            getConfiguration("DevelopmentConfigurationWithConfiguredDefaultBuildVariant.confdef");
+        assertThat(config, notNullValue());
+        final Compartment compartment = config.getCompartment("example.com_EXAMPLE_SC1_1");
+        assertThat(compartment, notNullValue());
+        assertThat(compartment.getUsedCompartments(), hasSize(3));
+
+        assertThat(Compartment.create("sap.com_SAP-JEE_1", CompartmentState.Archive),
+            isIn(compartment.getUsedCompartments()));
+        assertThat(Compartment.create("sap.com_SAP_BUILDT_1", CompartmentState.Archive),
+            isIn(compartment.getUsedCompartments()));
+        assertThat(Compartment.create("sap.com_SAP_JTECHS_1", CompartmentState.Archive),
+            isIn(compartment.getUsedCompartments()));
+    }
+
+    /**
+     * Test method for
+     * {@link org.arachna.netweaver.hudson.nwdi.confdef.ConfdefReader1#execute(java.io.Reader)}
+     * .
+     */
+    @Test
+    public final void testConfigurationCompartmentBuildVariantsRule() {
+        final DevelopmentConfiguration config =
+            getConfiguration("DevelopmentConfigurationWithConfiguredDefaultBuildVariant.confdef");
+        assertThat(config, notNullValue());
+        final Compartment compartment = config.getCompartment("example.com_EXAMPLE_SC1_1");
+        assertThat(compartment, notNullValue());
+        final BuildVariant expectedBuildVariant = new BuildVariant("default", true);
+        expectedBuildVariant.add(new BuildOption("com.sap.jdk.home_path_key", "JDK1.3.1_HOME"));
+        expectedBuildVariant.add(new BuildOption("com.sap.jdk.javac.force_fork", "true"));
+        assertThat(compartment.getBuildVariants(), hasItem(expectedBuildVariant));
+    }
+
+    /**
+     * Test method for
+     * {@link org.arachna.netweaver.hudson.nwdi.confdef.ConfdefReader1#execute(java.io.Reader)}
+     * .
+     */
     @Test
     public void testReadExampleConfDef() {
-        final DevelopmentConfiguration configuration = readDevelopmentConfiguration("Example.confdef");
+        final DevelopmentConfiguration configuration = getConfiguration("Example.confdef");
 
         final Collection<Compartment> compartments = configuration.getCompartments();
 
@@ -81,20 +205,23 @@ public final class ConfDefReaderTest {
 
     }
 
+    /**
+     * Test method for
+     * {@link org.arachna.netweaver.hudson.nwdi.confdef.ConfdefReader1#execute(java.io.Reader)}
+     * .
+     */
     @Test
     public void testReadExampleConfDefAndVerifyThatGetCompartmentsReturnsTheCorrectCompartments() {
-        final DevelopmentConfiguration configuration = readDevelopmentConfiguration("Example.confdef");
+        final DevelopmentConfiguration configuration = getConfiguration("Example.confdef");
 
         for (final String compartmentName : getExpectedCompartmentNames()) {
             assertThat(configuration.getCompartment(compartmentName), notNullValue());
         }
     }
 
-    @Test
-    public void x() {
-        final DevelopmentConfiguration configuration = readDevelopmentConfiguration("Example.confdef");
-
-        assertThat(configuration.getDtrServerUrl(), equalTo("http://di0db:53000/dtr"));
+    private DevelopmentConfiguration getConfiguration(final String configFileName) {
+        return configurationReader.execute(new InputStreamReader(this.getClass().getResourceAsStream(
+            String.format("/org/arachna/netweaver/hudson/nwdi/confdef/%s", configFileName))));
     }
 
     /**
@@ -114,33 +241,5 @@ public final class ConfDefReaderTest {
         compartmentNames.add("sap.com_WD-RUNTIME_1");
 
         return compartmentNames;
-    }
-
-    /**
-     * Read a development configuration with the given resource name.
-     * 
-     * @param configurationName
-     *            resource to be read.
-     * @return the read <code>DevelopmentConfiguration</code>.
-     * @throws IOException
-     *             any <code>IOException</code> thrown in the underlying code.
-     * @throws SAXException
-     *             any <code>SAXException</code> thrown in the underlying code.
-     */
-    private DevelopmentConfiguration readDevelopmentConfiguration(final String configurationName) {
-        final ConfDefReader developmentConfigurationReader = new ConfDefReader();
-
-        try {
-            new XmlReaderHelper(developmentConfigurationReader).parse(new InputStreamReader(this.getClass().getResourceAsStream(
-                configurationName)));
-        }
-        catch (IOException e) {
-            fail(e.getLocalizedMessage());
-        }
-        catch (SAXException e) {
-            fail(e.getLocalizedMessage());
-        }
-
-        return developmentConfigurationReader.getDevelopmentConfiguration();
     }
 }

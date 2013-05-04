@@ -76,7 +76,7 @@ public class SyncDevelopmentComponentsCommandBuilderTest {
     protected void setUpDevelopmentConfiguration() {
         config = new DevelopmentConfiguration("DI0_Example_D");
 
-        final BuildVariant buildVariant = new BuildVariant("default");
+        final BuildVariant buildVariant = new BuildVariant("default", true);
         buildVariant.addBuildOption(BuildVariant.COM_SAP_JDK_HOME_PATH_KEY, JdkHomeAlias.Jdk131Home.toString());
 
         config.setBuildVariant(buildVariant);

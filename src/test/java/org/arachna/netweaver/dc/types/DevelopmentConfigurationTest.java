@@ -98,7 +98,7 @@ public class DevelopmentConfigurationTest {
     @Test
     public void assertThatGetJdkHomeAliasReturnsLatestDefinedJdkHomeAliasWithBuildVariantButNoJdkHomePath() {
         final DevelopmentConfiguration config = new DevelopmentConfiguration("DI1_ExampleTrack_D");
-        config.setBuildVariant(new BuildVariant("default"));
+        config.setBuildVariant(new BuildVariant("default", true));
 
         final JdkHomeAlias alias = config.getJdkHomeAlias();
         assertThat(alias, notNullValue());
@@ -113,7 +113,7 @@ public class DevelopmentConfigurationTest {
     @Test
     public void assertThatGetJdkHomeAliasReturnsAliasDefinedViaJdkHomePathKey() {
         final DevelopmentConfiguration config = new DevelopmentConfiguration("DI1_ExampleTrack_D");
-        final BuildVariant buildVariant = new BuildVariant("default");
+        final BuildVariant buildVariant = new BuildVariant("default", true);
         buildVariant.addBuildOption(BuildVariant.COM_SAP_JDK_HOME_PATH_KEY, JdkHomeAlias.Jdk142Home.toString());
         config.setBuildVariant(buildVariant);
         assertThat(config.getJdkHomeAlias(), equalTo(JdkHomeAlias.Jdk142Home));

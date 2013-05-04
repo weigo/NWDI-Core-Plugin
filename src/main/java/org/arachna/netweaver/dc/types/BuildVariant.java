@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 
 /**
  * build variant to use for a compartment.
@@ -28,17 +29,24 @@ public final class BuildVariant {
     private final Map<String, String> buildOptions = new HashMap<String, String>();
 
     /**
+     * Flag to indicate whether this build variant is required to execute prior
+     * to activation of activities.
+     */
+    private final boolean requiredForActivation;
+
+    /**
      * Create a build variant with the given name.
      * 
      * @param name
      *            name of build variant.
      */
-    public BuildVariant(final String name) {
+    public BuildVariant(final String name, final boolean requiredForActivation) {
         if (StringUtils.isEmpty(name)) {
             throw new IllegalArgumentException("A build variant must have a name!");
         }
 
         this.name = name;
+        this.requiredForActivation = requiredForActivation;
     }
 
     /**
@@ -60,6 +68,16 @@ public final class BuildVariant {
      */
     public void addBuildOption(final String name, final String value) {
         buildOptions.put(name, value);
+    }
+
+    /**
+     * Add build option to this build variant.
+     * 
+     * @param option
+     *            new build option.
+     */
+    public void add(final BuildOption option) {
+        addBuildOption(option.getName(), option.getValue());
     }
 
     /**
@@ -92,5 +110,65 @@ public final class BuildVariant {
      */
     public String getJdkHomePath() {
         return buildOptions.get(COM_SAP_JDK_HOME_PATH_KEY);
+    }
+
+    /**
+     * Indicate whether this build variant is required to execute prior to
+     * activation of activities.
+     * 
+     * @return <code>true</code> when this build variant is required for
+     *         activation, <code>false</code> otherwise.
+     */
+    public boolean isRequiredForActivation() {
+        return requiredForActivation;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        final HashCodeBuilder builder = new HashCodeBuilder();
+        builder.append(name).append(requiredForActivation);
+
+        for (final Map.Entry<String, String> buildOption : buildOptions.entrySet()) {
+            builder.append(buildOption.getKey()).append(buildOption.getValue());
+        }
+
+        return builder.toHashCode();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * Compare with other build variant property-wise.
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+
+        final BuildVariant other = (BuildVariant)obj;
+
+        final int hashCode = hashCode();
+        final int hashCode2 = other.hashCode();
+        return hashCode == hashCode2;
+    }
+
+    /**
+     * Merge the build options from the given build varaint into this one (only
+     * if it has the same name).
+     * 
+     * @param variant
+     *            build variant whose build options are to merge into this.
+     */
+    public void mergeBuildOptions(final BuildVariant variant) {
+        for (final String name : variant.getBuildOptionNames()) {
+            addBuildOption(name, variant.getBuildOption(name));
+        }
     }
 }

@@ -20,14 +20,12 @@ import org.xml.sax.SAXException;
  */
 abstract class AbstractComponentConfigurationReader implements ComponentConfigurationReader {
     /**
-     * Update the given development component from the given
-     * <code>portalapp.xml</code> file.
+     * Update the given development component from the given configuration file.
      * 
      * @param component
      *            development component to update from given reader.
      * @param reader
-     *            reader object for reading the <code>portalapp.xml</code> of
-     *            the given portal component.
+     *            reader object for reading the configuration file.
      */
     public void execute(final DevelopmentComponent component, final Reader reader) {
         try {

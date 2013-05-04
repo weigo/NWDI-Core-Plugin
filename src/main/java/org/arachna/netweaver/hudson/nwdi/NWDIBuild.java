@@ -37,8 +37,6 @@ import org.arachna.netweaver.hudson.util.FilePathHelper;
 import org.arachna.netweaver.tools.DIToolCommandExecutionResult;
 import org.arachna.netweaver.tools.cbs.CBSToolCommandExecutor;
 import org.arachna.netweaver.tools.dc.DCToolCommandExecutor;
-import org.arachna.xml.XmlReaderHelper;
-import org.xml.sax.SAXException;
 
 /**
  * A job for building a NWDI development configuration/track.
@@ -108,13 +106,8 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
     public DevelopmentConfiguration getDevelopmentConfiguration() {
         if (developmentConfiguration == null) {
             try {
-                final ConfDefReader confdefReader = new ConfDefReader();
-                new XmlReaderHelper(confdefReader).parse(new StringReader(getDtcFolder().child(".confdef")
-                    .readToString()));
-                developmentConfiguration = confdefReader.getDevelopmentConfiguration();
-            }
-            catch (final SAXException e) {
-                throw new RuntimeException(e);
+                developmentConfiguration =
+                    new ConfDefReader().execute(new StringReader(getDtcFolder().child(".confdef").readToString()));
             }
             catch (final IOException e) {
                 throw new RuntimeException(e);
