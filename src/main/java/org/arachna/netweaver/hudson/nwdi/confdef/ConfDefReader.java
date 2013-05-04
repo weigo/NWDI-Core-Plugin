@@ -33,6 +33,11 @@ public class ConfDefReader {
     private static final String YES = "yes";
 
     /**
+     * Factory for {@link BuildVariant} objects.
+     */
+    private final BuildVariantFactory buildVariantFactory = new BuildVariantFactory();
+
+    /**
      * Update the given development component from the given
      * <code>portalapp.xml</code> file.
      * 
@@ -47,9 +52,9 @@ public class ConfDefReader {
             final Digester digester = digesterLoader.newDigester();
 
             final DevelopmentConfiguration config = (DevelopmentConfiguration)digester.parse(reader);
-            final BuildVariant defaultBuildVariant = findBuildVariant(config.getCompartments(CompartmentState.Source));
 
-            config.setBuildVariant(defaultBuildVariant);
+            config.setBuildVariant(buildVariantFactory.findBuildVariantRequiredForActivation(config
+                .getCompartments(CompartmentState.Source)));
 
             return config;
         }
@@ -67,57 +72,6 @@ public class ConfDefReader {
                 throw new RuntimeException(e);
             }
         }
-    }
-
-    /**
-     * Find the build variant to use as default.
-     * 
-     * @param sourceCompartments
-     *            collection of compartments in source state.
-     * @return the build variant to use as default (the one that is used for
-     *         building in the CBS).
-     */
-    private BuildVariant findBuildVariant(final Collection<Compartment> sourceCompartments) {
-        final Map<String, BuildVariant> buildVariants = mergeBuildOptions(sourceCompartments);
-        BuildVariant defaultBuildVariant = buildVariants.get("default");
-
-        if (defaultBuildVariant == null) {
-            for (final BuildVariant variant : buildVariants.values()) {
-                if (variant.isRequiredForActivation()) {
-                    defaultBuildVariant = variant;
-                }
-            }
-        }
-
-        return defaultBuildVariant;
-    }
-
-    /**
-     * Merge build options of variants with the same name and collect those
-     * variants in a map.
-     * 
-     * @param sourceCompartments
-     *            compartments in source state contianing the build variants to
-     *            merge.
-     * @return a mapping of names to build variants.
-     */
-    protected Map<String, BuildVariant> mergeBuildOptions(final Collection<Compartment> sourceCompartments) {
-        final Map<String, BuildVariant> buildVariants = new HashMap<String, BuildVariant>();
-
-        for (final Compartment compartment : sourceCompartments) {
-            for (final BuildVariant variant : compartment.getBuildVariants()) {
-                final BuildVariant v = buildVariants.get(variant.getName());
-
-                if (v == null) {
-                    buildVariants.put(variant.getName(), variant);
-                }
-                else {
-                    v.mergeBuildOptions(variant);
-                }
-            }
-        }
-
-        return buildVariants;
     }
 
     /**
@@ -141,7 +95,7 @@ public class ConfDefReader {
                 .callMethod("addUsedCompartment").withParamTypes(String.class).withParamCount(1)
                 .usingElementBodyAsArgument();
             forPattern("configuration/sc-compartments/sc-compartment/build-variants/build-variant").factoryCreate()
-                .usingFactory(new BuildVariantFactory()).then().setNext("add");
+                .usingFactory(buildVariantFactory).then().setNext("add");
             forPattern(
                 "configuration/sc-compartments/sc-compartment/build-variants/build-variant/build-options/build-option")
                 .factoryCreate().usingFactory(new BuildOptionFactory()).then().setNext("add");
@@ -157,7 +111,8 @@ public class ConfDefReader {
      * 
      * @author Dirk Weigenand
      */
-    private class DevelopmentConfigurationFactory extends AbstractObjectCreationFactory<DevelopmentConfiguration> {
+    private static class DevelopmentConfigurationFactory extends
+        AbstractObjectCreationFactory<DevelopmentConfiguration> {
         @Override
         public DevelopmentConfiguration createObject(final Attributes attributes) throws Exception {
             final DevelopmentConfiguration config = new DevelopmentConfiguration(attributes.getValue("name"));
@@ -176,7 +131,7 @@ public class ConfDefReader {
      * 
      * @author Dirk Weigenand
      */
-    private class CompartmentFactory extends AbstractObjectCreationFactory<Compartment> {
+    private static class CompartmentFactory extends AbstractObjectCreationFactory<Compartment> {
         @Override
         public Compartment createObject(final Attributes attributes) throws Exception {
             final CompartmentState state =
@@ -191,7 +146,7 @@ public class ConfDefReader {
      * 
      * @author Dirk Weigenand
      */
-    private class DtrUrlFactory extends AbstractObjectCreationFactory<String> {
+    private static class DtrUrlFactory extends AbstractObjectCreationFactory<String> {
         @Override
         public String createObject(final Attributes attributes) throws Exception {
             return attributes.getValue("url");
@@ -204,7 +159,12 @@ public class ConfDefReader {
      * 
      * @author Dirk Weigenand
      */
-    private class BuildVariantFactory extends AbstractObjectCreationFactory<BuildVariant> {
+    private static class BuildVariantFactory extends AbstractObjectCreationFactory<BuildVariant> {
+        /**
+         * mapping from name to build variants.
+         */
+        private final Map<String, BuildVariant> buildVariants = new HashMap<String, BuildVariant>();
+
         /**
          * Create a new {@link BuildVariant} object from the <code>name</code>
          * and <code>required-for-activation</code> attributes of a
@@ -217,8 +177,36 @@ public class ConfDefReader {
          */
         @Override
         public BuildVariant createObject(final Attributes attributes) throws Exception {
-            return new BuildVariant(attributes.getValue("name"), YES.equals(attributes
-                .getValue("required-for-activation")));
+            BuildVariant variant = buildVariants.get(attributes.getValue("name"));
+
+            if (null == variant) {
+                variant =
+                    new BuildVariant(attributes.getValue("name"), YES.equals(attributes
+                        .getValue("required-for-activation")));
+                buildVariants.put(variant.getName(), variant);
+            }
+
+            return variant;
+        }
+
+        /**
+         * Find the build variant to use as default.
+         * 
+         * @param sourceCompartments
+         *            collection of compartments in source state.
+         * @return the build variant to use as default (the one that is used for
+         *         building in the CBS).
+         */
+        private BuildVariant findBuildVariantRequiredForActivation(final Collection<Compartment> sourceCompartments) {
+            BuildVariant defaultBuildVariant = null;
+
+            for (final BuildVariant variant : buildVariants.values()) {
+                if (variant.isRequiredForActivation()) {
+                    defaultBuildVariant = variant;
+                }
+            }
+
+            return defaultBuildVariant;
         }
     }
 
@@ -228,7 +216,7 @@ public class ConfDefReader {
      * 
      * @author Dirk Weigenand
      */
-    private class BuildOptionFactory extends AbstractObjectCreationFactory<BuildOption> {
+    private static class BuildOptionFactory extends AbstractObjectCreationFactory<BuildOption> {
         @Override
         public BuildOption createObject(final Attributes attributes) throws Exception {
             return new BuildOption(attributes.getValue("name"));
