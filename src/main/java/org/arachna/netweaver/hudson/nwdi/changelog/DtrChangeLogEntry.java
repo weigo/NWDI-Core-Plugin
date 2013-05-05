@@ -30,7 +30,7 @@ import org.arachna.netweaver.hudson.dtr.browser.ActivityResource;
  * 
  * @author Dirk Weigenand
  */
-final class DtrChangeLogEntry extends Entry {
+public final class DtrChangeLogEntry extends Entry {
     /**
      * date format specification for check in times.
      */
