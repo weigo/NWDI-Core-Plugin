@@ -5,6 +5,7 @@ package org.arachna.netweaver.hudson.nwdi.changelog;
 
 import hudson.model.AbstractBuild;
 import hudson.scm.ChangeLogParser;
+import hudson.scm.ChangeLogSet;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -23,6 +24,7 @@ public final class ChangeLogService {
      * Write the given activities as change log into the given file.
      * 
      * @param build
+     *            build to use for creating the {@link ChangeLogSet}.
      * @param changelogFile
      *            file to write change log into.
      * @param activities
@@ -37,6 +39,11 @@ public final class ChangeLogService {
         dtrChangeLogWriter.write();
     }
 
+    /**
+     * Create a DTR change log parser.
+     * 
+     * @return a new DTR change log parser.
+     */
     public ChangeLogParser createChangeLogParser() {
         return new DtrChangeLogParser();
     }
