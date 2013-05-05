@@ -32,6 +32,32 @@ import org.junit.Test;
  */
 public final class ConfDefReaderTest {
     /**
+     * SC name for SAP_JTECHS.
+     */
+    private static final String SAP_JTECHS = "sap.com_SAP_JTECHS_1";
+
+    /**
+     * SC name for SAP_BUILDT.
+     */
+    private static final String SAP_BUILDT = "sap.com_SAP_BUILDT_1";
+
+    /**
+     * SC name for SAP_JEE.
+     */
+    private static final String SAP_JEE = "sap.com_SAP-JEE_1";
+
+    /**
+     * example SC name.
+     */
+    private static final String EXAMPLE_SC1 = "example.com_EXAMPLE_SC1_1";
+
+    /**
+     * name of development configuration with a default build variant.
+     */
+    private static final String CONFDEF_WITH_CONFIGURED_DEFAULT_BUILD_VARIANT =
+        "DevelopmentConfigurationWithConfiguredDefaultBuildVariant.confdef";
+
+    /**
      * instance under test.
      */
     private ConfDefReader configurationReader;
@@ -58,9 +84,8 @@ public final class ConfDefReaderTest {
      * .
      */
     @Test
-    public final void testConfigurationElementRules() {
-        final DevelopmentConfiguration config =
-            getConfiguration("DevelopmentConfigurationWithConfiguredDefaultBuildVariant.confdef");
+    public void testConfigurationElementRules() {
+        final DevelopmentConfiguration config = getConfiguration(CONFDEF_WITH_CONFIGURED_DEFAULT_BUILD_VARIANT);
         assertThat(config, notNullValue());
         assertThat(config.getName(), equalTo("DI0_Example_D"));
         assertThat(config.getWorkspace(), equalTo("Example"));
@@ -72,9 +97,8 @@ public final class ConfDefReaderTest {
      * .
      */
     @Test
-    public final void testConfigurationDescriptionRule() {
-        final DevelopmentConfiguration config =
-            getConfiguration("DevelopmentConfigurationWithConfiguredDefaultBuildVariant.confdef");
+    public void testConfigurationDescriptionRule() {
+        final DevelopmentConfiguration config = getConfiguration(CONFDEF_WITH_CONFIGURED_DEFAULT_BUILD_VARIANT);
         assertThat(config, notNullValue());
         assertThat(config.getDescription(), equalTo("Example Track_dev"));
     }
@@ -85,9 +109,8 @@ public final class ConfDefReaderTest {
      * .
      */
     @Test
-    public final void testConfigurationBuildServerRule() {
-        final DevelopmentConfiguration config =
-            getConfiguration("DevelopmentConfigurationWithConfiguredDefaultBuildVariant.confdef");
+    public void testConfigurationBuildServerRule() {
+        final DevelopmentConfiguration config = getConfiguration(CONFDEF_WITH_CONFIGURED_DEFAULT_BUILD_VARIANT);
         assertThat(config, notNullValue());
         assertThat(config.getBuildServer(), equalTo("http://di0db.example.com:50000"));
     }
@@ -98,15 +121,13 @@ public final class ConfDefReaderTest {
      * .
      */
     @Test
-    public final void testConfigurationCompartmentRule() {
-        final DevelopmentConfiguration config =
-            getConfiguration("DevelopmentConfigurationWithConfiguredDefaultBuildVariant.confdef");
+    public void testConfigurationCompartmentRule() {
+        final DevelopmentConfiguration config = getConfiguration(CONFDEF_WITH_CONFIGURED_DEFAULT_BUILD_VARIANT);
         assertThat(config, notNullValue());
-        final String compartmentName = "example.com_EXAMPLE_SC1_1";
-        final Compartment compartment = config.getCompartment(compartmentName);
+        final Compartment compartment = config.getCompartment(EXAMPLE_SC1);
         assertThat(compartment, notNullValue());
 
-        final Compartment expectedCompartment = Compartment.create(compartmentName, CompartmentState.Source);
+        final Compartment expectedCompartment = Compartment.create(EXAMPLE_SC1, CompartmentState.Source);
         assertThat(compartment.getName(), equalTo(expectedCompartment.getName()));
         assertThat(compartment.getCaption(), equalTo(expectedCompartment.getCaption()));
         assertThat(compartment.getSoftwareComponent(), equalTo(expectedCompartment.getSoftwareComponent()));
@@ -120,11 +141,10 @@ public final class ConfDefReaderTest {
      * .
      */
     @Test
-    public final void testConfigurationCompartmentDtrUrlRule() {
-        final DevelopmentConfiguration config =
-            getConfiguration("DevelopmentConfigurationWithConfiguredDefaultBuildVariant.confdef");
+    public void testConfigurationCompartmentDtrUrlRule() {
+        final DevelopmentConfiguration config = getConfiguration(CONFDEF_WITH_CONFIGURED_DEFAULT_BUILD_VARIANT);
         assertThat(config, notNullValue());
-        final Compartment compartment = config.getCompartment("example.com_EXAMPLE_SC1_1");
+        final Compartment compartment = config.getCompartment(EXAMPLE_SC1);
         assertThat(compartment, notNullValue());
         assertThat(compartment.getDtrUrl(), equalTo("http://di0db.example.com:50000/dtr"));
     }
@@ -135,11 +155,10 @@ public final class ConfDefReaderTest {
      * .
      */
     @Test
-    public final void testConfigurationCompartmentInactiveLocationRule() {
-        final DevelopmentConfiguration config =
-            getConfiguration("DevelopmentConfigurationWithConfiguredDefaultBuildVariant.confdef");
+    public void testConfigurationCompartmentInactiveLocationRule() {
+        final DevelopmentConfiguration config = getConfiguration(CONFDEF_WITH_CONFIGURED_DEFAULT_BUILD_VARIANT);
         assertThat(config, notNullValue());
-        final Compartment compartment = config.getCompartment("example.com_EXAMPLE_SC1_1");
+        final Compartment compartment = config.getCompartment(EXAMPLE_SC1);
         assertThat(compartment, notNullValue());
         assertThat(compartment.getInactiveLocation(), equalTo("ws/Example/example.com_EXAMPLE_SC1/dev/inactive/"));
     }
@@ -150,20 +169,16 @@ public final class ConfDefReaderTest {
      * .
      */
     @Test
-    public final void testConfigurationCompartmentDependenciesRule() {
-        final DevelopmentConfiguration config =
-            getConfiguration("DevelopmentConfigurationWithConfiguredDefaultBuildVariant.confdef");
+    public void testConfigurationCompartmentDependenciesRule() {
+        final DevelopmentConfiguration config = getConfiguration(CONFDEF_WITH_CONFIGURED_DEFAULT_BUILD_VARIANT);
         assertThat(config, notNullValue());
-        final Compartment compartment = config.getCompartment("example.com_EXAMPLE_SC1_1");
+        final Compartment compartment = config.getCompartment(EXAMPLE_SC1);
         assertThat(compartment, notNullValue());
         assertThat(compartment.getUsedCompartments(), hasSize(3));
 
-        assertThat(Compartment.create("sap.com_SAP-JEE_1", CompartmentState.Archive),
-            isIn(compartment.getUsedCompartments()));
-        assertThat(Compartment.create("sap.com_SAP_BUILDT_1", CompartmentState.Archive),
-            isIn(compartment.getUsedCompartments()));
-        assertThat(Compartment.create("sap.com_SAP_JTECHS_1", CompartmentState.Archive),
-            isIn(compartment.getUsedCompartments()));
+        assertThat(Compartment.create(SAP_JEE, CompartmentState.Archive), isIn(compartment.getUsedCompartments()));
+        assertThat(Compartment.create(SAP_BUILDT, CompartmentState.Archive), isIn(compartment.getUsedCompartments()));
+        assertThat(Compartment.create(SAP_JTECHS, CompartmentState.Archive), isIn(compartment.getUsedCompartments()));
     }
 
     /**
@@ -172,11 +187,10 @@ public final class ConfDefReaderTest {
      * .
      */
     @Test
-    public final void testConfigurationCompartmentBuildVariantsRule() {
-        final DevelopmentConfiguration config =
-            getConfiguration("DevelopmentConfigurationWithConfiguredDefaultBuildVariant.confdef");
+    public void testConfigurationCompartmentBuildVariantsRule() {
+        final DevelopmentConfiguration config = getConfiguration(CONFDEF_WITH_CONFIGURED_DEFAULT_BUILD_VARIANT);
         assertThat(config, notNullValue());
-        final Compartment compartment = config.getCompartment("example.com_EXAMPLE_SC1_1");
+        final Compartment compartment = config.getCompartment(EXAMPLE_SC1);
         assertThat(compartment, notNullValue());
         final BuildVariant expectedBuildVariant = new BuildVariant("default", true);
         expectedBuildVariant.add(new BuildOption("com.sap.jdk.home_path_key", "JDK1.3.1_HOME"));
@@ -195,7 +209,7 @@ public final class ConfDefReaderTest {
 
         final Collection<Compartment> compartments = configuration.getCompartments();
 
-        assertThat(8, equalTo(compartments.size()));
+        assertThat(compartments, hasSize(8));
 
         final Set<String> compartmentNames = getExpectedCompartmentNames();
 
@@ -219,25 +233,33 @@ public final class ConfDefReaderTest {
         }
     }
 
+    /**
+     * Read development configuration from given resource on class path.
+     * 
+     * @param configFileName
+     *            name of config file on class path.
+     * @return the development configuration read from the configuration file.
+     */
     private DevelopmentConfiguration getConfiguration(final String configFileName) {
         return configurationReader.execute(new InputStreamReader(this.getClass().getResourceAsStream(
             String.format("/org/arachna/netweaver/hudson/nwdi/confdef/%s", configFileName))));
     }
 
     /**
-     * @return
+     * Get a collection of expected compartment names.
+     * 
+     * @return collection of expected compartment names
      */
     private Set<String> getExpectedCompartmentNames() {
         final Set<String> compartmentNames = new HashSet<String>();
 
-        compartmentNames.add("example.com_EXAMPLE_SC1_1");
-        compartmentNames.add("sap.com_FRAMEWORK_1");
+        compartmentNames.add(EXAMPLE_SC1);
         compartmentNames.add("sap.com_ENGFACADE_1");
         compartmentNames.add("sap.com_EP_BUILDT_1");
         compartmentNames.add("sap.com_FRAMEWORK_1");
-        compartmentNames.add("sap.com_SAP_BUILDT_1");
-        compartmentNames.add("sap.com_SAP_JTECHS_1");
-        compartmentNames.add("sap.com_SAP-JEE_1");
+        compartmentNames.add(SAP_BUILDT);
+        compartmentNames.add(SAP_JTECHS);
+        compartmentNames.add(SAP_JEE);
         compartmentNames.add("sap.com_WD-RUNTIME_1");
 
         return compartmentNames;
