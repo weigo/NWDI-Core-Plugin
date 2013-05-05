@@ -1,7 +1,7 @@
 /**
  *
  */
-package org.arachna.netweaver.hudson.nwdi;
+package org.arachna.netweaver.hudson.nwdi.changelog;
 
 import hudson.Util;
 
@@ -9,14 +9,14 @@ import java.io.IOException;
 import java.io.Writer;
 import java.text.SimpleDateFormat;
 
-import org.arachna.netweaver.hudson.nwdi.DtrChangeLogEntry.Item;
+import org.arachna.netweaver.hudson.nwdi.changelog.DtrChangeLogEntry.Item;
 
 /**
  * Persist a {@link DtrChangeLogSet} to a file as XML.
  * 
  * @author Dirk Weigenand
  */
-public class DtrChangeLogWriter {
+class DtrChangeLogWriter {
     /**
      * the writer to write the XML into.
      */
@@ -28,7 +28,8 @@ public class DtrChangeLogWriter {
     private final DtrChangeLogSet changeSet;
 
     /**
-     * Create an instance of a <code></code> using the given {@link DtrChangeLogSet} and writer.
+     * Create an instance of a <code></code> using the given
+     * {@link DtrChangeLogSet} and writer.
      * 
      * @param changeSet
      *            change set to persist to XML.
@@ -41,9 +42,11 @@ public class DtrChangeLogWriter {
     }
 
     /**
-     * Write the change set as XML into the writer given when this writer was created.
+     * Write the change set as XML into the writer given when this writer was
+     * created.
      * 
-     * Closes the writer at the end, so calling it more than once will result in an exception.
+     * Closes the writer at the end, so calling it more than once will result in
+     * an exception.
      * 
      * @throws IOException
      *             when an error occurs writing the XML.
@@ -53,7 +56,7 @@ public class DtrChangeLogWriter {
         changeLog.write("<changelog>\n");
         final SimpleDateFormat format = new SimpleDateFormat(DtrChangeLogEntry.DATE_FORMAT_SPEC);
 
-        for (final DtrChangeLogEntry entry : this.changeSet) {
+        for (final DtrChangeLogEntry entry : changeSet) {
             changeLog
                 .write(String.format("\t<changeset activityUrl=\"%s\">\n", Util.xmlEscape(entry.getActivityUrl())));
             changeLog.write(String.format("\t\t<date>%s</date>\n", format.format(entry.getCheckInTime())));

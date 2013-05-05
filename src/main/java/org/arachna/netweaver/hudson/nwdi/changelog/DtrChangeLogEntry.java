@@ -1,7 +1,7 @@
 /**
  *
  */
-package org.arachna.netweaver.hudson.nwdi;
+package org.arachna.netweaver.hudson.nwdi.changelog;
 
 import hudson.Util;
 import hudson.model.User;
@@ -30,7 +30,7 @@ import org.arachna.netweaver.hudson.dtr.browser.ActivityResource;
  * 
  * @author Dirk Weigenand
  */
-public final class DtrChangeLogEntry extends Entry {
+final class DtrChangeLogEntry extends Entry {
     /**
      * date format specification for check in times.
      */
@@ -114,17 +114,19 @@ public final class DtrChangeLogEntry extends Entry {
     }
 
     /**
-     * Add {@link Item}
+     * Add {@link Item}.
      * 
      * @param item
+     *            item to add to this changelog entry.
      */
-    void add(final Item item) {
+    public void add(final Item item) {
         item.setParent(this);
         items.add(item);
     }
 
     /**
-     * Add the given {@link ActivityResource} as an {@link Item} to this changelog entry.
+     * Add the given {@link ActivityResource} as an {@link Item} to this
+     * changelog entry.
      * 
      * @param resource
      *            <code>ActivityResource</code> to add to change log.
@@ -144,9 +146,11 @@ public final class DtrChangeLogEntry extends Entry {
     }
 
     /**
-     * Get paths (to resources) affected by the recent activities depicted by this change log.
+     * Get paths (to resources) affected by the recent activities depicted by
+     * this change log.
      * 
-     * @return paths (to resources) affected by the recent activities depicted by this change log.
+     * @return paths (to resources) affected by the recent activities depicted
+     *         by this change log.
      */
     @Override
     public Collection<String> getAffectedPaths() {
@@ -180,6 +184,8 @@ public final class DtrChangeLogEntry extends Entry {
 
     /**
      * Returns the message associated with this entry.
+     * 
+     * @return the commit message of this entry.
      */
     @Override
     public String getMsg() {
@@ -199,7 +205,7 @@ public final class DtrChangeLogEntry extends Entry {
      * @param msg
      *            the msg to set
      */
-    void setMsg(final String msg) {
+    public void setMsg(final String msg) {
         this.msg = msg == null ? "" : msg;
     }
 
@@ -208,18 +214,18 @@ public final class DtrChangeLogEntry extends Entry {
      *            the checkInTime to set
      * @throws ParseException
      */
-    void setCheckInTime(final String checkInTime) {
+    public void setCheckInTime(final String checkInTime) {
         final SimpleDateFormat format = new SimpleDateFormat(DATE_FORMAT_SPEC);
 
         try {
             this.checkInTime = format.parse(checkInTime);
         }
         catch (final ParseException e) {
-            throw new RuntimeException(e);
+            throw new IllegalArgumentException(e);
         }
     }
 
-    void setUser(final String user) {
+    public void setUser(final String user) {
         this.user = user;
     }
 
@@ -231,11 +237,11 @@ public final class DtrChangeLogEntry extends Entry {
     }
 
     /**
-     * Returns the URL that can be used to display information about this activity.
+     * Returns the URL that can be used to display information about this
+     * activity.
      * 
-     * @param dtrUrl
-     *            URL to DTR.
-     * @return the URL that can be used to display information about this activity.
+     * @return the URL that can be used to display information about this
+     *         activity.
      */
     public String getActivityUrl() {
         return activityUrl;
@@ -264,7 +270,7 @@ public final class DtrChangeLogEntry extends Entry {
      * @param description
      *            the long description of this DtrChangeLogEntry
      */
-    void setDescription(final String description) {
+    public void setDescription(final String description) {
         this.description = description == null ? "" : description;
     }
 
@@ -274,7 +280,8 @@ public final class DtrChangeLogEntry extends Entry {
     }
 
     /**
-     * An <code>Item</code> represents a resource associated with an activity an is used to visualize it.
+     * An <code>Item</code> represents a resource associated with an activity an
+     * is used to visualize it.
      * 
      * @author Dirk Weigenand
      */
@@ -361,6 +368,51 @@ public final class DtrChangeLogEntry extends Entry {
 
             return editType;
         }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + (action == null ? 0 : action.hashCode());
+            result = prime * result + (parent == null ? 0 : parent.hashCode());
+            result = prime * result + (path == null ? 0 : path.hashCode());
+            return result;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean equals(final Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            final Item other = (Item)obj;
+            if (action != other.action) {
+                return false;
+            }
+
+            if (path == null) {
+                if (other.path != null) {
+                    return false;
+                }
+            }
+            else if (!path.equals(other.path)) {
+                return false;
+            }
+
+            return true;
+        }
+
     }
 
     /**

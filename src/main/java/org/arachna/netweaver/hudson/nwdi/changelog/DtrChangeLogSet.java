@@ -1,7 +1,7 @@
 /**
  *
  */
-package org.arachna.netweaver.hudson.nwdi;
+package org.arachna.netweaver.hudson.nwdi.changelog;
 
 import hudson.model.AbstractBuild;
 import hudson.scm.ChangeLogSet;

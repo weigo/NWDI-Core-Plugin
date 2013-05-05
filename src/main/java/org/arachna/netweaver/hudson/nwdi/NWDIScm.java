@@ -18,7 +18,6 @@ import hudson.scm.SCMRevisionState;
 import hudson.scm.SCM;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Collection;
@@ -34,6 +33,7 @@ import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 import org.arachna.netweaver.hudson.dtr.browser.Activity;
 import org.arachna.netweaver.hudson.dtr.browser.DtrBrowser;
+import org.arachna.netweaver.hudson.nwdi.changelog.ChangeLogService;
 import org.arachna.netweaver.hudson.nwdi.dcupdater.DevelopmentComponentUpdater;
 import org.arachna.netweaver.tools.DIToolCommandExecutionResult;
 import org.arachna.netweaver.tools.dc.DCToolCommandExecutor;
@@ -66,6 +66,11 @@ public class NWDIScm extends SCM {
     private final transient String password;
 
     /**
+     * Service for reading/writing DTR change logs.
+     */
+    private transient ChangeLogService changeLogService = new ChangeLogService();
+
+    /**
      * Create an instance of a <code>NWDIScm</code>.
      * 
      * @param dtrUser
@@ -85,11 +90,13 @@ public class NWDIScm extends SCM {
     }
 
     /**
+     * Create parser for DTR change logs.
+     * 
      * {@inheritDoc}
      */
     @Override
     public ChangeLogParser createChangeLogParser() {
-        return new DtrChangeLogParser();
+        return changeLogService.createChangeLogParser();
     }
 
     /**
@@ -235,9 +242,7 @@ public class NWDIScm extends SCM {
      */
     private void writeChangeLog(final AbstractBuild<?, ?> build, final File changelogFile,
         final Collection<Activity> activities) throws IOException {
-        final DtrChangeLogWriter dtrChangeLogWriter =
-            new DtrChangeLogWriter(new DtrChangeLogSet(build, activities), new FileWriter(changelogFile));
-        dtrChangeLogWriter.write();
+        changeLogService.writeChangeLog(build, changelogFile, activities);
     }
 
     /**

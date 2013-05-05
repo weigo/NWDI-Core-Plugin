@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<changelog>
+	<changeset activityUrl="/dtr/system-tools/reports/ResourceDetails?path=/act/default_w_XMPL_example_2e_org_UNIT_TEST_SUPPORT_dev_inactive_u_weigo_t_2012_11_11_22_41_24_GMT_ebf9a8ae-2c50-11e2-8933-00e04da4ba37&amp;technical=false">
+		<date>20121111 23:46:14 +0100</date>
+		<user>weigo</user>
+		<comment>add hamcrest-library-1.3.jar to hamcrest DC</comment>
+		<description>description</description>
+		<items>
+			<item action="add">hamcrest.org/hamcrest/comp_/libraries/hamcrest-library-1.3.jar</item>
+			<item action="add">hamcrest.org/hamcrest/comp_/libraries</item>
+		</items>
+	</changeset>
+</changelog>
