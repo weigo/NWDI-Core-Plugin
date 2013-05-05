@@ -1,7 +1,7 @@
 /**
  *
  */
-package org.arachna.netweaver.hudson.nwdi.confdef;
+package org.arachna.netweaver.hudson.nwdi;
 
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -242,7 +242,7 @@ public final class ConfDefReaderTest {
      */
     private DevelopmentConfiguration getConfiguration(final String configFileName) {
         return configurationReader.execute(new InputStreamReader(this.getClass().getResourceAsStream(
-            String.format("/org/arachna/netweaver/hudson/nwdi/confdef/%s", configFileName))));
+            String.format("/org/arachna/netweaver/hudson/nwdi/%s", configFileName))));
     }
 
     /**

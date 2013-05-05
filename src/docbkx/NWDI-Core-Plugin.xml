@@ -18,181 +18,386 @@
       </author>
     </authorgroup>
     <copyright>
-      <year>2010-12</year>
-      <holder>Dirk
-        Weigenand
+      <year>2010-13</year>
+      <holder>Dirk Weigenand
       </holder>
     </copyright>
   </info>
   <chapter>
     <title>Introduction</title>
-    <para>The NWDI-Core-Plugin integrates the SAP NetWeaver development
-      infrastructure (NWDI) into the Jenkins continuous integration
-      environment.
+
+    <para>Did you ever wonder how to integrate quality assessment tools like Checkstyle, FindBugs and Sonar into the NetWeaver development
+      infrastructure (NWDI)? You have come a long way to an answer to this question.
     </para>
-    <para>The plugin adds various new capabilities to Jenkins:</para>
-    <itemizedlist>
-      <listitem>
-        <para>A new project type that lets the user configure a CBS build space (or NWDI track) to monitor for changes and build.</para>
-      </listitem>
-      <listitem>
-        <para>A new source code management system (SCM) that monitors the configured track for changes to development components.</para>
-      </listitem>
-      <listitem>
-        <para>A new type of build that synchronizes changed development components (and their dependencies) to a Jenkins workspace and
-          builds those components.
-        </para>
-      </listitem>
-    </itemizedlist>
-    <para>
-      The plugin also exposes an object model to be used by other plugins to add functionality with respect to SAP NetWeaver development
-      components to Jenkins.
+    <para>This document describes how to build, install, configure and use the Jenkins NWDI-Core-Plugin. It will show you how to answer the
+      above question using the other members of the Jenkins NWDI-Plugin family.
     </para>
+    <section>
+      <title>What is the NWDI-Core-Plugin?</title>
+      <para>The NWDI-Core-Plugin integrates the SAP NetWeaver development
+        infrastructure (NWDI) into the Jenkins continuous integration
+        environment.
+      </para>
+      <para>The plugin adds various new capabilities to Jenkins:</para>
+      <itemizedlist>
+        <listitem>
+          <para>A new project type that lets the user configure a CBS build space (or NWDI track) to monitor for changes and build.</para>
+        </listitem>
+        <listitem>
+          <para>A new source code management system (SCM) that monitors the configured track for changes to development components.</para>
+        </listitem>
+        <listitem>
+          <para>A new type of build that synchronizes changed development components (and their dependencies) to a Jenkins workspace and
+            builds those components.
+          </para>
+        </listitem>
+      </itemizedlist>
+      <para>
+        The plugin also exposes an object model to be used by other plugins to add functionality with respect to SAP NetWeaver
+        development
+        components to Jenkins.
+      </para>
+    </section>
   </chapter>
   <chapter>
-    <title>Building and installing the plugin</title>
-    <para>
-      The plugin is not available through the Jenkins update center yet. To build the plugin you'll need to clone the following GitHub
-      repositories:
-    </para>
-    <programlisting>
+    <title>Build, installation and configuration of the NWDI-Core-Plugin</title>
+    <section>
+      <title>Building and installing the plugin</title>
+      <para>
+        The plugin is not available through the Jenkins update center yet. To build the plugin you'll need to clone the following GitHub
+        repositories:
+      </para>
+      <programlisting>
 <![CDATA[
 git clone git://github.com/weigo/NWDI-config-plugin.git
 git clone git://github.com/weigo/NWDI-pom-Plugin.git
 git clone git://github.com/weigo/NWDI-Core-Plugin.git]]>
-    </programlisting>
-    <para>
-      and build the Maven projects:
-    </para>
-    <programlisting>
+      </programlisting>
+      <para>
+        and build the Maven projects:
+      </para>
+      <para>
+        Prior to attempt to build the plugin you'll have to adjust your Maven configuration for Jenkins plugin development. For details on
+        how to adjust your
+        <code>settings.xml</code>
+        read the article
+        <link xl:href="https://wiki.jenkins-ci.org/display/JENKINS/Plugin+tutorial#Plugintutorial-SettingUpEnvironment">Plugin tutorial - Setting Up Environment</link>
+        . Now you're ready to build the plugin:
+      </para>
+      <programlisting>
 <![CDATA[
 for d in NWDI-config-plugin NWDI-pom-Plugin NWDI-Core-Plugin;\
   do (cd $d; mvn install); done]]>
-    </programlisting>
-    <para>
-      in
-      <filename class='directory'>NWDI-Core-Plugin/target</filename>
-      you'll find the
-      <filename>NWDI-Core-Plugin.hpi</filename>
-      file which you should upload using the Jenkins update center
-      extended
-      settings view.
-    </para>
-  </chapter>
-  <chapter>
-    <title>NetWeaver DI command line tools installation</title>
-    <section>
-      <title>NetWeaver 7.0.x</title>
+      </programlisting>
       <para>
-        With NetWeaver 7.0.x the DI command tools are provided together with NetWeaver developer studio. They
-        are located in the sub
-        folder
-        <filename class='directory'>tools</filename>
-        beneath your NWDS installation folder. Copy this folder to your
-        Jenkins server.
+        In the directory
+        <filename class='directory'>NWDI-Core-Plugin/target</filename>
+        you'll find the
+        <filename>NWDI-Core-Plugin.hpi</filename>
+        file which you should upload using the Jenkins update center
+        extended
+        settings view.
       </para>
     </section>
     <section>
-      <title>NetWeaver 7.1.+</title>
-      <para>
-        NetWeaver versions more recent than 7.0.x do not provide the DI command tools with the NetWeaver developer
-        studio. You'll need to
-        download the software component archive (SCA)
-        <filename>DICLIENTS.SCA</filename>
-        from SAP market place (enter 'DICLIENTS' as search term).
-      </para>
-      <para>
-        Unzip the SCA. In the sub folder
-        <filename class='directory'>DEPLOYARCHIVES</filename>
-        there is the SDA
-        <filename>tc~di~cmd_tools~sda.sda</filename>
-        . Extract the ZIP
-        archive
-        <filename>di_cmd_tools.zip</filename>
-        and copy it to your Jenkins Server. Unpack the archive to a location of your choice.
-      </para>
-    </section>
-    <section>
-      <title>patching dctool.(bat|sh)</title>
-      <para>
-        The batch file/shell script needs to be adapted to use the environment variable
-        <envar>JDK_PROPERTY_NAME</envar>
-        to build
-        other build variants
-        than `default`.
-      </para>
-      <para>On Unix systems please verify the encoding/line endings of the modified shell scripts. These should not contain
-        DOS line endings.
-        The interpreter to execute the shell scripts won't be found otherwise.
-      </para>
+      <title>NetWeaver DI command line tools installation</title>
       <section>
         <title>NetWeaver 7.0.x</title>
         <para>
-          The call to the Java VM (on Windows) should look like this:
+          With NetWeaver 7.0.x the DI command tools are provided together with NetWeaver developer studio. They
+          are located in the sub
+          folder
+          <filename class='directory'>tools</filename>
+          beneath your NWDS installation folder. Copy this folder to your
+          Jenkins server.
         </para>
-        <programlisting>
+      </section>
+      <section>
+        <title>NetWeaver 7.1.+</title>
+        <para>
+          NetWeaver versions more recent than 7.0.x do not provide the DI command tools with the NetWeaver developer
+          studio. You'll need to
+          download the software component archive (SCA)
+          <filename>DICLIENTS.SCA</filename>
+          from SAP market place (enter 'DICLIENTS' as search term).
+        </para>
+        <para>
+          Unzip the SCA. In the sub folder
+          <filename class='directory'>DEPLOYARCHIVES</filename>
+          there is the SDA
+          <filename>tc~di~cmd_tools~sda.sda.</filename>
+          Extract the ZIP archive
+          <filename>di_cmd_tools.zip</filename>
+          and copy it to your Jenkins Server. Unpack the archive to a location of your choice.
+        </para>
+      </section>
+      <section>
+        <title>patching dctool.(bat|sh)</title>
+        <para>
+          The batch file/shell script needs to be adapted to use the environment variable
+          <envar>JDK_PROPERTY_NAME</envar>
+          to build
+          other build variants
+          than `default`.
+        </para>
+        <para>On Unix systems please verify the encoding/line endings of the modified shell scripts. These should not contain
+          DOS line
+          endings.
+          The interpreter to execute the shell scripts won't be found otherwise.
+        </para>
+        <section>
+          <title>NetWeaver 7.0.x</title>
+          <para>
+            The call to the Java VM (on Windows) should look like this:
+          </para>
+          <programlisting>
 <![CDATA[call "%JAVA_HOME%\bin\java" -classpath "%startup%" -Xmx256m -Xss20m
   -Ddctool.jarrootdir="%NWDITOOLLIB%"
-  -Ddctool.JDK_PROPERTY_NAME="%JDK_PROPERTY_NAME%" %PARAM_JDK% %APPL% %*]]>
-        </programlisting>
-        <para>
-          On Unix the VM should be called like this:
-        </para>
-        <programlisting>
+  -Ddctool.JDK_PROPERTY_NAME="%JDK_PROPERTY_NAME%"
+  %PARAM_JDK% %APPL% %*]]>
+          </programlisting>
+          <para>
+            On Unix the VM should be called like this:
+          </para>
+          <programlisting>
 <![CDATA["$JAVA_HOME/bin/java" -classpath "$startup" -Xmx256m -Xss20m\
   -Ddctool.jarrootdir="$NWDITOOLLIB"\
   -Ddctool.JDK_PROPERTY_NAME="$JDK_PROPERTY_NAME" $PARAM_JDK $APPL $*
 ]]>
-        </programlisting>
-      </section>
-      <section>
-        <title>NetWeaver 7.1+</title>
-        <para>
-          The call to the Java VM (on Windows) should look like this:
-        </para>
-        <programlisting>
+          </programlisting>
+        </section>
+        <section>
+          <title>NetWeaver 7.1+</title>
+          <para>
+            The call to the Java VM (on Windows) should look like this:
+          </para>
+          <programlisting>
 <![CDATA[call "%JAVA_HOME%\bin\java" -classpath "%startup%" -Xmx256m -Xss20m
   -Dappl.jars="%NWDITOOLLIB%"
   -Dappl.classname=com.sap.tc.cetool.DcConsoleApplication
   -Ddctool.JDK_PROPERTY_NAME=%JDK_PROPERTY_NAME% %PARAM_JDK% %APPL% %*
 ]]>
-        </programlisting>
-        <para>
-          On a Unix system the shell script should call the Java VM like this:
-        </para>
-        <programlisting>
+          </programlisting>
+          <para>
+            On a Unix system the shell script should call the Java VM like this:
+          </para>
+          <programlisting>
 <![CDATA["$JAVA_HOME/bin/java" -cp "$startup" -Xmx256m -Xss20m\
   -Dappl.jars="$NWDITOOLLIB"\
   -Dappl.classname=com.sap.tc.cetool.DcConsoleApplication\
   -Ddctool.JDK_PROPERTY_NAME="$JDK_PROPERTY_NAME" $PARAM_JDK $APPL $*]]>
-        </programlisting>
+          </programlisting>
+        </section>
       </section>
+    </section>
+    <section>
+      <title>Global configuration</title>
+      <para>
+        After installation of the NWDI-Core-Plugin you'll find a new section
+        <emphasis>NetWeaver development infrastructure</emphasis>
+        on the Jenkins global configuration page.
+      </para>
+      <figure>
+        <info>
+          <title>global settings for the Jenkins NWDI-Core-Plugin</title>
+        </info>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="images/Jenkins-Global-Configuration-NWDI-Section.png" format="PNG" width="150mm" />
+          </imageobject>
+        </mediaobject>
+      </figure>
+      <para>The following table describes which information should go into which field in the above figure:</para>
+      <variablelist>
+        <varlistentry>
+          <term>NWDI tool library location (7.0.x)</term>
+          <listitem>Enter the path to where you installed the DI tools for NetWeaver 7.0.x,</listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>NWDI tool library location (7.1.+)</term>
+          <listitem>Enter the path to where you installed the DI tools for NetWeaver CE and beyond,</listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>JDK_HOME_PATHS</term>
+          <listitem>
+            <para>
+              In this field enter the values as configured in the NetWeaver Administrator (NWA) for NetWeaver CE and post CE systems or
+              using the Config Tool for NetWeaver 7.0.x systems. Valid keys are
+              <itemizedlist>
+                <listitem>JDK1.3.1_HOME,</listitem>
+                <listitem>JDK1.4.2_HOME,</listitem>
+                <listitem>JDK1.5.0_HOME and</listitem>
+                <listitem>JDK1.6.0_HOME.</listitem>
+              </itemizedlist>
+            </para>
+            <para>Separate multiple entries with semicolon.</para>
+            <para>
+              The article
+              <link xl:href="http://help.sap.com/saphelp_nw73/helpdata/en/4d/c149fa499d48318debe4249d80711c/frameset.htm">Building Using Different JDK Versions</link>
+              describes how the CBS determines which JDK version should be used to build a particular development component and how this can
+              be
+              configured.
+            </para>
+            <para>See also the next chapter for details on configuring the NWDI wrt. build paths and build variants.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>NWDI user</term>
+          <listitem>Enter the user that should be used to connect to the NWDI.</listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>NWDI password</term>
+          <listitem>Enter the password that should be used to authenticate the user against the NWDI.</listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>CBS URL</term>
+          <listitem>Enter the URL to be used to connect to the NWDI (This is the same URL you would enter in the NWDS to configure access to
+            the NWDI).
+          </listitem>
+        </varlistentry>
+      </variablelist>
     </section>
   </chapter>
   <chapter>
-    <title>Global configuration</title>
-    <para>
-      After installation of the NWDI-Core-Plugin you'll find a new section
-      <emphasis>NetWeaver development infrastructure</emphasis>
-      on the Jenkins global configuration page.
-    </para>
-    <figure>
-      <info>
-        <title>global settings for the Jenkins NWDI-Core-Plugin</title>
-      </info>
-      <mediaobject>
-        <imageobject>
-          <imagedata fileref="images/Jenkins-Global-Configuration-NWDI-Section.png" format="PNG" />
-        </imageobject>
-      </mediaobject>
-    </figure>
-    <para>Enter the </para>
+    <title>NetWeaver administrator and CMS configuration tasks</title>
+    <section>
+      <title>
+        <code>JDK_HOME_PATHS</code>
+        configuration using the NetWeaver administrator
+      </title>
+      <para>
+        Open the NetWeaver administrator in the web browser and go to the
+        <emphasis>java system properties</emphasis>
+        view (you can search for this view using the search field in the upper right corner in the NetWeaver administrator). Select the
+        <emphasis>services</emphasis>
+        tab and search for the
+        <emphasis>Component Build Service</emphasis>
+        entry.
+      </para>
+      <para>
+        In the
+        <emphasis>properties</emphasis>
+        tab at the bottom look for the
+        <code>JDK_HOME_PATHS.</code>
+        Klick on the
+        <emphasis>edit</emphasis>
+        button to add or delete a path to a JDK.
+      </para>
+      <para>
+        The following figure shows how to configure the
+        <code>JDK_HOME_PATHS</code>
+        in the NetWeaver administrator.
+      </para>
+      <figure>
+        <info>
+          <title>
+            <code>JDK_HOME_PATHS</code>
+            configuration in NWA
+          </title>
+        </info>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="images/Java-System-Properties-CBS-JDK_HOME_PATHS.png" format="PNG" width="150mm" />
+          </imageobject>
+        </mediaobject>
+      </figure>
+    </section>
+    <section>
+      <title>CMS build variant configuration</title>
+      <para>To build a track or a software component using a JDK different from the one the CBS is running with, a build variant has to be
+        configured for this track/software component.
+      </para>
+      <para>
+        Open the landscape configurator in the CMS and select the track you want to configure. Select the link
+        <emphasis>track data</emphasis>
+        and then the tab
+        <emphasis>build variants.</emphasis>
+        Define the property
+        <code>com.sap.jdk.home_path_key</code>
+        and assign it the JDK home path to be used for building.
+      </para>
+      <para>See the following figure how the configuration should look like for building components using a Java 1.6 development kit.</para>
+      <figure>
+        <info>
+          <title>build variant configuration in CMS</title>
+        </info>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="images/BuildVariantConfiguriationInCMS.png" format="PNG" width="150mm" />
+          </imageobject>
+        </mediaobject>
+      </figure>
+    </section>
   </chapter>
   <chapter>
     <title>Creating and configuring a new NWDI-Project</title>
-    <para></para>
+    <para>
+      To create a new
+      <emphasis>NWDI project</emphasis>
+      click on the
+      <code>New Job</code>
+      link in the side panel at the left of the Jenkins main page. Choose
+      <code>NWDI project</code>
+      from the choices presented in this view. Assign a name to the Job and click the
+      <code>Ok</code>
+      button at the bottom of the page. See the following figure on how the view should look like.
+    </para>
+    <figure>
+      <info>
+        <title>create a new Jenkins NWDI project</title>
+      </info>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="images/CreateNWDIProject.png" format="PNG" width="150mm" />
+        </imageobject>
+      </mediaobject>
+    </figure>
+    <para>
+      The view now shown presents some choices unique to the NWDI-Core-Plugin. The plugin adds a section
+      <code>NWDI-Build</code>
+      to the view where you can select the build space (or track) to build.
+    </para>
+    <figure>
+      <info>
+        <title>configure a new Jenkins NWDI project</title>
+      </info>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="images/ConfigureNWDIProject.png" format="PNG" width="150mm" />
+        </imageobject>
+      </mediaobject>
+    </figure>
+    <para>
+      Check the
+      <code>clean workspace</code>
+      option when you'd like to rebuild the whole track regardless of the existence of new activities since the last build.
+    </para>
+    <warning>This is a
+      potentially lengthy operation since all development components used by components of this track will be synchronized
+      from the CBS.
+    </warning>
+    <para>Do this when you imported software components from another track into the this track. Development components that depend on the
+      imported SCs should probably be rebuilt against the imported versions of development components.
+    </para>
+
+    <para>
+      The section
+      <code>Build Triggers</code>
+      contains a check box labelled
+      <code>Poll SCM</code>
+      . You should tick this on and configure a time plan. Enter
+      <code>*/30 * * * *</code>
+      to query the DTR every thirty minutes for changes (i.e. activities checked into the development workspace by your developers).
+    </para>
+    <para>
+      The section
+      <code>Build</code>
+      presents a select box you can use to add new build steps to this build. Jenkins plugins special to integration of the NWDI are
+      discussed in
+      <xref linkend="chapter:AdditionalJenkinsNwdiPlugins" />
+    </para>
   </chapter>
-  <chapter>
+  <chapter xml:id="chapter:AdditionalJenkinsNwdiPlugins">
     <title>Jenkins plugins based on the NWDI-Core-Plugin</title>
     <para>
       <variablelist>
@@ -267,6 +472,17 @@ for d in NWDI-config-plugin NWDI-pom-Plugin NWDI-Core-Plugin;\
               The results of this analysis can be visualized using the
               <link xl:href="https://wiki.jenkins-ci.org/display/JENKINS/PMD+Plugin">Jenkins PMD plugin</link>
               .
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <link xl:href="https://github.com/weigo/NWDI-Sonar-Plugin">NWDI-Sonar-Plugin</link>
+          </term>
+          <listitem>
+            <para>
+              This plugin uses the Sonar Maven plugin to analyze Java sources of development components. The analysis results will be
+              published to a Sonar installation.
             </para>
           </listitem>
         </varlistentry>

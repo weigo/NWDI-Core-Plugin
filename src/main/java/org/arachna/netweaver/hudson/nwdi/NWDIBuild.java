@@ -32,7 +32,6 @@ import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 import org.arachna.netweaver.hudson.nwdi.DCBuildResultParser.BuildResults;
-import org.arachna.netweaver.hudson.nwdi.confdef.ConfDefReader;
 import org.arachna.netweaver.hudson.util.FilePathHelper;
 import org.arachna.netweaver.tools.DIToolCommandExecutionResult;
 import org.arachna.netweaver.tools.cbs.CBSToolCommandExecutor;

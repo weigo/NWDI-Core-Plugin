@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.arachna.netweaver.hudson.nwdi.confdef;
+package org.arachna.netweaver.hudson.nwdi;
 
 import java.io.IOException;
 import java.io.Reader;
