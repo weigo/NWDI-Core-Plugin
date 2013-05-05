@@ -59,17 +59,17 @@ public class ConfDefReader {
             return config;
         }
         catch (final SAXException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
         catch (final IOException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
         finally {
             try {
                 reader.close();
             }
             catch (final IOException e) {
-                throw new RuntimeException(e);
+                throw new IllegalStateException(e);
             }
         }
     }
