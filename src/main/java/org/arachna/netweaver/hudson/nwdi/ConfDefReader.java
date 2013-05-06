@@ -5,7 +5,6 @@ package org.arachna.netweaver.hudson.nwdi;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -53,8 +52,7 @@ public class ConfDefReader {
 
             final DevelopmentConfiguration config = (DevelopmentConfiguration)digester.parse(reader);
 
-            config.setBuildVariant(buildVariantFactory.findBuildVariantRequiredForActivation(config
-                .getCompartments(CompartmentState.Source)));
+            config.setBuildVariant(buildVariantFactory.findBuildVariantRequiredForActivation());
 
             return config;
         }
@@ -192,12 +190,10 @@ public class ConfDefReader {
         /**
          * Find the build variant to use as default.
          * 
-         * @param sourceCompartments
-         *            collection of compartments in source state.
          * @return the build variant to use as default (the one that is used for
          *         building in the CBS).
          */
-        private BuildVariant findBuildVariantRequiredForActivation(final Collection<Compartment> sourceCompartments) {
+        private BuildVariant findBuildVariantRequiredForActivation() {
             BuildVariant defaultBuildVariant = null;
 
             for (final BuildVariant variant : buildVariants.values()) {
