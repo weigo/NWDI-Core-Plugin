@@ -110,7 +110,7 @@ final class ActivityListParser extends AbstractResourceParser {
             activityXPath = new DOMXPath("td[1]/a/@href");
         }
         catch (final JaxenException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
     }
 
@@ -211,10 +211,10 @@ final class ActivityListParser extends AbstractResourceParser {
             }
         }
         catch (final ParseException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
         catch (final JaxenException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
     }
 

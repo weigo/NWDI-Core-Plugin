@@ -13,13 +13,15 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 /**
- * Base class for resource parsers. Implements logic common to all parsers extracting information read from the DTR.
+ * Base class for resource parsers. Implements logic common to all parsers
+ * extracting information read from the DTR.
  * 
  * @author Dirk Weigenand
  */
 abstract class AbstractResourceParser {
     /**
-     * Parses the given <code>InputStream</code> and updates the activities details.
+     * Parses the given <code>InputStream</code> and updates the activities
+     * details.
      * 
      * @param content
      *            of the activities detail HTML page.
@@ -40,10 +42,10 @@ abstract class AbstractResourceParser {
             parseInternal(selectedNodes);
         }
         catch (final JaxenException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
         catch (final IOException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
     }
 
@@ -79,8 +81,8 @@ abstract class AbstractResourceParser {
     abstract String getXPath();
 
     /**
-     * Return the minimum count of nodes one can expect when applying the XPath expression returned by {@see
-     * #getXPath()}.
+     * Return the minimum count of nodes one can expect when applying the XPath
+     * expression returned by {@see #getXPath()}.
      * 
      * @return minimum count of nodes selected by getXPath().
      */

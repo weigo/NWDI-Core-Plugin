@@ -83,13 +83,13 @@ public final class DtrBrowser {
             return activityListBrowser.getActivities();
         }
         catch (final ClientProtocolException e) {
-            throw new RuntimeException(ERROR_COMMUNICATING_WITH_DTR, e);
+            throw new IllegalStateException(ERROR_COMMUNICATING_WITH_DTR, e);
         }
         catch (final IOException e) {
-            throw new RuntimeException(String.format(ERROR_READING_ACTIVITIES, queryUrl), e);
+            throw new IllegalStateException(String.format(ERROR_READING_ACTIVITIES, queryUrl), e);
         }
         catch (final IllegalStateException ise) {
-            throw new RuntimeException(String.format(ERROR_READING_ACTIVITIES, queryUrl), ise);
+            throw new IllegalStateException(String.format(ERROR_READING_ACTIVITIES, queryUrl), ise);
         }
     }
 
