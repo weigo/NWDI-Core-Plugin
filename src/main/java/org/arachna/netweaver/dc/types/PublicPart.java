@@ -29,7 +29,7 @@ public class PublicPart {
     /**
      * The type of this public part.
      */
-    private final PublicPartType type;
+    private PublicPartType type;
 
     /**
      * Create a new public part object.
@@ -52,7 +52,7 @@ public class PublicPart {
             throw new IllegalArgumentException("The type of this public part must not be null!");
         }
 
-        this.publicPart = name;
+        publicPart = name;
         this.type = type;
 
         if (caption != null) {
@@ -62,6 +62,13 @@ public class PublicPart {
         if (description != null) {
             this.description = description;
         }
+    }
+
+    /**
+     * Default constructor.
+     */
+    public PublicPart() {
+        this("", "", "", PublicPartType.COMPILE);
     }
 
     /**
@@ -112,8 +119,7 @@ public class PublicPart {
      */
     @Override
     public int hashCode() {
-        return Arrays
-            .hashCode(new String[] { caption, description, publicPart, (type == null ? "" : type.toString()) });
+        return Arrays.hashCode(new String[] { caption, description, publicPart, type == null ? "" : type.toString() });
     }
 
     /*
@@ -144,7 +150,7 @@ public class PublicPart {
     /**
      * @return the caption
      */
-    public final String getCaption() {
+    public String getCaption() {
         return caption;
     }
 
@@ -152,7 +158,7 @@ public class PublicPart {
      * @param caption
      *            the caption to set
      */
-    public final void setCaption(final String caption) {
+    public void setCaption(final String caption) {
         this.caption = caption;
     }
 
@@ -163,5 +169,13 @@ public class PublicPart {
      */
     public PublicPartType getType() {
         return type;
+    }
+
+    /**
+     * @param type
+     *            the type to set
+     */
+    public void setType(final PublicPartType type) {
+        this.type = type;
     }
 }

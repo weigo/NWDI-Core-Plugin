@@ -19,7 +19,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Unit test for {@link DcDefinitionReader1}.
+ * Unit test for {@link DcDefinitionReader}.
  * 
  * @author Dirk Weigenand
  */
@@ -30,7 +30,7 @@ public class DcDefinitionReaderTest {
     private DcDefinitionReader dcDefReader;
 
     /**
-     * example development component for testing DcDefinitionReader1
+     * example development component for testing {@link DcDefinitionReader}
      * correctness.
      */
     private DevelopmentComponent component;

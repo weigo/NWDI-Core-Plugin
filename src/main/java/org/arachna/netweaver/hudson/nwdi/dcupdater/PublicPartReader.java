@@ -3,12 +3,15 @@
  */
 package org.arachna.netweaver.hudson.nwdi.dcupdater;
 
-import java.util.Stack;
+import java.io.IOException;
+import java.io.Reader;
 
+import org.apache.commons.digester3.Digester;
+import org.apache.commons.digester3.Rule;
+import org.apache.commons.digester3.binder.AbstractRulesModule;
+import org.apache.commons.digester3.binder.DigesterLoader;
 import org.arachna.netweaver.dc.types.PublicPart;
 import org.arachna.netweaver.dc.types.PublicPartType;
-import org.arachna.xml.AbstractDefaultHandler;
-import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
 /**
@@ -16,129 +19,68 @@ import org.xml.sax.SAXException;
  * 
  * @author Dirk Weigenand
  */
-final class PublicPartReader extends AbstractDefaultHandler {
+final class PublicPartReader {
     /**
-     * element 'purpose' of a public part definition.
-     */
-    private static final String PURPOSE = "purpose";
-
-    /**
-     * element 'caption'.
-     */
-    private static final String CAPTION = "caption";
-
-    /**
-     * element 'description'.
-     */
-    private static final String DESCRIPTION = "description";
-
-    /**
-     * element 'name'.
-     */
-    private static final String NAME = "name";
-
-    /**
-     * element 'public-part'.
-     */
-    private static final String PUBLIC_PART = "public-part";
-
-    /**
-     * stack for keeping track of parent elements.
-     */
-    private final Stack<String> parents = new Stack<String>();
-
-    /**
-     * name of current public part.
-     */
-    private String publicPartName;
-
-    /**
-     * description of current public part.
-     */
-    private String description;
-
-    /**
-     * caption of current public part.
-     */
-    private String caption;
-
-    /**
-     * current public part.
-     */
-    private PublicPart publicPart;
-
-    private String purpose;
-
-    /**
-     * Create an instance of a <code>PublicPartReader</code>.
-     */
-    public PublicPartReader() {
-        super();
-    }
-
-    /*
-     * (non-Javadoc)
+     * RulesModule for parsing public part definitions.
      * 
-     * @see org.xml.sax.helpers.DefaultHandler#endElement(java.lang.String,
-     * java.lang.String, java.lang.String)
+     * @author Dirk Weigenand
      */
-    @Override
-    public void endElement(final String uri, final String localName, final String qName) throws SAXException {
-        final String currentParent = getCurrentParent();
-
-        if (PUBLIC_PART.equals(currentParent)) {
-            if (NAME.equals(localName)) {
-                this.publicPartName = this.getText();
-            }
-            else if (DESCRIPTION.equals(localName)) {
-                this.description = this.getText();
-            }
-            else if (CAPTION.equals(localName)) {
-                this.caption = this.getText();
-            }
-            else if (PURPOSE.equals(localName)) {
-                this.purpose = this.getText();
-            }
-        }
-        else if (PUBLIC_PART.equals(localName)) {
-            this.publicPart =
-                new PublicPart(this.publicPartName, this.caption, this.description, PublicPartType.fromString(purpose));
+    private static class PublicPartModule extends AbstractRulesModule {
+        @Override
+        protected void configure() {
+            forPattern("public-part").createObject().ofType(PublicPart.class);
+            forPattern("public-part/name").setBeanProperty().withName("publicPart");
+            forPattern("public-part/caption").setBeanProperty().withName("caption");
+            forPattern("public-part/description").setBeanProperty().withName("description");
+            forPattern("public-part/purpose").addRule(new PurposeRule()).then().setNext("setType");
         }
     }
 
     /**
-     * Returns the current parent element.
+     * Rule to parse the purpose of a public part, i.e. its type.
      * 
-     * @return the current parent element.
+     * @author Dirk Weigenand
      */
-    private String getCurrentParent() {
-        this.parents.pop();
-        String currentParent = "";
-
-        if (!this.parents.isEmpty()) {
-            currentParent = this.parents.peek();
+    private static final class PurposeRule extends Rule {
+        @Override
+        public void body(final String namespace, final String name, final String text) throws Exception {
+            getDigester().push(PublicPartType.fromString(text));
         }
-        return currentParent;
-    }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.xml.sax.helpers.DefaultHandler#startElement(java.lang.String,
-     * java.lang.String, java.lang.String, org.xml.sax.Attributes)
-     */
-    @Override
-    public void startElement(final String uri, final String localName, final String qName, final Attributes attributes)
-        throws SAXException {
-        this.parents.push(localName);
+        @Override
+        public void end(final String namespace, final String name) throws Exception {
+            getDigester().pop();
+            super.end(namespace, name);
+        }
     }
 
     /**
-     * Returns the public part just read from the '.pp' configuration file.
+     * Parse a {@link PublicPart} object from the given reader.
      * 
-     * @return the public part just read from the '.pp' configuration file.
+     * @param reader
+     *            reader containing a public part definition.
+     * @return the public part.
      */
-    public PublicPart getPublicPart() {
-        return this.publicPart;
+    public PublicPart execute(final Reader reader) {
+        try {
+            final DigesterLoader digesterLoader = DigesterLoader.newLoader(new PublicPartModule());
+            final Digester digester = digesterLoader.newDigester();
+
+            return (PublicPart)digester.parse(reader);
+        }
+        catch (final SAXException e) {
+            throw new IllegalStateException(e);
+        }
+        catch (final IOException e) {
+            throw new IllegalStateException(e);
+        }
+        finally {
+            try {
+                reader.close();
+            }
+            catch (final IOException e) {
+                throw new IllegalStateException(e);
+            }
+        }
     }
 }

@@ -7,13 +7,12 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.arachna.netweaver.dc.types.PublicPart;
-import org.arachna.xml.XmlReaderHelper;
-import org.xml.sax.SAXException;
 
 /**
  * Reader for Public Parts.
@@ -21,6 +20,11 @@ import org.xml.sax.SAXException;
  * @author Dirk Weigenand
  */
 final class PublicPartsReader {
+    /**
+     * Logger.
+     */
+    private final Logger logger = Logger.getLogger(PublicPartsReader.class.getName());
+
     /**
      * location of public part descriptors.
      */
@@ -33,7 +37,7 @@ final class PublicPartsReader {
      *            base folder for public part descriptors.
      */
     public PublicPartsReader(final String componentLocation) {
-        this.publicPartsLocation = new File(String.format("%s%cdef", componentLocation, File.separatorChar));
+        publicPartsLocation = new File(String.format("%s/def", componentLocation));
     }
 
     /**
@@ -44,40 +48,18 @@ final class PublicPartsReader {
     List<PublicPart> read() {
         final List<PublicPart> publicParts = new ArrayList<PublicPart>();
 
-        if (this.publicPartsLocation.exists()) {
-            PublicPartReader reader;
-            PublicPart part;
-            FileReader ppFileReader = null;
+        if (publicPartsLocation.exists()) {
+            final PublicPartReader reader = new PublicPartReader();
 
-            for (final File definition : this.publicPartsLocation.listFiles(new PublicPartFileFilter())) {
+            for (final File definition : publicPartsLocation.listFiles(new PublicPartFileFilter())) {
                 try {
-                    reader = new PublicPartReader();
-                    ppFileReader = new FileReader(definition);
-                    new XmlReaderHelper(reader).parse(ppFileReader);
-                    part = reader.getPublicPart();
-
-                    if (part != null) {
-                        publicParts.add(part);
-                    }
+                    publicParts.add(reader.execute(new FileReader(definition)));
                 }
                 catch (final FileNotFoundException e) {
-                    throw new RuntimeException(e);
+                    logger.log(Level.WARNING, e.getLocalizedMessage(), e);
                 }
-                catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                catch (SAXException e) {
-                    throw new RuntimeException(e);
-                }
-                finally {
-                    if (ppFileReader != null) {
-                        try {
-                            ppFileReader.close();
-                        }
-                        catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
+                catch (final IllegalStateException ise) {
+                    logger.log(Level.WARNING, ise.getLocalizedMessage(), ise);
                 }
             }
         }
