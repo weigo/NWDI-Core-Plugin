@@ -7,8 +7,8 @@ import java.io.IOException;
 import java.io.Reader;
 
 import org.apache.commons.digester3.Digester;
-import org.apache.commons.digester3.binder.AbstractRulesModule;
 import org.apache.commons.digester3.binder.DigesterLoader;
+import org.apache.commons.digester3.binder.RulesModule;
 import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.xml.sax.SAXException;
 
@@ -35,17 +35,17 @@ abstract class AbstractComponentConfigurationReader implements ComponentConfigur
             digester.parse(reader);
         }
         catch (final SAXException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
         catch (final IOException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
         finally {
             try {
                 reader.close();
             }
             catch (final IOException e) {
-                throw new RuntimeException(e);
+                throw new IllegalStateException(e);
             }
         }
     }
@@ -53,7 +53,7 @@ abstract class AbstractComponentConfigurationReader implements ComponentConfigur
     /**
      * Create a digester rules module.
      * 
-     * @return an implementation of {@link AbstractRulesModule}.
+     * @return an implementation of {@link RulesModule}.
      */
-    abstract AbstractRulesModule getRulesModule();
+    abstract RulesModule getRulesModule();
 }
