@@ -14,13 +14,13 @@ import java.io.IOException;
 import java.io.Reader;
 
 import org.apache.commons.digester3.AbstractObjectCreationFactory;
-import org.apache.commons.digester3.Digester;
 import org.apache.commons.digester3.Rule;
 import org.apache.commons.digester3.binder.AbstractRulesModule;
-import org.apache.commons.digester3.binder.DigesterLoader;
 import org.apache.commons.digester3.binder.RulesModule;
 import org.arachna.netweaver.hudson.nwdi.changelog.DtrChangeLogEntry.Action;
 import org.arachna.netweaver.hudson.nwdi.changelog.DtrChangeLogEntry.Item;
+import org.arachna.xml.DigesterHelper;
+import org.arachna.xml.RulesModuleProducer;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -29,7 +29,7 @@ import org.xml.sax.SAXException;
  * 
  * @author Dirk Weigenand
  */
-final class DtrChangeLogParser extends ChangeLogParser {
+final class DtrChangeLogParser extends ChangeLogParser implements RulesModuleProducer {
     @Override
     public ChangeLogSet<? extends Entry> parse(final AbstractBuild build, final File changelogFile) throws IOException,
         SAXException {
@@ -50,27 +50,7 @@ final class DtrChangeLogParser extends ChangeLogParser {
      *            reader to parse change set entries from.
      */
     protected void parse(final DtrChangeLogSet changeSet, final Reader reader) {
-        try {
-            final DigesterLoader digesterLoader = DigesterLoader.newLoader(getRulesModule());
-            final Digester digester = digesterLoader.newDigester();
-            digester.push(changeSet);
-            digester.parse(reader);
-
-        }
-        catch (final SAXException e) {
-            throw new IllegalStateException(e);
-        }
-        catch (final IOException e) {
-            throw new IllegalStateException(e);
-        }
-        finally {
-            try {
-                reader.close();
-            }
-            catch (final IOException e) {
-                throw new IllegalStateException(e);
-            }
-        }
+        new DigesterHelper<DtrChangeLogSet>(this).update(reader, changeSet);
     }
 
     /**
@@ -78,7 +58,7 @@ final class DtrChangeLogParser extends ChangeLogParser {
      * 
      * @return rules module for parsing a DTR changelog.
      */
-    private RulesModule getRulesModule() {
+    public RulesModule getRulesModule() {
         return new AbstractRulesModule() {
             @Override
             protected void configure() {

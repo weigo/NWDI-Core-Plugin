@@ -9,7 +9,9 @@ import java.util.LinkedList;
 
 import org.apache.commons.digester3.AbstractObjectCreationFactory;
 import org.apache.commons.digester3.binder.AbstractRulesModule;
+import org.apache.commons.digester3.binder.RulesModule;
 import org.arachna.netweaver.dc.types.PublicPartReference;
+import org.arachna.xml.RulesModuleProducer;
 import org.xml.sax.Attributes;
 
 /**
@@ -18,7 +20,7 @@ import org.xml.sax.Attributes;
  * 
  * @author Dirk Weigenand
  */
-final class PortalApplicationConfigurationReader extends AbstractComponentConfigurationReader {
+final class PortalApplicationConfigurationRulesModuleProducer implements RulesModuleProducer {
     /**
      * constant for attribute 'value'.
      */
@@ -47,7 +49,7 @@ final class PortalApplicationConfigurationReader extends AbstractComponentConfig
      *         configuration file.
      */
     @Override
-    AbstractRulesModule getRulesModule() {
+    public RulesModule getRulesModule() {
         return new AbstractRulesModule() {
             @Override
             protected void configure() {

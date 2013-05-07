@@ -14,12 +14,13 @@ import java.io.Reader;
 import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.arachna.netweaver.dc.types.DevelopmentComponentType;
 import org.arachna.netweaver.dc.types.PublicPartReference;
+import org.arachna.xml.DigesterHelper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Unit test for {@link DcDefinitionReader}.
+ * Unit test for {@link DcDefinitionRulesModuleProducer}.
  * 
  * @author Dirk Weigenand
  */
@@ -27,10 +28,10 @@ public class DcDefinitionReaderTest {
     /**
      * instance under test.
      */
-    private DcDefinitionReader dcDefReader;
+    private DcDefinitionRulesModuleProducer dcDefReader;
 
     /**
-     * example development component for testing {@link DcDefinitionReader}
+     * example development component for testing {@link DcDefinitionRulesModuleProducer}
      * correctness.
      */
     private DevelopmentComponent component;
@@ -40,9 +41,11 @@ public class DcDefinitionReaderTest {
      */
     @Before
     public void setUp() {
-        dcDefReader = new DcDefinitionReader();
+        dcDefReader = new DcDefinitionRulesModuleProducer();
+        final DigesterHelper<DevelopmentComponent> digesterHelper =
+            new DigesterHelper<DevelopmentComponent>(dcDefReader);
         component = new DevelopmentComponent("", "");
-        dcDefReader.execute(component, getDcDef());
+        digesterHelper.update(getDcDef(), component);
     }
 
     /**

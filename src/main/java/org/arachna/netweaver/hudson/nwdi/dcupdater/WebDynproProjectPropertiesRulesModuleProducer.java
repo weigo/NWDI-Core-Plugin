@@ -5,15 +5,17 @@ package org.arachna.netweaver.hudson.nwdi.dcupdater;
 
 import org.apache.commons.digester3.AbstractObjectCreationFactory;
 import org.apache.commons.digester3.binder.AbstractRulesModule;
+import org.apache.commons.digester3.binder.RulesModule;
 import org.arachna.netweaver.dc.types.PublicPartReference;
+import org.arachna.xml.RulesModuleProducer;
 import org.xml.sax.Attributes;
 
 /**
- * Reader for 'ProjectProperties.wdproperties' configuration files.
+ * Reader for <code>ProjectProperties.wdproperties</code> configuration files.
  * 
  * @author Dirk Weigenand
  */
-final class WebDynproProjectPropertiesReader extends AbstractComponentConfigurationReader {
+final class WebDynproProjectPropertiesRulesModuleProducer implements RulesModuleProducer {
     /**
      * prefix used to reference portal applications/services.
      */
@@ -25,13 +27,16 @@ final class WebDynproProjectPropertiesReader extends AbstractComponentConfigurat
     private static final String LIBRARY_NAME = "libraryName";
 
     /**
-     * rules module for parsing a <code>.dcdef</code> development component
+     * Create a rules module for parsing a
+     * <code>ProjectProperties.wdproperties</code> development component
      * configuration file.
      * 
+     * @return a rules module for parsing WebDynPro properties (pre NetWeaver
+     *         CE).
      * @author Dirk Weigenand
      */
     @Override
-    AbstractRulesModule getRulesModule() {
+    public RulesModule getRulesModule() {
         return new AbstractRulesModule() {
             @Override
             protected void configure() {

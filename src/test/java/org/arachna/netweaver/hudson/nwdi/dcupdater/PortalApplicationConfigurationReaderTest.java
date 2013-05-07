@@ -12,12 +12,13 @@ import java.io.Reader;
 
 import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.arachna.netweaver.dc.types.PublicPartReference;
+import org.arachna.xml.DigesterHelper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Unit tests for {@link PortalApplicationConfigurationReader}.
+ * Unit tests for {@link PortalApplicationConfigurationRulesModuleProducer}.
  * 
  * @author Dirk Weigenand
  */
@@ -30,7 +31,7 @@ public class PortalApplicationConfigurationReaderTest {
     /**
      * 
      */
-    private PortalApplicationConfigurationReader configurationReader;
+    private PortalApplicationConfigurationRulesModuleProducer configurationReader;
 
     /**
      * sample development component.
@@ -42,9 +43,11 @@ public class PortalApplicationConfigurationReaderTest {
      */
     @Before
     public void setUp() {
-        configurationReader = new PortalApplicationConfigurationReader();
+        configurationReader = new PortalApplicationConfigurationRulesModuleProducer();
+        final DigesterHelper<DevelopmentComponent> digesterHelper =
+            new DigesterHelper<DevelopmentComponent>(configurationReader);
         component = new DevelopmentComponent("", "");
-        configurationReader.execute(component, getPortalAppXml());
+        digesterHelper.update(getPortalAppXml(), component);
     }
 
     /**
@@ -58,7 +61,7 @@ public class PortalApplicationConfigurationReaderTest {
 
     /**
      * Test method for
-     * {@link PortalApplicationConfigurationReader#execute(org.arachna.netweaver.dc.types.DevelopmentComponent, java.io.Reader)}
+     * {@link PortalApplicationConfigurationRulesModuleProducer#execute(org.arachna.netweaver.dc.types.DevelopmentComponent, java.io.Reader)}
      * .
      */
     @Test
@@ -68,7 +71,7 @@ public class PortalApplicationConfigurationReaderTest {
 
     /**
      * Test method for
-     * {@link PortalApplicationConfigurationReader#execute(org.arachna.netweaver.dc.types.DevelopmentComponent, java.io.Reader)}
+     * {@link PortalApplicationConfigurationRulesModuleProducer#execute(org.arachna.netweaver.dc.types.DevelopmentComponent, java.io.Reader)}
      * .
      */
     @Test
@@ -80,7 +83,7 @@ public class PortalApplicationConfigurationReaderTest {
 
     /**
      * Test method for
-     * {@link PortalApplicationConfigurationReader#execute(org.arachna.netweaver.dc.types.DevelopmentComponent, java.io.Reader)}
+     * {@link PortalApplicationConfigurationRulesModuleProducer#execute(org.arachna.netweaver.dc.types.DevelopmentComponent, java.io.Reader)}
      * .
      */
     @Test
@@ -92,7 +95,7 @@ public class PortalApplicationConfigurationReaderTest {
 
     /**
      * Test method for
-     * {@link PortalApplicationConfigurationReader#execute(org.arachna.netweaver.dc.types.DevelopmentComponent, java.io.Reader)}
+     * {@link PortalApplicationConfigurationRulesModuleProducer#execute(org.arachna.netweaver.dc.types.DevelopmentComponent, java.io.Reader)}
      * .
      */
     @Test
@@ -104,7 +107,7 @@ public class PortalApplicationConfigurationReaderTest {
 
     /**
      * Test method for
-     * {@link PortalApplicationConfigurationReader#execute(org.arachna.netweaver.dc.types.DevelopmentComponent, java.io.Reader)}
+     * {@link PortalApplicationConfigurationRulesModuleProducer#execute(org.arachna.netweaver.dc.types.DevelopmentComponent, java.io.Reader)}
      * .
      */
     @Test

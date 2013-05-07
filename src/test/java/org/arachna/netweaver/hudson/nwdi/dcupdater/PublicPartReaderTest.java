@@ -11,12 +11,13 @@ import java.io.InputStreamReader;
 
 import org.arachna.netweaver.dc.types.PublicPart;
 import org.arachna.netweaver.dc.types.PublicPartType;
+import org.arachna.xml.DigesterHelper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Unit tests for {@link PublicPartReader}.
+ * Unit tests for {@link PublicPartRulesModuleProducer}.
  * 
  * @author Dirk Weigenand
  */
@@ -31,9 +32,10 @@ public class PublicPartReaderTest {
      */
     @Before
     public void setUp() {
-        final PublicPartReader reader = new PublicPartReader();
+        final DigesterHelper<PublicPart> digesterHelper =
+            new DigesterHelper<PublicPart>(new PublicPartRulesModuleProducer());
         publicPart =
-            reader.execute(new InputStreamReader(this.getClass().getResourceAsStream(
+            digesterHelper.execute(new InputStreamReader(this.getClass().getResourceAsStream(
                 "/org/arachna/netweaver/hudson/nwdi/dcupdater/API.pp")));
     }
 
@@ -47,7 +49,8 @@ public class PublicPartReaderTest {
 
     /**
      * Test method for
-     * {@link org.arachna.netweaver.hudson.nwdi.dcupdater.PublicPartReader} .
+     * {@link org.arachna.netweaver.hudson.nwdi.dcupdater.PublicPartRulesModuleProducer}
+     * .
      */
     @Test
     public final void testPublicPartName() {
@@ -57,7 +60,8 @@ public class PublicPartReaderTest {
 
     /**
      * Test method for
-     * {@link org.arachna.netweaver.hudson.nwdi.dcupdater.PublicPartReader} .
+     * {@link org.arachna.netweaver.hudson.nwdi.dcupdater.PublicPartRulesModuleProducer}
+     * .
      */
     @Test
     public final void testPublicPartCaption() {
@@ -67,7 +71,8 @@ public class PublicPartReaderTest {
 
     /**
      * Test method for
-     * {@link org.arachna.netweaver.hudson.nwdi.dcupdater.PublicPartReader} .
+     * {@link org.arachna.netweaver.hudson.nwdi.dcupdater.PublicPartRulesModuleProducer}
+     * .
      */
     @Test
     public final void testPublicPartDescription() {
@@ -77,12 +82,12 @@ public class PublicPartReaderTest {
 
     /**
      * Test method for
-     * {@link org.arachna.netweaver.hudson.nwdi.dcupdater.PublicPartReader} .
+     * {@link org.arachna.netweaver.hudson.nwdi.dcupdater.PublicPartRulesModuleProducer}
+     * .
      */
     @Test
     public final void testPublicPartType() {
         assertNotNull(publicPart);
         assertThat(publicPart.getType(), equalTo(PublicPartType.COMPILE));
     }
-
 }

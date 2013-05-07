@@ -3,7 +3,6 @@
  */
 package org.arachna.netweaver.hudson.nwdi.dcupdater;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
@@ -14,6 +13,7 @@ import org.arachna.ant.AntHelper;
 import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.DevelopmentComponentType;
+import org.arachna.xml.DigesterHelper;
 
 /**
  * Update development components with information read from the on disk
@@ -24,40 +24,21 @@ import org.arachna.netweaver.dc.types.DevelopmentComponentType;
  */
 public final class DevelopmentComponentUpdater {
     /**
-     * template for path to the current DCs _comp folder.
-     */
-    private static final String LOCATION_TEMPLATE = "%s/DCs/%s/%s/_comp";
-
-    /**
-     * Folder where development configuration is to be found.
-     */
-    private final String location;
-
-    /**
      * List of development components to be updated.
      */
     private final DevelopmentComponentFactory dcFactory;
 
     /**
-     * development component currently processed.
-     */
-    private DevelopmentComponent currentComponent;
-
-    /**
-     * base directory for currently processed development component.
-     */
-    private String componentBase;
-
-    /**
      * Reader for <code>ProjectProperties.wdproperties</code> files.
      */
-    private final ComponentConfigurationReader wdPropertiesReader = new WebDynproProjectPropertiesReader();
+    private final DigesterHelper<DevelopmentComponent> wdPropertiesReader = new DigesterHelper<DevelopmentComponent>(
+        new WebDynproProjectPropertiesRulesModuleProducer());
 
     /**
      * Reader for <code>portalapp.xml</code> files.
      */
-    private final ComponentConfigurationReader portalApplicationConfigurationReader =
-        new PortalApplicationConfigurationReader();
+    private final DigesterHelper<DevelopmentComponent> portalApplicationConfigurationReader =
+        new DigesterHelper<DevelopmentComponent>(new PortalApplicationConfigurationRulesModuleProducer());
 
     /**
      * helper class.
@@ -73,7 +54,6 @@ public final class DevelopmentComponentUpdater {
      *            registry for development components.
      */
     public DevelopmentComponentUpdater(final String location, final DevelopmentComponentFactory dcFactory) {
-        this.location = location;
         this.dcFactory = dcFactory;
         antHelper = new AntHelper(location, dcFactory);
     }
@@ -84,20 +64,18 @@ public final class DevelopmentComponentUpdater {
      * .dcdef, Project.wdproperties, etc.)
      */
     public void execute() {
-        final DcDefinitionReader dcDefinitionReader = new DcDefinitionReader();
+        final DigesterHelper<DevelopmentComponent> digesterHelper =
+            new DigesterHelper<DevelopmentComponent>(new DcDefinitionRulesModuleProducer());
 
         for (final DevelopmentComponent component : dcFactory.getAll()) {
-            currentComponent = component;
-            componentBase = getComponentBaseLocation();
-
             try {
-                dcDefinitionReader.execute(component, getConfigFile(component, ".dcdef"));
+                digesterHelper.update(getConfigFile(component, ".dcdef"), component);
             }
             catch (final FileNotFoundException e) {
                 // ignore
             }
 
-            readPublicParts();
+            readPublicParts(component);
             readProperties(component);
         }
     }
@@ -111,14 +89,14 @@ public final class DevelopmentComponentUpdater {
      */
     private void readProperties(final DevelopmentComponent component) {
         try {
-            if (DevelopmentComponentType.WebDynpro.equals(currentComponent.getType())) {
-                wdPropertiesReader.execute(component,
-                    getConfigFile(component, "src/packages/ProjectProperties.wdproperties"));
+            if (DevelopmentComponentType.WebDynpro.equals(component.getType())) {
+                wdPropertiesReader.update(getConfigFile(component, "src/packages/ProjectProperties.wdproperties"),
+                    component);
             }
-            else if (DevelopmentComponentType.PortalApplicationModule.equals(currentComponent.getType())
-                || DevelopmentComponentType.PortalApplicationStandalone.equals(currentComponent.getType())) {
-                portalApplicationConfigurationReader.execute(component,
-                    getConfigFile(component, "dist/PORTAL-INF/portalapp.xml"));
+            else if (DevelopmentComponentType.PortalApplicationModule.equals(component.getType())
+                || DevelopmentComponentType.PortalApplicationStandalone.equals(component.getType())) {
+                portalApplicationConfigurationReader.update(getConfigFile(component, "dist/PORTAL-INF/portalapp.xml"),
+                    component);
             }
         }
         catch (final FileNotFoundException e) {
@@ -147,18 +125,11 @@ public final class DevelopmentComponentUpdater {
     /**
      * Read the public parts of the current development component and add them
      * to it.
-     */
-    private void readPublicParts() {
-        currentComponent.setPublicParts(new PublicPartsReader(componentBase).read());
-    }
-
-    /**
-     * Get the base path of the current component (its '_comp' folder).
      * 
-     * @return the base path of the current component (its '_comp' folder).
+     * @param component
+     *            development component to determine public parts for.
      */
-    protected String getComponentBaseLocation() {
-        return String.format(LOCATION_TEMPLATE, location, currentComponent.getVendor(), currentComponent.getName())
-            .replace('/', File.separatorChar);
+    private void readPublicParts(final DevelopmentComponent component) {
+        component.setPublicParts(new PublicPartsReader(antHelper.getBaseLocation(component)).read());
     }
 }

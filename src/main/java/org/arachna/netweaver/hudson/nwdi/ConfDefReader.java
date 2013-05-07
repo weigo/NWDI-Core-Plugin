@@ -3,29 +3,32 @@
  */
 package org.arachna.netweaver.hudson.nwdi;
 
-import java.io.IOException;
 import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.digester3.AbstractObjectCreationFactory;
-import org.apache.commons.digester3.Digester;
 import org.apache.commons.digester3.binder.AbstractRulesModule;
-import org.apache.commons.digester3.binder.DigesterLoader;
+import org.apache.commons.digester3.binder.RulesModule;
 import org.arachna.netweaver.dc.types.BuildOption;
 import org.arachna.netweaver.dc.types.BuildVariant;
 import org.arachna.netweaver.dc.types.Compartment;
 import org.arachna.netweaver.dc.types.CompartmentState;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
+import org.arachna.xml.DigesterHelper;
+import org.arachna.xml.RulesModuleProducer;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 
 /**
  * Reader for development configuration (<code>.confdef</code>) files.
  * 
+ * Do not re-use! Not thread safe! The <code>BuildVariantFactory</code> used
+ * internally would fill up with build variants not contained in the parsed
+ * configuration file!
+ * 
  * @author Dirk Weigenand
  */
-public class ConfDefReader {
+public class ConfDefReader implements RulesModuleProducer {
     /**
      * 'yes' attribute value.
      */
@@ -46,61 +49,48 @@ public class ConfDefReader {
      * @return the development configuration object just read.
      */
     public DevelopmentConfiguration execute(final Reader reader) {
-        try {
-            final DigesterLoader digesterLoader = DigesterLoader.newLoader(new DevelopmentConfigurationModule());
-            final Digester digester = digesterLoader.newDigester();
+        final DigesterHelper<DevelopmentConfiguration> digesterHelper =
+            new DigesterHelper<DevelopmentConfiguration>(this);
+        final DevelopmentConfiguration config = digesterHelper.execute(reader);
 
-            final DevelopmentConfiguration config = (DevelopmentConfiguration)digester.parse(reader);
+        config.setBuildVariant(buildVariantFactory.findBuildVariantRequiredForActivation());
 
-            config.setBuildVariant(buildVariantFactory.findBuildVariantRequiredForActivation());
-
-            return config;
-        }
-        catch (final SAXException e) {
-            throw new IllegalStateException(e);
-        }
-        catch (final IOException e) {
-            throw new IllegalStateException(e);
-        }
-        finally {
-            try {
-                reader.close();
-            }
-            catch (final IOException e) {
-                throw new IllegalStateException(e);
-            }
-        }
+        return config;
     }
 
     /**
-     * Rules for parsing a <code>.confdef</code> development configuration file.
+     * Create rules for parsing a <code>.confdef</code> development
+     * configuration file.
      * 
-     * @author Dirk Weigenand
+     * {@inheritDoc}
      */
-    class DevelopmentConfigurationModule extends AbstractRulesModule {
-        @Override
-        protected void configure() {
-            forPattern("configuration").factoryCreate().usingFactory(new DevelopmentConfigurationFactory());
-            forPattern("configuration/config-description").setBeanProperty().withName("description");
-            forPattern("configuration/build-server").setBeanProperty().withName("buildServer");
-            forPattern("configuration/sc-compartments/sc-compartment").factoryCreate()
-                .usingFactory(new CompartmentFactory()).then().setNext("add");
-            forPattern("configuration/sc-compartments/sc-compartment/source-state/repository").factoryCreate()
-                .usingFactory(new DtrUrlFactory()).then().setNext("setDtrUrl");
-            forPattern("configuration/sc-compartments/sc-compartment/source-state/inactive-location").setBeanProperty()
-                .withName("inactiveLocation");
-            forPattern("configuration/sc-compartments/sc-compartment/dependencies/used-compartment")
-                .callMethod("addUsedCompartment").withParamTypes(String.class).withParamCount(1)
-                .usingElementBodyAsArgument();
-            forPattern("configuration/sc-compartments/sc-compartment/build-variants/build-variant").factoryCreate()
-                .usingFactory(buildVariantFactory).then().setNext("add");
-            forPattern(
-                "configuration/sc-compartments/sc-compartment/build-variants/build-variant/build-options/build-option")
-                .factoryCreate().usingFactory(new BuildOptionFactory()).then().setNext("add");
-            forPattern(
-                "configuration/sc-compartments/sc-compartment/build-variants/build-variant/build-options/build-option/option-value")
-                .setBeanProperty().withName("value");
-        }
+    @Override
+    public RulesModule getRulesModule() {
+        return new AbstractRulesModule() {
+            @Override
+            protected void configure() {
+                forPattern("configuration").factoryCreate().usingFactory(new DevelopmentConfigurationFactory());
+                forPattern("configuration/config-description").setBeanProperty().withName("description");
+                forPattern("configuration/build-server").setBeanProperty().withName("buildServer");
+                forPattern("configuration/sc-compartments/sc-compartment").factoryCreate()
+                    .usingFactory(new CompartmentFactory()).then().setNext("add");
+                forPattern("configuration/sc-compartments/sc-compartment/source-state/repository").factoryCreate()
+                    .usingFactory(new DtrUrlFactory()).then().setNext("setDtrUrl");
+                forPattern("configuration/sc-compartments/sc-compartment/source-state/inactive-location")
+                    .setBeanProperty().withName("inactiveLocation");
+                forPattern("configuration/sc-compartments/sc-compartment/dependencies/used-compartment")
+                    .callMethod("addUsedCompartment").withParamTypes(String.class).withParamCount(1)
+                    .usingElementBodyAsArgument();
+                forPattern("configuration/sc-compartments/sc-compartment/build-variants/build-variant").factoryCreate()
+                    .usingFactory(buildVariantFactory).then().setNext("add");
+                forPattern(
+                    "configuration/sc-compartments/sc-compartment/build-variants/build-variant/build-options/build-option")
+                    .factoryCreate().usingFactory(new BuildOptionFactory()).then().setNext("add");
+                forPattern(
+                    "configuration/sc-compartments/sc-compartment/build-variants/build-variant/build-options/build-option/option-value")
+                    .setBeanProperty().withName("value");
+            }
+        };
     }
 
     /**

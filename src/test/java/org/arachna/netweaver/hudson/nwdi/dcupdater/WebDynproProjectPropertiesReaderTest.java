@@ -12,11 +12,12 @@ import java.util.Collection;
 
 import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.arachna.netweaver.dc.types.PublicPartReference;
+import org.arachna.xml.DigesterHelper;
 import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Unit tests for {@link WebDynproProjectPropertiesReader}.
+ * Unit tests for {@link WebDynproProjectPropertiesRulesModuleProducer}.
  * 
  * @author Dirk Weigenand
  */
@@ -24,7 +25,7 @@ public class WebDynproProjectPropertiesReaderTest {
     /**
      * Instance under test.
      */
-    private WebDynproProjectPropertiesReader propertiesReader;
+    private WebDynproProjectPropertiesRulesModuleProducer propertiesReader;
 
     /**
      * sample component for testing.
@@ -36,9 +37,11 @@ public class WebDynproProjectPropertiesReaderTest {
      */
     @Before
     public void setUp() {
-        propertiesReader = new WebDynproProjectPropertiesReader();
+        propertiesReader = new WebDynproProjectPropertiesRulesModuleProducer();
+        final DigesterHelper<DevelopmentComponent> digesterHelper =
+            new DigesterHelper<DevelopmentComponent>(propertiesReader);
         component = new DevelopmentComponent("", "");
-        propertiesReader.execute(component, getProjectWDProperties());
+        digesterHelper.update(getProjectWDProperties(), component);
     }
 
     @Test

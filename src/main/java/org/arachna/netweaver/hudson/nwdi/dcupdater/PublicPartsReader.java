@@ -13,6 +13,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.arachna.netweaver.dc.types.PublicPart;
+import org.arachna.xml.DigesterHelper;
 
 /**
  * Reader for Public Parts.
@@ -49,11 +50,11 @@ final class PublicPartsReader {
         final List<PublicPart> publicParts = new ArrayList<PublicPart>();
 
         if (publicPartsLocation.exists()) {
-            final PublicPartReader reader = new PublicPartReader();
+            final DigesterHelper<PublicPart> digesterHelper = new DigesterHelper<PublicPart>(new PublicPartRulesModuleProducer());
 
             for (final File definition : publicPartsLocation.listFiles(new PublicPartFileFilter())) {
                 try {
-                    publicParts.add(reader.execute(new FileReader(definition)));
+                    publicParts.add(digesterHelper.execute(new FileReader(definition)));
                 }
                 catch (final FileNotFoundException e) {
                     logger.log(Level.WARNING, e.getLocalizedMessage(), e);

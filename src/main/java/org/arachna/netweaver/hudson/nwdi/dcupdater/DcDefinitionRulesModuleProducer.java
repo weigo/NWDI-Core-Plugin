@@ -1,14 +1,16 @@
 package org.arachna.netweaver.hudson.nwdi.dcupdater;
 
 import org.apache.commons.digester3.binder.AbstractRulesModule;
+import org.apache.commons.digester3.binder.RulesModule;
 import org.arachna.netweaver.dc.types.PublicPartReference;
+import org.arachna.xml.RulesModuleProducer;
 
 /**
  * Update a given development component from its corresponding '.dcdef' file.
  * 
  * @author Dirk Weigenand
  */
-class DcDefinitionReader extends AbstractComponentConfigurationReader {
+class DcDefinitionRulesModuleProducer implements RulesModuleProducer {
     /**
      * Create a rules module for parsing a <code>.dcdef</code> development
      * component configuration file.
@@ -17,7 +19,7 @@ class DcDefinitionReader extends AbstractComponentConfigurationReader {
      *         component configuration file.
      */
     @Override
-    AbstractRulesModule getRulesModule() {
+    public RulesModule getRulesModule() {
         return new AbstractRulesModule() {
             @Override
             protected void configure() {
