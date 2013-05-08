@@ -14,13 +14,9 @@ import hudson.tasks.Builder;
 import hudson.tasks.Publisher;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.StringReader;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -40,7 +36,6 @@ import org.arachna.netweaver.hudson.util.FilePathHelper;
 import org.arachna.netweaver.tools.DIToolCommandExecutionResult;
 import org.arachna.netweaver.tools.cbs.CBSToolCommandExecutor;
 import org.arachna.netweaver.tools.dc.DCToolCommandExecutor;
-import org.arachna.xml.DigesterHelper;
 
 /**
  * A job for building a NWDI development configuration/track.
@@ -444,25 +439,7 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
          *            development components.
          */
         private void updateSourceCodeLocations(final AntHelper antHelper) {
-            final Collection<Compartment> compartments =
-                getDevelopmentConfiguration().getCompartments(CompartmentState.Source);
-            final DigesterHelper<DevelopmentComponent> digesterHelper =
-                new DigesterHelper<DevelopmentComponent>(new BuildXmlRulesModuleProducer());
-
-            for (final Compartment compartment : compartments) {
-                for (final DevelopmentComponent component : compartment.getDevelopmentComponents()) {
-                    try {
-                        final File buildXml =
-                            new File(antHelper.getBaseLocation(component), "gen/default/logs/build.xml");
-                        digesterHelper.update(
-                            new InputStreamReader(new FileInputStream(buildXml), Charset.forName(DEFAULT_ENCODING)),
-                            component);
-                    }
-                    catch (final FileNotFoundException e) {
-                        // ignore: component was not built yet.
-                    }
-                }
-            }
+            getDevelopmentConfiguration().accept(new DevelopmentComponentPropertiesUpdater(antHelper));
         }
 
         @Override

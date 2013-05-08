@@ -29,32 +29,21 @@ public final class BuildXmlRulesModuleProducer implements RulesModuleProducer {
         return new AbstractRulesModule() {
             @Override
             protected void configure() {
+                forPattern("project/target/javac/src").addRule(new Rule() {
+                    @Override
+                    public void begin(final String namespace, final String name, final Attributes attributes)
+                        throws Exception {
+                        final DevelopmentComponent component = getDigester().peek();
+                        component.addSourceFolder(attributes.getValue("path"));
+                    }
+                });
                 forPattern("project/target/javac").addRule(new Rule() {
-                    /**
-                     * Look up encoding and destination folder from attributes.
-                     * 
-                     * {@inheritDoc}
-                     */
                     @Override
                     public void begin(final String namespace, final String name, final Attributes attributes)
                         throws Exception {
                         final DevelopmentComponent component = getDigester().peek();
                         component.setSourceEncoding(attributes.getValue("encoding"));
                         component.setOutputFolder(attributes.getValue("destdir"));
-                    }
-                });
-
-                forPattern("project/target/javac/src").addRule(new Rule() {
-                    /**
-                     * Look up encoding and destination folder from attributes.
-                     * 
-                     * {@inheritDoc}
-                     */
-                    @Override
-                    public void begin(final String namespace, final String name, final Attributes attributes)
-                        throws Exception {
-                        final DevelopmentComponent component = getDigester().peek();
-                        component.addSourceFolder(attributes.getValue("path"));
                     }
                 });
             }
