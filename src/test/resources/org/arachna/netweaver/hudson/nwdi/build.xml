@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+    development component
+                     name: spring_sap_jpa_support
+                   vendor: arachna.org
+                     type: Java
+                 sub-type: 
+              type-vendor: sap.com
+
+       software component
+                     name: SPRING_JPA_SUPPORT
+                   vendor: arachna.org
+
+                 location: DI0_XMPL_D
+          source location: http://eileanne.arachna.org:50000/dtr/ws/XMPL/arachna.org_SPRING_JPA_SUPPORT/dev/inactive/
+            build variant: default
+
+    building on eileanne, Linux/amd64, version 3.7-trunk-amd64
+    using Java VM 'Java HotSpot(TM) 64-Bit Server VM', version 20.10-b01 (Sun Microsystems Inc.)
+    build started at 2013-04-23 22:12:34 GMT+02:00 (CEST)
+
+    Build Plugin 'JavaPlugin', Version 7.30 SP 1 (NW731CORE_01_REL, built on 2011-09-17 17:12:25 +0200, CL155733)
+    detailed versions:
+    sap.com:tc/bi/anttasks#def      7.30 SP 1 (NW731CORE_01_REL, built on 2011-09-17 17:10:39 +0200, CL155733)
+    sap.com:tc/bi/bp/javaLib#saplib 7.30 SP 1 (NW731CORE_01_REL, built on 2011-09-17 17:12:25 +0200, CL155733)
+    sap.com:tc/bi/core#def          7.30 SP 1 (NW731CORE_01_REL, built on 2011-09-17 17:13:01 +0200, CL155733)
+    sap.com:tc/bi/exception#def     7.30 SP 1 (NW731CORE_01_REL, built on 2011-09-17 17:10:38 +0200, CL155733)
+    sap.com:tc/bi/extddicdb#def     7.30 SP 1 (NW731CORE_01_REL, built on 2011-09-17 17:10:43 +0200, CL155733)
+    sap.com:tc/bi/extsql#def        7.30 SP 1 (NW731CORE_01_REL, built on 2011-09-17 17:10:41 +0200, CL155733)
+    sap.com:tc/bi/framework#def     7.30 SP 1 (NW731CORE_01_REL, built on 2011-09-17 17:11:01 +0200, CL155733)
+    sap.com:tc/bi/i18n#def          7.30 SP 1 (NW731CORE_01_REL, built on 2011-09-17 17:10:35 +0200, CL155733)
+    sap.com:tc/bi/javatech#def      7.30 SP 1 (NW731CORE_01_REL, built on 2011-09-17 17:11:16 +0200, CL155733)
+    sap.com:tc/bi/jdoc#def          7.30 SP 1 (NW731CORE_01_REL, built on 2011-09-17 17:10:39 +0200, CL155733)
+    sap.com:tc/bi/jdoc/util#def     7.30 SP 1 (NW731CORE_01_REL, built on 2011-09-17 17:11:10 +0200, CL155733)
+    sap.com:tc/bi/jlincbs#def       7.30 SP 1 (NW731CORE_01_REL, built on 2011-09-17 17:10:50 +0200, CL155733)
+    sap.com:tc/bi/settings#version  7.30 SP 1 (NW731CORE_01_REL, built on 2011-09-17 17:11:52 +0200, CL155733)
+    sap.com:tc/bi/util#util         7.30 SP 1 (NW731CORE_01_REL, built on 2011-09-17 17:11:07 +0200, CL155733)
+    sap.com:tc/bi/velocity#def      7.30 SP 1 (NW731CORE_01_REL, built on 2011-09-17 17:10:35 +0200, CL155733)
+    sap.com:tc/bi/xml#def           7.30 SP 1 (NW731CORE_01_REL, built on 2011-09-17 17:10:36 +0200, CL155733)
+ -->
+<project name="DC Build"
+         default="build"
+         basedir=".">
+<taskdef name="checkfileset" classname="com.sap.tools.ant.taskdefs.EmptyFilesetCheck"/>
+<taskdef name="propertybag" classname="com.sap.tools.ant.taskdefs.PropertyBag"/>
+<taskdef name="timer" classname="com.sap.tools.ant.taskdefs.Timer"/>
+<taskdef name="xlf2prop" classname="com.sap.tc.buildplugin.util.XlfConverter"/>
+<!-- public part creation skipped because there are no public parts defined. -->
+
+<target name="compile">
+<mkdir dir="/home/weigo/tmp/hudson/workspace/EXAMPLE_TRACK/.dtc/t/9EE6C210A2FB88E24A923C37CD81FFCB/classes"/>
+<!-- begin generator extension type 'sap.com~sqlj' for generator id 'sap.com~javac' -->
+<!-- No *.sqlj files found, skipping SQLJ preprocessing. -->
+<!-- end generator extension type 'sap.com~sqlj' for generator id 'sap.com~javac' -->
+<!-- begin generator id 'sap.com~javac', type 'sap.com~javac' -->
+<echo message="Forking Java compiler as a new process: /opt/jdk1.6.0_35/bin/javac"/>
+<timer/>
+<echo message="Settings:"/>
+<echo message="        debug: on"/>
+<echo message="     optimize: off"/>
+<echo message="  deprecation: default"/>
+<echo message="      verbose: default"/>
+<echo message="     encoding: UTF-8"/>
+<echo message="       source: default"/>
+<echo message="       target: default"/>
+<echo message="  source path: /home/weigo/tmp/hudson/workspace/EXAMPLE_TRACK/.dtc/DCs/arachna.org/spring_sap_jpa_support/_comp/src"/>
+<echo message="   class path:"/>
+<echo message="      /home/weigo/tmp/hudson/workspace/EXAMPLE_TRACK/.dtc/DCs/arachna.org/orpersistence/_comp/gen/default/public/api/lib/java/cglib-nodep-2.2.jar"/>
+<echo message="      /home/weigo/tmp/hudson/workspace/EXAMPLE_TRACK/.dtc/DCs/arachna.org/orpersistence/_comp/gen/default/public/api/lib/java/orpersistence.jar"/>
+<echo message="      /home/weigo/tmp/hudson/workspace/EXAMPLE_TRACK/.dtc/DCs/arachna.org/orpersistence/_comp/gen/default/public/api/lib/java/persistence-api-1.0.jar"/>
+<echo message="      /home/weigo/tmp/hudson/workspace/EXAMPLE_TRACK/.dtc/DCs/arachna.org/orpersistence/_comp/gen/default/public/api/lib/java/sap.com~tc~antlr~runtime.jar"/>
+<echo message="      /home/weigo/tmp/hudson/workspace/EXAMPLE_TRACK/.dtc/DCs/sap.com/public.test.facade/_comp/gen/default/public/apimock/lib/java/easymock.jar"/>
+<echo message="      /home/weigo/tmp/hudson/workspace/EXAMPLE_TRACK/.dtc/DCs/sap.com/engine.jee5.facade/_comp/gen/default/public/api/lib/java/engine.jee5.facade.jar"/>
+<echo message="      /home/weigo/tmp/hudson/workspace/EXAMPLE_TRACK/.dtc/DCs/sap.com/engine.jee5.facade/_comp/gen/default/public/api/lib/java/jee5.facade.jar"/>
+<echo message="      /home/weigo/tmp/hudson/workspace/EXAMPLE_TRACK/.dtc/DCs/sap.com/public.test.facade/_comp/gen/default/public/api381/lib/java/junit.jar"/>
+<echo message="      /home/weigo/tmp/hudson/workspace/EXAMPLE_TRACK/.dtc/DCs/sap.com/engine.jee5.facade/_comp/gen/default/public/apiwithoutjsf/lib/java/apiwithoutjsf.facade.jar"/>
+<echo message="      /home/weigo/tmp/hudson/workspace/EXAMPLE_TRACK/.dtc/DCs/sap.com/public.test.facade/_comp/gen/default/public/api/lib/java/junit-4.5.jar"/>
+<echo message="      /home/weigo/tmp/hudson/workspace/EXAMPLE_TRACK/.dtc/DCs/springsource.org/spring/_comp/gen/default/public/api/lib/java/spring-aop-3.1.1.RELEASE.jar"/>
+<echo message="      /home/weigo/tmp/hudson/workspace/EXAMPLE_TRACK/.dtc/DCs/springsource.org/spring/_comp/gen/default/public/api/lib/java/spring-asm-3.1.1.RELEASE.jar"/>
+<echo message="      /home/weigo/tmp/hudson/workspace/EXAMPLE_TRACK/.dtc/DCs/springsource.org/spring/_comp/gen/default/public/api/lib/java/spring-beans-3.1.1.RELEASE.jar"/>
+<echo message="      /home/weigo/tmp/hudson/workspace/EXAMPLE_TRACK/.dtc/DCs/springsource.org/spring/_comp/gen/default/public/api/lib/java/spring-context-3.1.1.RELEASE.jar"/>
+<echo message="      /home/weigo/tmp/hudson/workspace/EXAMPLE_TRACK/.dtc/DCs/springsource.org/spring/_comp/gen/default/public/api/lib/java/spring-core-3.1.1.RELEASE.jar"/>
+<echo message="      /home/weigo/tmp/hudson/workspace/EXAMPLE_TRACK/.dtc/DCs/springsource.org/spring/_comp/gen/default/public/api/lib/java/spring-jdbc-3.1.1.RELEASE.jar"/>
+<echo message="      /home/weigo/tmp/hudson/workspace/EXAMPLE_TRACK/.dtc/DCs/springsource.org/spring/_comp/gen/default/public/api/lib/java/spring-orm-3.1.1.RELEASE.jar"/>
+<echo message="      /home/weigo/tmp/hudson/workspace/EXAMPLE_TRACK/.dtc/DCs/springsource.org/spring/_comp/gen/default/public/api/lib/java/spring-test-3.1.1.RELEASE.jar"/>
+<echo message="      /home/weigo/tmp/hudson/workspace/EXAMPLE_TRACK/.dtc/DCs/springsource.org/spring/_comp/gen/default/public/api/lib/java/spring-tx-3.1.1.RELEASE.jar"/>
+<echo message="   output dir: /home/weigo/tmp/hudson/workspace/EXAMPLE_TRACK/.dtc/t/9EE6C210A2FB88E24A923C37CD81FFCB/classes"/>
+<checkfileset fail="false">
+<fileset dir="/home/weigo/tmp/hudson/workspace/EXAMPLE_TRACK/.dtc/DCs/arachna.org/spring_sap_jpa_support/_comp/src">
+<include name="**/*.class"/>
+</fileset>
+</checkfileset>
+<javac includeAntRuntime="no"
+       destdir="/home/weigo/tmp/hudson/workspace/EXAMPLE_TRACK/.dtc/t/9EE6C210A2FB88E24A923C37CD81FFCB/classes"
+       encoding="UTF-8"
+       fork="true"
+       executable="/opt/jdk1.6.0_35/bin/javac"
+       memoryMaximumSize="238616576"
+       deprecation="false"
+       debug="on"
+       compiler="com.sap.tc.buildplugin.gen.JavacAdapter"
+       tempdir="/home/weigo/tmp/hudson/workspace/EXAMPLE_TRACK/.dtc/t/9EE6C210A2FB88E24A923C37CD81FFCB">
+	<src path="/home/weigo/tmp/hudson/workspace/EXAMPLE_TRACK/.dtc/DCs/arachna.org/spring_sap_jpa_support/_comp/src"/>
+	<src path="/home/weigo/tmp/hudson/workspace/EXAMPLE_TRACK/.dtc/DCs/arachna.org/spring_sap_jpa_support/_comp/test"/>
+<include name="**/*.java"/>
+<classpath>
+<pathelement location="/home/weigo/tmp/hudson/workspace/EXAMPLE_TRACK/.dtc/DCs/arachna.org/orpersistence/_comp/gen/default/public/api/lib/java/cglib-nodep-2.2.jar"/>
+<pathelement location="/home/weigo/tmp/hudson/workspace/EXAMPLE_TRACK/.dtc/DCs/arachna.org/orpersistence/_comp/gen/default/public/api/lib/java/orpersistence.jar"/>
+<pathelement location="/home/weigo/tmp/hudson/workspace/EXAMPLE_TRACK/.dtc/DCs/arachna.org/orpersistence/_comp/gen/default/public/api/lib/java/persistence-api-1.0.jar"/>
+<pathelement location="/home/weigo/tmp/hudson/workspace/EXAMPLE_TRACK/.dtc/DCs/arachna.org/orpersistence/_comp/gen/default/public/api/lib/java/sap.com~tc~antlr~runtime.jar"/>
+<pathelement location="/home/weigo/tmp/hudson/workspace/EXAMPLE_TRACK/.dtc/DCs/sap.com/public.test.facade/_comp/gen/default/public/apimock/lib/java/easymock.jar"/>
+<pathelement location="/home/weigo/tmp/hudson/workspace/EXAMPLE_TRACK/.dtc/DCs/sap.com/engine.jee5.facade/_comp/gen/default/public/api/lib/java/engine.jee5.facade.jar"/>
+<pathelement location="/home/weigo/tmp/hudson/workspace/EXAMPLE_TRACK/.dtc/DCs/sap.com/engine.jee5.facade/_comp/gen/default/public/api/lib/java/jee5.facade.jar"/>
+<pathelement location="/home/weigo/tmp/hudson/workspace/EXAMPLE_TRACK/.dtc/DCs/sap.com/public.test.facade/_comp/gen/default/public/api381/lib/java/junit.jar"/>
+<pathelement location="/home/weigo/tmp/hudson/workspace/EXAMPLE_TRACK/.dtc/DCs/sap.com/engine.jee5.facade/_comp/gen/default/public/apiwithoutjsf/lib/java/apiwithoutjsf.facade.jar"/>
+<pathelement location="/home/weigo/tmp/hudson/workspace/EXAMPLE_TRACK/.dtc/DCs/sap.com/public.test.facade/_comp/gen/default/public/api/lib/java/junit-4.5.jar"/>
+<pathelement location="/home/weigo/tmp/hudson/workspace/EXAMPLE_TRACK/.dtc/DCs/springsource.org/spring/_comp/gen/default/public/api/lib/java/spring-aop-3.1.1.RELEASE.jar"/>
+<pathelement location="/home/weigo/tmp/hudson/workspace/EXAMPLE_TRACK/.dtc/DCs/springsource.org/spring/_comp/gen/default/public/api/lib/java/spring-asm-3.1.1.RELEASE.jar"/>
+<pathelement location="/home/weigo/tmp/hudson/workspace/EXAMPLE_TRACK/.dtc/DCs/springsource.org/spring/_comp/gen/default/public/api/lib/java/spring-beans-3.1.1.RELEASE.jar"/>
+<pathelement location="/home/weigo/tmp/hudson/workspace/EXAMPLE_TRACK/.dtc/DCs/springsource.org/spring/_comp/gen/default/public/api/lib/java/spring-context-3.1.1.RELEASE.jar"/>
+<pathelement location="/home/weigo/tmp/hudson/workspace/EXAMPLE_TRACK/.dtc/DCs/springsource.org/spring/_comp/gen/default/public/api/lib/java/spring-core-3.1.1.RELEASE.jar"/>
+<pathelement location="/home/weigo/tmp/hudson/workspace/EXAMPLE_TRACK/.dtc/DCs/springsource.org/spring/_comp/gen/default/public/api/lib/java/spring-jdbc-3.1.1.RELEASE.jar"/>
+<pathelement location="/home/weigo/tmp/hudson/workspace/EXAMPLE_TRACK/.dtc/DCs/springsource.org/spring/_comp/gen/default/public/api/lib/java/spring-orm-3.1.1.RELEASE.jar"/>
+<pathelement location="/home/weigo/tmp/hudson/workspace/EXAMPLE_TRACK/.dtc/DCs/springsource.org/spring/_comp/gen/default/public/api/lib/java/spring-test-3.1.1.RELEASE.jar"/>
+<pathelement location="/home/weigo/tmp/hudson/workspace/EXAMPLE_TRACK/.dtc/DCs/springsource.org/spring/_comp/gen/default/public/api/lib/java/spring-tx-3.1.1.RELEASE.jar"/>
+</classpath>
+</javac>
+<timer message="Java compilation finished in "/>
+<!-- end generator id 'sap.com~javac', type 'sap.com~javac' -->
+<!-- begin generator extension type 'sap.com~jlin' for generator id 'sap.com~javac' -->
+<!-- JLin disabled. -->
+<!-- end generator extension type 'sap.com~jlin' for generator id 'sap.com~javac' -->
+<!-- begin generator extension type 'sap.com~sqlj' for generator id 'sap.com~javac' -->
+<!-- No *.sqlj files found, skipping SQLJ post-processing. -->
+<!-- end generator extension type 'sap.com~sqlj' for generator id 'sap.com~javac' -->
+<!-- begin generator extension type 'sap.com~jdo' for generator id 'sap.com~javac' -->
+<!-- No *.jdo files found, skipping JDO enhancer. -->
+<!-- end generator extension type 'sap.com~jdo' for generator id 'sap.com~javac' -->
+<!-- begin generator extension type 'sap.com~xlf2prop' for generator id 'sap.com~javac' -->
+<echo message="Start XLF conversion"/>
+<timer/>
+<xlf2prop todir="/home/weigo/tmp/hudson/workspace/EXAMPLE_TRACK/.dtc/t/9EE6C210A2FB88E24A923C37CD81FFCB/classes">
+<fileset dir="/home/weigo/tmp/hudson/workspace/EXAMPLE_TRACK/.dtc/DCs/arachna.org/spring_sap_jpa_support/_comp/src"/>
+</xlf2prop>
+<timer message="XLF conversion finished in "/>
+<!-- end generator extension type 'sap.com~xlf2prop' for generator id 'sap.com~javac' -->
+<!-- begin generator extension type 'sap.com~jdoc' for generator id 'sap.com~javac' -->
+<!-- Javadoc generation disabled. -->
+<!-- end generator extension type 'sap.com~jdoc' for generator id 'sap.com~javac' -->
+</target>
+
+<target name="build" depends="compile">
+
+</target>
+</project>

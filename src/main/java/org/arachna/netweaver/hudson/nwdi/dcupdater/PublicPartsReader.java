@@ -5,8 +5,10 @@ package org.arachna.netweaver.hudson.nwdi.dcupdater;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -38,7 +40,7 @@ final class PublicPartsReader {
      *            base folder for public part descriptors.
      */
     public PublicPartsReader(final String componentLocation) {
-        publicPartsLocation = new File(String.format("%s/def", componentLocation));
+        publicPartsLocation = new File(componentLocation, "def");
     }
 
     /**
@@ -50,11 +52,13 @@ final class PublicPartsReader {
         final List<PublicPart> publicParts = new ArrayList<PublicPart>();
 
         if (publicPartsLocation.exists()) {
-            final DigesterHelper<PublicPart> digesterHelper = new DigesterHelper<PublicPart>(new PublicPartRulesModuleProducer());
+            final DigesterHelper<PublicPart> digesterHelper =
+                new DigesterHelper<PublicPart>(new PublicPartRulesModuleProducer());
 
             for (final File definition : publicPartsLocation.listFiles(new PublicPartFileFilter())) {
                 try {
-                    publicParts.add(digesterHelper.execute(new FileReader(definition)));
+                    publicParts.add(digesterHelper.execute(new InputStreamReader(new FileInputStream(definition),
+                        Charset.forName("UTF-8"))));
                 }
                 catch (final FileNotFoundException e) {
                     logger.log(Level.WARNING, e.getLocalizedMessage(), e);

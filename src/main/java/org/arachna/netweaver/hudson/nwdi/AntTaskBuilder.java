@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.Reader;
+import java.nio.charset.Charset;
 
 import org.apache.velocity.app.VelocityEngine;
 import org.arachna.ant.AntHelper;
@@ -112,7 +113,8 @@ public abstract class AntTaskBuilder extends Builder {
      * @return the reader for the velocity template.
      */
     protected final Reader getTemplateReader(final String pathToResourceInClassPath) {
-        return new InputStreamReader(this.getClass().getResourceAsStream(pathToResourceInClassPath));
+        return new InputStreamReader(this.getClass().getResourceAsStream(pathToResourceInClassPath),
+            Charset.forName("UTF-8"));
     }
 
     /**

@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -73,18 +74,23 @@ public final class DevelopmentComponent {
     /**
      * collection of development components that use this DC.
      */
-    private final Set<DevelopmentComponent> usingComponents = new HashSet<DevelopmentComponent>();
+    private final Set<DevelopmentComponent> usingComponents = new LinkedHashSet<DevelopmentComponent>();
 
     /**
      * folders containing sources.
      */
-    private final Set<String> sourceFolders = new HashSet<String>();
+    private final Set<String> sourceFolders = new LinkedHashSet<String>();
 
     /**
      * folder the class files for this development component were generated to
      * during the last build.
      */
     private String outputFolder = "";
+
+    /**
+     * Encoding of source files.
+     */
+    private String sourceEncoding;
 
     /**
      * Create an instance of a development component with the given name, vendor
@@ -532,7 +538,35 @@ public final class DevelopmentComponent {
         this.buildPlugin = buildPlugin;
     }
 
+    /**
+     * Set the developement component type from the given type and sub type.
+     * 
+     * @param type
+     *            main type of development component.
+     * @param subType
+     *            sub type of development component.
+     */
     public void setType(final String type, final String subType) {
         setType(DevelopmentComponentType.fromString(type, subType));
+    }
+
+    /**
+     * Set the encoding of source files to use.
+     * 
+     * @param sourceEncoding
+     *            encoding of source files to use.
+     */
+    public void setSourceEncoding(final String sourceEncoding) {
+        this.sourceEncoding = sourceEncoding;
+    }
+
+    /**
+     * Return the encoding of source files to use for this development
+     * component.
+     * 
+     * @return encoding of source files to use for this development component.
+     */
+    public String getSourceEncoding() {
+        return sourceEncoding;
     }
 }
