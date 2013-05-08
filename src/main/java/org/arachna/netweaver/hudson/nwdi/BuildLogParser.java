@@ -3,11 +3,13 @@
  */
 package org.arachna.netweaver.hudson.nwdi;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.LineNumberReader;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -64,32 +66,17 @@ class BuildLogParser {
      * Parse the <code>build.log</code> file.
      */
     void parse() {
-        LineNumberReader reader = null;
+        BufferedReader reader = null;
 
         try {
-            final String path =
-                String.format("%s/gen/default/logs/build.log", projectDirectory).replace('/', File.separatorChar);
-            reader = new LineNumberReader(new FileReader(path));
+            reader =
+                new BufferedReader(new InputStreamReader(new FileInputStream(new File(projectDirectory,
+                    "gen/default/logs/build.log")), Charset.forName("UTF8")));
 
-            String line;
-
-            while ((line = reader.readLine()) != null) {
-                if (line.contains(SOURCE_PATHS)) {
-                    readMultipleSourcePaths(reader);
-                }
-                else if (line.contains(SOURCE_PATH)) {
-                    readSingleSourcePath(line);
-                }
-                else if (line.contains(OUTPUT_DIR)) {
-                    readOutputDirectory(line);
-                }
-            }
-
-            readTestPackages();
+            parseBuildLog(reader);
         }
         catch (final FileNotFoundException e) {
             // ignore, maybe there was a build error so the file does not exist.
-            e.printStackTrace();
         }
         catch (final IOException e) {
             // TODO Auto-generated catch block
@@ -109,17 +96,25 @@ class BuildLogParser {
     }
 
     /**
-     * Determine whether there is a folder 'test/packages' containing java
-     * sources in the project directory.
+     * Parse the build log given in the specified reader.
+     * 
+     * @param reader
+     *            reader containing the build log.
+     * @throws IOException
      */
-    private void readTestPackages() {
-        // FIXME: make this configurable
-        // FIXME: how are unit test folders handled in NW 7.3?
-        final String testPackages =
-            normalizeFileName(projectDirectory + File.separatorChar + "test" + File.separatorChar + "packages");
+    protected void parseBuildLog(final BufferedReader reader) throws IOException {
+        String line;
 
-        if (folderContainsJavaSources(testPackages)) {
-            sourceFolders.add(testPackages);
+        while ((line = reader.readLine()) != null) {
+            if (line.contains(SOURCE_PATHS)) {
+                readMultipleSourcePaths(reader);
+            }
+            else if (line.contains(SOURCE_PATH)) {
+                readSingleSourcePath(line);
+            }
+            else if (line.contains(OUTPUT_DIR)) {
+                readOutputDirectory(line);
+            }
         }
     }
 
@@ -159,7 +154,7 @@ class BuildLogParser {
      * @throws IOException
      *             throw any IOException thrown reading the build log.
      */
-    private void readMultipleSourcePaths(final LineNumberReader reader) throws IOException {
+    private void readMultipleSourcePaths(final BufferedReader reader) throws IOException {
         String line;
         while ((line = reader.readLine()) != null) {
             if (line.contains("class path:")) {
