@@ -280,9 +280,10 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
      */
     private final class RunnerImpl extends AbstractRunner {
         /**
-         * 
+         * default encoding for file reading.
          */
         private static final String DEFAULT_ENCODING = "UTF-8";
+
         /**
          * collection of reporter plugins to be run prior to building.
          */
@@ -454,7 +455,8 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
                         final File buildXml =
                             new File(antHelper.getBaseLocation(component), "gen/default/logs/build.xml");
                         digesterHelper.update(
-                            new InputStreamReader(new FileInputStream(buildXml), Charset.forName("UTF-8")), component);
+                            new InputStreamReader(new FileInputStream(buildXml), Charset.forName(DEFAULT_ENCODING)),
+                            component);
                     }
                     catch (final FileNotFoundException e) {
                         // ignore: component was not built yet.
