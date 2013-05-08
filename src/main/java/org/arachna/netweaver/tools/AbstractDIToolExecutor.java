@@ -119,7 +119,7 @@ public abstract class AbstractDIToolExecutor {
             result.write("\nOperation has been interrupted!".getBytes(Charset.defaultCharset()));
         }
 
-        return new DIToolCommandExecutionResult(result.toString(), exitCode);
+        return new DIToolCommandExecutionResult(result.toString(Charset.defaultCharset().name()), exitCode);
     }
 
     /**
@@ -138,7 +138,7 @@ public abstract class AbstractDIToolExecutor {
             cmds.append(cmd).append(separator);
         }
 
-        return new ByteArrayInputStream(cmds.toString().getBytes());
+        return new ByteArrayInputStream(cmds.toString().getBytes(Charset.defaultCharset()));
     }
 
     /**
