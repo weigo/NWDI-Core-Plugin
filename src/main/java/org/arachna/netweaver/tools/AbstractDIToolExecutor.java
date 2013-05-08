@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -115,7 +116,7 @@ public abstract class AbstractDIToolExecutor {
             exitCode = starter.join();
         }
         catch (final InterruptedException e) {
-            result.write("\nOperation has been interrupted!".getBytes());
+            result.write("\nOperation has been interrupted!".getBytes(Charset.defaultCharset()));
         }
 
         return new DIToolCommandExecutionResult(result.toString(), exitCode);
