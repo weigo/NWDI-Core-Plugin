@@ -98,20 +98,11 @@ public final class DtrChangeLogSet extends ChangeLogSet<DtrChangeLogEntry> {
      * Sort the change log entries by check in time.
      */
     void sort() {
-        Collections.sort(entries, new DtrChangeLogEntryComparator());
-    }
-
-    /**
-     * Comparator for change log entries.
-     * 
-     * @author Dirk Weigenand
-     */
-    private final class DtrChangeLogEntryComparator implements Comparator<DtrChangeLogEntry> {
-        /**
-         * {@inheritDoc}
-         */
-        public int compare(final DtrChangeLogEntry entry1, final DtrChangeLogEntry entry2) {
-            return entry1.getCheckInTime().compareTo(entry2.getCheckInTime());
-        }
+        Collections.sort(entries, new Comparator<DtrChangeLogEntry>() {
+            @Override
+            public int compare(final DtrChangeLogEntry entry1, final DtrChangeLogEntry entry2) {
+                return entry1.getCheckInTime().compareTo(entry2.getCheckInTime());
+            }
+        });
     }
 }
