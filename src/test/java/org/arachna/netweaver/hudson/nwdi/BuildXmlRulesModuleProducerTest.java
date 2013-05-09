@@ -38,7 +38,8 @@ public class BuildXmlRulesModuleProducerTest {
     @Before
     public void setUp() {
         component = new DevelopmentComponent("", "");
-        new DigesterHelper<DevelopmentComponent>(new BuildXmlRulesModuleProducer()).update(getBuildXml(), component);
+        new DigesterHelper<DevelopmentComponent>(new BuildXmlRulesModuleProducer(new FakeTestFolderFinder())).update(
+            getBuildXml(), component);
 
     }
 
@@ -80,13 +81,37 @@ public class BuildXmlRulesModuleProducerTest {
     public final void assertParsingResultsInCorrectSourceFolders() {
         assertThat(
             component.getSourceFolders(),
-            containsInAnyOrder(
-                "/home/weigo/tmp/hudson/workspace/EXAMPLE_TRACK/.dtc/DCs/arachna.org/spring_sap_jpa_support/_comp/src",
-                "/home/weigo/tmp/hudson/workspace/EXAMPLE_TRACK/.dtc/DCs/arachna.org/spring_sap_jpa_support/_comp/test"));
+            containsInAnyOrder("/home/weigo/tmp/hudson/workspace/EXAMPLE_TRACK/.dtc/DCs/arachna.org/spring_sap_jpa_support/_comp/src"));
+    }
+
+    /**
+     * Test method for
+     * {@link org.arachna.netweaver.hudson.nwdi.BuildXmlRulesModuleProducer#getRulesModule()}
+     * .
+     */
+    @Test
+    public final void assertParsingResultsInCorrectTestSourceFolders() {
+        assertThat(
+            component.getTestSourceFolders(),
+            containsInAnyOrder("/home/weigo/tmp/hudson/workspace/EXAMPLE_TRACK/.dtc/DCs/arachna.org/spring_sap_jpa_support/_comp/test"));
     }
 
     private Reader getBuildXml() {
         return new InputStreamReader(this.getClass()
             .getResourceAsStream("/org/arachna/netweaver/hudson/nwdi/build.xml"), Charset.forName(UTF_8));
+    }
+
+    private class FakeTestFolderFinder extends TestFolderFinder {
+        @Override
+        boolean isTestFolder(final String encoding, final String sourceFolder) {
+            boolean retVal = false;
+
+            if ("/home/weigo/tmp/hudson/workspace/EXAMPLE_TRACK/.dtc/DCs/arachna.org/spring_sap_jpa_support/_comp/test"
+                .equals(sourceFolder)) {
+                retVal = true;
+            }
+
+            return retVal;
+        }
     }
 }

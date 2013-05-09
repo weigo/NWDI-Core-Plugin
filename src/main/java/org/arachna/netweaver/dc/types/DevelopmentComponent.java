@@ -82,6 +82,11 @@ public final class DevelopmentComponent {
     private final Set<String> sourceFolders = new LinkedHashSet<String>();
 
     /**
+     * folders containing test sources.
+     */
+    private final Set<String> testSourceFolders = new LinkedHashSet<String>();
+
+    /**
      * folder the class files for this development component were generated to
      * during the last build.
      */
@@ -517,7 +522,7 @@ public final class DevelopmentComponent {
      *         character.
      */
     public String getNormalizedName(final String separator) {
-        return String.format("%s%s%s", getVendor(), separator, getName().replaceAll("/", separator));
+        return getVendor() + separator + getName().replaceAll("/", separator);
     }
 
     /**
@@ -568,5 +573,25 @@ public final class DevelopmentComponent {
      */
     public String getSourceEncoding() {
         return sourceEncoding;
+    }
+
+    /**
+     * Add the given sourceFolder to the collection of source folders containing
+     * unit tests.
+     * 
+     * @param sourceFolder
+     *            source folder to add to folders containing unit tests.
+     */
+    public void addTestSourceFolder(final String sourceFolder) {
+        testSourceFolders.add(sourceFolder);
+    }
+
+    /**
+     * Return the collection of folders containing unit tests.
+     * 
+     * @return collection of folders containing unit tests.
+     */
+    public Set<String> getTestSourceFolders() {
+        return testSourceFolders;
     }
 }
