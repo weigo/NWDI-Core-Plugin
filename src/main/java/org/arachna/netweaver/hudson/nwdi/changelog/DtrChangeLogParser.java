@@ -29,7 +29,7 @@ import org.xml.sax.SAXException;
  * 
  * @author Dirk Weigenand
  */
-final class DtrChangeLogParser extends ChangeLogParser implements RulesModuleProducer {
+public final class DtrChangeLogParser extends ChangeLogParser implements RulesModuleProducer {
     @Override
     public ChangeLogSet<? extends Entry> parse(final AbstractBuild build, final File changelogFile) throws IOException,
         SAXException {

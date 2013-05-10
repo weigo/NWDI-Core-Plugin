@@ -6,9 +6,12 @@ package org.arachna.netweaver.hudson.nwdi;
 import static hudson.model.Result.FAILURE;
 import hudson.FilePath;
 import hudson.Launcher;
+import hudson.init.InitMilestone;
+import hudson.init.Initializer;
 import hudson.model.BuildListener;
 import hudson.model.Result;
 import hudson.model.AbstractBuild;
+import hudson.model.Run;
 import hudson.tasks.BuildStep;
 import hudson.tasks.Builder;
 import hudson.tasks.Publisher;
@@ -32,6 +35,7 @@ import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 import org.arachna.netweaver.hudson.nwdi.DCBuildResultParser.BuildResults;
+import org.arachna.netweaver.hudson.nwdi.changelog.DtrChangeLogParser;
 import org.arachna.netweaver.hudson.util.FilePathHelper;
 import org.arachna.netweaver.tools.DIToolCommandExecutionResult;
 import org.arachna.netweaver.tools.cbs.CBSToolCommandExecutor;
@@ -452,5 +456,14 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
                 setResult(Result.FAILURE);
             }
         }
+    }
+
+    /**
+     * XStream aliases.
+     */
+    @Initializer(before = InitMilestone.PLUGINS_STARTED)
+    public static void addAliases() {
+        Run.XSTREAM2.addCompatibilityAlias("org.arachna.netweaver.hudson.nwdi.DtrChangeLogParser",
+            DtrChangeLogParser.class);
     }
 }
