@@ -67,7 +67,7 @@ final class SoftwareComponentsParser {
             }
         }
         catch (final JaxenException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
 
         return compartments;
@@ -83,8 +83,6 @@ final class SoftwareComponentsParser {
     private String createCompartmentName(final String href) {
         final int firstUnderScore = href.lastIndexOf('/');
         // FIXME: fix generation of compartment name.
-        final String name = href.substring(firstUnderScore + 1, href.length()) + "_1";
-
-        return name;
+        return href.substring(firstUnderScore + 1, href.length()) + "_1";
     }
 }
