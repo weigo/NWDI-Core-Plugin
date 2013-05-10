@@ -58,9 +58,8 @@ public final class DevelopmentConfiguration {
     @Deprecated
     // FIXME: remove in a future version!
     private final transient Set<Compartment> compartments = new HashSet<Compartment>();
-
     /**
-     * Translation 'vendor:scName' to compartment.
+     * map 'scName' to compartment.
      */
     private final Map<String, Compartment> compartmentMap = new HashMap<String, Compartment>();
 
