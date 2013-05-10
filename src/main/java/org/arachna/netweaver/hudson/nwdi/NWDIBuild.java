@@ -129,11 +129,10 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
      */
     public Collection<DevelopmentComponent> getAffectedDevelopmentComponents() {
         if (affectedComponents == null) {
-            final Set<DevelopmentComponent> affectedComponents = getDevelopmentComponentsThatNeedRebuild();
             final Collection<DevelopmentComponent> components = new LinkedList<DevelopmentComponent>();
             final AntHelper antHelper = new AntHelper(FilePathHelper.makeAbsolute(getWorkspace()), dcFactory);
 
-            for (final DevelopmentComponent component : affectedComponents) {
+            for (final DevelopmentComponent component : getDevelopmentComponentsThatNeedRebuild()) {
                 if (component.getCompartment() != null && new File(antHelper.getBaseLocation(component)).exists()) {
                     components.add(component);
                 }
@@ -150,7 +149,7 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
             final DependencySorter dependencySorter =
                 new DependencySorter(dcFactory, finder.calculateDevelopmentComponentsThatNeedRebuilding(components));
 
-            this.affectedComponents = dependencySorter.determineBuildSequence();
+            affectedComponents = dependencySorter.determineBuildSequence();
         }
 
         return affectedComponents;
