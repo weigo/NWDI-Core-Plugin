@@ -4,7 +4,7 @@
 package org.arachna.netweaver.hudson.dtr.browser;
 
 import java.io.IOException;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
@@ -21,6 +21,13 @@ import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
  */
 final class DevelopmentComponentCollector {
     /**
+     * error message when a resource could not be found in resource page but was
+     * gleaned from prior activities (the respective DC was probably deleted).
+     */
+    private static final String RESOURCE_NOT_FOUND_IN_X_PATH_EXPRESSION_FOR_RESOURCE_EXTRACTION =
+        "Resource read from %s\ndoes not match current XPath expression for resource extraction:\n%s\n";
+
+    /**
      * error message when an error occurred computing the associated development
      * components of the given set of activities.
      */
@@ -30,7 +37,8 @@ final class DevelopmentComponentCollector {
     /**
      * template for querying details of a activity.
      */
-    private static final String ACTIVITY_DETAIL_QUERY_TEMPLATE = "%s/dtr/system-tools/reports/ResourceDetails?technical=false&path=%s";
+    private static final String ACTIVITY_DETAIL_QUERY_TEMPLATE =
+        "%s/dtr/system-tools/reports/ResourceDetails?technical=false&path=%s";
 
     /**
      * Template for querying resources of an activity.
@@ -41,7 +49,8 @@ final class DevelopmentComponentCollector {
     /**
      * Template for querying details of a resource of an activity.
      */
-    private static final String RESOURCE_DETAIL_QUERY_TEMPLATE = "%s/dtr/system-tools/reports/ResourceDetails?technical=false&path=/vh/%s";
+    private static final String RESOURCE_DETAIL_QUERY_TEMPLATE =
+        "%s/dtr/system-tools/reports/ResourceDetails?technical=false&path=/vh/%s";
     /**
      * Logger to use.
      */
@@ -75,7 +84,8 @@ final class DevelopmentComponentCollector {
      *            create and register development components that are related to
      *            an activity in the DTR.
      */
-    public DevelopmentComponentCollector(final DtrHttpClient dtrHttpClient, final String dtrUrl, final DevelopmentComponentFactory dcFactory) {
+    public DevelopmentComponentCollector(final DtrHttpClient dtrHttpClient, final String dtrUrl,
+        final DevelopmentComponentFactory dcFactory) {
         this.dtrHttpClient = dtrHttpClient;
         this.dtrUrl = dtrUrl;
         this.dcFactory = dcFactory;
@@ -91,7 +101,7 @@ final class DevelopmentComponentCollector {
      * @return the set of associated development components
      */
     public Set<DevelopmentComponent> collect(final List<Activity> activities) {
-        final Set<DevelopmentComponent> components = new HashSet<DevelopmentComponent>();
+        final Set<DevelopmentComponent> components = new LinkedHashSet<DevelopmentComponent>();
 
         if (activities != null) {
             for (final Activity activity : activities) {
@@ -113,7 +123,7 @@ final class DevelopmentComponentCollector {
      * @return set of development components affected by the given activity.
      */
     private Set<DevelopmentComponent> calculateAffectedDevelopmentComponents(final Activity activity) {
-        final Set<DevelopmentComponent> components = new HashSet<DevelopmentComponent>();
+        final Set<DevelopmentComponent> components = new LinkedHashSet<DevelopmentComponent>();
 
         try {
             updateActivityDetails(activity);
@@ -129,9 +139,10 @@ final class DevelopmentComponentCollector {
                 catch (final IllegalStateException ise) {
                     // This means that the resource was deleted from the DTR.
                     // Verify this using the URL printed below.
-                    LOGGER.log(Level.FINE, String.format(
-                        "Resource read from %s\ndoes not match current XPath expression for resource extraction:\n%s\n", queryURL,
-                        ise.getMessage()));
+                    LOGGER.log(
+                        Level.FINE,
+                        String.format(RESOURCE_NOT_FOUND_IN_X_PATH_EXPRESSION_FOR_RESOURCE_EXTRACTION, queryURL,
+                            ise.getMessage()));
                 }
             }
         }
@@ -164,9 +175,10 @@ final class DevelopmentComponentCollector {
             activityResourceParser.parse(dtrHttpClient.getContent(queryURL));
         }
         catch (final IllegalStateException ise) {
-            System.err
-                .println(String.format("Resource read from %s\ndoes not match current XPath expression for resource extraction:\n%s\n",
-                    queryURL, ise.getMessage()));
+            LOGGER.log(
+                Level.SEVERE,
+                String.format(RESOURCE_NOT_FOUND_IN_X_PATH_EXPRESSION_FOR_RESOURCE_EXTRACTION, queryURL,
+                    ise.getMessage()));
         }
     }
 
