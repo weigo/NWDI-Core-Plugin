@@ -99,12 +99,13 @@ public final class DigesterHelper<T> {
     }
 
     /**
-     * @return
+     * Create a <code>Digester</code> using the <code>RulesModule</code> from
+     * the <code>rulesProducer</code>.
+     * 
+     * @return new Digester instance.
      */
     protected Digester createDigester() {
         final DigesterLoader digesterLoader = DigesterLoader.newLoader(rulesProducer.getRulesModule());
-        final Digester digester = digesterLoader.newDigester();
-        return digester;
+        return digesterLoader.newDigester();
     }
-
 }
