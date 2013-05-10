@@ -58,7 +58,7 @@ public class PublicPartReference {
     public PublicPartReference(final String vendor, final String componentName, final String name) {
         this.vendor = vendor;
         this.componentName = componentName;
-        setName(name);
+        this.name = name;
     }
 
     /**
