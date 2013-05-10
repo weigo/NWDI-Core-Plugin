@@ -8,8 +8,9 @@ import hudson.scm.ChangeLogParser;
 import hudson.scm.ChangeLogSet;
 
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.Collection;
 
 import org.arachna.netweaver.hudson.dtr.browser.Activity;
@@ -35,7 +36,8 @@ public final class ChangeLogService {
     public void writeChangeLog(final AbstractBuild<?, ?> build, final File changelogFile,
         final Collection<Activity> activities) throws IOException {
         final DtrChangeLogWriter dtrChangeLogWriter =
-            new DtrChangeLogWriter(new DtrChangeLogSet(build, activities), new FileWriter(changelogFile));
+            new DtrChangeLogWriter(new DtrChangeLogSet(build, activities), new OutputStreamWriter(new FileOutputStream(
+                changelogFile), "UTF-8"));
         dtrChangeLogWriter.write();
     }
 
