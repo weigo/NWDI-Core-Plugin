@@ -65,7 +65,8 @@ final class PortalApplicationConfigurationRulesModuleProducer implements RulesMo
      * 
      * @author Dirk Weigenand
      */
-    class PublicPartReferenceCreationFactory extends AbstractObjectCreationFactory<Collection<PublicPartReference>> {
+    private static final class PublicPartReferenceCreationFactory extends
+        AbstractObjectCreationFactory<Collection<PublicPartReference>> {
         /**
          * Factory for {@link PublicPartReference} objects.
          */

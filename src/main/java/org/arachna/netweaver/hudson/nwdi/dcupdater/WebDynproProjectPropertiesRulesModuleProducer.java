@@ -64,7 +64,8 @@ final class WebDynproProjectPropertiesRulesModuleProducer implements RulesModule
      * 
      * @author Dirk Weigenand
      */
-    class PublicPartReferenceCreationFactory extends AbstractObjectCreationFactory<PublicPartReference> {
+    private static final class PublicPartReferenceCreationFactory extends
+        AbstractObjectCreationFactory<PublicPartReference> {
         /**
          * Factory for {@link PublicPartReference} objects.
          */

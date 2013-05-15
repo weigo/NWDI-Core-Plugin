@@ -74,7 +74,7 @@ public final class BuildXmlRulesModuleProducer implements RulesModuleProducer {
      * 
      * @author Dirk Weigenand
      */
-    private class SourceFolderRule extends Rule {
+    private static final class SourceFolderRule extends Rule {
         /**
          * finder to determine whether folders contain unit tests.
          */

@@ -3,6 +3,7 @@
  */
 package org.arachna.netweaver.hudson.nwdi.dcupdater;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
@@ -14,6 +15,7 @@ import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.DevelopmentComponentType;
 import org.arachna.xml.DigesterHelper;
+import org.arachna.xml.RulesModuleProducer;
 
 /**
  * Update development components with information read from the on disk
@@ -27,18 +29,6 @@ public final class DevelopmentComponentUpdater {
      * List of development components to be updated.
      */
     private final DevelopmentComponentFactory dcFactory;
-
-    /**
-     * Reader for <code>ProjectProperties.wdproperties</code> files.
-     */
-    private final DigesterHelper<DevelopmentComponent> wdPropertiesReader = new DigesterHelper<DevelopmentComponent>(
-        new WebDynproProjectPropertiesRulesModuleProducer());
-
-    /**
-     * Reader for <code>portalapp.xml</code> files.
-     */
-    private final DigesterHelper<DevelopmentComponent> portalApplicationConfigurationReader =
-        new DigesterHelper<DevelopmentComponent>(new PortalApplicationConfigurationRulesModuleProducer());
 
     /**
      * helper class.
@@ -64,62 +54,131 @@ public final class DevelopmentComponentUpdater {
      * .dcdef, Project.wdproperties, etc.)
      */
     public void execute() {
-        final DigesterHelper<DevelopmentComponent> digesterHelper =
-            new DigesterHelper<DevelopmentComponent>(new DcDefinitionRulesModuleProducer());
-
         for (final DevelopmentComponent component : dcFactory.getAll()) {
+            DcPropertiesReaderDescriptor.update(component, antHelper);
+            readPublicParts(component);
+        }
+    }
+
+    /**
+     * Descriptor for configuration files to update a development component
+     * from.
+     * 
+     * @author Dirk Weigenand
+     */
+    private enum DcPropertiesReaderDescriptor {
+        /**
+         * Descriptor for DCs of type WebDynpro.
+         */
+        WebDynpro(DevelopmentComponentType.WebDynpro, new WebDynproProjectPropertiesRulesModuleProducer(),
+            "src/packages/ProjectProperties.wdproperties"),
+
+        /**
+         * Descriptor for DCs of type Portal Application Module.
+         */
+        PortalApplicationModule(DevelopmentComponentType.PortalApplicationModule,
+            new PortalApplicationConfigurationRulesModuleProducer(), "dist/PORTAL-INF/portalapp.xml"),
+
+        /**
+         * Descriptor for DCs of type Portal Standalone Application.
+         */
+        PortalApplicationStandalone(DevelopmentComponentType.PortalApplicationStandalone,
+            new PortalApplicationConfigurationRulesModuleProducer(), "dist/PORTAL-INF/portalapp.xml"),
+
+        /**
+         * Special type meaning all development component types.
+         */
+        All(null, new DcDefinitionRulesModuleProducer(), ".dcdef");
+
+        /**
+         * type of development component.
+         */
+        private final DevelopmentComponentType dcType;
+
+        /**
+         * producer for rules to parse the config file.
+         */
+        private final RulesModuleProducer rulesModuleProducer;
+
+        /**
+         * name of configuration file relative to <code>_comp</code> folder.
+         */
+        private final String configFile;
+
+        /**
+         * Create descriptor instance with given type, rules producer and config
+         * file name.
+         * 
+         * @param dcType
+         *            type of development component may be null.
+         * @param rulesModuleProducer
+         *            producer for parsing rules.
+         * @param configFile
+         *            name of configuration file.
+         */
+        private DcPropertiesReaderDescriptor(final DevelopmentComponentType dcType,
+            final RulesModuleProducer rulesModuleProducer, final String configFile) {
+            this.dcType = dcType;
+            this.rulesModuleProducer = rulesModuleProducer;
+            this.configFile = configFile;
+        }
+
+        /**
+         * Get a reader for the configuration file.
+         * 
+         * @param antHelper
+         *            use antHelper to determine the exact location in the file
+         *            system.
+         * @param component
+         *            determine path for this component.
+         * @return reader for config file.
+         * @throws FileNotFoundException
+         *             when the configuration file could not be found, i.e. in
+         *             NW CE and new releases there is no
+         *             <code>ProjectProperties.wdproperties</code> anymore.
+         */
+        private Reader getConfigFile(final AntHelper antHelper, final DevelopmentComponent component)
+            throws FileNotFoundException {
+            return new InputStreamReader(
+                new FileInputStream(new File(antHelper.getBaseLocation(component), configFile)),
+                Charset.forName("UTF-8"));
+        }
+
+        /**
+         * Update the given development component with the properties defined by
+         * this descriptor.
+         * 
+         * @param antHelper
+         *            helper class for extracting file names.
+         * @param component
+         *            component to update.
+         */
+        private void update(final AntHelper antHelper, final DevelopmentComponent component) {
             try {
-                digesterHelper.update(getConfigFile(component, ".dcdef"), component);
+                new DigesterHelper<DevelopmentComponent>(rulesModuleProducer).update(
+                    getConfigFile(antHelper, component), component);
             }
             catch (final FileNotFoundException e) {
                 // ignore
             }
-
-            readPublicParts(component);
-            readProperties(component);
         }
-    }
 
-    /**
-     * Read additional properties from configuration files specific to the type
-     * of development component.
-     * 
-     * @param component
-     *            development to additional configuration files for.
-     */
-    private void readProperties(final DevelopmentComponent component) {
-        try {
-            if (DevelopmentComponentType.WebDynpro.equals(component.getType())) {
-                wdPropertiesReader.update(getConfigFile(component, "src/packages/ProjectProperties.wdproperties"),
-                    component);
-            }
-            else if (DevelopmentComponentType.PortalApplicationModule.equals(component.getType())
-                || DevelopmentComponentType.PortalApplicationStandalone.equals(component.getType())) {
-                portalApplicationConfigurationReader.update(getConfigFile(component, "dist/PORTAL-INF/portalapp.xml"),
-                    component);
+        /**
+         * External interface for updating development components.
+         * 
+         * @param component
+         *            component to update.
+         * @param antHelper
+         *            helper class for determining file paths.
+         */
+        static void update(final DevelopmentComponent component, final AntHelper antHelper) {
+            for (final DcPropertiesReaderDescriptor descriptor : values()) {
+                if (descriptor.dcType != null && descriptor.dcType.equals(component.getType())) {
+                    descriptor.update(antHelper, component);
+                    break;
+                }
             }
         }
-        catch (final FileNotFoundException e) {
-            // ignore
-        }
-    }
-
-    /**
-     * Get a reader for the given development component and configuration file
-     * name.
-     * 
-     * @param component
-     *            development component to read configuration files for.
-     * @param configFile
-     *            the configuration file name.
-     * @return a reader for the given configuration file name.
-     * @throws FileNotFoundException
-     *             when the given file could not be found.
-     */
-    private Reader getConfigFile(final DevelopmentComponent component, final String configFile)
-        throws FileNotFoundException {
-        final String absolutePath = String.format("%s/%s", antHelper.getBaseLocation(component), configFile);
-        return new InputStreamReader(new FileInputStream(absolutePath), Charset.forName("UTF-8"));
     }
 
     /**
