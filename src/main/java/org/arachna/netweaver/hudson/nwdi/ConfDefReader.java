@@ -30,6 +30,16 @@ import org.xml.sax.Attributes;
  */
 public class ConfDefReader implements RulesModuleProducer {
     /**
+     * method name 'add'.
+     */
+    private static final String ADD_METHOD_NAME = "add";
+
+    /**
+     * constant for name attribute.
+     */
+    private static final String NAME_ATTRIBUTE = "name";
+
+    /**
      * 'yes' attribute value.
      */
     private static final String YES = "yes";
@@ -73,7 +83,7 @@ public class ConfDefReader implements RulesModuleProducer {
                 forPattern("configuration/config-description").setBeanProperty().withName("description");
                 forPattern("configuration/build-server").setBeanProperty().withName("buildServer");
                 forPattern("configuration/sc-compartments/sc-compartment").factoryCreate()
-                    .usingFactory(new CompartmentFactory()).then().setNext("add");
+                    .usingFactory(new CompartmentFactory()).then().setNext(ADD_METHOD_NAME);
                 forPattern("configuration/sc-compartments/sc-compartment/source-state/repository").factoryCreate()
                     .usingFactory(new DtrUrlFactory()).then().setNext("setDtrUrl");
                 forPattern("configuration/sc-compartments/sc-compartment/source-state/inactive-location")
@@ -82,10 +92,10 @@ public class ConfDefReader implements RulesModuleProducer {
                     .callMethod("addUsedCompartment").withParamTypes(String.class).withParamCount(1)
                     .usingElementBodyAsArgument();
                 forPattern("configuration/sc-compartments/sc-compartment/build-variants/build-variant").factoryCreate()
-                    .usingFactory(buildVariantFactory).then().setNext("add");
+                    .usingFactory(buildVariantFactory).then().setNext(ADD_METHOD_NAME);
                 forPattern(
                     "configuration/sc-compartments/sc-compartment/build-variants/build-variant/build-options/build-option")
-                    .factoryCreate().usingFactory(new BuildOptionFactory()).then().setNext("add");
+                    .factoryCreate().usingFactory(new BuildOptionFactory()).then().setNext(ADD_METHOD_NAME);
                 forPattern(
                     "configuration/sc-compartments/sc-compartment/build-variants/build-variant/build-options/build-option/option-value")
                     .setBeanProperty().withName("value");
@@ -103,7 +113,7 @@ public class ConfDefReader implements RulesModuleProducer {
         AbstractObjectCreationFactory<DevelopmentConfiguration> {
         @Override
         public DevelopmentConfiguration createObject(final Attributes attributes) throws Exception {
-            final DevelopmentConfiguration config = new DevelopmentConfiguration(attributes.getValue("name"));
+            final DevelopmentConfiguration config = new DevelopmentConfiguration(attributes.getValue(NAME_ATTRIBUTE));
 
             config.setCmsUrl(attributes.getValue("cms-url"));
             config.setVersion(Integer.valueOf(attributes.getValue("config-version")).toString());
@@ -125,7 +135,7 @@ public class ConfDefReader implements RulesModuleProducer {
             final CompartmentState state =
                 YES.equals(attributes.getValue("archive-state")) ? CompartmentState.Archive : CompartmentState.Source;
 
-            return Compartment.create(attributes.getValue("name"), state);
+            return Compartment.create(attributes.getValue(NAME_ATTRIBUTE), state);
         }
     }
 
@@ -165,11 +175,11 @@ public class ConfDefReader implements RulesModuleProducer {
          */
         @Override
         public BuildVariant createObject(final Attributes attributes) throws Exception {
-            BuildVariant variant = buildVariants.get(attributes.getValue("name"));
+            BuildVariant variant = buildVariants.get(attributes.getValue(NAME_ATTRIBUTE));
 
             if (null == variant) {
                 variant =
-                    new BuildVariant(attributes.getValue("name"), YES.equals(attributes
+                    new BuildVariant(attributes.getValue(NAME_ATTRIBUTE), YES.equals(attributes
                         .getValue("required-for-activation")));
                 buildVariants.put(variant.getName(), variant);
             }
@@ -205,7 +215,7 @@ public class ConfDefReader implements RulesModuleProducer {
     private static class BuildOptionFactory extends AbstractObjectCreationFactory<BuildOption> {
         @Override
         public BuildOption createObject(final Attributes attributes) throws Exception {
-            return new BuildOption(attributes.getValue("name"));
+            return new BuildOption(attributes.getValue(NAME_ATTRIBUTE));
         }
     }
 }
