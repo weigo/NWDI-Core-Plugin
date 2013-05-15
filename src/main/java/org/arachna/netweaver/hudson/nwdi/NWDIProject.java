@@ -545,7 +545,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
          * @return the validation result.
          */
         public FormValidation doCbsUrlCheck(@QueryParameter final String value) {
-            // FIXME: Validate that CBS URL is reachable and the use can login
+            // FIXME: Validate that CBS URL is reachable and the user can login
             // (how???)
             final FormValidation result = FormValidation.ok();
 
@@ -727,12 +727,10 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
                 buildSpaceNames.addAll(executor.getBuildSpaceNames());
             }
             catch (final IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                Logger.getLogger(getClass().getName()).log(Level.SEVERE, e.getLocalizedMessage(), e);
             }
             catch (final InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                // ignore
             }
 
             Collections.sort(buildSpaceNames);
