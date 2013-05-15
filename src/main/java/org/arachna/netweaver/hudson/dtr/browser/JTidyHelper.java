@@ -37,9 +37,7 @@ final class JTidyHelper {
         tidy.setErrout(new PrintWriter(new StringWriter()));
         tidy.setNumEntities(true);
         tidy.setXmlOut(true);
-        final Document doc = tidy.parseDOM(input, null);
-        // tidy.pprint(doc, System.out);
 
-        return doc;
+        return tidy.parseDOM(input, null);
     }
 }
