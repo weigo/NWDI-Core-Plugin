@@ -103,7 +103,7 @@ public final class DtrChangeLogEntry extends Entry {
     public DtrChangeLogEntry(final String principal, final String msg, final String activityUrl, final Date checkInTime) {
         user = principal;
         this.activityUrl = activityUrl;
-        this.checkInTime = checkInTime;
+        this.checkInTime = new Date(checkInTime.getTime());
         setMsg(msg);
     }
 
@@ -198,7 +198,7 @@ public final class DtrChangeLogEntry extends Entry {
      * @return the time this activity was checked in.
      */
     public Date getCheckInTime() {
-        return checkInTime;
+        return new Date(checkInTime.getTime());
     }
 
     /**
