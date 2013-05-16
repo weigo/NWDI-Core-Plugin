@@ -8,7 +8,6 @@ import java.io.Reader;
 
 import org.apache.commons.digester3.Digester;
 import org.apache.commons.digester3.binder.DigesterLoader;
-import org.apache.commons.digester3.binder.RulesModule;
 import org.xml.sax.SAXException;
 
 /**
@@ -20,8 +19,8 @@ import org.xml.sax.SAXException;
  */
 public final class DigesterHelper<T> {
     /**
-     * producer for {@link RulesModule} instances that should be used to control
-     * the parsing process.
+     * producer for <code>RulesModule</code> instances that should be used to
+     * control the parsing process.
      */
     private final RulesModuleProducer rulesProducer;
 
@@ -30,7 +29,7 @@ public final class DigesterHelper<T> {
      * {@link RulesModuleProducer}.
      * 
      * @param rulesProducer
-     *            producer for {@link RulesModule} instances to guide the
+     *            producer for <code>RulesModule</code> instances to guide the
      *            parsing process.
      */
     public DigesterHelper(final RulesModuleProducer rulesProducer) {
