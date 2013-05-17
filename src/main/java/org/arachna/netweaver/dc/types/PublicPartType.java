@@ -3,9 +3,6 @@
  */
 package org.arachna.netweaver.dc.types;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Type of a {@link PublicPart}.
  * 
@@ -17,6 +14,7 @@ public enum PublicPartType {
      * another development component.
      */
     ASSEMBLY("assembly"),
+
     /**
      * Denotes a public part that provides a reference to the api of a
      * development component at build and/or run time.
@@ -27,17 +25,6 @@ public enum PublicPartType {
      * 
      */
     INFRASTRUCTURE("infrastructure");
-    
-    /**
-     * Allowed types of development component.
-     */
-    private static final Map<String, PublicPartType> TYPES = new HashMap<String, PublicPartType>();
-
-    static {
-        for (final PublicPartType type : values()) {
-            TYPES.put(type.toString(), type);
-        }
-    }
 
     /**
      * type of public part.
@@ -56,7 +43,7 @@ public enum PublicPartType {
 
     @Override
     public String toString() {
-        return this.type;
+        return type;
 
     }
 
@@ -70,6 +57,12 @@ public enum PublicPartType {
      *         otherwise.
      */
     public static PublicPartType fromString(final String typeName) {
-        return TYPES.get(typeName);
+        for (final PublicPartType type : values()) {
+            if (type.type.equals(typeName)) {
+                return type;
+            }
+        }
+
+        return null;
     }
 }
