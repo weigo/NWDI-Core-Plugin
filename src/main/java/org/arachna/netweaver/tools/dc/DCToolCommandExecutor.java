@@ -153,7 +153,7 @@ public final class DCToolCommandExecutor extends AbstractDIToolExecutor {
      * @author Dirk Weigenand
      * 
      */
-    private class DCToolCommandBuilderWrapper implements DIToolCommandBuilder {
+    private static class DCToolCommandBuilderWrapper implements DIToolCommandBuilder {
         /**
          * builder for connecting/disconnecting to/from the NDWI.
          */
