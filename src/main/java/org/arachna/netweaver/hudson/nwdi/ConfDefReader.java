@@ -87,49 +87,56 @@ public class ConfDefReader implements RulesModuleProducer {
      */
     @Override
     public RulesModule getRulesModule() {
-        return new AbstractRulesModule() {
-            @Override
-            protected void configure() {
-                forPattern("configuration").factoryCreate().usingFactory(new DevelopmentConfigurationFactory());
-                forPattern("configuration/config-description").setBeanProperty().withName("description");
-                forPattern("configuration/build-server").setBeanProperty().withName("buildServer");
-                addCompartmentRules();
-            }
+        return new ConfDefReaderRulesModule();
+    }
 
-            /**
-             * Add rules for parsing elements wrt. compartments.
-             */
-            private void addCompartmentRules() {
-                forPattern(COMPARTMENT_PREFIX).factoryCreate().usingFactory(new CompartmentFactory()).then()
-                    .setNext(ADD_METHOD_NAME);
-                forPattern(COMPARTMENT_PREFIX + "/source-state/repository").factoryCreate()
-                    .usingFactory(new DtrUrlFactory()).then().setNext("setDtrUrl");
-                forPattern(COMPARTMENT_PREFIX + "/source-state/inactive-location").setBeanProperty().withName(
-                    "inactiveLocation");
-                forPattern(COMPARTMENT_PREFIX + "/dependencies/used-compartment").callMethod("addUsedCompartment")
-                    .withParamTypes(String.class).withParamCount(1).usingElementBodyAsArgument();
-                addBuildVariantRule();
-            }
+    /**
+     * Rules module for parsing a development configuration.
+     * 
+     * @author Dirk Weigenand
+     */
+    private class ConfDefReaderRulesModule extends AbstractRulesModule {
+        @Override
+        protected void configure() {
+            forPattern("configuration").factoryCreate().usingFactory(new DevelopmentConfigurationFactory());
+            forPattern("configuration/config-description").setBeanProperty().withName("description");
+            forPattern("configuration/build-server").setBeanProperty().withName("buildServer");
+            addCompartmentRules();
+        }
 
-            /**
-             * Add rules for parsing elements wrt. build variants.
-             */
-            private void addBuildVariantRule() {
-                forPattern(BUILD_VARIANT_PREFIX).factoryCreate().usingFactory(buildVariantFactory).then()
-                    .setNext(ADD_METHOD_NAME);
-                addBuildOptionsRule();
-            }
+        /**
+         * Add rules for parsing elements wrt. compartments.
+         */
+        private void addCompartmentRules() {
+            forPattern(COMPARTMENT_PREFIX).factoryCreate().usingFactory(new CompartmentFactory()).then()
+                .setNext(ADD_METHOD_NAME);
+            forPattern(COMPARTMENT_PREFIX + "/source-state/repository").factoryCreate()
+                .usingFactory(new DtrUrlFactory()).then().setNext("setDtrUrl");
+            forPattern(COMPARTMENT_PREFIX + "/source-state/inactive-location").setBeanProperty().withName(
+                "inactiveLocation");
+            forPattern(COMPARTMENT_PREFIX + "/dependencies/used-compartment").callMethod("addUsedCompartment")
+                .withParamTypes(String.class).withParamCount(1).usingElementBodyAsArgument();
+            addBuildVariantRule();
+        }
 
-            /**
-             * Add rules for parsing elements wrt. build options.
-             */
-            private void addBuildOptionsRule() {
-                forPattern(BUILD_VARIANT_PREFIX + "/build-options/build-option").factoryCreate()
-                    .usingFactory(new BuildOptionFactory()).then().setNext(ADD_METHOD_NAME);
-                forPattern(BUILD_VARIANT_PREFIX + "/build-options/build-option/option-value").setBeanProperty()
-                    .withName("value");
-            }
-        };
+        /**
+         * Add rules for parsing elements wrt. build variants.
+         */
+        private void addBuildVariantRule() {
+            forPattern(BUILD_VARIANT_PREFIX).factoryCreate().usingFactory(buildVariantFactory).then()
+                .setNext(ADD_METHOD_NAME);
+            addBuildOptionsRule();
+        }
+
+        /**
+         * Add rules for parsing elements wrt. build options.
+         */
+        private void addBuildOptionsRule() {
+            forPattern(BUILD_VARIANT_PREFIX + "/build-options/build-option").factoryCreate()
+                .usingFactory(new BuildOptionFactory()).then().setNext(ADD_METHOD_NAME);
+            forPattern(BUILD_VARIANT_PREFIX + "/build-options/build-option/option-value").setBeanProperty().withName(
+                "value");
+        }
     }
 
     /**
