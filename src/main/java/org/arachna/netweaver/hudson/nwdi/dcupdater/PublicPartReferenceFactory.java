@@ -47,7 +47,7 @@ final class PublicPartReferenceFactory {
      * @return index where the vendor prefix ends.
      */
     private int getVendorSeparationIndex(final String reference) {
-        final int tildeIndex = reference.indexOf("~");
+        final int tildeIndex = reference.indexOf('~');
         final int slashIndex = reference.indexOf(FORWARD_SLASH);
         final boolean slashIsVendorSeparatorCharacter =
             slashIndex > -1 && slashIndex == reference.lastIndexOf(FORWARD_SLASH);
