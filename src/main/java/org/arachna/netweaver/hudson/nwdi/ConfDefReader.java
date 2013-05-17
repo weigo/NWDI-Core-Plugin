@@ -30,6 +30,17 @@ import org.xml.sax.Attributes;
  */
 public class ConfDefReader implements RulesModuleProducer {
     /**
+     * prefix for a compartment element.
+     */
+    private static final String COMPARTMENT_PREFIX = "configuration/sc-compartments/sc-compartment";
+
+    /**
+     * prefix for a build variant element.
+     */
+    private static final String BUILD_VARIANT_PREFIX =
+        "configuration/sc-compartments/sc-compartment/build-variants/build-variant";
+
+    /**
      * method name 'add'.
      */
     private static final String ADD_METHOD_NAME = "add";
@@ -82,23 +93,41 @@ public class ConfDefReader implements RulesModuleProducer {
                 forPattern("configuration").factoryCreate().usingFactory(new DevelopmentConfigurationFactory());
                 forPattern("configuration/config-description").setBeanProperty().withName("description");
                 forPattern("configuration/build-server").setBeanProperty().withName("buildServer");
-                forPattern("configuration/sc-compartments/sc-compartment").factoryCreate()
-                    .usingFactory(new CompartmentFactory()).then().setNext(ADD_METHOD_NAME);
-                forPattern("configuration/sc-compartments/sc-compartment/source-state/repository").factoryCreate()
+                addCompartmentRules();
+            }
+
+            /**
+             * Add rules for parsing elements wrt. compartments.
+             */
+            private void addCompartmentRules() {
+                forPattern(COMPARTMENT_PREFIX).factoryCreate().usingFactory(new CompartmentFactory()).then()
+                    .setNext(ADD_METHOD_NAME);
+                forPattern(COMPARTMENT_PREFIX + "/source-state/repository").factoryCreate()
                     .usingFactory(new DtrUrlFactory()).then().setNext("setDtrUrl");
-                forPattern("configuration/sc-compartments/sc-compartment/source-state/inactive-location")
-                    .setBeanProperty().withName("inactiveLocation");
-                forPattern("configuration/sc-compartments/sc-compartment/dependencies/used-compartment")
-                    .callMethod("addUsedCompartment").withParamTypes(String.class).withParamCount(1)
-                    .usingElementBodyAsArgument();
-                forPattern("configuration/sc-compartments/sc-compartment/build-variants/build-variant").factoryCreate()
-                    .usingFactory(buildVariantFactory).then().setNext(ADD_METHOD_NAME);
-                forPattern(
-                    "configuration/sc-compartments/sc-compartment/build-variants/build-variant/build-options/build-option")
-                    .factoryCreate().usingFactory(new BuildOptionFactory()).then().setNext(ADD_METHOD_NAME);
-                forPattern(
-                    "configuration/sc-compartments/sc-compartment/build-variants/build-variant/build-options/build-option/option-value")
-                    .setBeanProperty().withName("value");
+                forPattern(COMPARTMENT_PREFIX + "/source-state/inactive-location").setBeanProperty().withName(
+                    "inactiveLocation");
+                forPattern(COMPARTMENT_PREFIX + "/dependencies/used-compartment").callMethod("addUsedCompartment")
+                    .withParamTypes(String.class).withParamCount(1).usingElementBodyAsArgument();
+                addBuildVariantRule();
+            }
+
+            /**
+             * Add rules for parsing elements wrt. build variants.
+             */
+            private void addBuildVariantRule() {
+                forPattern(BUILD_VARIANT_PREFIX).factoryCreate().usingFactory(buildVariantFactory).then()
+                    .setNext(ADD_METHOD_NAME);
+                addBuildOptionsRule();
+            }
+
+            /**
+             * Add rules for parsing elements wrt. build options.
+             */
+            private void addBuildOptionsRule() {
+                forPattern(BUILD_VARIANT_PREFIX + "/build-options/build-option").factoryCreate()
+                    .usingFactory(new BuildOptionFactory()).then().setNext(ADD_METHOD_NAME);
+                forPattern(BUILD_VARIANT_PREFIX + "/build-options/build-option/option-value").setBeanProperty()
+                    .withName("value");
             }
         };
     }
