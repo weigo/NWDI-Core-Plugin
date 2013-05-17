@@ -53,8 +53,8 @@ class DCListReader extends AbstractDCListReader {
         final Matcher matcher = regexp.matcher(line);
 
         if (matcher.matches()) {
-            final Compartment compartment = config.getCompartment(matcher.group(1));
-            compartment.add(dcFactory.create(matcher.group(VENDOR_INDEX), matcher.group(DC_INDEX)));
+            final Compartment compartment = getCompartment(matcher.group(1));
+            compartment.add(createDC(matcher.group(VENDOR_INDEX), matcher.group(DC_INDEX)));
         }
     }
 }

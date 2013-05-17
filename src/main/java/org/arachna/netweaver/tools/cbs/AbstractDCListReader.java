@@ -7,6 +7,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
 
+import org.arachna.netweaver.dc.types.Compartment;
+import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 
@@ -19,12 +21,12 @@ abstract class AbstractDCListReader {
     /**
      * development configuration to add read compartments to.
      */
-    protected final DevelopmentConfiguration config;
+    private final DevelopmentConfiguration config;
 
     /**
      * registry for read development components.
      */
-    protected final DevelopmentComponentFactory dcFactory;
+    private final DevelopmentComponentFactory dcFactory;
 
     /**
      * Create a new instance of a DCListReader using the given development
@@ -69,4 +71,28 @@ abstract class AbstractDCListReader {
      *            line of output from the CBS tool 'listdcs' command.
      */
     protected abstract void process(final String line);
+
+    /**
+     * Get the compartment matching the given compartment name.
+     * 
+     * @param compartmentName
+     *            name of compartment
+     * @return the compartment found or <code>null</code>, when none was found.
+     */
+    protected final Compartment getCompartment(final String compartmentName) {
+        return config.getCompartment(compartmentName);
+    }
+
+    /**
+     * Create a development component using the given vendor and component name.
+     * 
+     * @param vendor
+     *            vendor to use for the component.
+     * @param name
+     *            component name to use.
+     * @return the new development component.
+     */
+    protected final DevelopmentComponent createDC(final String vendor, final String name) {
+        return dcFactory.create(vendor, name);
+    }
 }

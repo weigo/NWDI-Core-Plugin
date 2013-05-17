@@ -59,13 +59,13 @@ final class PreCeDCListReader extends AbstractDCListReader {
         Matcher matcher = compartmentRegex.matcher(line);
 
         if (matcher.matches()) {
-            compartment = config.getCompartment(matcher.group(1));
+            compartment = getCompartment(matcher.group(1));
         }
 
         matcher = dcRegexp.matcher(line);
 
         if (matcher.matches()) {
-            compartment.add(dcFactory.create(matcher.group(2), matcher.group(1)));
+            compartment.add(createDC(matcher.group(2), matcher.group(1)));
         }
     }
 }
