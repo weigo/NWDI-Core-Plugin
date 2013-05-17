@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -207,7 +208,8 @@ public final class Compartment {
         for (final DevelopmentComponent dc : components) {
             if (dc.equals(component)) {
                 components.remove(component);
-                System.err.println(String.format("Removing component %s from %s.", component, this));
+                Logger.getLogger(getClass().getName()).fine(
+                    String.format("Removing component %s from %s.", component, this));
             }
         }
     }
