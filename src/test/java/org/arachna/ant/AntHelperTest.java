@@ -21,77 +21,74 @@ import org.junit.Test;
  */
 public class AntHelperTest {
     /**
+     * 
+     */
+    private static final String DEFAULT_PP_LOCATION_DC1 = "/workspace/.dtc/DCs/example.com/dc1/_comp/gen/default/public/default/lib/java";
+
+    /**
      * instance under test.
      */
     private AntHelper antHelper;
 
     /**
-     * registry for development components.
+     * example development component.
      */
-    private DevelopmentComponentFactory dcFactory;
+    private DevelopmentComponent dc1;
 
     /**
-     * @throws java.lang.Exception
+     * Set up fixture.
      */
     @Before
-    public void setUp() throws Exception {
-        dcFactory = new DevelopmentComponentFactory();
-        DevelopmentComponent component = dcFactory.create("example.com", "dc1");
-        component.add(new PublicPart("default", "", "", PublicPartType.COMPILE));
-        dcFactory.create("example.com", "dc2");
-        this.antHelper = new AntHelper("/workspace", dcFactory);
+    public void setUp() {
+        final DevelopmentComponentFactory dcFactory = new DevelopmentComponentFactory();
+        dc1 = dcFactory.create("example.com", "dc1");
+        dc1.add(new PublicPart("default", "", "", PublicPartType.COMPILE));
+        antHelper = new AntHelper("/workspace", dcFactory);
     }
 
     /**
-     * @throws java.lang.Exception
+     * Tear down fixture.
      */
     @After
-    public void tearDown() throws Exception {
-        this.dcFactory = null;
-        this.antHelper = null;
+    public void tearDown() {
+        antHelper = null;
+        dc1 = null;
     }
 
     /**
      * Test method for
-     * {@link org.arachna.ant.AntHelper#getBaseLocation(org.arachna.netweaver.dc.types.DevelopmentComponent, java.lang.String)}
-     * .
+     * {@link org.arachna.ant.AntHelper#getBaseLocation(org.arachna.netweaver.dc.types.DevelopmentComponent, java.lang.String)} .
      */
     @Test
     public final void testGetBaseLocationForDevelopmentComponentAndPublicPart() {
-        assertThat(this.antHelper.getBaseLocation(dcFactory.get("example.com", "dc1"), "default"),
-            equalTo("/workspace/.dtc/DCs/example.com/dc1/_comp/gen/default/public/default/lib/java"));
+        assertThat(antHelper.getBaseLocation(dc1, "default"), equalTo(DEFAULT_PP_LOCATION_DC1));
     }
 
     /**
      * Test method for
-     * {@link org.arachna.ant.AntHelper#getBaseLocation(org.arachna.netweaver.dc.types.DevelopmentComponent, java.lang.String)}
-     * .
+     * {@link org.arachna.ant.AntHelper#getBaseLocation(org.arachna.netweaver.dc.types.DevelopmentComponent, java.lang.String)} .
      */
     @Test
     public final void testGetBaseLocationForDevelopmentComponentAndEmptyPublicPartReference() {
-        assertThat(this.antHelper.getBaseLocation(dcFactory.get("example.com", "dc1"), ""),
-            equalTo("/workspace/.dtc/DCs/example.com/dc1/_comp/gen/default/public/default/lib/java"));
+        assertThat(antHelper.getBaseLocation(dc1, ""), equalTo(DEFAULT_PP_LOCATION_DC1));
     }
 
     /**
      * Test method for
-     * {@link org.arachna.ant.AntHelper#getBaseLocation(org.arachna.netweaver.dc.types.DevelopmentComponent, java.lang.String)}
-     * .
+     * {@link org.arachna.ant.AntHelper#getBaseLocation(org.arachna.netweaver.dc.types.DevelopmentComponent, java.lang.String)} .
      */
     @Test
     public final void testGetBaseLocationForDevelopmentComponentAndNullPublicPartReference() {
-        assertThat(this.antHelper.getBaseLocation(dcFactory.get("example.com", "dc1"), null),
-            equalTo("/workspace/.dtc/DCs/example.com/dc1/_comp/gen/default/public/default/lib/java"));
+        assertThat(antHelper.getBaseLocation(dc1, null), equalTo(DEFAULT_PP_LOCATION_DC1));
     }
 
     /**
      * Test method for
-     * {@link org.arachna.ant.AntHelper#getBaseLocation(org.arachna.netweaver.dc.types.DevelopmentComponent, java.lang.String)}
-     * .
+     * {@link org.arachna.ant.AntHelper#getBaseLocation(org.arachna.netweaver.dc.types.DevelopmentComponent, java.lang.String)} .
      */
     @Test
     public final void testGetBaseLocationForDevelopmentComponentWithoutPublicPartAndNullPublicPartReference() {
-        assertThat(this.antHelper.getBaseLocation(dcFactory.get("example.com", "dc2"), null),
+        assertThat(antHelper.getBaseLocation(new DevelopmentComponent("dc2", "example.com"), null),
             equalTo("/workspace/.dtc/DCs/example.com/dc2/_comp/gen/default"));
     }
 }
