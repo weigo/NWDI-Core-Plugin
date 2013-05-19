@@ -1,76 +1,73 @@
 package org.arachna.netweaver.dc.types;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.junit.Test;
 
 /**
- * Unit Tests for
- * {@link org.arachna.netweaver.dc.types.DevelopmentComponentType}
- *
+ * Unit Tests for {@link DevelopmentComponentType}.
+ * 
  * @author Dirk Weigenand
  */
 public class DevelopmentComponentTypeTest {
 
     /**
-     * Assert that creating a development component type from empty strings
-     * returns {@link DevelopmentComponentType#unknown}.
+     * Assert that creating a development component type from empty strings returns {@link DevelopmentComponentType#unknown}.
      */
     @Test
     public final void testGetUnknownDevelopmentComponentTypeFromEmptyString() {
-        assertEquals(DevelopmentComponentType.unknown, DevelopmentComponentType.fromString("", ""));
+        assertThat(DevelopmentComponentType.unknown, equalTo(DevelopmentComponentType.fromString("", "")));
     }
 
     /**
-     * Assert that creating a development component type from a mix of empty
-     * strings and null values returns {@link DevelopmentComponentType#unknown}.
+     * Assert that creating a development component type from a mix of empty strings and null values returns
+     * {@link DevelopmentComponentType#unknown}.
      */
     @Test
     public final void testGetUnknownDevelopmentComponentTypeFromNullString() {
-        assertEquals(DevelopmentComponentType.unknown, DevelopmentComponentType.fromString("", null));
+        assertThat(DevelopmentComponentType.unknown, equalTo(DevelopmentComponentType.fromString("", null)));
     }
 
     /**
-     * Assert that creating a development component type from a mix of empty
-     * strings and null values returns {@link DevelopmentComponentType#unknown}.
+     * Assert that creating a development component type from a mix of empty strings and null values returns
+     * {@link DevelopmentComponentType#unknown}.
      */
     @Test
     public final void testGetDevelopmentComponentTypeFrom() {
-        assertEquals(DevelopmentComponentType.unknown, DevelopmentComponentType.fromString(null, ""));
+        assertThat(DevelopmentComponentType.unknown, equalTo(DevelopmentComponentType.fromString(null, "")));
     }
 
     /**
-     * Assert that creating a development component type from null values
-     * returns {@link DevelopmentComponentType#unknown}.
+     * Assert that creating a development component type from null values returns {@link DevelopmentComponentType#unknown}.
      */
     @Test
     public final void testGetUnknownDevelopmentComponentTypeFromNullComponentTypeAndNullSubTypeString() {
-        assertEquals(DevelopmentComponentType.unknown, DevelopmentComponentType.fromString(null, null));
+        assertThat(DevelopmentComponentType.unknown, equalTo(DevelopmentComponentType.fromString(null, null)));
     }
 
     /**
-     * Assert creating the correct development component type for a deployable
-     * WebService proxy.
+     * Assert creating the correct development component type for a deployable WebService proxy.
      */
     @Test
     public final void testGetWebServicesDeployableProxyFromString() {
-        assertEquals(DevelopmentComponentType.WebServicesDeployableProxy,
-            DevelopmentComponentType.fromString("Web Services", "Deployable Proxy"));
+        assertThat(DevelopmentComponentType.WebServicesDeployableProxy,
+            equalTo(DevelopmentComponentType.fromString("Web Services", "Deployable Proxy")));
     }
 
     /**
-     * Assert creating the correct development component type for a WebDynpro
-     * DC.
+     * Assert creating the correct development component type for a WebDynpro DC.
      */
-
     @Test
     public final void testGetWebDynproFromString() {
-        assertEquals(DevelopmentComponentType.WebDynpro, DevelopmentComponentType.fromString("Web Dynpro", ""));
+        assertThat(DevelopmentComponentType.WebDynpro, equalTo(DevelopmentComponentType.fromString("Web Dynpro", "")));
     }
 
+    /**
+     * Assert the development component type unknown cannot contain java sources.
+     */
     @Test
-    public void testBuildInfraStructureDCsCanContainJavaSources() {
-        assertTrue(DevelopmentComponentType.BuildInfrastructure.canContainJavaSources());
+    public void testUnknownDCsCanContainJavaSources() {
+        assertThat(DevelopmentComponentType.unknown.canContainJavaSources(), equalTo(false));
     }
 }
