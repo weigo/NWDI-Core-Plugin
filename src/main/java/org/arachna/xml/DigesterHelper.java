@@ -19,18 +19,15 @@ import org.xml.sax.SAXException;
  */
 public final class DigesterHelper<T> {
     /**
-     * producer for <code>RulesModule</code> instances that should be used to
-     * control the parsing process.
+     * producer for <code>RulesModule</code> instances that should be used to control the parsing process.
      */
     private final RulesModuleProducer rulesProducer;
 
     /**
-     * Create an instance of <code>DigesterHelper</code> using the given
-     * {@link RulesModuleProducer}.
+     * Create an instance of <code>DigesterHelper</code> using the given {@link RulesModuleProducer}.
      * 
      * @param rulesProducer
-     *            producer for <code>RulesModule</code> instances to guide the
-     *            parsing process.
+     *            producer for <code>RulesModule</code> instances to guide the parsing process.
      */
     public DigesterHelper(final RulesModuleProducer rulesProducer) {
         this.rulesProducer = rulesProducer;
@@ -45,7 +42,7 @@ public final class DigesterHelper<T> {
      */
     public T execute(final Reader reader) {
         try {
-            return createDigester().<T> parse(reader);
+            return createDigester().<T>parse(reader);
         }
         catch (final SAXException e) {
             throw new IllegalStateException(e);
@@ -64,14 +61,12 @@ public final class DigesterHelper<T> {
     }
 
     /**
-     * Parse the given configuration file and return the parsed configuration
-     * object of type T.
+     * Parse the given configuration file and return the parsed configuration object of type T.
      * 
      * @param reader
      *            reader object for reading the configuration file.
      * @param updatee
-     *            the object that should be updated from the given configuration
-     *            file.
+     *            the object that should be updated from the given configuration file.
      * @return <T> an object of type T parsed from the given configuration file.
      */
     public T update(final Reader reader, final T updatee) {
@@ -79,7 +74,7 @@ public final class DigesterHelper<T> {
             final Digester digester = createDigester();
             digester.push(updatee);
 
-            return digester.<T> parse(reader);
+            return digester.<T>parse(reader);
         }
         catch (final SAXException e) {
             throw new IllegalStateException(e);
@@ -98,8 +93,7 @@ public final class DigesterHelper<T> {
     }
 
     /**
-     * Create a <code>Digester</code> using the <code>RulesModule</code> from
-     * the <code>rulesProducer</code>.
+     * Create a <code>Digester</code> using the <code>RulesModule</code> from the <code>rulesProducer</code>.
      * 
      * @return new Digester instance.
      */
