@@ -21,7 +21,17 @@ import org.junit.Test;
  */
 public class AntHelperTest {
     /**
-     * 
+     * public part name 'default'.
+     */
+    private static final String DEFAULT_PP = "default";
+
+    /**
+     * vendor 'example.com'.
+     */
+    private static final String EXAMPLE_COM = "example.com";
+
+    /**
+     * expected public part location for dc1.
      */
     private static final String DEFAULT_PP_LOCATION_DC1 = "/workspace/.dtc/DCs/example.com/dc1/_comp/gen/default/public/default/lib/java";
 
@@ -41,8 +51,8 @@ public class AntHelperTest {
     @Before
     public void setUp() {
         final DevelopmentComponentFactory dcFactory = new DevelopmentComponentFactory();
-        dc1 = dcFactory.create("example.com", "dc1");
-        dc1.add(new PublicPart("default", "", "", PublicPartType.COMPILE));
+        dc1 = dcFactory.create(EXAMPLE_COM, "dc1");
+        dc1.add(new PublicPart(DEFAULT_PP, "", "", PublicPartType.COMPILE));
         antHelper = new AntHelper("/workspace", dcFactory);
     }
 
@@ -61,7 +71,7 @@ public class AntHelperTest {
      */
     @Test
     public final void testGetBaseLocationForDevelopmentComponentAndPublicPart() {
-        assertThat(antHelper.getBaseLocation(dc1, "default"), equalTo(DEFAULT_PP_LOCATION_DC1));
+        assertThat(antHelper.getBaseLocation(dc1, DEFAULT_PP), equalTo(DEFAULT_PP_LOCATION_DC1));
     }
 
     /**
@@ -88,7 +98,7 @@ public class AntHelperTest {
      */
     @Test
     public final void testGetBaseLocationForDevelopmentComponentWithoutPublicPartAndNullPublicPartReference() {
-        assertThat(antHelper.getBaseLocation(new DevelopmentComponent("dc2", "example.com"), null),
+        assertThat(antHelper.getBaseLocation(new DevelopmentComponent("dc2", EXAMPLE_COM), null),
             equalTo("/workspace/.dtc/DCs/example.com/dc2/_comp/gen/default"));
     }
 }
