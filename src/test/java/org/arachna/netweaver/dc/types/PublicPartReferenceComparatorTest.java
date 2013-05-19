@@ -52,64 +52,56 @@ public class PublicPartReferenceComparatorTest {
      */
     @Before
     public void setUp() {
-        this.comparator = new PublicPartReferenceComparator();
+        comparator = new PublicPartReferenceComparator();
     }
 
     /**
      */
     @After
     public void tearDown() {
-        this.comparator = null;
+        comparator = null;
     }
 
     /**
-     * Test method for
-     * {@link org.arachna.netweaver.dc.types.PublicPartReferenceComparator#compare(org.arachna.netweaver.dc.types.PublicPartReference, org.arachna.netweaver.dc.types.PublicPartReference)}
-     * .
+     * Test method for {@link PublicPartReferenceComparator#compare(PublicPartReference, PublicPartReference)} .
      */
     @Test
     public final void testCompareWithSelf() {
         final PublicPartReference reference = new PublicPartReference(EXAMPLE_COM, DC_A, "");
-        assertThat(this.comparator.compare(reference, reference), is(equalTo(0)));
+        assertThat(comparator.compare(reference, reference), is(equalTo(0)));
     }
 
     /**
-     * Test method for
-     * {@link org.arachna.netweaver.dc.types.PublicPartReferenceComparator#compare(org.arachna.netweaver.dc.types.PublicPartReference, org.arachna.netweaver.dc.types.PublicPartReference)}
-     * .
+     * Test method for {@link PublicPartReferenceComparator#compare(PublicPartReference, PublicPartReference)} .
      */
     @Test
     public final void testThatCompareWithSameVendorSortsAndEmptyPublicPartNameLexicographicallyByDCName() {
         final PublicPartReference dcRefToA = new PublicPartReference(EXAMPLE_COM, DC_A, "");
         final PublicPartReference dcRefToB = new PublicPartReference(EXAMPLE_COM, DC_B, "");
-        assertThat(this.comparator.compare(dcRefToA, dcRefToB), is(equalTo(-1)));
-        assertThat(this.comparator.compare(dcRefToB, dcRefToA), is(equalTo(1)));
+        assertThat(comparator.compare(dcRefToA, dcRefToB), is(equalTo(-1)));
+        assertThat(comparator.compare(dcRefToB, dcRefToA), is(equalTo(1)));
     }
 
     /**
-     * Test method for
-     * {@link org.arachna.netweaver.dc.types.PublicPartReferenceComparator#compare(org.arachna.netweaver.dc.types.PublicPartReference, org.arachna.netweaver.dc.types.PublicPartReference)}
-     * .
+     * Test method for {@link PublicPartReferenceComparator#compare(PublicPartReference, PublicPartReference)} .
      */
     @Test
     public final void testThatCompareWithSameVendorAndSameDCNameSortsLexicographicallyByPublicPartName() {
         final PublicPartReference dcRefToA = new PublicPartReference(EXAMPLE_COM, DC_A, PUBLIC_PART_A);
         final PublicPartReference dcRefToB = new PublicPartReference(EXAMPLE_COM, DC_A, PUBLIC_PART_B);
-        assertThat(this.comparator.compare(dcRefToA, dcRefToB), is(equalTo(-1)));
-        assertThat(this.comparator.compare(dcRefToB, dcRefToA), is(equalTo(1)));
+        assertThat(comparator.compare(dcRefToA, dcRefToB), is(equalTo(-1)));
+        assertThat(comparator.compare(dcRefToB, dcRefToA), is(equalTo(1)));
     }
 
     /**
-     * Test method for
-     * {@link org.arachna.netweaver.dc.types.PublicPartReferenceComparator#compare(org.arachna.netweaver.dc.types.PublicPartReference, org.arachna.netweaver.dc.types.PublicPartReference)}
-     * .
+     * Test method for {@link PublicPartReferenceComparator#compare(PublicPartReference, PublicPartReference)} .
      */
     @Test
     public final void testThatCompareWithSameVendorAndDifferentDCNameSortsLexicographicallyByDCNameAndThenPublicPartName() {
         final PublicPartReference dcRefToA = new PublicPartReference(EXAMPLE_COM, DC_A, PUBLIC_PART_A);
         final PublicPartReference dcRefToB = new PublicPartReference(EXAMPLE_COM, DC_B, PUBLIC_PART_A);
-        assertThat(this.comparator.compare(dcRefToA, dcRefToB), is(equalTo(-1)));
-        assertThat(this.comparator.compare(dcRefToB, dcRefToA), is(equalTo(1)));
+        assertThat(comparator.compare(dcRefToA, dcRefToB), is(equalTo(-1)));
+        assertThat(comparator.compare(dcRefToB, dcRefToA), is(equalTo(1)));
     }
 
     /**
@@ -121,7 +113,7 @@ public class PublicPartReferenceComparatorTest {
     public final void testThatCompareWithDifferentVendorAndEqualDCNameSortsLexicographicallyByVendorAndThenDCNameAndThenPublicPartName() {
         final PublicPartReference dcRefToA = new PublicPartReference(EXAMPLE_COM, DC_A, PUBLIC_PART_A);
         final PublicPartReference dcRefToB = new PublicPartReference("example.org", DC_A, PUBLIC_PART_A);
-        assertThat(this.comparator.compare(dcRefToA, dcRefToB), is(equalTo(-1)));
-        assertThat(this.comparator.compare(dcRefToB, dcRefToA), is(equalTo(1)));
+        assertThat(comparator.compare(dcRefToA, dcRefToB), is(equalTo(-1)));
+        assertThat(comparator.compare(dcRefToB, dcRefToA), is(equalTo(1)));
     }
 }

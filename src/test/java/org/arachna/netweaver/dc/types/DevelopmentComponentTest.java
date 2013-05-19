@@ -20,6 +20,11 @@ import org.junit.Test;
  */
 public class DevelopmentComponentTest {
     /**
+     * public part name 'API'.
+     */
+    private static final String API = "API";
+
+    /**
      * the development component used throughout the test.
      */
     private DevelopmentComponent component;
@@ -51,12 +56,11 @@ public class DevelopmentComponentTest {
     }
 
     /**
-     * Assert that public parts are returned sorted lexicographically when
-     * returned by {@link DevelopmentComponent#getPublicParts()}.
+     * Assert that public parts are returned sorted lexicographically when returned by {@link DevelopmentComponent#getPublicParts()}.
      */
     @Test
     public void testGetPublicPartsReturnedAreSorted() {
-        final PublicPart part1 = new PublicPart("API", null, null, PublicPartType.COMPILE);
+        final PublicPart part1 = new PublicPart(API, null, null, PublicPartType.COMPILE);
         final PublicPart part2 = new PublicPart("ASSEMBLY", null, null, PublicPartType.COMPILE);
         component.add(part1);
         component.add(part2);
@@ -70,11 +74,14 @@ public class DevelopmentComponentTest {
      */
     @Test
     public void testGetPublicPartsReturnedAreNotEmpty() {
-        final PublicPart part1 = new PublicPart("API", null, null, PublicPartType.COMPILE);
+        final PublicPart part1 = new PublicPart(API, null, null, PublicPartType.COMPILE);
         component.add(part1);
         assertThat(1, is(equalTo(component.getPublicParts().size())));
     }
 
+    /**
+     * Verify {@link DevelopmentComponent#getNormalizedName()}.
+     */
     @Test
     public void testNormalize() {
         component = new DevelopmentComponent("name/subname", "vendor");
