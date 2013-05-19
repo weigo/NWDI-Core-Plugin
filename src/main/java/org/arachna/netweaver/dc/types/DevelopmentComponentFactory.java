@@ -33,10 +33,10 @@ public final class DevelopmentComponentFactory {
      * @param developmentConfiguration
      *            a development configuration to initialize the registry with.
      */
-    public DevelopmentComponentFactory(DevelopmentConfiguration developmentConfiguration) {
-        for (Compartment compartment : developmentConfiguration.getCompartments()) {
-            for (DevelopmentComponent component : compartment.getDevelopmentComponents()) {
-                this.componentMap.put(this.createComponentKey(component.getName(), component.getVendor()), component);
+    public DevelopmentComponentFactory(final DevelopmentConfiguration developmentConfiguration) {
+        for (final Compartment compartment : developmentConfiguration.getCompartments()) {
+            for (final DevelopmentComponent component : compartment.getDevelopmentComponents()) {
+                componentMap.put(createComponentKey(component.getName(), component.getVendor()), component);
             }
         }
     }
@@ -57,7 +57,7 @@ public final class DevelopmentComponentFactory {
 
         if (null == component) {
             component = new DevelopmentComponent(name, vendor, type);
-            this.componentMap.put(this.createComponentKey(name, vendor), component);
+            componentMap.put(createComponentKey(name, vendor), component);
         }
 
         return component;
@@ -80,11 +80,11 @@ public final class DevelopmentComponentFactory {
         final PublicPartReference[] references) {
         final DevelopmentComponent component = this.create(vendor, dcName);
 
-        for (PublicPart pp : publicParts) {
+        for (final PublicPart pp : publicParts) {
             component.add(pp);
         }
 
-        for (PublicPartReference reference : references) {
+        for (final PublicPartReference reference : references) {
             component.add(reference);
         }
 
@@ -123,9 +123,8 @@ public final class DevelopmentComponentFactory {
      * @return a collection of all registered development components.
      */
     public Collection<DevelopmentComponent> getAll() {
-        final Collection<DevelopmentComponent> components =
-            new ArrayList<DevelopmentComponent>(this.componentMap.size());
-        components.addAll(this.componentMap.values());
+        final Collection<DevelopmentComponent> components = new ArrayList<DevelopmentComponent>(componentMap.size());
+        components.addAll(componentMap.values());
 
         return components;
     }
@@ -137,7 +136,7 @@ public final class DevelopmentComponentFactory {
      * component will be looked up and the currently worked on DC will be added to its using DCs.
      */
     public void updateUsingDCs() {
-        for (final DevelopmentComponent component : this.componentMap.values()) {
+        for (final DevelopmentComponent component : componentMap.values()) {
             this.updateUsingDCs(component);
         }
     }
@@ -149,12 +148,11 @@ public final class DevelopmentComponentFactory {
      *            development component whose using DCs are to be updated.
      */
     private void updateUsingDCs(final DevelopmentComponent root) {
-        for (final DevelopmentComponent dc : this.componentMap.values()) {
+        for (final DevelopmentComponent dc : componentMap.values()) {
             final Collection<PublicPartReference> references = dc.getUsedDevelopmentComponents();
 
             for (final PublicPartReference reference : references) {
-                if (root.getVendor().equals(reference.getVendor())
-                    && root.getName().equals(reference.getComponentName())) {
+                if (root.getVendor().equals(reference.getVendor()) && root.getName().equals(reference.getComponentName())) {
                     root.addUsingDC(dc);
 
                     if (dc.getUsingDevelopmentComponents().size() == 0) {
@@ -175,7 +173,7 @@ public final class DevelopmentComponentFactory {
      * @return the development component asked for or <code>null</code> if it is not registered.
      */
     public DevelopmentComponent get(final String vendor, final String name) {
-        return this.componentMap.get(createComponentKey(name, vendor));
+        return componentMap.get(createComponentKey(name, vendor));
     }
 
     /**
@@ -185,16 +183,19 @@ public final class DevelopmentComponentFactory {
      *            reference to a development components public part.
      * @return the development component asked for or <code>null</code> if it is not registered.
      */
-    public DevelopmentComponent get(PublicPartReference ppRef) {
-        return this.componentMap.get(createComponentKey(ppRef.getComponentName(), ppRef.getVendor()));
+    public DevelopmentComponent get(final PublicPartReference ppRef) {
+        return componentMap.get(createComponentKey(ppRef.getComponentName(), ppRef.getVendor()));
     }
 
     /**
+     * Remove a development component from this registry.
+     * 
      * @param component
+     *            the development component to be removed from this registry.
      */
-    public void remove(DevelopmentComponent component) {
-        this.componentMap.remove(createComponentKey(component.getName(), component.getVendor()));
-        Compartment compartment = component.getCompartment();
+    public void remove(final DevelopmentComponent component) {
+        componentMap.remove(createComponentKey(component.getName(), component.getVendor()));
+        final Compartment compartment = component.getCompartment();
 
         if (compartment != null) {
             compartment.remove(component);

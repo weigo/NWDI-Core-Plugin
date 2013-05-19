@@ -29,8 +29,7 @@ public final class BuildVariant {
     private final Map<String, String> buildOptions = new HashMap<String, String>();
 
     /**
-     * Flag to indicate whether this build variant is required to execute prior
-     * to activation of activities.
+     * Flag to indicate whether this build variant is required to execute prior to activation of activities.
      */
     private final boolean requiredForActivation;
 
@@ -39,6 +38,8 @@ public final class BuildVariant {
      * 
      * @param name
      *            name of build variant.
+     * @param requiredForActivation
+     *            <code>true</code> when this build variant shall be required for activation, <code>false</code> otherwise.
      */
     public BuildVariant(final String name, final boolean requiredForActivation) {
         if (StringUtils.isEmpty(name)) {
@@ -81,13 +82,11 @@ public final class BuildVariant {
     }
 
     /**
-     * Return the value of the named build option or <code>null</code> if it
-     * does not exist.
+     * Return the value of the named build option or <code>null</code> if it does not exist.
      * 
      * @param name
      *            Name of the build option asked for
-     * @return the value of the named build option or <code>null</code> if it
-     *         does not exist.
+     * @return the value of the named build option or <code>null</code> if it does not exist.
      */
     public String getBuildOption(final String name) {
         return buildOptions.get(name);
@@ -105,19 +104,16 @@ public final class BuildVariant {
     /**
      * Get the Jdk home path from build options if it exists.
      * 
-     * @return the Jdk home path it defined in build options <code>null</code>
-     *         otherwise.
+     * @return the Jdk home path it defined in build options <code>null</code> otherwise.
      */
     public String getJdkHomePath() {
         return buildOptions.get(COM_SAP_JDK_HOME_PATH_KEY);
     }
 
     /**
-     * Indicate whether this build variant is required to execute prior to
-     * activation of activities.
+     * Indicate whether this build variant is required to execute prior to activation of activities.
      * 
-     * @return <code>true</code> when this build variant is required for
-     *         activation, <code>false</code> otherwise.
+     * @return <code>true</code> when this build variant is required for activation, <code>false</code> otherwise.
      */
     public boolean isRequiredForActivation() {
         return requiredForActivation;
@@ -160,8 +156,7 @@ public final class BuildVariant {
     }
 
     /**
-     * Merge the build options from the given build varaint into this one (only
-     * if it has the same name).
+     * Merge the build options from the given build varaint into this one (only if it has the same name).
      * 
      * @param variant
      *            build variant whose build options are to merge into this.
