@@ -4,62 +4,61 @@
 package org.arachna.ant;
 
 import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertThat;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 /**
+ * Unit tests for {@link ExcludeDataDictionarySourceDirectoryFilterTest}.
+ * 
  * @author Dirk Weigenand
  */
 public class ExcludeDataDictionarySourceDirectoryFilterTest {
+    /**
+     * instance under test.
+     */
     private SourceDirectoryFilter filter;
 
     /**
-     * @throws java.lang.Exception
+     * Set up fixture.
      */
     @Before
-    public void setUp() throws Exception {
-        this.filter = new ExcludeDataDictionarySourceDirectoryFilter();
+    public void setUp() {
+        filter = new ExcludeDataDictionarySourceDirectoryFilter();
     }
 
     /**
-     * @throws java.lang.Exception
+     * Tear down fixture.
      */
     @After
-    public void tearDown() throws Exception {
-        this.filter = null;
+    public void tearDown() {
+        filter = null;
     }
 
     /**
-     * Test method for
-     * {@link org.arachna.ant.ExcludeDataDictionarySourceDirectoryFilter#accept(java.lang.String)}
-     * .
+     * Test method for {@link org.arachna.ant.ExcludeDataDictionarySourceDirectoryFilter#accept(java.lang.String)} .
      */
     @Test
-    public final void testDoNotAcceptGen_ddicDatatypesFolderUnixStyle() {
-        assertThat(this.filter.accept("/tmp/gen_ddic/datatypes"), not(equalTo(true)));
+    public final void testDoNotAcceptGenDdicDatatypesFolderUnixStyle() {
+        assertThat(filter.accept("/tmp/gen_ddic/datatypes"), not(equalTo(true)));
     }
 
     /**
-     * Test method for
-     * {@link org.arachna.ant.ExcludeDataDictionarySourceDirectoryFilter#accept(java.lang.String)}
-     * .
+     * Test method for {@link org.arachna.ant.ExcludeDataDictionarySourceDirectoryFilter#accept(java.lang.String)} .
      */
     @Test
-    public final void testDoNotAcceptGen_ddicDatatypesFolderWindowsStyle() {
-        assertThat(this.filter.accept("C:\\tmp\\gen_ddic\\datatypes"), not(equalTo(true)));
+    public final void testDoNotAcceptGenDdicDatatypesFolderWindowsStyle() {
+        assertThat(filter.accept("C:\\tmp\\gen_ddic\\datatypes"), not(equalTo(true)));
     }
 
     /**
-     * Test method for
-     * {@link org.arachna.ant.ExcludeDataDictionarySourceDirectoryFilter#accept(java.lang.String)}
-     * .
+     * Test method for {@link org.arachna.ant.ExcludeDataDictionarySourceDirectoryFilter#accept(java.lang.String)} .
      */
     @Test
-    public final void testDoAcceptGen_WdpFolder() {
-        assertThat(this.filter.accept("C:\\tmp\\gen_wdp\\src\\packages"), equalTo(true));
+    public final void testDoAcceptGenWdpFolder() {
+        assertThat(filter.accept("C:\\tmp\\gen_wdp\\src\\packages"), equalTo(true));
     }
 }
