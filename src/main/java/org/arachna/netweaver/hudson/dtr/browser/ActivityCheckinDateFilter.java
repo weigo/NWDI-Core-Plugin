@@ -28,9 +28,8 @@ final class ActivityCheckinDateFilter implements ActivityFilter {
     }
 
     /**
-     * Create an instance of a <code>ActivityCheckinDateFilter</code>. The
-     * accepted date range will be initialized to [minimum, maximum] as is
-     * representable by the {@link java.util.Date} class.
+     * Create an instance of a <code>ActivityCheckinDateFilter</code>. The accepted date range will be initialized to [minimum, maximum] as
+     * is representable by the {@link java.util.Date} class.
      */
     ActivityCheckinDateFilter() {
         from = getMinimumDate();
@@ -55,16 +54,14 @@ final class ActivityCheckinDateFilter implements ActivityFilter {
     }
 
     /**
-     * Tests whether the given activity date lies between the from and to date
-     * of this filter.
+     * Tests whether the given activity date lies between the from and to date of this filter.
      * 
      * @param activity
      *            the activity to be tested.
-     * @return <code>true</code> iff the given activities check in date/time
-     *         lies between this filters from and to date/time,
+     * @return <code>true</code> iff the given activities check in date/time lies between this filters from and to date/time,
      *         <code>false</code> otherwise.
      */
     public boolean accept(final Activity activity) {
-        return !from.after(activity.getCheckinTime());
+        return !from.after(activity.getCheckInTime());
     }
 }

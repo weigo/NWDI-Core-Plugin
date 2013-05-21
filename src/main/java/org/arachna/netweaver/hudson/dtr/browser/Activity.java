@@ -31,14 +31,12 @@ public final class Activity {
     private final Principal principal;
 
     /**
-     * short description of activity as given by principal that created this
-     * activity.
+     * short description of activity as given by principal that created this activity.
      */
     private final String comment;
 
     /**
-     * long description of activity as given by principal that created this
-     * activity.
+     * long description of activity as given by principal that created this activity.
      */
     private String description;
 
@@ -58,17 +56,15 @@ public final class Activity {
     private final Map<String, String> activityUrlParams = new LinkedHashMap<String, String>();
 
     /**
-     * Create an instance of an <code>Activity</code> using the principal that
-     * created it, its description and checkin date. Also contains the relative
-     * URL where the content of the activity can be browsed.
+     * Create an instance of an <code>Activity</code> using the principal that created it, its description and checkin date. Also contains
+     * the relative URL where the content of the activity can be browsed.
      * 
      * @param activityUrl
      *            relative URL where the content of the activity can be browsed.
      * @param principal
      *            user that created the activity.
      * @param comment
-     *            the short description of the activity as was given by the user
-     *            creating it.
+     *            the short description of the activity as was given by the user creating it.
      * @param checkinTime
      *            time the activity was checked into the DTR.
      */
@@ -82,8 +78,7 @@ public final class Activity {
     }
 
     /**
-     * Parse parameters of activity URL and store them into map for easier use
-     * later.
+     * Parse parameters of activity URL and store them into map for easier use later.
      */
     private void parseActivityUrlParameters() {
         final int paramSpecStartIndex = StringUtils.isBlank(activityUrl) ? -1 : activityUrl.indexOf('?') + 1;
@@ -154,13 +149,12 @@ public final class Activity {
     /**
      * @return the checkinTime
      */
-    public Date getCheckinTime() {
+    public Date getCheckInTime() {
         return cloneDate(checkinTime);
     }
 
     /**
-     * Returns the path part of the activity url (i.e. the string after
-     * '&path=').
+     * Returns the path part of the activity url (i.e. the string after '&path=').
      * 
      * @return the path part of the activity url
      */
@@ -175,13 +169,12 @@ public final class Activity {
      */
     @Override
     public String toString() {
-        return "Activity [checkinTime=" + checkinTime + ", principal=" + principal + ",\ndescription=" + description
-            + ",\nactivityUrl=" + activityUrl + "]";
+        return "Activity [checkinTime=" + checkinTime + ", principal=" + principal + ",\ndescription=" + description + ",\nactivityUrl="
+            + activityUrl + "]";
     }
 
     /**
-     * Add the given resource to this activity's resources. If the given
-     * resource is <code>null</code> it is ignored.
+     * Add the given resource to this activity's resources. If the given resource is <code>null</code> it is ignored.
      * 
      * @param resource
      *            resource to add to this activity's resources.

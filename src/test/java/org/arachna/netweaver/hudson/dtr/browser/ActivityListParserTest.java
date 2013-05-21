@@ -35,8 +35,7 @@ public class ActivityListParserTest {
      */
     @Test
     public final void testExctractActivities() {
-        final ActivityListParser browser =
-            new ActivityListParser();
+        final ActivityListParser browser = new ActivityListParser();
         final InputStream input = this.getClass().getResourceAsStream("ExampleTrackActivityQuery.html");
         browser.parse(input);
         final List<Activity> activities = browser.getActivities();
@@ -52,7 +51,7 @@ public class ActivityListParserTest {
         final SimpleDateFormat format = new SimpleDateFormat(ActivityListParser.ACTIVITY_DATE_FORMAT);
 
         try {
-            assertThat(format.parse("17.05.2010 14:40:12 GMT"), is(equalTo(activity.getCheckinTime())));
+            assertThat(format.parse("17.05.2010 14:40:12 GMT"), is(equalTo(activity.getCheckInTime())));
         }
         catch (final ParseException e) {
             fail(e.getMessage());

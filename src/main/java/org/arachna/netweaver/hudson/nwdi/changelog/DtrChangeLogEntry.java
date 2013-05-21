@@ -72,7 +72,7 @@ public final class DtrChangeLogEntry extends Entry {
      *            activity to use creating the change log.
      */
     public DtrChangeLogEntry(final Activity activity) {
-        this(activity.getPrincipal().getUser(), activity.getComment(), activity.getActivityUrl(), activity.getCheckinTime());
+        this(activity.getPrincipal().getUser(), activity.getComment(), activity.getActivityUrl(), activity.getCheckInTime());
         setDescription(activity.getDescription());
 
         for (final ActivityResource resource : activity.getResources()) {
