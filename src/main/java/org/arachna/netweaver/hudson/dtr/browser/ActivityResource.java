@@ -36,12 +36,12 @@ public class ActivityResource {
     /**
      * date the resource was created at.
      */
-    private Date creationDate;
+    private Date creationDate = new Date(0);
 
     /**
      * date this resource was last modified at.
      */
-    private Date lastModified;
+    private Date lastModified = new Date(0);
 
     /**
      * signifies whether this resources last modification was a deletion.
