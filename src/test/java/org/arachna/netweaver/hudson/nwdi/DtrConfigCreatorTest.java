@@ -99,7 +99,7 @@ public final class DtrConfigCreatorTest {
         config = null;
         configCreator = null;
 
-        // Util.deleteRecursive(workspace);
+        Util.deleteRecursive(workspace);
     }
 
     /**
@@ -197,8 +197,6 @@ public final class DtrConfigCreatorTest {
      */
     private void assertFilePathExists(final FilePath path) {
         try {
-            System.err.println(path);
-
             if (!path.exists()) {
                 fail("Assert failed: Path " + path.getName() + " does not exist.");
             }
