@@ -31,14 +31,9 @@ import org.xml.sax.SAXException;
  */
 public final class DtrConfigCreatorTest {
     /**
-     * 
+     * DTR server url.
      */
-    private static final String VENDOR = "sap.com";
-
-    /**
-     * 
-     */
-    private static final String DTR_URL = "http://di01db.example.com:53000/dtr";
+    private static final String DTR_URL = "http://di0db.example.com:53000/dtr";
 
     /**
      * URL to build server.
@@ -74,12 +69,12 @@ public final class DtrConfigCreatorTest {
         config = new DevelopmentConfiguration("DI0_testTrack_D");
         config.setBuildServer(BUILD_SERVER_URL);
 
-        Compartment compartment = Compartment.create(VENDOR, "EP_BUILDT", CompartmentState.Source, "");
-        compartment.setDtrUrl("http://di01db.example.com:53000");
+        Compartment compartment = Compartment.create("sap.com_EP_BUILDT_1", CompartmentState.Source);
+        compartment.setDtrUrl("http://DI0DB:53000/dtr");
         config.add(compartment);
 
-        compartment = Compartment.create(VENDOR, "SAP_BUILDT", CompartmentState.Source, "");
-        compartment.setDtrUrl(DTR_URL);
+        compartment = Compartment.create("sap.com_SAP_BUILDT_1", CompartmentState.Source);
+        compartment.setDtrUrl("http://DI0DB:53000/dtr");
         config.add(compartment);
 
         configCreator = new DtrConfigCreator(new FilePath(workspace), config);
@@ -99,7 +94,7 @@ public final class DtrConfigCreatorTest {
         config = null;
         configCreator = null;
 
-        Util.deleteRecursive(workspace);
+        // Util.deleteRecursive(workspace);
     }
 
     /**
@@ -140,8 +135,7 @@ public final class DtrConfigCreatorTest {
         assertFilePathExists(clientsXml);
         assertContent(clientsXml, String.format("/clients/client[@name = '%s']", config.getName()));
         assertContent(clientsXml, String.format("/clients/client[@logicalSystem = '%s']", config.getName()));
-        assertContent(clientsXml,
-            String.format("/clients/client[@absoluteLocalRoot = '%s']", FilePathHelper.makeAbsolute(dotDtc)));
+        assertContent(clientsXml, String.format("/clients/client[@absoluteLocalRoot = '%s']", FilePathHelper.makeAbsolute(dotDtc)));
     }
 
     /**
@@ -186,7 +180,7 @@ public final class DtrConfigCreatorTest {
             fail(e.getMessage());
         }
         catch (final XpathException e) {
-            fail(e.getMessage() + "'" + xPath + "'");
+            fail(String.format("%s: '%s'", e.getMessage(), xPath));
         }
     }
 
@@ -198,6 +192,8 @@ public final class DtrConfigCreatorTest {
      */
     private void assertFilePathExists(final FilePath path) {
         try {
+            System.err.println(path);
+
             if (!path.exists()) {
                 fail("Assert failed: Path " + path.getName() + " does not exist.");
             }
@@ -208,6 +204,5 @@ public final class DtrConfigCreatorTest {
         catch (final InterruptedException e) {
             fail(e.getMessage());
         }
-
     }
 }

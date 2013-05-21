@@ -3,6 +3,8 @@
  */
 package org.arachna.netweaver.dc.types;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -11,10 +13,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
- * A class representing an NWDI development configuration description, i.e. the
- * name of the development configuration and the compartments contained therein.
+ * A class representing an NWDI development configuration description, i.e. the name of the development configuration and the compartments
+ * contained therein.
  * 
  * @author Dirk Weigenand
  */
@@ -52,8 +56,7 @@ public final class DevelopmentConfiguration {
     /**
      * compartments contained in this development configuration.
      * 
-     * @deprecated Not used anymore. Retain for backward compatibility with
-     *             builds saved via XStream.
+     * @deprecated Not used anymore. Retain for backward compatibility with builds saved via XStream.
      */
     @Deprecated
     // FIXME: remove in a future version!
@@ -94,13 +97,11 @@ public final class DevelopmentConfiguration {
     }
 
     /**
-     * Find the start index of the workspace name in the given development
-     * configuration name.
+     * Find the start index of the workspace name in the given development configuration name.
      * 
      * @param name
      *            development configuration name.
-     * @return the start index of the workspace name in the given development
-     *         configuration name.
+     * @return the start index of the workspace name in the given development configuration name.
      */
     private int getBeginIndexOfWorkspace(final String name) {
         final int firstIndexOfUnderScore = name.indexOf('_');
@@ -109,13 +110,11 @@ public final class DevelopmentConfiguration {
     }
 
     /**
-     * Find the end index of the workspace name in the given development
-     * configuration name.
+     * Find the end index of the workspace name in the given development configuration name.
      * 
      * @param name
      *            development configuration name.
-     * @return the end index of the workspace name in the given development
-     *         configuration name.
+     * @return the end index of the workspace name in the given development configuration name.
      */
     private int getEndIndexOfWorkspace(final String name) {
         final int lastIndexOfUnderScore = name.lastIndexOf('_');
@@ -352,9 +351,8 @@ public final class DevelopmentConfiguration {
     }
 
     /**
-     * Returns the URL for the DTR this development configuration is stored on.
-     * The returned string is empty when no compartment in source state is
-     * contained in this development configuration.
+     * Returns the URL for the DTR this development configuration is stored on. The returned string is empty when no compartment in source
+     * state is contained in this development configuration.
      * 
      * @return URL for the DTR this development configuration is stored on.
      */
@@ -363,8 +361,22 @@ public final class DevelopmentConfiguration {
 
         for (final Compartment compartment : this.getCompartments(CompartmentState.Source)) {
             if (compartment.getDtrUrl() != null && compartment.getDtrUrl().endsWith("dtr")) {
-                dtrServerUrl = compartment.getDtrUrl();
-                break;
+                try {
+                    final String buildServerName = new URL(getBuildServer()).getHost().toLowerCase();
+                    URL dtrUrl = new URL(compartment.getDtrUrl());
+                    final String dtrHostName = dtrUrl.getHost().toLowerCase();
+
+                    // handle the case where host names are not fully qualified DNS names but contain only the host name
+                    if (buildServerName.startsWith(dtrHostName)) {
+                        dtrUrl = new URL(dtrUrl.getProtocol(), buildServerName, dtrUrl.getPort(), dtrUrl.getPath());
+                    }
+
+                    dtrServerUrl = dtrUrl.toString();
+                    break;
+                }
+                catch (final MalformedURLException e) {
+                    Logger.getLogger(getClass().getName()).log(Level.WARNING, e.getLocalizedMessage(), e);
+                }
             }
         }
 
@@ -372,11 +384,9 @@ public final class DevelopmentConfiguration {
     }
 
     /**
-     * Get the {@link JdkHomeAlias} associated with the {@link BuildVariant} of
-     * this development configuration.
+     * Get the {@link JdkHomeAlias} associated with the {@link BuildVariant} of this development configuration.
      * 
-     * @return the JdkHomeAlias associated with the build variant of this
-     *         development configuration iff there is one defined and a {@see
+     * @return the JdkHomeAlias associated with the build variant of this development configuration iff there is one defined and a {@see
      *         #COM_SAP_JDK_HOME_PATH_KEY} build option is defined.
      * 
      *         Returns <code>null</code> otherwise.
@@ -399,9 +409,8 @@ public final class DevelopmentConfiguration {
     /**
      * Returns the source version to use for generating javadoc documentation.
      * 
-     * Uses the {@link JdkHomeAlias} defined in the development configuration.
-     * If there is no alias defined use the JDK version the ant task is run
-     * with.
+     * Uses the {@link JdkHomeAlias} defined in the development configuration. If there is no alias defined use the JDK version the ant task
+     * is run with.
      * 
      * @return java source version to use generating javadoc documentation.
      */
@@ -421,9 +430,8 @@ public final class DevelopmentConfiguration {
     }
 
     /**
-     * Accept a visitor of this development configuration. Iterate over its
-     * compartments and development components and call the respective visit
-     * method.
+     * Accept a visitor of this development configuration. Iterate over its compartments and development components and call the respective
+     * visit method.
      * 
      * @param visitor
      *            visitor for this development configuration.
