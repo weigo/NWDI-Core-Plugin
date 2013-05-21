@@ -31,6 +31,11 @@ import org.xml.sax.SAXException;
  */
 public final class DtrConfigCreatorTest {
     /**
+     * URL to DTR without fully qualified DNS host name.
+     */
+    private static final String DTR_URL_WITHOUT_FULLY_QUALIFIED_HOSTNAME = "http://DI0DB:53000/dtr";
+
+    /**
      * DTR server url.
      */
     private static final String DTR_URL = "http://di0db.example.com:53000/dtr";
@@ -70,11 +75,11 @@ public final class DtrConfigCreatorTest {
         config.setBuildServer(BUILD_SERVER_URL);
 
         Compartment compartment = Compartment.create("sap.com_EP_BUILDT_1", CompartmentState.Source);
-        compartment.setDtrUrl("http://DI0DB:53000/dtr");
+        compartment.setDtrUrl(DTR_URL_WITHOUT_FULLY_QUALIFIED_HOSTNAME);
         config.add(compartment);
 
         compartment = Compartment.create("sap.com_SAP_BUILDT_1", CompartmentState.Source);
-        compartment.setDtrUrl("http://DI0DB:53000/dtr");
+        compartment.setDtrUrl(DTR_URL_WITHOUT_FULLY_QUALIFIED_HOSTNAME);
         config.add(compartment);
 
         configCreator = new DtrConfigCreator(new FilePath(workspace), config);
