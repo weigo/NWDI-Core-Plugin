@@ -65,8 +65,7 @@ public class ActivityResource {
      * @param id
      *            the resource id
      */
-    public ActivityResource(final Activity activity, final DevelopmentComponent developmentComponent,
-        final String path, final String id) {
+    public ActivityResource(final Activity activity, final DevelopmentComponent developmentComponent, final String path, final String id) {
         super();
         this.activity = activity;
         this.developmentComponent = developmentComponent;
@@ -99,7 +98,7 @@ public class ActivityResource {
      * @return the creationDate
      */
     public Date getCreationDate() {
-        return creationDate;
+        return new Date(creationDate.getTime());
     }
 
     /**
@@ -114,7 +113,7 @@ public class ActivityResource {
      * @return the lastModified
      */
     public Date getLastModified() {
-        return lastModified;
+        return new Date(lastModified.getTime());
     }
 
     /**
@@ -129,7 +128,7 @@ public class ActivityResource {
      * @return the deleted
      */
     public Boolean isDeleted() {
-        return this.deleted;
+        return deleted;
     }
 
     /**
@@ -171,10 +170,8 @@ public class ActivityResource {
      */
     @Override
     public String toString() {
-        return String
-            .format(
-                "ActivityResource[creationDate = '%s', id = '%s', lastModified = '%s', path = '%s', deleted = '%s', sequenceNumber = '%s']",
-                this.getCreationDate(), this.getId(), this.getLastModified(), this.getPath(), this.isDeleted(),
-                this.getSequenceNumber());
+        return String.format(
+            "ActivityResource[creationDate = '%s', id = '%s', lastModified = '%s', path = '%s', deleted = '%s', sequenceNumber = '%s']",
+            getCreationDate(), getId(), getLastModified(), getPath(), isDeleted(), getSequenceNumber());
     }
 }
