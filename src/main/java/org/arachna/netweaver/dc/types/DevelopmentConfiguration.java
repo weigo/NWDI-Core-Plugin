@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -362,9 +363,9 @@ public final class DevelopmentConfiguration {
         for (final Compartment compartment : this.getCompartments(CompartmentState.Source)) {
             if (compartment.getDtrUrl() != null && compartment.getDtrUrl().endsWith("dtr")) {
                 try {
-                    final String buildServerName = new URL(getBuildServer()).getHost().toLowerCase();
+                    final String buildServerName = new URL(getBuildServer()).getHost().toLowerCase(Locale.getDefault());
                     URL dtrUrl = new URL(compartment.getDtrUrl());
-                    final String dtrHostName = dtrUrl.getHost().toLowerCase();
+                    final String dtrHostName = dtrUrl.getHost().toLowerCase(Locale.getDefault());
 
                     // handle the case where host names are not fully qualified DNS names but contain only the host name
                     if (buildServerName.startsWith(dtrHostName)) {
