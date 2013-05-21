@@ -41,7 +41,7 @@ public final class DtrChangeLogSet extends ChangeLogSet<DtrChangeLogEntry> {
         super(build);
 
         for (final Activity activity : activities) {
-            this.add(new DtrChangeLogEntry(activity));
+            add(new DtrChangeLogEntry(activity));
         }
     }
 
@@ -62,25 +62,12 @@ public final class DtrChangeLogSet extends ChangeLogSet<DtrChangeLogEntry> {
     }
 
     /**
-     * Return an {@link Iterator} for the change log entries contained in this
-     * change log set.
+     * Return an {@link Iterator} for the change log entries contained in this change log set.
      * 
      * {@inheritDoc}
      */
     public Iterator<DtrChangeLogEntry> iterator() {
         return entries.iterator();
-    }
-
-    /**
-     * Add all given change log entries to this change log set.
-     * 
-     * @param entries
-     *            change log entries to add to this change log set
-     */
-    void add(final List<DtrChangeLogEntry> entries) {
-        for (final DtrChangeLogEntry entry : entries) {
-            this.add(entry);
-        }
     }
 
     /**
@@ -90,7 +77,7 @@ public final class DtrChangeLogSet extends ChangeLogSet<DtrChangeLogEntry> {
      *            change log entry to add to this change log set.
      */
     public void add(final DtrChangeLogEntry entry) {
-        entry.setParent(this);
+        entry.addTo(this);
         entries.add(entry);
     }
 

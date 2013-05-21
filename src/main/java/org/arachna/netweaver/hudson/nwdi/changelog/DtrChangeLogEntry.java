@@ -6,7 +6,6 @@ package org.arachna.netweaver.hudson.nwdi.changelog;
 import hudson.Util;
 import hudson.model.User;
 import hudson.scm.EditType;
-import hudson.scm.ChangeLogSet;
 import hudson.scm.ChangeLogSet.Entry;
 
 import java.text.ParseException;
@@ -73,8 +72,7 @@ public final class DtrChangeLogEntry extends Entry {
      *            activity to use creating the change log.
      */
     public DtrChangeLogEntry(final Activity activity) {
-        this(activity.getPrincipal().getUser(), activity.getComment(), activity.getActivityUrl(), activity
-            .getCheckinTime());
+        this(activity.getPrincipal().getUser(), activity.getComment(), activity.getActivityUrl(), activity.getCheckinTime());
         setDescription(activity.getDescription());
 
         for (final ActivityResource resource : activity.getResources()) {
@@ -82,8 +80,7 @@ public final class DtrChangeLogEntry extends Entry {
                 createAndAddItem(resource);
             }
             else {
-                Logger.getLogger(getClass().getName()).fine(
-                    String.format("Null resource for activity %s!", activity.getActivityUrl()));
+                Logger.getLogger(getClass().getName()).fine(String.format("Null resource for activity %s!", activity.getActivityUrl()));
             }
         }
     }
@@ -125,8 +122,7 @@ public final class DtrChangeLogEntry extends Entry {
     }
 
     /**
-     * Add the given {@link ActivityResource} as an {@link Item} to this
-     * changelog entry.
+     * Add the given {@link ActivityResource} as an {@link Item} to this changelog entry.
      * 
      * @param resource
      *            <code>ActivityResource</code> to add to change log.
@@ -146,11 +142,9 @@ public final class DtrChangeLogEntry extends Entry {
     }
 
     /**
-     * Get paths (to resources) affected by the recent activities depicted by
-     * this change log.
+     * Get paths (to resources) affected by the recent activities depicted by this change log.
      * 
-     * @return paths (to resources) affected by the recent activities depicted
-     *         by this change log.
+     * @return paths (to resources) affected by the recent activities depicted by this change log.
      */
     @Override
     public Collection<String> getAffectedPaths() {
@@ -237,11 +231,9 @@ public final class DtrChangeLogEntry extends Entry {
     }
 
     /**
-     * Returns the URL that can be used to display information about this
-     * activity.
+     * Returns the URL that can be used to display information about this activity.
      * 
-     * @return the URL that can be used to display information about this
-     *         activity.
+     * @return the URL that can be used to display information about this activity.
      */
     public String getActivityUrl() {
         return activityUrl;
@@ -274,14 +266,18 @@ public final class DtrChangeLogEntry extends Entry {
         this.description = description == null ? "" : description;
     }
 
-    @Override
-    protected void setParent(final ChangeLogSet parent) {
+    /**
+     * Add this change log entry to the given set of change logs.
+     * 
+     * @param parent
+     *            change log to use as parent.
+     */
+    void addTo(final DtrChangeLogSet parent) {
         super.setParent(parent);
     }
 
     /**
-     * An <code>Item</code> represents a resource associated with an activity an
-     * is used to visualize it.
+     * An <code>Item</code> represents a resource associated with an activity an is used to visualize it.
      * 
      * @author Dirk Weigenand
      */
