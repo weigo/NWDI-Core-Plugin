@@ -27,7 +27,7 @@
     <title>Introduction</title>
 
     <para>Did you ever wonder how to integrate quality assessment tools like Checkstyle, FindBugs and Sonar into the NetWeaver development
-      infrastructure (NWDI)? You have come a long way to an answer to this question.
+      infrastructure (NWDI)?
     </para>
     <para>This document describes how to build, install, configure and use the Jenkins NWDI-Core-Plugin. It will show you how to answer the
       above question using the other members of the Jenkins NWDI-Plugin family.
