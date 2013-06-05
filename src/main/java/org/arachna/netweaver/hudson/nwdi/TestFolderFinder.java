@@ -11,7 +11,11 @@ import japa.parser.ast.body.BodyDeclaration;
 import japa.parser.ast.body.TypeDeclaration;
 
 import java.io.File;
-import java.io.IOException;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -39,28 +43,37 @@ class TestFolderFinder {
      * @return <code>true</code> when there are sources in the given folder containing unit tests, <code>false</code> else.
      */
     boolean isTestFolder(final String encoding, final String sourceFolder) {
-        final FileFinder finder = new FileFinder(new File(sourceFolder), ".*\\.java");
-
-        for (final File file : finder.find()) {
+        for (final InputStream source : getJavaSources(encoding, sourceFolder)) {
             try {
-                final CompilationUnit compilationUnit = JavaParser.parse(file, encoding);
+                final CompilationUnit compilationUnit = JavaParser.parse(source, encoding);
                 final PackageDeclaration packageDescriptor = compilationUnit.getPackage();
 
-                if (packageDescriptor != null) {
-                    if (compilationUnitContainsJUnitTest(compilationUnit, packageDescriptor)) {
-                        return true;
-                    }
+                if (packageDescriptor != null && compilationUnitContainsJUnitTest(compilationUnit, packageDescriptor)) {
+                    return true;
                 }
             }
             catch (final ParseException e) {
                 logger.log(Level.WARNING, e.getLocalizedMessage(), e);
             }
-            catch (final IOException e) {
+        }
+
+        return false;
+    }
+
+    protected Collection<InputStream> getJavaSources(final String encoding, final String sourceFolder) {
+        final FileFinder finder = new FileFinder(new File(sourceFolder), ".*\\.java");
+        final Collection<InputStream> sources = new ArrayList<InputStream>();
+
+        for (final File file : finder.find()) {
+            try {
+                sources.add(new FileInputStream(file));
+            }
+            catch (final FileNotFoundException e) {
                 logger.log(Level.WARNING, e.getLocalizedMessage(), e);
             }
         }
 
-        return false;
+        return sources;
     }
 
     /**
