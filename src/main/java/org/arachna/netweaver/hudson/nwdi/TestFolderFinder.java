@@ -7,6 +7,8 @@ import japa.parser.JavaParser;
 import japa.parser.ParseException;
 import japa.parser.ast.CompilationUnit;
 import japa.parser.ast.PackageDeclaration;
+import japa.parser.ast.body.BodyDeclaration;
+import japa.parser.ast.body.TypeDeclaration;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,7 +23,7 @@ import org.arachna.util.io.FileFinder;
  * 
  * @author Dirk Weigenand
  */
-public class TestFolderFinder {
+class TestFolderFinder {
     /**
      * Logger.
      */
@@ -34,8 +36,7 @@ public class TestFolderFinder {
      *            encoding to use for reading of source files.
      * @param sourceFolder
      *            source folder from <code>build.xml</code>.
-     * @return <code>true</code> when there are sources in the given folder
-     *         containing unit tests, <code>false</code> else.
+     * @return <code>true</code> when there are sources in the given folder containing unit tests, <code>false</code> else.
      */
     boolean isTestFolder(final String encoding, final String sourceFolder) {
         final FileFinder finder = new FileFinder(new File(sourceFolder), ".*\\.java");
@@ -46,12 +47,7 @@ public class TestFolderFinder {
                 final PackageDeclaration packageDescriptor = compilationUnit.getPackage();
 
                 if (packageDescriptor != null) {
-                    final TestPackageResolver testPackageResolver =
-                        new TestPackageResolver(new ClassNameResolver(packageDescriptor.getName().toString(),
-                            compilationUnit.getImports()));
-                    compilationUnit.accept(testPackageResolver, null);
-
-                    if (testPackageResolver.isTestFolder()) {
+                    if (compilationUnitContainsJUnitTest(compilationUnit, packageDescriptor)) {
                         return true;
                     }
                 }
@@ -65,5 +61,33 @@ public class TestFolderFinder {
         }
 
         return false;
+    }
+
+    /**
+     * Determine whether the given compilation unit contains JUnit tests.
+     * 
+     * @param compilationUnit
+     *            the compilation unit to test for JUnit tests.
+     * @param packageDescriptor
+     *            descriptor of package of compilation unit.
+     * @return <code>true</code> when a JUnit 3 or 4 test class could be identified, <code>false</code> otherwise.
+     */
+    protected boolean compilationUnitContainsJUnitTest(final CompilationUnit compilationUnit, final PackageDeclaration packageDescriptor) {
+        final TestPropertyResolver testPropertyResolver =
+            new TestPropertyResolver(new ClassNameResolver(packageDescriptor.getName().toString(), compilationUnit.getImports()));
+
+        // find JUnit3 test cases.
+        compilationUnit.accept(testPropertyResolver, null);
+
+        // inspect method declarations for @Test annotation (JUnit4).
+        if (!testPropertyResolver.junitTestFound()) {
+            for (final TypeDeclaration type : compilationUnit.getTypes()) {
+                for (final BodyDeclaration body : type.getMembers()) {
+                    body.accept(testPropertyResolver, null);
+                }
+            }
+        }
+
+        return testPropertyResolver.junitTestFound();
     }
 }
