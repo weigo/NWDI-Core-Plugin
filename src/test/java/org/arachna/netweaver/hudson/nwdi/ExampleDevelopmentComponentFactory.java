@@ -14,6 +14,16 @@ import org.arachna.netweaver.dc.types.PublicPartType;
  * @author Dirk Weigenand
  */
 public final class ExampleDevelopmentComponentFactory {
+    /**
+     * example DC.
+     */
+    public static final String LIB_JETM = "lib/jetm";
+
+    /**
+     * Vendor for example development configuration, compartment and development
+     * components.
+     */
+    public static final String EXAMPLE_COM = "example.com";
 
     /**
      *
@@ -34,17 +44,6 @@ public final class ExampleDevelopmentComponentFactory {
      * example DC.
      */
     static final String LIB_JUNIT = "lib/junit";
-
-    /**
-     * example DC.
-     */
-    public static final String LIB_JETM = "lib/jetm";
-
-    /**
-     * Vendor for example development configuration, compartment and development
-     * components.
-     */
-    public static final String EXAMPLE_COM = "example.com";
 
     /**
      * assembly public part.
