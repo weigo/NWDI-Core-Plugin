@@ -10,16 +10,6 @@ import org.arachna.netweaver.dc.types.JdkHomePaths;
  */
 public final class DIToolDescriptor {
     /**
-     * folder name that contains the DTR configuration files.
-     */
-    public static final String DTR_FOLDER = ".dtr";
-
-    /**
-     * folder name that contains the development configuration.
-     */
-    public static final String DTC_FOLDER = ".dtc";
-
-    /**
      * UME user for authentication against the NWDI.
      */
     private final String user;
@@ -58,8 +48,8 @@ public final class DIToolDescriptor {
      * @param paths
      *            configured JDKs.
      */
-    public DIToolDescriptor(final String user, final String password, final String nwdiToolLibrary,
-        final String cbsUrl, final JdkHomePaths paths) {
+    public DIToolDescriptor(final String user, final String password, final String nwdiToolLibrary, final String cbsUrl,
+        final JdkHomePaths paths) {
         super();
         this.user = user;
         this.password = password;
@@ -87,8 +77,7 @@ public final class DIToolDescriptor {
     }
 
     /**
-     * Path to the NWDI tools library folder (folder where the di_tools were
-     * extracted to).
+     * Path to the NWDI tools library folder (folder where the di_tools were extracted to).
      * 
      * @return the nwdiToolLibrary
      */
@@ -100,10 +89,8 @@ public final class DIToolDescriptor {
      * Return the JavaHome for the given {@link JdkHomeAlias}.
      * 
      * @param alias
-     *            the <code>JdkHomeAlias</code> the JavaHome folder shall be
-     *            returned for.
-     * @return the registered JavaHome folder or the value of the system
-     *         property <code>java.home</code> if no alias was registered.
+     *            the <code>JdkHomeAlias</code> the JavaHome folder shall be returned for.
+     * @return the registered JavaHome folder or the value of the system property <code>java.home</code> if no alias was registered.
      */
     String getJavaHome(final JdkHomeAlias alias) {
         return paths.get(alias);

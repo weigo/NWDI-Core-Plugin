@@ -7,10 +7,11 @@ import java.io.PrintStream;
 import java.util.Properties;
 
 import org.apache.velocity.app.VelocityEngine;
+import org.apache.velocity.runtime.RuntimeConstants;
+import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 
 /**
- * Helper class to encapsulate common code relevant to use of the Velocity
- * template engine.
+ * Helper class to encapsulate common code relevant to use of the Velocity template engine.
  * 
  * @author Dirk Weigenand
  */
@@ -21,24 +22,24 @@ public final class VelocityHelper {
     private final VelocityEngine engine;
 
     /**
-     * Create a new instance of this <code>VelocityHelper</code> using the given
-     * logger for logging of velocity related messages.
+     * Create a new instance of this <code>VelocityHelper</code> using the given logger for logging of velocity related messages.
      * 
      * @param logger
      *            use for logging of messages
      */
     public VelocityHelper(final PrintStream logger) {
         try {
-            this.engine = new VelocityEngine();
-            Properties properties = new Properties();
-            properties.load(this.getClass().getResourceAsStream(
-                "/org/arachna/netweaver/hudson/nwdi/velocity.properties"));
+            engine = new VelocityEngine();
+            final Properties properties = new Properties();
+            properties.load(this.getClass().getResourceAsStream("/org/arachna/netweaver/hudson/nwdi/velocity.properties"));
             engine.setProperty(VelocityEngine.RUNTIME_LOG_LOGSYSTEM, new VelocityLogChute(logger));
+            engine.setProperty(RuntimeConstants.RESOURCE_LOADER, "classpath");
+            engine.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
             engine.init(properties);
         }
-//CHECKSTYLE:OFF
-        catch (Exception e) {
-//CHECKSTYLE:ON
+        // CHECKSTYLE:OFF
+        catch (final Exception e) {
+            // CHECKSTYLE:ON
             throw new RuntimeException(e);
         }
     }
@@ -49,6 +50,6 @@ public final class VelocityHelper {
      * @return the <code>VelocityEngine</code> embedded in this helper class.
      */
     public VelocityEngine getVelocityEngine() {
-        return this.engine;
+        return engine;
     }
 }

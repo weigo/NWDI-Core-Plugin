@@ -3,19 +3,14 @@
  */
 package org.arachna.netweaver.dc.types;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * A class representing an NWDI development configuration description, i.e. the name of the development configuration and the compartments
@@ -362,22 +357,8 @@ public final class DevelopmentConfiguration {
 
         for (final Compartment compartment : this.getCompartments(CompartmentState.Source)) {
             if (compartment.getDtrUrl() != null && compartment.getDtrUrl().endsWith("dtr")) {
-                try {
-                    final String buildServerName = new URL(getBuildServer()).getHost().toLowerCase(Locale.getDefault());
-                    URL dtrUrl = new URL(compartment.getDtrUrl());
-                    final String dtrHostName = dtrUrl.getHost().toLowerCase(Locale.getDefault());
-
-                    // handle the case where host names are not fully qualified DNS names but contain only the host name
-                    if (buildServerName.startsWith(dtrHostName)) {
-                        dtrUrl = new URL(dtrUrl.getProtocol(), buildServerName, dtrUrl.getPort(), dtrUrl.getPath());
-                    }
-
-                    dtrServerUrl = dtrUrl.toString();
-                    break;
-                }
-                catch (final MalformedURLException e) {
-                    Logger.getLogger(getClass().getName()).log(Level.WARNING, e.getLocalizedMessage(), e);
-                }
+                dtrServerUrl = compartment.getDtrUrl();
+                break;
             }
         }
 

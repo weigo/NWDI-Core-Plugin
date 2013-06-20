@@ -6,6 +6,7 @@ package org.arachna.netweaver.tools.dc;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.arachna.netweaver.hudson.nwdi.NWDIConfigFolder;
 import org.arachna.netweaver.tools.DIToolCommandBuilder;
 import org.arachna.netweaver.tools.DIToolDescriptor;
 
@@ -55,8 +56,8 @@ class LoadConfigCommandBuilder implements DIToolCommandBuilder {
      * @return command for loading a development configuration.
      */
     String getLoadConfigCommand() {
-        return String.format(template.getLoadConfigCommand(), dcToolDescriptor.getUser(),
-            dcToolDescriptor.getPassword(), DIToolDescriptor.DTR_FOLDER, DIToolDescriptor.DTC_FOLDER);
+        return String.format(template.getLoadConfigCommand(), dcToolDescriptor.getUser(), dcToolDescriptor.getPassword(),
+            NWDIConfigFolder.DTR.getName(), NWDIConfigFolder.DTC.getName());
     }
 
     /**

@@ -36,11 +36,6 @@ public final class DtrConfigCreatorTest {
     private static final String DTR_URL_WITHOUT_FULLY_QUALIFIED_HOSTNAME = "http://DI0DB:53000/dtr";
 
     /**
-     * DTR server url.
-     */
-    private static final String DTR_URL = "http://di0db.example.com:53000/dtr";
-
-    /**
      * URL to build server.
      */
     private static final String BUILD_SERVER_URL = "http://di0db.example.com:53000";
@@ -74,11 +69,11 @@ public final class DtrConfigCreatorTest {
         config = new DevelopmentConfiguration("DI0_testTrack_D");
         config.setBuildServer(BUILD_SERVER_URL);
 
-        Compartment compartment = Compartment.create("sap.com_EP_BUILDT_1", CompartmentState.Source);
+        Compartment compartment = Compartment.create("example.com_SC1_1", CompartmentState.Source);
         compartment.setDtrUrl(DTR_URL_WITHOUT_FULLY_QUALIFIED_HOSTNAME);
         config.add(compartment);
 
-        compartment = Compartment.create("sap.com_SAP_BUILDT_1", CompartmentState.Source);
+        compartment = Compartment.create("example.com_SC2_1", CompartmentState.Source);
         compartment.setDtrUrl(DTR_URL_WITHOUT_FULLY_QUALIFIED_HOSTNAME);
         config.add(compartment);
 
@@ -110,16 +105,17 @@ public final class DtrConfigCreatorTest {
     @Test
     public void testServersXml() {
         final FilePath workspace = new FilePath(this.workspace);
-        final FilePath dotDtc = workspace.child(DtrConfigCreator.DOT_DTC);
+        final FilePath dotDtc = workspace.child(NWDIConfigFolder.DTC.getName());
 
         assertFilePathExists(dotDtc);
 
-        final FilePath dotDtr = workspace.child(DtrConfigCreator.DOT_DTR);
+        final FilePath dotDtr = workspace.child(NWDIConfigFolder.DTR.getName());
         assertFilePathExists(dotDtr);
 
         final FilePath serversXml = dotDtr.child(DtrConfigCreator.SERVERS_XML);
         assertFilePathExists(serversXml);
-        assertContent(serversXml, String.format("/servers/server[@url = '%s']", BUILD_SERVER_URL));
+        assertContent(serversXml, String.format("/servers/server[@url = '%s/']", BUILD_SERVER_URL));
+        assertContent(serversXml, String.format("/servers/server[@url = '%s/']", DTR_URL_WITHOUT_FULLY_QUALIFIED_HOSTNAME));
     }
 
     /**
@@ -130,10 +126,10 @@ public final class DtrConfigCreatorTest {
     @Test
     public void testClientsXml() {
         final FilePath workspace = new FilePath(this.workspace);
-        final FilePath dotDtr = workspace.child(DtrConfigCreator.DOT_DTR);
+        final FilePath dotDtr = workspace.child(NWDIConfigFolder.DTR.getName());
         assertFilePathExists(dotDtr);
 
-        final FilePath dotDtc = workspace.child(DtrConfigCreator.DOT_DTC);
+        final FilePath dotDtc = workspace.child(NWDIConfigFolder.DTC.getName());
         assertFilePathExists(dotDtc);
 
         final FilePath clientsXml = dotDtr.child(DtrConfigCreator.CLIENTS_XML);
@@ -151,15 +147,16 @@ public final class DtrConfigCreatorTest {
     @Test
     public void testSystemXml() {
         final FilePath workspace = new FilePath(this.workspace);
-        final FilePath dotDtr = workspace.child(DtrConfigCreator.DOT_DTR);
+        final FilePath dotDtr = workspace.child(NWDIConfigFolder.DTR.getName());
         assertFilePathExists(dotDtr);
 
-        final FilePath dotDtc = workspace.child(DtrConfigCreator.DOT_DTC);
+        final FilePath dotDtc = workspace.child(NWDIConfigFolder.DTC.getName());
         assertFilePathExists(dotDtc);
 
         final FilePath systemXml = dotDtr.child(config.getName() + ".system");
         assertFilePathExists(systemXml);
-        assertContent(systemXml, String.format("/system/repositoryServers/repositoryServer[@url = '%s']", DTR_URL));
+        assertContent(systemXml,
+            String.format("/system/repositoryServers/repositoryServer[@url = '%s']", DTR_URL_WITHOUT_FULLY_QUALIFIED_HOSTNAME));
     }
 
     /**
@@ -173,6 +170,7 @@ public final class DtrConfigCreatorTest {
     private void assertContent(final FilePath path, final String xPath) {
         try {
             final String content = path.readToString();
+            System.err.println(content);
             final Document document = XMLUnit.buildControlDocument(content);
             final XpathEngine engine = XMLUnit.newXpathEngine();
             assertTrue(String.format("xpath '%s' did not match in document '%s'.", xPath, content), engine

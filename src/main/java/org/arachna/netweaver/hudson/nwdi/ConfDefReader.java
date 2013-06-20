@@ -22,9 +22,8 @@ import org.xml.sax.Attributes;
 /**
  * Reader for development configuration (<code>.confdef</code>) files.
  * 
- * Do not re-use! Not thread safe! The <code>BuildVariantFactory</code> used
- * internally would fill up with build variants not contained in the parsed
- * configuration file!
+ * Do not re-use! Not thread safe! The <code>BuildVariantFactory</code> used internally would fill up with build variants not contained in
+ * the parsed configuration file!
  * 
  * @author Dirk Weigenand
  */
@@ -37,8 +36,7 @@ public class ConfDefReader implements RulesModuleProducer {
     /**
      * prefix for a build variant element.
      */
-    private static final String BUILD_VARIANT_PREFIX =
-        "configuration/sc-compartments/sc-compartment/build-variants/build-variant";
+    private static final String BUILD_VARIANT_PREFIX = "configuration/sc-compartments/sc-compartment/build-variants/build-variant";
 
     /**
      * method name 'add'.
@@ -61,17 +59,14 @@ public class ConfDefReader implements RulesModuleProducer {
     private final BuildVariantFactory buildVariantFactory = new BuildVariantFactory();
 
     /**
-     * Update the given development component from the given
-     * <code>portalapp.xml</code> file.
+     * Read a development configuration from the given <code>.confdef</code> file.
      * 
      * @param reader
-     *            reader object for reading the <code>portalapp.xml</code> of
-     *            the given portal component.
+     *            reader object for reading the <code>.confdef</code> of development configuration.
      * @return the development configuration object just read.
      */
     public DevelopmentConfiguration execute(final Reader reader) {
-        final DigesterHelper<DevelopmentConfiguration> digesterHelper =
-            new DigesterHelper<DevelopmentConfiguration>(this);
+        final DigesterHelper<DevelopmentConfiguration> digesterHelper = new DigesterHelper<DevelopmentConfiguration>(this);
         final DevelopmentConfiguration config = digesterHelper.execute(reader);
 
         config.setBuildVariant(buildVariantFactory.findBuildVariantRequiredForActivation());
@@ -80,8 +75,7 @@ public class ConfDefReader implements RulesModuleProducer {
     }
 
     /**
-     * Create rules for parsing a <code>.confdef</code> development
-     * configuration file.
+     * Create rules for parsing a <code>.confdef</code> development configuration file.
      * 
      * {@inheritDoc}
      */
@@ -108,14 +102,12 @@ public class ConfDefReader implements RulesModuleProducer {
          * Add rules for parsing elements wrt. compartments.
          */
         private void addCompartmentRules() {
-            forPattern(COMPARTMENT_PREFIX).factoryCreate().usingFactory(new CompartmentFactory()).then()
-                .setNext(ADD_METHOD_NAME);
-            forPattern(COMPARTMENT_PREFIX + "/source-state/repository").factoryCreate()
-                .usingFactory(new DtrUrlFactory()).then().setNext("setDtrUrl");
-            forPattern(COMPARTMENT_PREFIX + "/source-state/inactive-location").setBeanProperty().withName(
-                "inactiveLocation");
-            forPattern(COMPARTMENT_PREFIX + "/dependencies/used-compartment").callMethod("addUsedCompartment")
-                .withParamTypes(String.class).withParamCount(1).usingElementBodyAsArgument();
+            forPattern(COMPARTMENT_PREFIX).factoryCreate().usingFactory(new CompartmentFactory()).then().setNext(ADD_METHOD_NAME);
+            forPattern(COMPARTMENT_PREFIX + "/source-state/repository").factoryCreate().usingFactory(new DtrUrlFactory()).then()
+                .setNext("setDtrUrl");
+            forPattern(COMPARTMENT_PREFIX + "/source-state/inactive-location").setBeanProperty().withName("inactiveLocation");
+            forPattern(COMPARTMENT_PREFIX + "/dependencies/used-compartment").callMethod("addUsedCompartment").withParamTypes(String.class)
+                .withParamCount(1).usingElementBodyAsArgument();
             addBuildVariantRule();
         }
 
@@ -123,8 +115,7 @@ public class ConfDefReader implements RulesModuleProducer {
          * Add rules for parsing elements wrt. build variants.
          */
         private void addBuildVariantRule() {
-            forPattern(BUILD_VARIANT_PREFIX).factoryCreate().usingFactory(buildVariantFactory).then()
-                .setNext(ADD_METHOD_NAME);
+            forPattern(BUILD_VARIANT_PREFIX).factoryCreate().usingFactory(buildVariantFactory).then().setNext(ADD_METHOD_NAME);
             addBuildOptionsRule();
         }
 
@@ -132,21 +123,18 @@ public class ConfDefReader implements RulesModuleProducer {
          * Add rules for parsing elements wrt. build options.
          */
         private void addBuildOptionsRule() {
-            forPattern(BUILD_VARIANT_PREFIX + "/build-options/build-option").factoryCreate()
-                .usingFactory(new BuildOptionFactory()).then().setNext(ADD_METHOD_NAME);
-            forPattern(BUILD_VARIANT_PREFIX + "/build-options/build-option/option-value").setBeanProperty().withName(
-                "value");
+            forPattern(BUILD_VARIANT_PREFIX + "/build-options/build-option").factoryCreate().usingFactory(new BuildOptionFactory()).then()
+                .setNext(ADD_METHOD_NAME);
+            forPattern(BUILD_VARIANT_PREFIX + "/build-options/build-option/option-value").setBeanProperty().withName("value");
         }
     }
 
     /**
-     * Create {@link DevelopmentConfiguration} objects from attributes of
-     * <code>sc-compartment</code> elements.
+     * Create {@link DevelopmentConfiguration} objects from attributes of <code>sc-compartment</code> elements.
      * 
      * @author Dirk Weigenand
      */
-    private static class DevelopmentConfigurationFactory extends
-        AbstractObjectCreationFactory<DevelopmentConfiguration> {
+    private static class DevelopmentConfigurationFactory extends AbstractObjectCreationFactory<DevelopmentConfiguration> {
         @Override
         public DevelopmentConfiguration createObject(final Attributes attributes) throws Exception {
             final DevelopmentConfiguration config = new DevelopmentConfiguration(attributes.getValue(NAME_ATTRIBUTE));
@@ -160,8 +148,7 @@ public class ConfDefReader implements RulesModuleProducer {
     }
 
     /**
-     * Create {@link Compartment} objects from attributes of
-     * <code>sc-compartment</code> elements.
+     * Create {@link Compartment} objects from attributes of <code>sc-compartment</code> elements.
      * 
      * @author Dirk Weigenand
      */
@@ -188,8 +175,7 @@ public class ConfDefReader implements RulesModuleProducer {
     }
 
     /**
-     * Create {@link BuildVariant} objects from attributes of
-     * <code>build-variant</code> elements.
+     * Create {@link BuildVariant} objects from attributes of <code>build-variant</code> elements.
      * 
      * @author Dirk Weigenand
      */
@@ -200,23 +186,19 @@ public class ConfDefReader implements RulesModuleProducer {
         private final Map<String, BuildVariant> buildVariants = new HashMap<String, BuildVariant>();
 
         /**
-         * Create a new {@link BuildVariant} object from the <code>name</code>
-         * and <code>required-for-activation</code> attributes of a
+         * Create a new {@link BuildVariant} object from the <code>name</code> and <code>required-for-activation</code> attributes of a
          * <code>build-variant</code> element.
          * 
          * @param attributes
          *            the attributes of the <code>build-variant</code> element.
-         * @return a new build variant object with the given name indicating
-         *         whether it is required for activation or not.
+         * @return a new build variant object with the given name indicating whether it is required for activation or not.
          */
         @Override
         public BuildVariant createObject(final Attributes attributes) throws Exception {
             BuildVariant variant = buildVariants.get(attributes.getValue(NAME_ATTRIBUTE));
 
             if (null == variant) {
-                variant =
-                    new BuildVariant(attributes.getValue(NAME_ATTRIBUTE), YES.equals(attributes
-                        .getValue("required-for-activation")));
+                variant = new BuildVariant(attributes.getValue(NAME_ATTRIBUTE), YES.equals(attributes.getValue("required-for-activation")));
                 buildVariants.put(variant.getName(), variant);
             }
 
@@ -226,8 +208,7 @@ public class ConfDefReader implements RulesModuleProducer {
         /**
          * Find the build variant to use as default.
          * 
-         * @return the build variant to use as default (the one that is used for
-         *         building in the CBS).
+         * @return the build variant to use as default (the one that is used for building in the CBS).
          */
         private BuildVariant findBuildVariantRequiredForActivation() {
             BuildVariant defaultBuildVariant = null;
@@ -243,8 +224,7 @@ public class ConfDefReader implements RulesModuleProducer {
     }
 
     /**
-     * Extract a build option name from attributes of <code>build-option</code>
-     * elements.
+     * Extract a build option name from attributes of <code>build-option</code> elements.
      * 
      * @author Dirk Weigenand
      */
