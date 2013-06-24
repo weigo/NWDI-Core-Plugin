@@ -114,8 +114,19 @@ public final class DtrConfigCreatorTest {
 
         final FilePath serversXml = dotDtr.child(DtrConfigCreator.SERVERS_XML);
         assertFilePathExists(serversXml);
-        assertContent(serversXml, String.format("/servers/server[@url = '%s/']", BUILD_SERVER_URL));
-        assertContent(serversXml, String.format("/servers/server[@url = '%s/']", DTR_URL_WITHOUT_FULLY_QUALIFIED_HOSTNAME));
+        assertContent(serversXml, getServerByUrlXPath(BUILD_SERVER_URL));
+        assertContent(serversXml, getServerByUrlXPath(DTR_URL_WITHOUT_FULLY_QUALIFIED_HOSTNAME));
+    }
+
+    /**
+     * Prepare XPath expression for selecting 'server' elements by URL.
+     * 
+     * @param url
+     *            server URL to match against.
+     * @return XPath for matching 'server' elements by URL.
+     */
+    private String getServerByUrlXPath(final String url) {
+        return String.format("/servers/server[@url = '%s/']", BUILD_SERVER_URL);
     }
 
     /**
