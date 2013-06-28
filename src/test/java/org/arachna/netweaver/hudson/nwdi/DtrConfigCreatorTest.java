@@ -167,7 +167,7 @@ public final class DtrConfigCreatorTest {
         final FilePath systemXml = dotDtr.child(config.getName() + ".system");
         assertFilePathExists(systemXml);
         assertContent(systemXml,
-            String.format("/system/repositoryServers/repositoryServer[@url = '%s']", DTR_URL_WITHOUT_FULLY_QUALIFIED_HOSTNAME));
+            String.format("/system/repositoryServers/repositoryServer[@url = '%s/']", DTR_URL_WITHOUT_FULLY_QUALIFIED_HOSTNAME));
     }
 
     /**
@@ -181,7 +181,6 @@ public final class DtrConfigCreatorTest {
     private void assertContent(final FilePath path, final String xPath) {
         try {
             final String content = path.readToString();
-            System.err.println(content);
             final Document document = XMLUnit.buildControlDocument(content);
             final XpathEngine engine = XMLUnit.newXpathEngine();
             assertTrue(String.format("xpath '%s' did not match in document '%s'.", xPath, content), engine
