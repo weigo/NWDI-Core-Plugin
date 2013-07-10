@@ -99,6 +99,9 @@ public final class DigesterHelper<T> {
      */
     protected Digester createDigester() {
         final DigesterLoader digesterLoader = DigesterLoader.newLoader(rulesProducer.getRulesModule());
-        return digesterLoader.newDigester();
+        final Digester digester = digesterLoader.newDigester();
+        digester.setClassLoader(this.getClass().getClassLoader());
+
+        return digester;
     }
 }
