@@ -18,9 +18,8 @@ import org.arachna.xml.DigesterHelper;
 import org.arachna.xml.RulesModuleProducer;
 
 /**
- * Update development components with information read from the on disk
- * representation of those DCs (i.e. .confdef, .dcdef, project properties and
- * various JEE configuration files).
+ * Update development components with information read from the on disk representation of those DCs (i.e. .confdef, .dcdef, project
+ * properties and various JEE configuration files).
  * 
  * @author Dirk Weigenand
  */
@@ -49,20 +48,26 @@ public final class DevelopmentComponentUpdater {
     }
 
     /**
-     * Loops through all components and updates information read from dc tool
-     * with information from file system (i.e. configuration data of DCs:
-     * .dcdef, Project.wdproperties, etc.)
+     * Loops through all components and updates information read from dc tool with information from file system (i.e. configuration data of
+     * DCs: .dcdef, Project.wdproperties, etc.)
      */
     public void execute() {
         for (final DevelopmentComponent component : dcFactory.getAll()) {
-            DcPropertiesReaderDescriptor.update(component, antHelper);
+            DcPropertiesReaderDescriptor.All.update(antHelper, component);
+
+            for (final DcPropertiesReaderDescriptor descriptor : DcPropertiesReaderDescriptor.values()) {
+                if (descriptor.dcType != null && descriptor.dcType.equals(component.getType())) {
+                    descriptor.update(antHelper, component);
+                    break;
+                }
+            }
+
             readPublicParts(component);
         }
     }
 
     /**
-     * Descriptor for configuration files to update a development component
-     * from.
+     * Descriptor for configuration files to update a development component from.
      * 
      * @author Dirk Weigenand
      */
@@ -76,8 +81,8 @@ public final class DevelopmentComponentUpdater {
         /**
          * Descriptor for DCs of type Portal Application Module.
          */
-        PortalApplicationModule(DevelopmentComponentType.PortalApplicationModule,
-            new PortalApplicationConfigurationRulesModuleProducer(), "dist/PORTAL-INF/portalapp.xml"),
+        PortalApplicationModule(DevelopmentComponentType.PortalApplicationModule, new PortalApplicationConfigurationRulesModuleProducer(),
+            "dist/PORTAL-INF/portalapp.xml"),
 
         /**
          * Descriptor for DCs of type Portal Standalone Application.
@@ -106,8 +111,7 @@ public final class DevelopmentComponentUpdater {
         private final String configFile;
 
         /**
-         * Create descriptor instance with given type, rules producer and config
-         * file name.
+         * Create descriptor instance with given type, rules producer and config file name.
          * 
          * @param dcType
          *            type of development component may be null.
@@ -116,8 +120,8 @@ public final class DevelopmentComponentUpdater {
          * @param configFile
          *            name of configuration file.
          */
-        private DcPropertiesReaderDescriptor(final DevelopmentComponentType dcType,
-            final RulesModuleProducer rulesModuleProducer, final String configFile) {
+        private DcPropertiesReaderDescriptor(final DevelopmentComponentType dcType, final RulesModuleProducer rulesModuleProducer,
+            final String configFile) {
             this.dcType = dcType;
             this.rulesModuleProducer = rulesModuleProducer;
             this.configFile = configFile;
@@ -127,26 +131,21 @@ public final class DevelopmentComponentUpdater {
          * Get a reader for the configuration file.
          * 
          * @param antHelper
-         *            use antHelper to determine the exact location in the file
-         *            system.
+         *            use antHelper to determine the exact location in the file system.
          * @param component
          *            determine path for this component.
          * @return reader for config file.
          * @throws FileNotFoundException
-         *             when the configuration file could not be found, i.e. in
-         *             NW CE and new releases there is no
+         *             when the configuration file could not be found, i.e. in NW CE and new releases there is no
          *             <code>ProjectProperties.wdproperties</code> anymore.
          */
-        private Reader getConfigFile(final AntHelper antHelper, final DevelopmentComponent component)
-            throws FileNotFoundException {
-            return new InputStreamReader(
-                new FileInputStream(new File(antHelper.getBaseLocation(component), configFile)),
+        private Reader getConfigFile(final AntHelper antHelper, final DevelopmentComponent component) throws FileNotFoundException {
+            return new InputStreamReader(new FileInputStream(new File(antHelper.getBaseLocation(component), configFile)),
                 Charset.forName("UTF-8"));
         }
 
         /**
-         * Update the given development component with the properties defined by
-         * this descriptor.
+         * Update the given development component with the properties defined by this descriptor.
          * 
          * @param antHelper
          *            helper class for extracting file names.
@@ -155,35 +154,16 @@ public final class DevelopmentComponentUpdater {
          */
         private void update(final AntHelper antHelper, final DevelopmentComponent component) {
             try {
-                new DigesterHelper<DevelopmentComponent>(rulesModuleProducer).update(
-                    getConfigFile(antHelper, component), component);
+                new DigesterHelper<DevelopmentComponent>(rulesModuleProducer).update(getConfigFile(antHelper, component), component);
             }
             catch (final FileNotFoundException e) {
                 // ignore
             }
         }
-
-        /**
-         * External interface for updating development components.
-         * 
-         * @param component
-         *            component to update.
-         * @param antHelper
-         *            helper class for determining file paths.
-         */
-        static void update(final DevelopmentComponent component, final AntHelper antHelper) {
-            for (final DcPropertiesReaderDescriptor descriptor : values()) {
-                if (descriptor.dcType != null && descriptor.dcType.equals(component.getType())) {
-                    descriptor.update(antHelper, component);
-                    break;
-                }
-            }
-        }
     }
 
     /**
-     * Read the public parts of the current development component and add them
-     * to it.
+     * Read the public parts of the current development component and add them to it.
      * 
      * @param component
      *            development component to determine public parts for.
