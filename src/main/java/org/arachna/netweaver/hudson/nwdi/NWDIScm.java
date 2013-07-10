@@ -35,6 +35,7 @@ import org.arachna.netweaver.hudson.dtr.browser.Activity;
 import org.arachna.netweaver.hudson.dtr.browser.DtrBrowser;
 import org.arachna.netweaver.hudson.nwdi.changelog.ChangeLogService;
 import org.arachna.netweaver.hudson.nwdi.dcupdater.DevelopmentComponentUpdater;
+import org.arachna.netweaver.hudson.util.FilePathHelper;
 import org.arachna.netweaver.tools.DIToolCommandExecutionResult;
 import org.arachna.netweaver.tools.dc.DCToolCommandExecutor;
 import org.kohsuke.stapler.StaplerRequest;
@@ -78,8 +79,7 @@ public class NWDIScm extends SCM {
      * @param password
      *            password to use for authentication.
      * @param cleanCopy
-     *            indicate whether only changed development components should be
-     *            loaded from the NWDI or all that are contained in the
+     *            indicate whether only changed development components should be loaded from the NWDI or all that are contained in the
      *            indicated CBS workspace
      */
     public NWDIScm(final boolean cleanCopy, final String dtrUser, final String password) {
@@ -123,10 +123,8 @@ public class NWDIScm extends SCM {
 
         final DevelopmentComponentFactory dcFactory = currentBuild.getDevelopmentComponentFactory();
 
-        DIToolCommandExecutionResult result =
-            currentBuild.getCBSToolExecutor(launcher).listDevelopmentComponents(dcFactory);
-        final DevelopmentComponentUpdater updater =
-            new DevelopmentComponentUpdater(currentBuild.getAbsolutePathToDtcFolder(), dcFactory);
+        DIToolCommandExecutionResult result = currentBuild.getCBSToolExecutor(launcher).listDevelopmentComponents(dcFactory);
+        final DevelopmentComponentUpdater updater = new DevelopmentComponentUpdater(FilePathHelper.makeAbsolute(workspace), dcFactory);
 
         if (result.isExitCodeOk()) {
             final NWDIBuild lastSuccessfulBuild = project.getLastSuccessfulBuild();
@@ -139,8 +137,7 @@ public class NWDIScm extends SCM {
             }
 
             final NWDIRevisionState state =
-                lastSuccessfulBuild == null ? NWDIRevisionState.START_STATE : lastSuccessfulBuild
-                    .getAction(NWDIRevisionState.class);
+                lastSuccessfulBuild == null ? NWDIRevisionState.START_STATE : lastSuccessfulBuild.getAction(NWDIRevisionState.class);
             final DevelopmentConfiguration config = currentBuild.getDevelopmentConfiguration();
             activities.addAll(getActivities(logger, getDtrBrowser(config), dcFactory, state));
 
@@ -170,14 +167,12 @@ public class NWDIScm extends SCM {
     }
 
     /**
-     * Set the needsRebuild property on all development components in source
-     * state if a clean build was requested.
+     * Set the needsRebuild property on all development components in source state if a clean build was requested.
      * 
      * @param config
      *            the development configuration containing the DCs
      * @param cleanCopy
-     *            <code>true</code> when a clean build was requested,
-     *            <code>false</code> otherwise.
+     *            <code>true</code> when a clean build was requested, <code>false</code> otherwise.
      */
     private void setNeedsRebuildPropertyOnAllDevelopmentComponentsInSourceState(final DevelopmentConfiguration config,
         final boolean cleanCopy) {
@@ -191,8 +186,8 @@ public class NWDIScm extends SCM {
     }
 
     @Override
-    public SCMRevisionState calcRevisionsFromBuild(final AbstractBuild<?, ?> build, final Launcher launcher,
-        final TaskListener listener) throws IOException, InterruptedException {
+    public SCMRevisionState calcRevisionsFromBuild(final AbstractBuild<?, ?> build, final Launcher launcher, final TaskListener listener)
+        throws IOException, InterruptedException {
         listener.getLogger().println(Messages.NWDIScm_calculating_revisions_from_build(build.getNumber()));
 
         final NWDIRevisionState lastRevision = build.getAction(NWDIRevisionState.class);
@@ -201,9 +196,8 @@ public class NWDIScm extends SCM {
     }
 
     @Override
-    protected PollingResult compareRemoteRevisionWith(final AbstractProject<?, ?> project, final Launcher launcher,
-        final FilePath path, final TaskListener listener, final SCMRevisionState revisionState) throws IOException,
-        InterruptedException {
+    protected PollingResult compareRemoteRevisionWith(final AbstractProject<?, ?> project, final Launcher launcher, final FilePath path,
+        final TaskListener listener, final SCMRevisionState revisionState) throws IOException, InterruptedException {
         final NWDIProject nwdiProject = (NWDIProject)project;
         NWDIBuild lastBuild = nwdiProject.getLastSuccessfulBuild();
 
@@ -214,13 +208,9 @@ public class NWDIScm extends SCM {
         final PrintStream logger = listener.getLogger();
         nwdiProject.updateDevelopmentConfiguration(logger, path.child(".dtc"));
 
-        logger
-            .println(Messages
-                .NWDIScm_comparing_base_line_activities_with_activities_accumulated_since_last_build(lastBuild
-                    .getNumber()));
+        logger.println(Messages.NWDIScm_comparing_base_line_activities_with_activities_accumulated_since_last_build(lastBuild.getNumber()));
         final List<Activity> activities =
-            getActivities(logger, getDtrBrowser(lastBuild.getDevelopmentConfiguration()), null,
-                (NWDIRevisionState)revisionState);
+            getActivities(logger, getDtrBrowser(lastBuild.getDevelopmentConfiguration()), null, (NWDIRevisionState)revisionState);
 
         final Change changeState = activities.isEmpty() ? Change.NONE : Change.SIGNIFICANT;
         logger.println(Messages.NWDIScm_found_changes(changeState.toString()));
@@ -240,8 +230,8 @@ public class NWDIScm extends SCM {
      * @throws IOException
      *             will be re-thrown when writing the change log fails.
      */
-    private void writeChangeLog(final AbstractBuild<?, ?> build, final File changelogFile,
-        final Collection<Activity> activities) throws IOException {
+    private void writeChangeLog(final AbstractBuild<?, ?> build, final File changelogFile, final Collection<Activity> activities)
+        throws IOException {
         changeLogService.writeChangeLog(build, changelogFile, activities);
     }
 
@@ -272,31 +262,27 @@ public class NWDIScm extends SCM {
          * {@inheritDoc}
          */
         @Override
-        public SCM newInstance(final StaplerRequest req, final JSONObject formData)
-            throws hudson.model.Descriptor.FormException {
+        public SCM newInstance(final StaplerRequest req, final JSONObject formData) throws hudson.model.Descriptor.FormException {
             return super.newInstance(req, formData);
         }
     }
 
     /**
-     * Get list of activities since last run. If <code>lastRun</code> is
-     * <code>null</code> all activities will be read.
+     * Get list of activities since last run. If <code>lastRun</code> is <code>null</code> all activities will be read.
      * 
      * @param logger
      *            the logger to use.
      * @param browser
      *            the {@link DtrBrowser} to be used getting the activities.
      * @param dcFactory
-     *            registry for development components to use when determining
-     *            activities with resources. Should be <code>null</code>, when
+     *            registry for development components to use when determining activities with resources. Should be <code>null</code>, when
      *            only activities should be determined.
      * @param state
      *            the NWDI revision state to use to determine activities.
-     * @return a list of {@link Activity} objects that were checked in since the
-     *         last run or all activities.
+     * @return a list of {@link Activity} objects that were checked in since the last run or all activities.
      */
-    private List<Activity> getActivities(final PrintStream logger, final DtrBrowser browser,
-        final DevelopmentComponentFactory dcFactory, final NWDIRevisionState state) {
+    private List<Activity> getActivities(final PrintStream logger, final DtrBrowser browser, final DevelopmentComponentFactory dcFactory,
+        final NWDIRevisionState state) {
         final List<Activity> activities = new LinkedList<Activity>();
         final long start = System.currentTimeMillis();
 
@@ -304,16 +290,14 @@ public class NWDIScm extends SCM {
             activities.addAll(browser.getActivities(state.getCreationDate()));
         }
         else {
-            activities.addAll(browser.getActivitiesWithResourcesAndDevelopmentComponents(dcFactory,
-                state.getCreationDate()));
+            activities.addAll(browser.getActivitiesWithResourcesAndDevelopmentComponents(dcFactory, state.getCreationDate()));
         }
 
         if (NWDIRevisionState.START_STATE.equals(state)) {
             duration(logger, start, Messages.NWDIScm_determine_activities());
         }
         else {
-            duration(logger, start,
-                Messages.NWDIScm_determine_activities_since(String.format("%1$tF %<tT", state.getCreationDate())));
+            duration(logger, start, Messages.NWDIScm_determine_activities_since(String.format("%1$tF %<tT", state.getCreationDate())));
         }
 
         duration(logger, start, Messages.NWDIScm_read_countof_activities(activities.size()));
@@ -322,12 +306,10 @@ public class NWDIScm extends SCM {
     }
 
     /**
-     * Returns an instance of {@link DtrBrowser} using the given development
-     * configuration.
+     * Returns an instance of {@link DtrBrowser} using the given development configuration.
      * 
      * @param config
-     *            the development configuration to be used to connect to the
-     *            DTR.
+     *            the development configuration to be used to connect to the DTR.
      * @return the {@link DtrBrowser} for browsing the DTR for activities.
      */
     private DtrBrowser getDtrBrowser(final DevelopmentConfiguration config) {
@@ -335,8 +317,7 @@ public class NWDIScm extends SCM {
     }
 
     /**
-     * Determine the time in seconds passed since the given start time and log
-     * it using the message given.
+     * Determine the time in seconds passed since the given start time and log it using the message given.
      * 
      * @param logger
      *            the logger to use.
@@ -348,7 +329,6 @@ public class NWDIScm extends SCM {
     private void duration(final PrintStream logger, final long start, final String message) {
         final long duration = System.currentTimeMillis() - start;
 
-        logger
-            .println(Messages.NWDIProject_duration_template(message, String.format("%f", duration / A_THOUSAND_MSECS)));
+        logger.println(Messages.NWDIProject_duration_template(message, String.format("%f", duration / A_THOUSAND_MSECS)));
     }
 }
