@@ -19,7 +19,7 @@ import org.arachna.javaparser.ClassNameResolver;
  * 
  * @author Dirk Weigenand
  */
-public class TestPropertyResolver extends VoidVisitorAdapter {
+public class TestAnnotationResolver extends VoidVisitorAdapter<Object> {
     /**
      * Resolver for class names that are not fully qualified (i.e. from java.lang or the local package).
      */
@@ -30,7 +30,13 @@ public class TestPropertyResolver extends VoidVisitorAdapter {
      */
     private boolean junitTestFound;
 
-    public TestPropertyResolver(final ClassNameResolver classNameResolver) {
+    /**
+     * Create instance of test annotation resolver using the given class name resolver.
+     * 
+     * @param classNameResolver
+     *            resolver for imported class names.
+     */
+    public TestAnnotationResolver(final ClassNameResolver classNameResolver) {
         this.classNameResolver = classNameResolver;
     }
 

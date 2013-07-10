@@ -86,8 +86,8 @@ class TestFolderFinder {
      * @return <code>true</code> when a JUnit 3 or 4 test class could be identified, <code>false</code> otherwise.
      */
     protected boolean compilationUnitContainsJUnitTest(final CompilationUnit compilationUnit, final PackageDeclaration packageDescriptor) {
-        final TestPropertyResolver testPropertyResolver =
-            new TestPropertyResolver(new ClassNameResolver(packageDescriptor.getName().toString(), compilationUnit.getImports()));
+        final TestAnnotationResolver testPropertyResolver =
+            new TestAnnotationResolver(new ClassNameResolver(packageDescriptor.getName().toString(), compilationUnit.getImports()));
 
         // find JUnit3 test cases.
         compilationUnit.accept(testPropertyResolver, null);
