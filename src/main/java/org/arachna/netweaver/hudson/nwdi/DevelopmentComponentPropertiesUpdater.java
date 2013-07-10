@@ -18,8 +18,7 @@ import org.arachna.netweaver.dc.types.DevelopmentConfigurationVisitor;
 import org.arachna.xml.DigesterHelper;
 
 /**
- * Update development components source folders, source encodings and output
- * folder.
+ * Update development components source folders, source encodings and output folder.
  * 
  * @author Dirk Weigenand
  */
@@ -36,8 +35,7 @@ final class DevelopmentComponentPropertiesUpdater implements DevelopmentConfigur
         new BuildXmlRulesModuleProducer());
 
     /**
-     * Create updater for development component properties with the given
-     * {@link AntHelper} instance.
+     * Create updater for development component properties with the given {@link AntHelper} instance.
      * 
      * @param antHelper
      *            build helper
@@ -71,8 +69,9 @@ final class DevelopmentComponentPropertiesUpdater implements DevelopmentConfigur
 
         try {
             final File buildXml = new File(antHelper.getBaseLocation(component), "gen/default/logs/build.xml");
-            digesterHelper.update(new InputStreamReader(new FileInputStream(buildXml), Charset.forName("UTF-8")),
-                component);
+            // source folders have been read from .dcdef and are relative to DC base location. Replace with absolute paths from build.xml.
+            component.setSourceFolders(null);
+            digesterHelper.update(new InputStreamReader(new FileInputStream(buildXml), Charset.forName("UTF-8")), component);
         }
         catch (final FileNotFoundException e) {
             // ignore: component was not built yet.
