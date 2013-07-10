@@ -18,9 +18,32 @@ import java.util.Map;
  */
 public class ClassNameResolver {
     /**
-     * constant for java.lang package.
+     * Mapping for classes in java.lang.
      */
-    private static final String JAVA_LANG = "java.lang.";
+    @SuppressWarnings("serial")
+    private static final Map<String, String> JAVA_LANG_CLASSES = new HashMap<String, String>() {
+        {
+            for (final String className : new String[] { "Appendable", "CharSequence", "Cloneable", "Comparable", "Iterable", "Readable",
+                "Runnable", "Thread.UncaughtExceptionHandler", "Boolean", "Byte", "Character", "Character.Subset",
+                "Character.UnicodeBlock", "Class", "ClassLoader", "Compiler", "Double", "Enum", "Float", "InheritableThreadLocal",
+                "Integer", "Long", "Math", "Number", "Object", "Package", "Process", "ProcessBuilder", "Runtime", "RuntimePermission",
+                "SecurityManager", "Short", "StackTraceElement", "StrictMath", "String", "StringBuffer", "StringBuilder", "System",
+                "Thread", "ThreadGroup", "ThreadLocal", "Throwable", "Void", "Thread.State", "ArithmeticException",
+                "ArrayIndexOutOfBoundsException", "ArrayStoreException", "ClassCastException", "ClassNotFoundException",
+                "CloneNotSupportedException", "EnumConstantNotPresentException", "Exception", "IllegalAccessException",
+                "IllegalArgumentException", "IllegalMonitorStateException", "IllegalStateException", "IllegalThreadStateException",
+                "IndexOutOfBoundsException", "InstantiationException", "InterruptedException", "NegativeArraySizeException",
+                "NoSuchFieldException", "NoSuchMethodException", "NullPointerException", "NumberFormatException", "RuntimeException",
+                "SecurityException", "StringIndexOutOfBoundsException", "TypeNotPresentException", "UnsupportedOperationException",
+                "AbstractMethodError", "AssertionError", "ClassCircularityError", "ClassFormatError", "Error",
+                "ExceptionInInitializerError", "IllegalAccessError", "IncompatibleClassChangeError", "InstantiationError", "InternalError",
+                "LinkageError", "NoClassDefFoundError", "NoSuchFieldError", "NoSuchMethodError", "OutOfMemoryError", "StackOverflowError",
+                "ThreadDeath", "UnknownError", "UnsatisfiedLinkError", "UnsupportedClassVersionError", "VerifyError",
+                "VirtualMachineError", "Deprecated", "Override", "SuppressWarnings" }) {
+                put(className, "java.lang." + className);
+            }
+        }
+    };
 
     /**
      * a class name ending with [] indicates an array.
@@ -38,8 +61,7 @@ public class ClassNameResolver {
     private final String packageName;
 
     /**
-     * Create a <code>ClassNameResolver</code> using the given package name and
-     * list of imports.
+     * Create a <code>ClassNameResolver</code> using the given package name and list of imports.
      * 
      * @param packageName
      *            package name for which to resolve class names.
@@ -58,27 +80,22 @@ public class ClassNameResolver {
     }
 
     /**
-     * Determine the full class name (i.e. String --> java.lang.String) of the
-     * given {@link Parameter} object.
+     * Determine the full class name (i.e. String --> java.lang.String) of the given {@link Parameter} object.
      * 
      * @param parameter
      *            the Parameter to determine the class name for.
-     * @return the class name resolved either from the <code>java.lang</code>
-     *         package, from the imported classes or the current package.
+     * @return the class name resolved either from the <code>java.lang</code> package, from the imported classes or the current package.
      */
     public String resolveClassName(final Parameter parameter) {
         return resolveClassName(parameter.getType().toString());
     }
 
     /**
-     * Determine the full class name (i.e. String --> java.lang.String) of the
-     * given unqualified class name.
+     * Determine the full class name (i.e. String --> java.lang.String) of the given unqualified class name.
      * 
      * @param className
-     *            unqualified class name to determine the fully qualified class
-     *            name for.
-     * @return the class name resolved either from the <code>java.lang</code>
-     *         package, from the imported classes or the current package.
+     *            unqualified class name to determine the fully qualified class name for.
+     * @return the class name resolved either from the <code>java.lang</code> package, from the imported classes or the current package.
      */
     public String resolveClassName(final String className) {
         boolean isVarArgs = false;
@@ -90,7 +107,7 @@ public class ClassNameResolver {
         }
 
         if (isFromJavaLangPackage(resolvedClassName)) {
-            resolvedClassName = JAVA_LANG + resolvedClassName;
+            resolvedClassName = JAVA_LANG_CLASSES.get(resolvedClassName);
         }
         else if (classNameMapping.containsKey(resolvedClassName)) {
             resolvedClassName = classNameMapping.get(resolvedClassName).toString();
@@ -103,24 +120,13 @@ public class ClassNameResolver {
     }
 
     /**
-     * Determine whether the given class name can be loaded from the 'java.lang'
-     * package.
+     * Determine whether the given class name can be loaded from the 'java.lang' package.
      * 
      * @param className
      *            the class name to resolve from the 'java.lang' package.
-     * @return <code>true</code> when the given name can be loaded from the
-     *         'java.lang' package, <code>false</code> otherwise.
+     * @return <code>true</code> when the given name can be loaded from the 'java.lang' package, <code>false</code> otherwise.
      */
     protected boolean isFromJavaLangPackage(final String className) {
-        boolean result = false;
-
-        try {
-            result = getClass().getClassLoader().loadClass(JAVA_LANG + className) != null;
-        }
-        catch (final ClassNotFoundException e) {
-            // ignore exception when constructed class could not be loaded.
-        }
-
-        return result;
+        return JAVA_LANG_CLASSES.containsKey(className);
     }
 }
