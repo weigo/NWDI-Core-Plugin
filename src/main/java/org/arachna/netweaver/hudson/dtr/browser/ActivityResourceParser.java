@@ -12,8 +12,7 @@ import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.w3c.dom.Node;
 
 /**
- * A parser for {@link ActivityResource}s. Parses a DTR HTML report of a specific activity and returns the found
- * resources.
+ * A parser for {@link ActivityResource}s. Parses a DTR HTML report of a specific activity and returns the found resources.
  * 
  * @author Dirk Weigenand
  */
@@ -87,7 +86,7 @@ public final class ActivityResourceParser extends AbstractResourceParser {
      *            DOM nodes representing the extracted resources.
      */
     @Override
-    public void parseInternal(final List<Object> nodes) {
+    public void parseInternal(final List nodes) {
         for (final Object returnValue : nodes) {
             addResource((Node)returnValue);
         }
@@ -106,8 +105,8 @@ public final class ActivityResourceParser extends AbstractResourceParser {
             final DevelopmentComponent component =
                 developmentComponentFactory.create(getVendor(resourcePath), getDevelopmentComponentName(resourcePath));
             final ActivityResource resource =
-                new ActivityResource(activity, component, getResourcePath(resourcePath), getResourceId(node
-                    .getAttributes().getNamedItem("href").getNodeValue()));
+                new ActivityResource(activity, component, getResourcePath(resourcePath), getResourceId(node.getAttributes()
+                    .getNamedItem("href").getNodeValue()));
             activity.add(resource);
         }
     }

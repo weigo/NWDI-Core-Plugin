@@ -43,8 +43,8 @@ final class ActivityDetailParser extends AbstractResourceParser {
      *            list of nodes containing an activity's details.
      */
     @Override
-    void parseInternal(final List<Object> nodes) {
-        this.activity.setDescription(this.nodeValueAt(nodes, LONG_DESCRIPTION));
+    void parseInternal(final List nodes) {
+        activity.setDescription(nodeValueAt(nodes, LONG_DESCRIPTION));
     }
 
     @Override

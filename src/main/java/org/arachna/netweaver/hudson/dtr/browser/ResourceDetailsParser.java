@@ -41,8 +41,7 @@ final class ResourceDetailsParser extends AbstractResourceParser {
     private static final int IS_DELETED = 23;
 
     /**
-     * XPath expression for selecting property name/value nodes from the associated table in the html page returned upon
-     * query.
+     * XPath expression for selecting property name/value nodes from the associated table in the html page returned upon query.
      */
     private static final String XPATH = "/html/body/table[3]/tr/td";
 
@@ -52,8 +51,7 @@ final class ResourceDetailsParser extends AbstractResourceParser {
     private final ActivityResource resource;
 
     /**
-     * Create an instance of a <code>ResourceDetailsParser</code> with the given {@link ActivityResource} that is to be
-     * updated.
+     * Create an instance of a <code>ResourceDetailsParser</code> with the given {@link ActivityResource} that is to be updated.
      * 
      * @param resource
      *            the {@link ActivityResource} to update.
@@ -69,18 +67,17 @@ final class ResourceDetailsParser extends AbstractResourceParser {
      *            list of nodes extracted from resource detail page
      */
     @Override
-    void parseInternal(final List<Object> nodes) {
+    void parseInternal(final List nodes) {
         final SimpleDateFormat format = new SimpleDateFormat(ActivityListParser.ACTIVITY_DATE_FORMAT);
 
         try {
-            this.resource.setCreationDate(format.parse(nodeValueAt(nodes, CREATION_DATE)));
-            this.resource.setLastModified(format.parse(nodeValueAt(nodes, LAST_MODIFIED)));
-            this.resource.setSequenceNumber(Integer.valueOf(nodeValueAt(nodes, SEQUENCE_NUMBER)));
-            this.resource.setDeleted(Boolean.valueOf("yes".equals(nodeValueAt(nodes, IS_DELETED).toLowerCase())));
+            resource.setCreationDate(format.parse(nodeValueAt(nodes, CREATION_DATE)));
+            resource.setLastModified(format.parse(nodeValueAt(nodes, LAST_MODIFIED)));
+            resource.setSequenceNumber(Integer.valueOf(nodeValueAt(nodes, SEQUENCE_NUMBER)));
+            resource.setDeleted(Boolean.valueOf("yes".equals(nodeValueAt(nodes, IS_DELETED).toLowerCase())));
         }
         catch (final ParseException e) {
-            LOGGER.log(Level.SEVERE,
-                String.format("Error parsing date using format string:\n%s", ActivityListParser.ACTIVITY_DATE_FORMAT),
+            LOGGER.log(Level.SEVERE, String.format("Error parsing date using format string:\n%s", ActivityListParser.ACTIVITY_DATE_FORMAT),
                 e);
         }
     }
