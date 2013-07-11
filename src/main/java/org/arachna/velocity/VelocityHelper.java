@@ -3,8 +3,8 @@
  */
 package org.arachna.velocity;
 
-import java.io.PrintStream;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.runtime.RuntimeConstants;
@@ -27,12 +27,12 @@ public final class VelocityHelper {
      * @param logger
      *            use for logging of messages
      */
-    public VelocityHelper(final PrintStream logger) {
+    public VelocityHelper() {
         try {
             engine = new VelocityEngine();
             final Properties properties = new Properties();
             properties.load(this.getClass().getResourceAsStream("/org/arachna/netweaver/hudson/nwdi/velocity.properties"));
-            engine.setProperty(VelocityEngine.RUNTIME_LOG_LOGSYSTEM, new VelocityLogChute(logger));
+            engine.setProperty(VelocityEngine.RUNTIME_LOG_LOGSYSTEM, new VelocityLogChute(Logger.getLogger(getClass().getName())));
             engine.setProperty(RuntimeConstants.RESOURCE_LOADER, "classpath");
             engine.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
             engine.init(properties);

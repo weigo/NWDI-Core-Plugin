@@ -13,7 +13,6 @@ import hudson.tools.ToolInstallation;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintStream;
 import java.io.Reader;
 import java.nio.charset.Charset;
 
@@ -47,19 +46,16 @@ public abstract class AntTaskBuilder extends Builder {
      *            the name of the build file that shall be executed
      * @param antOpts
      *            options for the ant process (ANT_OPTS environment variable)
-     * @return returns <code>true</code> when the ant build returned
-     *         successfully, <code>false</code> otherwise
+     * @return returns <code>true</code> when the ant build returned successfully, <code>false</code> otherwise
      */
-    protected final boolean execute(final AbstractBuild<?, ?> build, final Launcher launcher,
-        final BuildListener listener, final String defaultTarget, final String buildFileName, final String antOpts) {
+    protected final boolean execute(final AbstractBuild<?, ?> build, final Launcher launcher, final BuildListener listener,
+        final String defaultTarget, final String buildFileName, final String antOpts) {
         boolean result = false;
-        final AntInstallation.DescriptorImpl descriptor =
-            ToolInstallation.all().get(AntInstallation.DescriptorImpl.class);
+        final AntInstallation.DescriptorImpl descriptor = ToolInstallation.all().get(AntInstallation.DescriptorImpl.class);
         final AntInstallation[] installations = descriptor.getInstallations();
 
         if (installations != null && installations.length > 0) {
-            final Ant ant =
-                new Ant(defaultTarget, installations[0].getName(), antOpts, buildFileName, getAntProperties());
+            final Ant ant = new Ant(defaultTarget, installations[0].getName(), antOpts, buildFileName, getAntProperties());
 
             try {
                 result = ant.perform(build, launcher, listener);
@@ -95,14 +91,12 @@ public abstract class AntTaskBuilder extends Builder {
     }
 
     /**
-     * Create a new VelocityEngine using the given Logger.
+     * Create a new VelocityEngine.
      * 
-     * @param logger
-     *            logger to use for VelocityEngine.
      * @return the new VelocityEngine.
      */
-    protected VelocityEngine getVelocityEngine(final PrintStream logger) {
-        return new VelocityHelper(logger).getVelocityEngine();
+    protected VelocityEngine getVelocityEngine() {
+        return new VelocityHelper().getVelocityEngine();
     }
 
     /**
@@ -113,8 +107,7 @@ public abstract class AntTaskBuilder extends Builder {
      * @return the reader for the velocity template.
      */
     protected final Reader getTemplateReader(final String pathToResourceInClassPath) {
-        return new InputStreamReader(this.getClass().getResourceAsStream(pathToResourceInClassPath),
-            Charset.forName("UTF-8"));
+        return new InputStreamReader(this.getClass().getResourceAsStream(pathToResourceInClassPath), Charset.forName("UTF-8"));
     }
 
     /**
