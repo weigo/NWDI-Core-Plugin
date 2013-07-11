@@ -49,6 +49,7 @@ import javax.servlet.ServletException;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
 
+import org.apache.commons.lang.StringUtils;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 import org.arachna.netweaver.dc.types.JdkHomePaths;
 import org.arachna.netweaver.tools.DIToolCommandExecutionResult;
@@ -449,7 +450,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
          * @return the folder of the DI tools for NetWeaver 7.1 and later.
          */
         public String getNwdiToolLibFolder71() {
-            return nwdiToolLibFolder71;
+            return StringUtils.trimToEmpty(nwdiToolLibFolder71);
         }
 
         /**
@@ -703,6 +704,9 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
             }
             catch (final InterruptedException e) {
                 // ignore
+            }
+            catch (final IllegalStateException e) {
+                Logger.getLogger(getClass().getName()).log(Level.SEVERE, e.getLocalizedMessage(), e);
             }
 
             Collections.sort(buildSpaceNames);

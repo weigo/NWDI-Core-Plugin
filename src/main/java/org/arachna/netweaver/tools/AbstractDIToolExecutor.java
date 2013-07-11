@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 import org.arachna.netweaver.dc.types.JdkHomeAlias;
 
@@ -65,21 +66,19 @@ public abstract class AbstractDIToolExecutor {
     private final PrintStream logger;
 
     /**
-     * create DC tool executor with the given command line generator and given
-     * command build.
+     * create DC tool executor with the given command line generator and given command build.
      * 
      * @param launcher
      *            the launcher to use executing the DC tool.
      * @param workspace
      *            the workspace where the DC tool should be executed.
      * @param diToolDescriptor
-     *            descriptor for various parameters needed for DC tool
-     *            execution.
+     *            descriptor for various parameters needed for DC tool execution.
      * @param developmentConfiguration
      *            {@link DevelopmentConfiguration} to use executing the DC tool.
      */
-    public AbstractDIToolExecutor(final Launcher launcher, final FilePath workspace,
-        final DIToolDescriptor diToolDescriptor, final DevelopmentConfiguration developmentConfiguration) {
+    public AbstractDIToolExecutor(final Launcher launcher, final FilePath workspace, final DIToolDescriptor diToolDescriptor,
+        final DevelopmentConfiguration developmentConfiguration) {
         this.launcher = launcher;
         this.workspace = workspace;
         this.diToolDescriptor = diToolDescriptor;
@@ -94,8 +93,7 @@ public abstract class AbstractDIToolExecutor {
      *            builder for dc tool commands
      * @return content of log file created by the executed dc tool.
      * @throws IOException
-     *             might be thrown be the {@link ProcStarter} used to execute
-     *             the DC tool commands.
+     *             might be thrown be the {@link ProcStarter} used to execute the DC tool commands.
      */
     public DIToolCommandExecutionResult execute(final DIToolCommandBuilder commandBuilder) throws IOException {
         final ProcStarter starter = launcher.launch();
@@ -123,8 +121,7 @@ public abstract class AbstractDIToolExecutor {
     }
 
     /**
-     * Create an <code>InputStream</code> containing the given NWDI tool
-     * commands.
+     * Create an <code>InputStream</code> containing the given NWDI tool commands.
      * 
      * @param commands
      *            list of NWDI tool commands
@@ -162,8 +159,7 @@ public abstract class AbstractDIToolExecutor {
     /**
      * Determines whether this executor runs on Unix or not.
      * 
-     * @return <code>true</code> iff this launcher runs on Unix,
-     *         <code>false</code> otherwise.
+     * @return <code>true</code> iff this launcher runs on Unix, <code>false</code> otherwise.
      */
     protected boolean isUnix() {
         return launcher.isUnix();
@@ -188,8 +184,7 @@ public abstract class AbstractDIToolExecutor {
     }
 
     /**
-     * Determine the name of the command to be executed. I.e. the name of the
-     * shell script or batch file.
+     * Determine the name of the command to be executed. I.e. the name of the shell script or batch file.
      * 
      * @return the name of the shell script or batch file to be executed.
      */
@@ -205,8 +200,7 @@ public abstract class AbstractDIToolExecutor {
     /**
      * Prepare the environment variables for the launcher.
      * 
-     * @return the map containing the environment variable name mapping to their
-     *         corresponding values.
+     * @return the map containing the environment variable name mapping to their corresponding values.
      */
     private Map<String, String> createEnvironment() {
         final Map<String, String> environment = new HashMap<String, String>();
@@ -224,8 +218,7 @@ public abstract class AbstractDIToolExecutor {
     }
 
     /**
-     * Determine the time in seconds passed since the given start time and log
-     * it using the message given.
+     * Determine the time in seconds passed since the given start time and log it using the message given.
      * 
      * @param start
      *            begin of action whose duration should be logged.
@@ -233,8 +226,7 @@ public abstract class AbstractDIToolExecutor {
      *            message to log.
      */
     protected final void duration(final long start, final String message) {
-        log(Messages.duration_template(message,
-            String.format("%f", (System.currentTimeMillis() - start) / A_THOUSAND_MSECS)));
+        log(Messages.duration_template(message, String.format("%f", (System.currentTimeMillis() - start) / A_THOUSAND_MSECS)));
     }
 
     /**
@@ -254,7 +246,17 @@ public abstract class AbstractDIToolExecutor {
         logger.println(message);
     }
 
+    /**
+     * Read the NWDI tool library location from the DiToolDescriptor. Throws an IllegalStateException if this location has not been
+     * configured yet.
+     * 
+     * @return NWDI tool library location
+     */
     protected final String getNwdiToolLibrary() {
+        if (StringUtils.isEmpty(getDiToolDescriptor().getNwdiToolLibrary())) {
+            throw new IllegalStateException("The NWDI tool library has not been configured yet!");
+        }
+
         return getDiToolDescriptor().getNwdiToolLibrary();
     }
 
