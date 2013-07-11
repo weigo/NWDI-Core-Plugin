@@ -41,7 +41,9 @@
       <para>The plugin adds various new capabilities to Jenkins:</para>
       <itemizedlist>
         <listitem>
-          <para>A new project type that lets the user configure a CBS build space (or NWDI track) to monitor for changes and build.</para>
+          <para>A new project type that lets the user configure a CBS build space (or NWDI track) to monitor for changes to development
+            components.
+          </para>
         </listitem>
         <listitem>
           <para>A new source code management system (SCM) that monitors the configured track for changes to development components.</para>
@@ -54,8 +56,7 @@
       </itemizedlist>
       <para>
         The plugin also exposes an object model to be used by other plugins to add functionality with respect to SAP NetWeaver
-        development
-        components to Jenkins.
+        development components to Jenkins.
       </para>
     </section>
   </chapter>
@@ -211,11 +212,15 @@ for d in NWDI-config-plugin NWDI-pom-Plugin NWDI-Core-Plugin;\
       <variablelist>
         <varlistentry>
           <term>NWDI tool library location (7.0.x)</term>
-          <listitem>Enter the path to where you installed the DI tools for NetWeaver 7.0.x,</listitem>
+          <listitem>
+            <para>Enter the path to where you installed the DI tools for NetWeaver 7.0.x,</para>
+          </listitem>
         </varlistentry>
         <varlistentry>
           <term>NWDI tool library location (7.1.+)</term>
-          <listitem>Enter the path to where you installed the DI tools for NetWeaver CE and beyond,</listitem>
+          <listitem>
+            <para>Enter the path to where you installed the DI tools for NetWeaver CE and beyond,</para>
+          </listitem>
         </varlistentry>
         <varlistentry>
           <term>JDK_HOME_PATHS</term>
@@ -224,10 +229,18 @@ for d in NWDI-config-plugin NWDI-pom-Plugin NWDI-Core-Plugin;\
               In this field enter the values as configured in the NetWeaver Administrator (NWA) for NetWeaver CE and post CE systems or
               using the Config Tool for NetWeaver 7.0.x systems. Valid keys are
               <itemizedlist>
-                <listitem>JDK1.3.1_HOME,</listitem>
-                <listitem>JDK1.4.2_HOME,</listitem>
-                <listitem>JDK1.5.0_HOME and</listitem>
-                <listitem>JDK1.6.0_HOME.</listitem>
+                <listitem>
+                  <para>JDK1.3.1_HOME,</para>
+                </listitem>
+                <listitem>
+                  <para>JDK1.4.2_HOME,</para>
+                </listitem>
+                <listitem>
+                  <para>JDK1.5.0_HOME and</para>
+                </listitem>
+                <listitem>
+                  <para>JDK1.6.0_HOME.</para>
+                </listitem>
               </itemizedlist>
             </para>
             <para>Separate multiple entries with semicolon.</para>
@@ -243,16 +256,24 @@ for d in NWDI-config-plugin NWDI-pom-Plugin NWDI-Core-Plugin;\
         </varlistentry>
         <varlistentry>
           <term>NWDI user</term>
-          <listitem>Enter the user that should be used to connect to the NWDI.</listitem>
+          <listitem>
+            <para>Enter the user that should be used to connect to the NWDI.</para>
+          </listitem>
         </varlistentry>
         <varlistentry>
           <term>NWDI password</term>
-          <listitem>Enter the password that should be used to authenticate the user against the NWDI.</listitem>
+          <listitem>
+            <para>Enter the password that should be used to authenticate the user against the NWDI.</para>
+          </listitem>
         </varlistentry>
         <varlistentry>
           <term>CBS URL</term>
-          <listitem>Enter the URL to be used to connect to the NWDI (This is the same URL you would enter in the NWDS to configure access to
-            the NWDI).
+          <listitem>
+            <para>
+              Enter the URL to be used to connect to the NWDI (This is the same URL you would enter in the NWDS to configure access to
+              the
+              NWDI).
+            </para>
           </listitem>
         </varlistentry>
       </variablelist>
@@ -372,9 +393,12 @@ for d in NWDI-config-plugin NWDI-pom-Plugin NWDI-Core-Plugin;\
       <code>clean workspace</code>
       option when you'd like to rebuild the whole track regardless of the existence of new activities since the last build.
     </para>
-    <warning>This is a
-      potentially lengthy operation since all development components used by components of this track will be synchronized
-      from the CBS.
+    <warning>
+      <para>
+        This is a potentially lengthy operation since all development components used by components of this track will be synchronized
+        from
+        the CBS.
+      </para>
     </warning>
     <para>Do this when you imported software components from another track into the this track. Development components that depend on the
       imported SCs should probably be rebuilt against the imported versions of development components.
@@ -394,10 +418,10 @@ for d in NWDI-config-plugin NWDI-pom-Plugin NWDI-Core-Plugin;\
       <code>Build</code>
       presents a select box you can use to add new build steps to this build. Jenkins plugins special to integration of the NWDI are
       discussed in
-      <xref linkend="chapter:AdditionalJenkinsNwdiPlugins" />
+      <xref linkend="chapter-AdditionalJenkinsNwdiPlugins" />
     </para>
   </chapter>
-  <chapter xml:id="chapter:AdditionalJenkinsNwdiPlugins">
+  <chapter xml:id="chapter-AdditionalJenkinsNwdiPlugins">
     <title>Jenkins plugins based on the NWDI-Core-Plugin</title>
     <para>
       <variablelist>
