@@ -34,6 +34,7 @@ import org.arachna.netweaver.dc.types.CompartmentState;
 import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
+import org.arachna.netweaver.dc.types.IDevelopmentComponentFilter;
 import org.arachna.netweaver.hudson.nwdi.DCBuildResultParser.BuildResults;
 import org.arachna.netweaver.hudson.nwdi.changelog.DtrChangeLogParser;
 import org.arachna.netweaver.hudson.util.FilePathHelper;

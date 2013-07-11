@@ -5,6 +5,7 @@ package org.arachna.netweaver.hudson.nwdi;
 
 import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.arachna.netweaver.dc.types.DevelopmentComponentType;
+import org.arachna.netweaver.dc.types.IDevelopmentComponentFilter;
 
 /**
  * Check whether a development component can contain java sources based on its {@link DevelopmentComponentType}.
