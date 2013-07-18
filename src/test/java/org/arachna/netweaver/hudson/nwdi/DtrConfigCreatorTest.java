@@ -19,6 +19,7 @@ import org.custommonkey.xmlunit.XMLUnit;
 import org.custommonkey.xmlunit.XpathEngine;
 import org.custommonkey.xmlunit.exceptions.XpathException;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.Document;
@@ -114,8 +115,8 @@ public final class DtrConfigCreatorTest {
 
         final FilePath serversXml = dotDtr.child(DtrConfigCreator.SERVERS_XML);
         assertFilePathExists(serversXml);
-        assertContent(serversXml, getServerByUrlXPath(BUILD_SERVER_URL));
-        assertContent(serversXml, getServerByUrlXPath(DTR_URL_WITHOUT_FULLY_QUALIFIED_HOSTNAME));
+        assertContent(serversXml, "/servers/server[position() = 1]/@url", DTR_URL_WITHOUT_FULLY_QUALIFIED_HOSTNAME + '/');
+        assertContent(serversXml, "/servers/server[position() = 2]/@url", BUILD_SERVER_URL + '/');
     }
 
     /**
@@ -126,7 +127,7 @@ public final class DtrConfigCreatorTest {
      * @return XPath for matching 'server' elements by URL.
      */
     private String getServerByUrlXPath(final String url) {
-        return String.format("/servers/server[@url = '%s/']", BUILD_SERVER_URL);
+        return String.format("/servers/server[@url = '%s/']", url);
     }
 
     /**
@@ -185,6 +186,25 @@ public final class DtrConfigCreatorTest {
             final XpathEngine engine = XMLUnit.newXpathEngine();
             assertTrue(String.format("xpath '%s' did not match in document '%s'.", xPath, content), engine
                 .getMatchingNodes(xPath, document).getLength() == 1);
+        }
+        catch (final SAXException e) {
+            fail(e.getMessage());
+        }
+        catch (final IOException e) {
+            fail(e.getMessage());
+        }
+        catch (final XpathException e) {
+            fail(String.format("%s: '%s'", e.getMessage(), xPath));
+        }
+    }
+
+    private void assertContent(final FilePath path, final String xPath, final String value) {
+        try {
+            final String content = path.readToString();
+            final Document document = XMLUnit.buildControlDocument(content);
+            final XpathEngine engine = XMLUnit.newXpathEngine();
+            Assert.assertEquals(String.format("xpath '%s' did not match in document '%s'.", xPath, content),
+                engine.evaluate(xPath, document), value);
         }
         catch (final SAXException e) {
             fail(e.getMessage());

@@ -152,7 +152,7 @@ final class DtrConfigCreator {
      *             when the user canceled the operation.
      */
     private void createOrUpdateServersXml() throws IOException, InterruptedException {
-        dtrDirectory.child(SERVERS_XML).write(String.format(getTemplate(SERVERS_XML), config.getBuildServer(), config.getDtrServerUrl()),
+        dtrDirectory.child(SERVERS_XML).write(String.format(getTemplate(SERVERS_XML), config.getDtrServerUrl(), config.getBuildServer()),
             DEFAULT_ENCODING);
     }
 
