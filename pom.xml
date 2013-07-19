@@ -114,6 +114,24 @@ getting those changes and building them using the SAP provided 'dctool'.
       <artifactId>xercesImpl</artifactId>
       <version>2.9.1</version>
     </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.main</groupId>
+      <artifactId>jenkins-core</artifactId>
+      <version>1.509</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>commons-digester</artifactId>
+          <groupId>commons-digester</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>jaxen</groupId>
+      <artifactId>jaxen</artifactId>
+      <version>1.1.1</version>
+      <type>jar</type>
+      <scope>compile</scope>
+    </dependency>
   </dependencies>
   <build>
     <pluginManagement>
@@ -121,9 +139,9 @@ getting those changes and building them using the SAP provided 'dctool'.
         <plugin>
           <groupId>org.jenkins-ci.tools</groupId>
           <artifactId>maven-hpi-plugin</artifactId>
-            <configuration>
-              <pluginFirstClassLoader>true</pluginFirstClassLoader>
-            </configuration>
+          <configuration>
+            <pluginFirstClassLoader>true</pluginFirstClassLoader>
+          </configuration>
         </plugin>
         <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself. -->
         <plugin>
