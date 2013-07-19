@@ -120,17 +120,6 @@ public final class DtrConfigCreatorTest {
     }
 
     /**
-     * Prepare XPath expression for selecting 'server' elements by URL.
-     * 
-     * @param url
-     *            server URL to match against.
-     * @return XPath for matching 'server' elements by URL.
-     */
-    private String getServerByUrlXPath(final String url) {
-        return String.format("/servers/server[@url = '%s/']", url);
-    }
-
-    /**
      * Assert that the various configuration files are created with correct content.
      * 
      * Test method for {@link org.arachna.netweaver.hudson.nwdi.DtrConfigCreator#execute()}.
