@@ -9,6 +9,8 @@ import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.Charset;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.arachna.ant.AntHelper;
 import org.arachna.netweaver.dc.types.DevelopmentComponent;
@@ -130,18 +132,15 @@ public final class DevelopmentComponentUpdater {
         /**
          * Get a reader for the configuration file.
          * 
-         * @param antHelper
-         *            use antHelper to determine the exact location in the file system.
-         * @param component
-         *            determine path for this component.
-         * @return reader for config file.
+         * @param config
+         *            configuration file object.
+         * @return reader for configuration file.
          * @throws FileNotFoundException
          *             when the configuration file could not be found, i.e. in NW CE and new releases there is no
          *             <code>ProjectProperties.wdproperties</code> anymore.
          */
-        private Reader getConfigFile(final AntHelper antHelper, final DevelopmentComponent component) throws FileNotFoundException {
-            return new InputStreamReader(new FileInputStream(new File(antHelper.getBaseLocation(component), configFile)),
-                Charset.forName("UTF-8"));
+        private Reader getConfigFile(final File config) throws FileNotFoundException {
+            return new InputStreamReader(new FileInputStream(config), Charset.forName("UTF-8"));
         }
 
         /**
@@ -153,11 +152,17 @@ public final class DevelopmentComponentUpdater {
          *            component to update.
          */
         private void update(final AntHelper antHelper, final DevelopmentComponent component) {
+            final File config = new File(antHelper.getBaseLocation(component), configFile);
+
             try {
-                new DigesterHelper<DevelopmentComponent>(rulesModuleProducer).update(getConfigFile(antHelper, component), component);
+                new DigesterHelper<DevelopmentComponent>(rulesModuleProducer).update(getConfigFile(config), component);
             }
             catch (final FileNotFoundException e) {
                 // ignore
+            }
+            catch (final IllegalStateException ise) {
+                Logger.getLogger(getClass().getName()).log(Level.WARNING,
+                    String.format("Error updating DC %s using %s!", component.getNormalizedName("~"), config.getAbsolutePath()), ise);
             }
         }
     }

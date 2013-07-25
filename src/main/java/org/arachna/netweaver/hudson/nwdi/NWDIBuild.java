@@ -294,15 +294,12 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
                 result = Result.FAILURE;
             }
 
-            if (Result.SUCCESS.equals(result) && !buildDevelopmentComponents(listener.getLogger()).isExitCodeOk()) {
-                result = Result.FAILURE;
-            }
-
             if (Result.SUCCESS.equals(result)) {
+                result = buildDevelopmentComponents(listener.getLogger()).isExitCodeOk() ? Result.SUCCESS : Result.UNSTABLE;
                 updateSourceCodeLocations(antHelper);
             }
 
-            if (Result.SUCCESS.equals(result) && !build(project.getBuilders(), antHelper)) {
+            if ((Result.SUCCESS.equals(result) || Result.UNSTABLE.equals(result)) && !build(project.getBuilders(), antHelper)) {
                 result = FAILURE;
             }
 
@@ -371,10 +368,8 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
                     // any value other than 0 signifies an error
                     result = new DIToolCommandExecutionResult(result.getOutput(), 1);
 
-                    // for (final DevelopmentComponent dcWithFailedBuild :
-                    // buildResults.getDcsWithBuildErrors()) {
-                    // nwdiBuild.addAction(new
-                    // FailedBuildsAction(dcWithFailedBuild));
+                    // for (final DevelopmentComponent dcWithFailedBuild : buildResults.getDcsWithBuildErrors()) {
+                    // nwdiBuild.addAction(new FailedBuildsAction(dcWithFailedBuild));
                     // }
                 }
             }

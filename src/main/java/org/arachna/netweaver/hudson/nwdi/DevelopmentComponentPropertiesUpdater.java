@@ -8,6 +8,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.arachna.ant.AntHelper;
 import org.arachna.netweaver.dc.types.Compartment;
@@ -69,12 +71,41 @@ final class DevelopmentComponentPropertiesUpdater implements DevelopmentConfigur
 
         try {
             final File buildXml = new File(antHelper.getBaseLocation(component), "gen/default/logs/build.xml");
-            // source folders have been read from .dcdef and are relative to DC base location. Replace with absolute paths from build.xml.
-            component.setSourceFolders(null);
-            digesterHelper.update(new InputStreamReader(new FileInputStream(buildXml), Charset.forName("UTF-8")), component);
+
+            if (buildXml.exists()) {
+                // source folders have been read from .dcdef and are relative to DC base location. Replace with absolute paths from
+                // build.xml.
+                component.setSourceFolders(null);
+                digesterHelper.update(new InputStreamReader(new FileInputStream(buildXml), Charset.forName("UTF-8")), component);
+            }
+            else {
+                final String base = antHelper.getBaseLocation(component);
+
+                component.setSourceFolders(makeFoldersAbsolute(base, component.getSourceFolders()));
+                component.setTestSourceFolders(makeFoldersAbsolute(base, component.getTestSourceFolders()));
+            }
         }
         catch (final FileNotFoundException e) {
             // ignore: component was not built yet.
         }
+    }
+
+    /**
+     * Prepend component base path to set of folders.
+     * 
+     * @param base
+     *            component base path.
+     * @param folders
+     *            set of folders relative to base path.
+     * @return set of absolute paths create from the given set of paths.
+     */
+    private Set<String> makeFoldersAbsolute(final String base, final Set<String> folders) {
+        final Set<String> sourceFolders = new HashSet<String>();
+
+        for (final String folder : folders) {
+            sourceFolders.add(new File(base, folder).getAbsolutePath());
+        }
+
+        return sourceFolders;
     }
 }

@@ -5,6 +5,8 @@ package org.arachna.xml;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.commons.digester3.Digester;
 import org.apache.commons.digester3.binder.DigesterLoader;
@@ -77,6 +79,7 @@ public final class DigesterHelper<T> {
             return digester.<T>parse(reader);
         }
         catch (final SAXException e) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, e.getMessage(), e);
             throw new IllegalStateException(e);
         }
         catch (final IOException e) {
