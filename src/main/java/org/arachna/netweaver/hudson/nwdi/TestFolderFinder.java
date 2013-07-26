@@ -16,6 +16,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -40,7 +41,8 @@ class TestFolderFinder {
      *            encoding to use for reading of source files.
      * @param sourceFolder
      *            source folder from <code>build.xml</code>.
-     * @return <code>true</code> when there are sources in the given folder containing unit tests, <code>false</code> else.
+     * @return <code>true</code> when there are sources in the given folder
+     *         containing unit tests, <code>false</code> else.
      */
     boolean isTestFolder(final String encoding, final String sourceFolder) {
         for (final InputStream source : getJavaSources(encoding, sourceFolder)) {
@@ -83,7 +85,8 @@ class TestFolderFinder {
      *            the compilation unit to test for JUnit tests.
      * @param packageDescriptor
      *            descriptor of package of compilation unit.
-     * @return <code>true</code> when a JUnit 3 or 4 test class could be identified, <code>false</code> otherwise.
+     * @return <code>true</code> when a JUnit 3 or 4 test class could be
+     *         identified, <code>false</code> otherwise.
      */
     protected boolean compilationUnitContainsJUnitTest(final CompilationUnit compilationUnit, final PackageDeclaration packageDescriptor) {
         final TestAnnotationResolver testPropertyResolver =
@@ -94,9 +97,17 @@ class TestFolderFinder {
 
         // inspect method declarations for @Test annotation (JUnit4).
         if (!testPropertyResolver.junitTestFound()) {
-            for (final TypeDeclaration type : compilationUnit.getTypes()) {
-                for (final BodyDeclaration body : type.getMembers()) {
-                    body.accept(testPropertyResolver, null);
+            final List<TypeDeclaration> typeDeclarations = compilationUnit.getTypes();
+
+            if (typeDeclarations != null) {
+                for (final TypeDeclaration type : typeDeclarations) {
+                    final List<BodyDeclaration> members = type.getMembers();
+
+                    if (members != null) {
+                        for (final BodyDeclaration body : members) {
+                            body.accept(testPropertyResolver, null);
+                        }
+                    }
                 }
             }
         }

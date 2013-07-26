@@ -55,16 +55,16 @@ public final class BuildXmlRulesModuleProducer implements RulesModuleProducer {
         return new AbstractRulesModule() {
             @Override
             protected void configure() {
-                forPattern("project/target/javac/src").addRule(new SourceFolderRule(testFolderFinder));
                 forPattern("project/target/javac").addRule(new Rule() {
                     @Override
-                    public void begin(final String namespace, final String name, final Attributes attributes)
-                        throws Exception {
+                    public void begin(final String namespace, final String name, final Attributes attributes) throws Exception {
                         final DevelopmentComponent component = getDigester().peek();
                         component.setSourceEncoding(attributes.getValue("encoding"));
                         component.setOutputFolder(attributes.getValue("destdir"));
                     }
                 });
+
+                forPattern("project/target/javac/src").addRule(new SourceFolderRule(testFolderFinder));
             }
         };
     }
