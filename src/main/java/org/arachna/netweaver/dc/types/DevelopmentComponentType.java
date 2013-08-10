@@ -27,7 +27,7 @@ public enum DevelopmentComponentType {
     /**
      * DC of type 'dictionary'.
      */
-    Dictionary("Dictionary", true),
+    Dictionary("Dictionary", false),
 
     /**
      * DC of type 'portal standalone application'.
