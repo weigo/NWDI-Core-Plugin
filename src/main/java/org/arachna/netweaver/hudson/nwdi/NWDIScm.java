@@ -285,12 +285,15 @@ public class NWDIScm extends SCM {
         final NWDIRevisionState state) {
         final List<Activity> activities = new LinkedList<Activity>();
         final long start = System.currentTimeMillis();
+        final boolean dryRun = Boolean.getBoolean("nwdibuild.dry.run");
 
-        if (dcFactory == null) {
-            activities.addAll(browser.getActivities(state.getCreationDate()));
-        }
-        else {
-            activities.addAll(browser.getActivitiesWithResourcesAndDevelopmentComponents(dcFactory, state.getCreationDate()));
+        if (!dryRun) {
+            if (dcFactory == null) {
+                activities.addAll(browser.getActivities(state.getCreationDate()));
+            }
+            else {
+                activities.addAll(browser.getActivitiesWithResourcesAndDevelopmentComponents(dcFactory, state.getCreationDate()));
+            }
         }
 
         if (NWDIRevisionState.START_STATE.equals(state)) {

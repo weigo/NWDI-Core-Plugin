@@ -10,6 +10,8 @@ import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.arachna.ant.AntHelper;
 import org.arachna.netweaver.dc.types.Compartment;
@@ -73,10 +75,18 @@ final class DevelopmentComponentPropertiesUpdater implements DevelopmentConfigur
             final File buildXml = new File(antHelper.getBaseLocation(component), "gen/default/logs/build.xml");
 
             if (buildXml.exists()) {
-                // source folders have been read from .dcdef and are relative to DC base location. Replace with absolute paths from
+                // source folders have been read from .dcdef and are relative to
+                // DC base location. Replace with absolute paths from
                 // build.xml.
                 component.setSourceFolders(null);
-                digesterHelper.update(new InputStreamReader(new FileInputStream(buildXml), Charset.forName("UTF-8")), component);
+
+                try {
+                    digesterHelper.update(new InputStreamReader(new FileInputStream(buildXml), Charset.forName("UTF-8")), component);
+                }
+                catch (final IllegalStateException ise) {
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE,
+                        String.format("IllegalStateException occured while updating '%s'", component), ise);
+                }
             }
             else {
                 final String base = antHelper.getBaseLocation(component);

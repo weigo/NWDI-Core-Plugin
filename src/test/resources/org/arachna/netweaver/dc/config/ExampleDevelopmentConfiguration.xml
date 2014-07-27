@@ -1,0 +1,598 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<development-configuration caption="Example_dev" description="Description_dev"
+  name="DI0_XMPL_D" version="3030">
+  <build-variant name="default" />
+  <compartment archive-state="yes" caption="SAP build components" name="sap.com_SAP_BUILDT_1" sc-name="SAP_BUILDT" vendor="sap.com">
+    <used-compartments />
+    <development-components>
+      <development-component name="tc/bi/anttasks" type="Build Infrastructure" vendor="sap.com">
+        <description>Ant tasks...</description>
+        <caption>Ant extension libraries</caption>
+        <dependencies />
+        <public-parts>
+          <public-part caption="Build Plugin" name="def" type="infrastructure">
+            <description></description>
+          </public-part>
+        </public-parts>
+        <sources />
+        <classes></classes>
+      </development-component>
+      <development-component name="tc/bi/ant" type="Build Infrastructure" vendor="sap.com">
+        <description>Apache Ant libraries</description>
+        <caption>Apache Ant libraries</caption>
+        <dependencies>
+          <dependency name="tc/bi/anttasks" pp-ref="def" vendor="sap.com" />
+          <dependency name="tc/bi/extddicdb" pp-ref="def" vendor="sap.com" />
+          <dependency name="tc/bi/extsql" pp-ref="def" vendor="sap.com" />
+          <dependency name="tc/bi/xml" pp-ref="def" vendor="sap.com" />
+        </dependencies>
+        <public-parts>
+          <public-part caption="Build Plugin" name="ant" type="infrastructure">
+            <description>Ant...</description>
+          </public-part>
+          <public-part caption="" name="api" type="compilation">
+            <description></description>
+          </public-part>
+        </public-parts>
+        <sources />
+        <classes></classes>
+      </development-component>
+    </development-components>
+  </compartment>
+  <compartment archive-state="no" caption="" name="enviam.de_VHPFC_1" sc-name="VHPFC" vendor="enviam.de">
+    <used-compartments>
+      <used-compartment archive-state="yes" caption="Apache POI project libraries" name="apache.org_APACHE_POI_1" sc-name="APACHE_POI" vendor="apache.org" />
+    </used-compartments>
+    <development-components>
+      <development-component name="sc/vhpfc" type="Software Component Description" vendor="enviam.de">
+        <description>SC f&amp;#252;r Stundenterminpreiskurven
+
+          Besteht aus UI Komponente (JSF/Primefaces) und Model Komponente.
+        </description>
+        <caption>Software Description for vhpfc</caption>
+        <dependencies />
+        <public-parts>
+          <public-part caption="" name="default" type="compilation">
+            <description></description>
+          </public-part>
+        </public-parts>
+        <sources />
+        <classes></classes>
+      </development-component>
+      <development-component name="vhpfc/web/module/impl" type="J2EE:WebModule" vendor="enviam.de">
+        <description></description>
+        <caption>JSF Web Oberfl&amp;#228;che f&amp;#252;r vHPFC</caption>
+        <dependencies>
+          <dependency name="jee/commons" pp-ref="api" vendor="apache.org">
+            <at-build-time />
+          </dependency>
+          <dependency name="jee/log4j" pp-ref="api" vendor="apache.org">
+            <at-build-time />
+          </dependency>
+          <dependency name="poi" pp-ref="API" vendor="apache.org">
+            <at-build-time />
+          </dependency>
+          <dependency name="velocity" pp-ref="api" vendor="apache.org">
+            <at-build-time />
+          </dependency>
+          <dependency name="dom4j" pp-ref="api" vendor="dom4j.sf.net">
+            <at-build-time />
+          </dependency>
+          <dependency name="egk/user/admin/service" pp-ref="API" vendor="enviam.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="vhpfc/km/service" pp-ref="API" vendor="enviam.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="vhpfc/permissions" pp-ref="api" vendor="enviam.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="vhpfc/persistence/service" pp-ref="api" vendor="enviam.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="vhpfc/profilverwaltung/service/ear" pp-ref="api" vendor="enviam.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="lib/base/ejb/service/ejb" pp-ref="client" vendor="gisa.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="lib/base/ejb/service/ejb" pp-ref="ejbjar" vendor="gisa.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="lib/base/ui/service/ejb" pp-ref="client" vendor="gisa.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="lib/base/ui/service/ejb" pp-ref="ejbjar" vendor="gisa.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="lib/jee/es/business/partner/data/mng" pp-ref="defLib" vendor="gisa.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="lib/jee/service/mail" pp-ref="API" vendor="gisa.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="lib/junit" pp-ref="api" vendor="gisa.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="lib/portal/services" pp-ref="api" vendor="gisa.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="lib/sapjco/runtime" pp-ref="api" vendor="gisa.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="lib/security.api.with.impl.classes" pp-ref="api" vendor="gisa.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="lib/security/api/test/helper" pp-ref="API" vendor="gisa.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="lib/service/jco" pp-ref="API" vendor="gisa.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="lib/services" pp-ref="API" vendor="gisa.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="lib/ume/helper" pp-ref="api" vendor="gisa.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="lib/jee/validation" pp-ref="api" vendor="hibernate.org">
+            <at-build-time />
+          </dependency>
+          <dependency name="xhtmlrenderer" pp-ref="api" vendor="java.net">
+            <at-build-time />
+          </dependency>
+          <dependency name="lib/jee/el" pp-ref="api" vendor="jboss.org">
+            <at-build-time />
+          </dependency>
+          <dependency name="primefaces40" pp-ref="api" vendor="primefaces.org">
+            <at-build-time />
+          </dependency>
+          <dependency name="engine.jee5.facade" pp-ref="api" vendor="sap.com">
+            <at-build-time />
+          </dependency>
+          <dependency name="fwk/com/sap/base/technology/facade" pp-ref="api" vendor="sap.com">
+            <at-build-time />
+          </dependency>
+          <dependency name="tc/bl/logging/api" pp-ref="api" vendor="sap.com">
+            <at-build-time />
+          </dependency>
+          <dependency name="tc/epbc/ume/ep5/deprecated" pp-ref="api" vendor="sap.com">
+            <at-build-time />
+          </dependency>
+          <dependency name="tc/je/usermanagement/api" pp-ref="api" vendor="sap.com">
+            <at-build-time />
+          </dependency>
+          <dependency name="lib/jsf/ear" pp-ref="api" vendor="sun.com">
+            <at-build-time />
+          </dependency>
+          <dependency name="mail" pp-ref="api" vendor="sun.com">
+            <at-build-time />
+          </dependency>
+        </dependencies>
+        <public-parts>
+          <public-part caption="" name="war" type="assembly">
+            <description></description>
+          </public-part>
+        </public-parts>
+        <sources>
+          <package-folder>.apt_generated</package-folder>
+          <package-folder>source</package-folder>
+          <package-folder>src/test/java</package-folder>
+        </sources>
+        <classes></classes>
+      </development-component>
+      <development-component name="vhpfc/web/module" type="J2EE:Enterprise Application" vendor="enviam.de">
+        <description></description>
+        <caption>Enterprise Applikation f&amp;#252;r JSF Komponente vHPFC</caption>
+        <dependencies>
+          <dependency name="jee/commons" pp-ref="" vendor="apache.org" />
+          <dependency name="jee/log4j" pp-ref="" vendor="apache.org" />
+          <dependency name="jee/log4j" pp-ref="api" vendor="apache.org">
+            <at-build-time />
+          </dependency>
+          <dependency name="poi" pp-ref="" vendor="apache.org" />
+          <dependency name="poi" pp-ref="API" vendor="apache.org">
+            <at-build-time />
+          </dependency>
+          <dependency name="velocity" pp-ref="" vendor="apache.org" />
+          <dependency name="velocity" pp-ref="api" vendor="apache.org">
+            <at-build-time />
+          </dependency>
+          <dependency name="dom4j" pp-ref="" vendor="dom4j.sf.net" />
+          <dependency name="dom4j" pp-ref="api" vendor="dom4j.sf.net">
+            <at-build-time />
+          </dependency>
+          <dependency name="egk/user/admin/service" pp-ref="" vendor="enviam.de" />
+          <dependency name="egk/user/admin/service" pp-ref="API" vendor="enviam.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="vhpfc/km/service" pp-ref="" vendor="enviam.de" />
+          <dependency name="vhpfc/km/service" pp-ref="API" vendor="enviam.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="vhpfc/permissions" pp-ref="" vendor="enviam.de" />
+          <dependency name="vhpfc/permissions" pp-ref="api" vendor="enviam.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="vhpfc/persistence/service" pp-ref="" vendor="enviam.de" />
+          <dependency name="vhpfc/persistence/service" pp-ref="api" vendor="enviam.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="vhpfc/profilverwaltung/service/ear" pp-ref="" vendor="enviam.de" />
+          <dependency name="vhpfc/profilverwaltung/service/ear" pp-ref="api" vendor="enviam.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="vhpfc/web/module/impl" pp-ref="war" vendor="enviam.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="lib/jee/es/business/partner/data/mng" pp-ref="" vendor="gisa.de" />
+          <dependency name="lib/jee/es/business/partner/data/mng" pp-ref="defLib" vendor="gisa.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="lib/jee/service/mail" pp-ref="" vendor="gisa.de" />
+          <dependency name="lib/jee/service/mail" pp-ref="API" vendor="gisa.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="lib/portal/services" pp-ref="" vendor="gisa.de" />
+          <dependency name="lib/portal/services" pp-ref="api" vendor="gisa.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="lib/services" pp-ref="" vendor="gisa.de" />
+          <dependency name="lib/services" pp-ref="API" vendor="gisa.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="lib/ume/helper" pp-ref="" vendor="gisa.de" />
+          <dependency name="lib/ume/helper" pp-ref="api" vendor="gisa.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="lib/jee/validation" pp-ref="" vendor="hibernate.org" />
+          <dependency name="xhtmlrenderer" pp-ref="" vendor="java.net" />
+          <dependency name="xhtmlrenderer" pp-ref="api" vendor="java.net">
+            <at-build-time />
+          </dependency>
+          <dependency name="lib/jee/el" pp-ref="" vendor="jboss.org" />
+          <dependency name="primefaces40" pp-ref="" vendor="primefaces.org" />
+          <dependency name="primefaces40" pp-ref="api" vendor="primefaces.org">
+            <at-build-time />
+          </dependency>
+          <dependency name="tc/bl/logging/api" pp-ref="" vendor="sap.com" />
+          <dependency name="tc/bl/logging/api" pp-ref="api" vendor="sap.com">
+            <at-build-time />
+          </dependency>
+          <dependency name="tc/je/usermanagement/api" pp-ref="api" vendor="sap.com">
+            <at-build-time />
+          </dependency>
+        </dependencies>
+        <public-parts />
+        <sources />
+        <classes></classes>
+      </development-component>
+      <development-component name="vhpfc/profilverwaltung/service" type="J2EE:EJBModule" vendor="enviam.de">
+        <description></description>
+        <caption>Servicekomponente f&amp;#252;r die Profilverwaltung</caption>
+        <dependencies>
+          <dependency name="jee/commons" pp-ref="api" vendor="apache.org">
+            <at-build-time />
+          </dependency>
+          <dependency name="vhpfc/permissions" pp-ref="api" vendor="enviam.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="vhpfc/persistence/service" pp-ref="api" vendor="enviam.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="lib/base/ejb/service/ejb" pp-ref="client" vendor="gisa.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="lib/base/ejb/service/ejb" pp-ref="ejbjar" vendor="gisa.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="lib/jee/es/business/partner/data/mng" pp-ref="defLib" vendor="gisa.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="lib/junit" pp-ref="api" vendor="gisa.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="lib/portal/services" pp-ref="api" vendor="gisa.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="lib/service/jco" pp-ref="API" vendor="gisa.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="lib/services" pp-ref="API" vendor="gisa.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="engine.jee5.facade" pp-ref="api" vendor="sap.com">
+            <at-build-time />
+          </dependency>
+          <dependency name="engine.jee5.facade" pp-ref="apiwithoutjsf" vendor="sap.com">
+            <at-build-time />
+          </dependency>
+          <dependency name="tc/bl/jco/api" pp-ref="api" vendor="sap.com">
+            <at-build-time />
+          </dependency>
+          <dependency name="tc/bl/logging/api" pp-ref="api" vendor="sap.com">
+            <at-build-time />
+          </dependency>
+        </dependencies>
+        <public-parts>
+          <public-part caption="" name="client" type="compilation">
+            <description></description>
+          </public-part>
+          <public-part caption="" name="ejbjar" type="assembly">
+            <description></description>
+          </public-part>
+        </public-parts>
+        <sources>
+          <package-folder>.apt_generated</package-folder>
+          <package-folder>ejbModule</package-folder>
+          <package-folder>src/test/java</package-folder>
+        </sources>
+        <classes></classes>
+      </development-component>
+      <development-component name="vhpfc/profilverwaltung/service/ear" type="J2EE:Enterprise Application" vendor="enviam.de">
+        <description></description>
+        <caption>Enterprise Applikation f&amp;#252;r die Profilverwaltung</caption>
+        <dependencies>
+          <dependency name="jee/commons" pp-ref="" vendor="apache.org" />
+          <dependency name="jee/commons" pp-ref="api" vendor="apache.org">
+            <at-build-time />
+          </dependency>
+          <dependency name="vhpfc/permissions" pp-ref="" vendor="enviam.de" />
+          <dependency name="vhpfc/permissions" pp-ref="api" vendor="enviam.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="vhpfc/persistence/service" pp-ref="" vendor="enviam.de" />
+          <dependency name="vhpfc/persistence/service" pp-ref="api" vendor="enviam.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="vhpfc/profilverwaltung/service" pp-ref="client" vendor="enviam.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="vhpfc/profilverwaltung/service" pp-ref="ejbjar" vendor="enviam.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="lib/jee/es/business/partner/data/mng" pp-ref="" vendor="gisa.de" />
+          <dependency name="lib/jee/es/business/partner/data/mng" pp-ref="defLib" vendor="gisa.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="lib/portal/services" pp-ref="" vendor="gisa.de" />
+          <dependency name="lib/portal/services" pp-ref="api" vendor="gisa.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="lib/service/jco" pp-ref="" vendor="gisa.de" />
+          <dependency name="lib/service/jco" pp-ref="API" vendor="gisa.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="lib/services" pp-ref="" vendor="gisa.de" />
+          <dependency name="lib/services" pp-ref="API" vendor="gisa.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="tc/bl/jco/api" pp-ref="" vendor="sap.com" />
+          <dependency name="tc/bl/jco/api" pp-ref="api" vendor="sap.com">
+            <at-build-time />
+          </dependency>
+        </dependencies>
+        <public-parts>
+          <public-part caption="Web Service Klassen" name="api" type="compilation">
+            <description></description>
+          </public-part>
+        </public-parts>
+        <sources />
+        <classes></classes>
+      </development-component>
+      <development-component name="vhpfc/persistence/service/impl" type="J2EE:EJBModule" vendor="enviam.de">
+        <description></description>
+        <caption>Persistenzservice f&amp;#252;r VHPFC</caption>
+        <dependencies>
+          <dependency name="jee/commons" pp-ref="api" vendor="apache.org">
+            <at-build-time />
+          </dependency>
+          <dependency name="jee/log4j" pp-ref="api" vendor="apache.org">
+            <at-build-time />
+          </dependency>
+          <dependency name="lib/base/configurationhelper" pp-ref="api" vendor="gisa.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="lib/base/configurationhelper" pp-ref="assembly" vendor="gisa.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="lib/base/ejb/service/ejb" pp-ref="client" vendor="gisa.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="lib/h2/jdbc" pp-ref="api" vendor="gisa.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="lib/jee/spring" pp-ref="api" vendor="gisa.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="lib/junit" pp-ref="api" vendor="gisa.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="lib/portal/services" pp-ref="api" vendor="gisa.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="lib/services" pp-ref="API" vendor="gisa.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="engine.jee5.facade" pp-ref="api" vendor="sap.com">
+            <at-build-time />
+          </dependency>
+          <dependency name="tc/bl/logging/api" pp-ref="api" vendor="sap.com">
+            <at-build-time />
+          </dependency>
+        </dependencies>
+        <public-parts>
+          <public-part caption="" name="client" type="compilation">
+            <description></description>
+          </public-part>
+          <public-part caption="" name="ejbjar" type="assembly">
+            <description></description>
+          </public-part>
+        </public-parts>
+        <sources>
+          <package-folder>.apt_generated</package-folder>
+          <package-folder>ejbModule</package-folder>
+          <package-folder>src/test/java</package-folder>
+        </sources>
+        <classes></classes>
+      </development-component>
+      <development-component name="vhpfc/persistence/service" type="J2EE:Enterprise Application" vendor="enviam.de">
+        <description></description>
+        <caption>Laufzeitkomponente f&amp;#252;r Persistenzservice VHPFC</caption>
+        <dependencies>
+          <dependency name="jee/log4j" pp-ref="" vendor="apache.org" />
+          <dependency name="jee/log4j" pp-ref="api" vendor="apache.org">
+            <at-build-time />
+          </dependency>
+          <dependency name="vhpfc/persistence/service/impl" pp-ref="client" vendor="enviam.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="vhpfc/persistence/service/impl" pp-ref="ejbjar" vendor="enviam.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="lib/base/configurationhelper" pp-ref="api" vendor="gisa.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="lib/base/configurationhelper" pp-ref="assembly" vendor="gisa.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="lib/base/ejb/service/ejb" pp-ref="client" vendor="gisa.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="lib/base/ejb/service/ejb" pp-ref="ejbjar" vendor="gisa.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="lib/portal/services" pp-ref="" vendor="gisa.de" />
+          <dependency name="lib/portal/services" pp-ref="api" vendor="gisa.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="lib/services" pp-ref="" vendor="gisa.de" />
+          <dependency name="lib/services" pp-ref="API" vendor="gisa.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="tc/bl/logging/api" pp-ref="api" vendor="sap.com">
+            <at-build-time />
+          </dependency>
+        </dependencies>
+        <public-parts>
+          <public-part caption="" name="api" type="compilation">
+            <description></description>
+          </public-part>
+        </public-parts>
+        <sources />
+        <classes></classes>
+      </development-component>
+      <development-component name="vhpfc/permissions/def" type="unknown" vendor="enviam.de">
+        <description></description>
+        <caption>Definition der Permissions f&amp;#252;r vHPFC</caption>
+        <dependencies />
+        <public-parts />
+        <sources />
+        <classes></classes>
+      </development-component>
+      <development-component name="vhpfc/permissions/util" type="Java" vendor="enviam.de">
+        <description></description>
+        <caption>Util Komponente f&amp;#252;r Permissions</caption>
+        <dependencies>
+          <dependency name="tc/je/usermanagement/api" pp-ref="api" vendor="sap.com">
+            <at-build-time />
+          </dependency>
+        </dependencies>
+        <public-parts>
+          <public-part caption="" name="api" type="compilation">
+            <description></description>
+          </public-part>
+          <public-part caption="" name="assembly" type="assembly">
+            <description></description>
+          </public-part>
+        </public-parts>
+        <sources>
+          <package-folder>src</package-folder>
+        </sources>
+        <classes></classes>
+      </development-component>
+      <development-component name="vhpfc/permissions" type="J2EE:Enterprise Application" vendor="enviam.de">
+        <description></description>
+        <caption>EAR Komponente f&amp;#252;r vHPFC Permissions</caption>
+        <dependencies>
+          <dependency name="vhpfc/permissions/util" pp-ref="api" vendor="enviam.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="vhpfc/permissions/util" pp-ref="assembly" vendor="enviam.de">
+            <at-build-time />
+          </dependency>
+        </dependencies>
+        <public-parts>
+          <public-part caption="" name="api" type="compilation">
+            <description></description>
+          </public-part>
+        </public-parts>
+        <sources />
+        <classes></classes>
+      </development-component>
+      <development-component name="vhpfc/km/service/ejb" type="J2EE:EJBModule" vendor="enviam.de">
+        <description></description>
+        <caption>Kapselung des KM Helper als EJB.</caption>
+        <dependencies>
+          <dependency name="lib/jee/kmhelper" pp-ref="API" vendor="gisa.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="engine.jee5.facade" pp-ref="api" vendor="sap.com">
+            <at-build-time />
+          </dependency>
+          <dependency name="engine.jee5.facade" pp-ref="apiwithoutjsf" vendor="sap.com">
+            <at-build-time />
+          </dependency>
+          <dependency name="tc/bl/logging/api" pp-ref="api" vendor="sap.com">
+            <at-build-time />
+          </dependency>
+          <dependency name="tc/epbc/ume/ep5/deprecated" pp-ref="api" vendor="sap.com">
+            <at-build-time />
+          </dependency>
+          <dependency name="tc/je/usermanagement/api" pp-ref="api" vendor="sap.com">
+            <at-build-time />
+          </dependency>
+          <dependency name="tc/km/frwk" pp-ref="api" vendor="sap.com">
+            <at-build-time />
+          </dependency>
+        </dependencies>
+        <public-parts>
+          <public-part caption="" name="client" type="compilation">
+            <description></description>
+          </public-part>
+          <public-part caption="" name="ejbjar" type="assembly">
+            <description></description>
+          </public-part>
+        </public-parts>
+        <sources>
+          <package-folder>.apt_generated</package-folder>
+          <package-folder>ejbModule</package-folder>
+        </sources>
+        <classes></classes>
+      </development-component>
+      <development-component name="vhpfc/km/service" type="J2EE:Enterprise Application" vendor="enviam.de">
+        <description></description>
+        <caption>Laufzeitkomponente f&amp;#252;r KM-Service.</caption>
+        <dependencies>
+          <dependency name="vhpfc/km/service/ejb" pp-ref="client" vendor="enviam.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="vhpfc/km/service/ejb" pp-ref="ejbjar" vendor="enviam.de">
+            <at-build-time />
+          </dependency>
+          <dependency name="lib/jee/kmhelper" pp-ref="" vendor="gisa.de" />
+          <dependency name="tc/bl/logging/api" pp-ref="" vendor="sap.com" />
+          <dependency name="tc/je/usermanagement/api" pp-ref="" vendor="sap.com" />
+          <dependency name="tc/km/frwk" pp-ref="" vendor="sap.com" />
+        </dependencies>
+        <public-parts>
+          <public-part caption="Laufzeitkomponente f&amp;#252;r KM-Zugriff f&amp;#252;r VHPFC." name="API" type="compilation">
+            <description></description>
+          </public-part>
+        </public-parts>
+        <sources />
+        <classes></classes>
+      </development-component>
+    </development-components>
+  </compartment>
+</development-configuration>

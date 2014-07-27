@@ -6,6 +6,8 @@ package org.arachna.netweaver.tools;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 
+import java.io.File;
+
 import org.arachna.netweaver.dc.types.JdkHomeAlias;
 import org.arachna.netweaver.dc.types.JdkHomePaths;
 import org.junit.After;
@@ -46,13 +48,12 @@ public class DIToolDescriptorTest {
     }
 
     /**
-     * Should return the java.home property without '/jre', when no home
-     * registered for the given alias.
+     * Should return the java.home property without '/jre', when no home registered for the given alias.
      */
     @Test
     public final void assertGetJavaHomeReturnsJvmHomeWhenNoJdkHomePathIsRegisteredForAGivenAlias() {
-        assertThat(descriptor.getJavaHome(JdkHomeAlias.Jdk131Home),
-            equalTo(System.getProperty("java.home").replace("/jre", "")));
+        final File javaHome = new File(System.getProperty("java.home"));
+        assertThat(descriptor.getJavaHome(JdkHomeAlias.Jdk131Home), equalTo(javaHome.getParent()));
     }
 
     /**

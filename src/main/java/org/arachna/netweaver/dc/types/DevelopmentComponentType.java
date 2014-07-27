@@ -20,6 +20,11 @@ public enum DevelopmentComponentType {
     BuildInfrastructure("Build Infrastructure", true),
 
     /**
+     * DC of type 'Build Infrastructure Extension'.
+     */
+    BuildInfraStructureExtensions("Build Infrastructure Extension", true),
+
+    /**
      * DC of type 'build plugin'.
      */
     BuildPlugin("Build Plugin", true),

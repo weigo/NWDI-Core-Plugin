@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -27,8 +28,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import javax.xml.stream.XMLStreamException;
+
 import org.arachna.ant.AntHelper;
 import org.arachna.ant.ExcludesFactory;
+import org.arachna.netweaver.dc.config.DevelopmentConfigurationXmlWriter;
 import org.arachna.netweaver.dc.types.Compartment;
 import org.arachna.netweaver.dc.types.CompartmentState;
 import org.arachna.netweaver.dc.types.DevelopmentComponent;
@@ -349,6 +353,19 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
             InterruptedException {
             final NWDIBuild nwdiBuild = NWDIBuild.this;
             final Collection<DevelopmentComponent> affectedComponents = nwdiBuild.getAffectedDevelopmentComponents();
+
+            final DevelopmentConfigurationXmlWriter xmlWriter =
+                new DevelopmentConfigurationXmlWriter(nwdiBuild.getDevelopmentConfiguration());
+            final StringWriter xml = new StringWriter();
+            try {
+                xmlWriter.write(xml);
+            }
+            catch (final XMLStreamException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            final FilePath xmlFP = new FilePath(nwdiBuild.getWorkspace(), "DevelopmentConfiguration.xml");
+            xmlFP.write(xml.toString(), "UTF-8");
 
             DIToolCommandExecutionResult result = new DIToolCommandExecutionResult("", 0);
             final boolean dryRun = Boolean.getBoolean("nwdibuild.dry.run");

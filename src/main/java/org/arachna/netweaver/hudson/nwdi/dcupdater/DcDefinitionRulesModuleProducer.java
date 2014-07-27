@@ -34,8 +34,10 @@ class DcDefinitionRulesModuleProducer implements RulesModuleProducer {
                 forPattern("development-component/component-type/sub-type").callParam().ofIndex(1);
                 addDependencyRule("development-component/build-plugin", "setBuildPlugin");
                 addDependencyRule("development-component/dependencies/dependency", "add");
-                forPattern("development-component/folders/package-folder").callMethod("addSourceFolder")
-                    .withParamCount(1).withParamTypes(String.class).then().callParam();
+                forPattern("development-component/folders/package-folder").callMethod("addSourceFolder").withParamCount(1)
+                    .withParamTypes(String.class).then().callParam();
+                forPattern("development-component/folders/source-folder").callMethod("addResourceFolder").withParamCount(1)
+                    .withParamTypes(String.class).then().callParam();
             }
 
             /**
@@ -50,13 +52,12 @@ class DcDefinitionRulesModuleProducer implements RulesModuleProducer {
              *            plugin.
              */
             private void addDependencyRule(final String prefix, final String methodName) {
-                forPattern(prefix).createObject().ofType(PublicPartReference.class)
-                    .usingConstructor(String.class, String.class).then().setNext(methodName);
+                forPattern(prefix).createObject().ofType(PublicPartReference.class).usingConstructor(String.class, String.class).then()
+                    .setNext(methodName);
 
                 forPattern(prefix + "/dc-ref/vendor").callParam().ofIndex(0);
                 forPattern(prefix + "/dc-ref/name").callParam().ofIndex(1);
-                forPattern(prefix + "/pp-ref").callMethod("setName").withParamCount(1).withParamTypes(String.class)
-                    .then().callParam();
+                forPattern(prefix + "/pp-ref").callMethod("setName").withParamCount(1).withParamTypes(String.class).then().callParam();
                 forPattern(prefix + "/at-build-time").callMethod("setAtBuildTime");
                 forPattern(prefix + "/at-run-time").callMethod("setAtRunTime");
             }
