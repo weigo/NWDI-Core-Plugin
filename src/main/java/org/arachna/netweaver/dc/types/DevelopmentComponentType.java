@@ -112,7 +112,12 @@ public enum DevelopmentComponentType {
     /**
      * DC of type 'web services', subtype 'deployable proxy'.
      */
-    WebServicesDeployableProxy("Web Services", "Deployable Proxy", true);
+    WebServicesDeployableProxy("Web Services", "Deployable Proxy", true),
+
+    /**
+     * UME permissions.
+     */
+    UMEPermissions("Content", "UME Permissions", false);
 
     /**
      * Allowed types of development component.
