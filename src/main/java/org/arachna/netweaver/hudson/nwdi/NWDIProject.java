@@ -62,7 +62,7 @@ import org.kohsuke.stapler.StaplerResponse;
 
 /**
  * A project for building tracks residing in a NWDI.
- * 
+ *
  * @author Dirk Weigenand
  */
 public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> implements SCMedItem, BuildableItemWithBuildWrappers, TopLevelItem {
@@ -105,7 +105,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
 
     /**
      * Create an instance of a NWDI project.
-     * 
+     *
      * @param parent
      *            the parent <code>ItemGroup</code> in the project configuration page.
      * @param name
@@ -117,7 +117,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
 
     /**
      * Create an instance of a NWDI project using the given project name and configuration.
-     * 
+     *
      * @param name
      *            project name.
      * @param buildSpaceName
@@ -197,7 +197,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
 
     /**
      * Update the development configuration from the CBS.
-     * 
+     *
      * @param logger
      *            logger for logging the update message.
      * @param dtcFolder
@@ -227,7 +227,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
 
     /**
      * Returns the SCM to be used by this NWDI project.
-     * 
+     *
      * @return SCM to be used by this NWDI project.
      */
     @Override
@@ -314,7 +314,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
 
     /**
      * Descriptor for NWDIProjects. Contains the global configuration commonly used for different NWDI tracks.
-     * 
+     *
      * @author Dirk Weigenand
      */
     @Extension
@@ -393,7 +393,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
 
         /**
          * Returns the user for authentication against the NWDI.
-         * 
+         *
          * @return the user for authentication against the NWDI
          */
         public String getUser() {
@@ -402,7 +402,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
 
         /**
          * Sets the user for authentication against the NWDI.
-         * 
+         *
          * @param user
          *            the user for authentication against the NWDI.
          */
@@ -427,7 +427,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
 
         /**
          * Get the folder of the DI tools for NetWeaver 7.0 and before.
-         * 
+         *
          * @return the folder of the DI tools for NetWeaver 7.0 and before.
          */
         public String getNwdiToolLibFolder() {
@@ -436,7 +436,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
 
         /**
          * Set the folder of the DI tools for NetWeaver 7.0 and before.
-         * 
+         *
          * @param nwdiToolLibFolder
          *            the folder of the DI tools for NetWeaver 7.0 and before.
          */
@@ -446,7 +446,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
 
         /**
          * Get the folder of the DI tools for NetWeaver 7.1 and later.
-         * 
+         *
          * @return the folder of the DI tools for NetWeaver 7.1 and later.
          */
         public String getNwdiToolLibFolder71() {
@@ -455,7 +455,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
 
         /**
          * Get the folder of the DI tools for NetWeaver 7.1 and later.
-         * 
+         *
          * @param nwdiToolLibFolder
          *            the folder of the DI tools for NetWeaver 7.1 and later.
          */
@@ -465,7 +465,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
 
         /**
          * Returns the paths to JDK installations to be used for building tracks.
-         * 
+         *
          * @return the paths to JDK installations to be used for building tracks.
          */
         public String getJdkHomePaths() {
@@ -474,7 +474,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
 
         /**
          * Set the paths to JDK installations to be used for building tracks.
-         * 
+         *
          * @param jdkHomePaths
          *            the paths to JDK installations to be used for building tracks.
          */
@@ -501,7 +501,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
 
         /**
          * Validate the 'NwdiToolLibFolder' parameter.
-         * 
+         *
          * @param value
          *            the form value for the 'NwdiToolLibFolder' field.
          * @return the form validation value.
@@ -512,7 +512,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
 
         /**
          * Validate the 'NwdiToolLibFolder' parameter.
-         * 
+         *
          * @param value
          *            the form value for the 'NwdiToolLibFolder' field.
          * @return the form validation value.
@@ -523,23 +523,36 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
 
         /**
          * Verify that the given URL can be reached and using the credentials for user and password can be used to access the NWDI.
-         * 
+         *
          * @param value
          *            URL to CBS
-         * 
+         *
          * @return the validation result.
          */
         public FormValidation doCbsUrlCheck(@QueryParameter final String value) {
-            // FIXME: Validate that CBS URL is reachable and the user can login
-            // (how???)
-            final FormValidation result = FormValidation.ok();
+            FormValidation result = FormValidation.ok();
+
+            try {
+                getBuildSpaceNames();
+            }
+            catch (final IOException e) {
+                result = FormValidation.error(e, "Connecting to CBS failed!");
+                Logger.getLogger(getClass().getName()).log(Level.SEVERE, e.getLocalizedMessage(), e);
+            }
+            catch (final InterruptedException e) {
+                // ignore
+            }
+            catch (final IllegalStateException e) {
+                result = FormValidation.error(e, "Connecting to CBS failed!");
+                Logger.getLogger(getClass().getName()).log(Level.SEVERE, e.getLocalizedMessage(), e);
+            }
 
             return result;
         }
 
         /**
          * Validate that the given folder name contains the NWDI tools.
-         * 
+         *
          * @param folderName
          *            name of folder that should be checked for NWDI tools.
          * @return the validation result containing error messages when validation fails.
@@ -576,7 +589,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
 
         /**
          * Validate that the given <code>FilePath</code> contains a 'dc' sub folder.
-         * 
+         *
          * @param folder
          *            the 'tools' folder of a NWDI tool library installation.
          * @return the validation result <code>FormValidation.ok()</code> when the 'dc' sub folder exists,
@@ -593,7 +606,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
 
         /**
          * Validate the given JdkHomePath.
-         * 
+         *
          * @param value
          *            path to a JDK.
          * @return the result of the validation.
@@ -616,7 +629,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
 
         /**
          * Validate the 'user' parameter.
-         * 
+         *
          * @param value
          *            the form value for the 'user' field.
          * @return the form validation value.
@@ -627,7 +640,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
 
         /**
          * Validate the 'password' parameter.
-         * 
+         *
          * @param value
          *            the form value for the 'password' field.
          * @return the form validation value.
@@ -639,7 +652,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
 
         /**
          * Returns the path mappings for the configured JDK homes.
-         * 
+         *
          * @return path mappings for the configured JDK homes.
          */
         JdkHomePaths getConfiguredJdkHomePaths() {
@@ -648,15 +661,26 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
 
         /**
          * Return a {@link ListBoxModel} containing names of build spaces to choose from.
-         * 
+         *
          * @return list of (development) build spaces in NWDI.
          */
         public ListBoxModel doFillBuildSpaceNameItems() {
             final ListBoxModel items = new ListBoxModel();
-            for (final String buildSpaceName : getBuildSpaceNames()) {
-                // build space names are of the form:
-                // [A-Z0-9]{3}_[A-Z-a-z0-9]+_D
-                items.add(buildSpaceName.split("_")[1], buildSpaceName);
+            try {
+                for (final String buildSpaceName : getBuildSpaceNames()) {
+                    // build space names are of the form:
+                    // [A-Z0-9]{3}_[A-Z-a-z0-9]+_D
+                    items.add(buildSpaceName.split("_")[1], buildSpaceName);
+                }
+            }
+            catch (final IOException e) {
+                Logger.getLogger(getClass().getName()).log(Level.SEVERE, e.getLocalizedMessage(), e);
+            }
+            catch (final InterruptedException e) {
+                // ignore
+            }
+            catch (final IllegalStateException e) {
+                Logger.getLogger(getClass().getName()).log(Level.SEVERE, e.getLocalizedMessage(), e);
             }
 
             return items;
@@ -664,7 +688,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
 
         /**
          * determine the NWDI tool library folder to use (the 71+ one will be preferred).
-         * 
+         *
          * @return the NWDI tool library folder to use for cbstool/dctool execution.
          */
         private String getNwdiToolLibraryFolder() {
@@ -679,7 +703,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
 
         /**
          * Create a descriptor for use the various NWDI tools (cbstool, dctool) for the given development configuration.
-         * 
+         *
          * @return a new {@link DIToolDescriptor} configured to run an {@link org.arachna.netweaver.tools.AbstractDIToolExecutor}.
          */
         public DIToolDescriptor getDIToolDescriptor() {
@@ -688,26 +712,21 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
 
         /**
          * List names of build spaces using the CBS tool.
-         * 
+         *
          * @return a list of build spaces names retrieved from the CBS.
+         * @throws InterruptedException
+         *             when interrupted by user.
+         * @throws IOException
+         *             an IOException occured
+         * @throws IllegalStateException
+         *             when the NWDIProject instance was not set up correctly to execute this CBS tool command.
          */
-        private Collection<String> getBuildSpaceNames() {
+        private Collection<String> getBuildSpaceNames() throws IOException, InterruptedException {
             final FilePath pwd = Jenkins.getInstance().createPath(System.getProperty("java.io.tmpdir"));
             final CBSToolCommandExecutor executor = createCBSToolExecutor(pwd);
             final List<String> buildSpaceNames = new LinkedList<String>();
 
-            try {
-                buildSpaceNames.addAll(executor.getBuildSpaceNames());
-            }
-            catch (final IOException e) {
-                Logger.getLogger(getClass().getName()).log(Level.SEVERE, e.getLocalizedMessage(), e);
-            }
-            catch (final InterruptedException e) {
-                // ignore
-            }
-            catch (final IllegalStateException e) {
-                Logger.getLogger(getClass().getName()).log(Level.SEVERE, e.getLocalizedMessage(), e);
-            }
+            buildSpaceNames.addAll(executor.getBuildSpaceNames());
 
             Collections.sort(buildSpaceNames);
 
@@ -716,10 +735,10 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
 
         /**
          * Create a {@link CBSToolCommandExecutor}.
-         * 
+         *
          * The executor is set up with a dummy development configuration and is executed in the temporary directory indicated by the system
          * property 'java.io.tmpdir'.
-         * 
+         *
          * @param folder
          *            the folder the cbstool shall be executed in
          * @return a <code>CBSToolCommandExecutor</code> that can be used to execute commands not related to a certain development
@@ -778,7 +797,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
 
     /**
      * Return whether the workspace should be cleaned before building.
-     * 
+     *
      * @return whether the workspace should be cleaned before building ( <code>true</code> yes, leave it as it is otherwise).
      */
     public boolean isCleanCopy() {
@@ -787,7 +806,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
 
     /**
      * Indicate whether the workspace should be cleaned before building.
-     * 
+     *
      * @param cleanCopy
      *            whether the workspace should be cleaned before building ( <code>true</code> yes, leave it as it is otherwise).
      */
