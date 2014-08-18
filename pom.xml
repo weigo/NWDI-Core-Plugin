@@ -27,19 +27,17 @@ getting those changes and building them using the SAP provided 'dctool'.
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpcore</artifactId>
-      <version>4.2.3</version>
-      <type>jar</type>
-      <scope>compile</scope>
+      <version>4.2.5</version>
     </dependency>
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpclient</artifactId>
-      <version>4.2.3</version>
+      <version>4.2.5</version>
     </dependency>
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpmime</artifactId>
-      <version>4.2.3</version>
+      <version>4.2.5</version>
     </dependency>
     <dependency>
       <groupId>commons-codec</groupId>
@@ -99,9 +97,7 @@ getting those changes and building them using the SAP provided 'dctool'.
     <dependency>
       <groupId>com.google.code.javaparser</groupId>
       <artifactId>javaparser</artifactId>
-      <version>1.0.8</version>
-      <type>jar</type>
-      <scope>compile</scope>
+      <version>1.0.9</version>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.main</groupId>
@@ -136,6 +132,11 @@ getting those changes and building them using the SAP provided 'dctool'.
       <artifactId>commons-digester3</artifactId>
       <version>3.2</version>
       <classifier>with-deps</classifier>
+    </dependency>
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>2.4</version>
     </dependency>
   </dependencies>
   <build>
