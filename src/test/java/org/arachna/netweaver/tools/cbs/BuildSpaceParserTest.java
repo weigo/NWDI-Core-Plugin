@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.arachna.netweaver.tools.cbs;
 
@@ -17,19 +17,17 @@ import org.junit.Test;
 
 /**
  * Unittest for {@link BuildSpaceParser}.
- * 
+ *
  * @author Dirk Weigenand
  */
 public class BuildSpaceParserTest {
     /**
-     * build spaces that are expected to be read from sample output of
-     * listbuildspaces command.
+     * build spaces that are expected to be read from sample output of listbuildspaces command.
      */
     private static final String[] EXPECTED_BUILDSPACES = { "DI0_Example_D", "DI0_Example1_D", "JDI_THECO50_D" };
 
     /**
-     * Test method for
-     * {@link org.arachna.netweaver.tools.cbs.BuildSpaceParser#parse()}.
+     * Test method for {@link org.arachna.netweaver.tools.cbs.BuildSpaceParser#parse()}.
      */
     @Test
     public final void testParseCbsTool70Output() {
@@ -39,8 +37,7 @@ public class BuildSpaceParserTest {
     }
 
     /**
-     * Test method for
-     * {@link org.arachna.netweaver.tools.cbs.BuildSpaceParser#parse()}.
+     * Test method for {@link org.arachna.netweaver.tools.cbs.BuildSpaceParser#parse()}.
      */
     @Test
     public final void testParseCbsTool71PlusPlusOutput() {
@@ -49,10 +46,17 @@ public class BuildSpaceParserTest {
         assertThat(buildSpaces, hasItems(EXPECTED_BUILDSPACES));
     }
 
+    @Test
+    public final void testParseCbsTool731SP12Output() {
+        final Collection<String> buildSpaces = getBuildSpaces("CbsToolListBuildSpaces7.31.SP12.txt");
+        final String expected[] = new String[] { "COLL_IK2_D", "COLL_IKPROD_D", "COLL_SEP_D" };
+        assertThat(buildSpaces.size(), equalTo(expected.length));
+        assertThat(buildSpaces, hasItems(expected));
+    }
+
     /**
-     * Read in the given sample output of listbuildspaces command and return the
-     * names of development build spaces parsed from it.
-     * 
+     * Read in the given sample output of listbuildspaces command and return the names of development build spaces parsed from it.
+     *
      * @param resourceName
      *            name of sample output file.
      * @return list of names of development build spaces.
@@ -62,8 +66,7 @@ public class BuildSpaceParserTest {
 
         try {
             Util.copyStreamAndClose(
-                new InputStreamReader(this.getClass().getResourceAsStream(
-                    "/org/arachna/netweaver/tools/cbs/" + resourceName)), result);
+                new InputStreamReader(this.getClass().getResourceAsStream("/org/arachna/netweaver/tools/cbs/" + resourceName)), result);
         }
         catch (final IOException e) {
             throw new IllegalStateException(e);

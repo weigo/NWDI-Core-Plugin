@@ -1,0 +1,9 @@
+cbs>listbuildspaces
+#   Build space  
+1   COLL_IK2_C   
+2   COLL_IK2_D   
+3   COLL_IKPROD_C
+4   COLL_IKPROD_D
+5   COLL_SEP_C   
+6   COLL_SEP_D   
+cbs>
