@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.arachna.netweaver.dc.config;
 
@@ -7,6 +7,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.core.IsCollectionContaining.hasItem;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -30,12 +31,12 @@ import org.junit.Test;
 
 /**
  * Unit tests for {@link DevelopmentConfigurationReader}.
- * 
+ *
  * @author Dirk Weigenand
  */
 public class DevelopmentConfigurationReaderTest {
     /**
-     * 
+     *
      */
     private DevelopmentComponentFactory dcFactory;
 
@@ -138,13 +139,8 @@ public class DevelopmentConfigurationReaderTest {
         assertThat(developmentComponent.getDescription(), equalTo("Apache Ant libraries"));
         assertThat(developmentComponent.getCaption(), equalTo("Apache Ant libraries"));
 
-        final List<PublicPart> publicParts = new ArrayList<PublicPart>(developmentComponent.getPublicParts());
-        final PublicPart pp = publicParts.get(0);
-
-        assertThat(pp.getCaption(), equalTo("Build Plugin"));
-        assertThat(pp.getType(), equalTo(PublicPartType.INFRASTRUCTURE));
-        assertThat(pp.getPublicPart(), equalTo("ant"));
-        assertThat(pp.getDescription(), equalTo("Ant..."));
+        assertThat(developmentComponent.getPublicParts(), hasItem(new PublicPart("ant", "Build Plugin", "Ant...",
+            PublicPartType.INFRASTRUCTURE)));
     }
 
     @Test
@@ -156,13 +152,8 @@ public class DevelopmentConfigurationReaderTest {
         assertThat(developmentComponents, hasSize(2));
 
         final DevelopmentComponent developmentComponent = developmentComponents.get(1);
-
-        final List<PublicPartReference> usedDCs = new ArrayList<PublicPartReference>(developmentComponent.getUsedDevelopmentComponents());
-        final PublicPartReference ref = usedDCs.get(0);
-
-        assertThat(ref.getComponentName(), equalTo("tc/bi/anttasks"));
-        assertThat(ref.getName(), equalTo("def"));
-        assertThat(ref.getVendor(), equalTo("sap.com"));
+        assertThat(developmentComponent.getUsedDevelopmentComponents(),
+            hasItem(new PublicPartReference("sap.com", "tc/bi/anttasks", "def")));
 
     }
 }

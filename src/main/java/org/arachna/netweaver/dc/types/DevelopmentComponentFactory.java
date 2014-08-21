@@ -10,7 +10,7 @@ import java.util.Map;
 
 /**
  * Factory/registry for {@link DevelopmentComponent} objects.
- * 
+ *
  * @author Dirk Weigenand
  */
 public final class DevelopmentComponentFactory {
@@ -29,7 +29,7 @@ public final class DevelopmentComponentFactory {
     /**
      * Create a new <code>DevelopmentComponentFactory</code> with the given {@link DevelopmentConfiguration}. Register all development
      * components contained within the configuration with the factory.
-     * 
+     *
      * @param developmentConfiguration
      *            a development configuration to initialize the registry with.
      */
@@ -43,7 +43,7 @@ public final class DevelopmentComponentFactory {
 
     /**
      * Create and register a {@link DevelopmentComponent}.
-     * 
+     *
      * @param vendor
      *            the vendor of the development component to register.
      * @param name
@@ -65,7 +65,7 @@ public final class DevelopmentComponentFactory {
 
     /**
      * Create a development component using the given vendor, DC name and public parts and public part references.
-     * 
+     *
      * @param vendor
      *            DC vendor
      * @param dcName
@@ -93,7 +93,7 @@ public final class DevelopmentComponentFactory {
 
     /**
      * Create the key for storing a development component in the registry.
-     * 
+     *
      * @param name
      *            name to use as part of the key.
      * @param vendor
@@ -106,7 +106,7 @@ public final class DevelopmentComponentFactory {
 
     /**
      * Create and register a development component. If the development component is already registered the existing object will be returned.
-     * 
+     *
      * @param vendor
      *            vendor of development component.
      * @param name
@@ -119,7 +119,7 @@ public final class DevelopmentComponentFactory {
 
     /**
      * Return all registered development components.
-     * 
+     *
      * @return a collection of all registered development components.
      */
     public Collection<DevelopmentComponent> getAll() {
@@ -131,7 +131,7 @@ public final class DevelopmentComponentFactory {
 
     /**
      * Update the using DCs for all registered DCs.
-     * 
+     *
      * For each registered development component the list of public parts it references will be iterated. The respective development
      * component will be looked up and the currently worked on DC will be added to its using DCs.
      */
@@ -143,7 +143,7 @@ public final class DevelopmentComponentFactory {
 
     /**
      * Updates the using DCs for the given DC.
-     * 
+     *
      * @param root
      *            development component whose using DCs are to be updated.
      */
@@ -152,10 +152,10 @@ public final class DevelopmentComponentFactory {
             final Collection<PublicPartReference> references = dc.getUsedDevelopmentComponents();
 
             for (final PublicPartReference reference : references) {
-                if (root.getVendor().equals(reference.getVendor()) && root.getName().equals(reference.getComponentName())) {
+                if (reference.references(root)) {
                     root.addUsingDC(dc);
 
-                    if (dc.getUsingDevelopmentComponents().size() == 0) {
+                    if (dc.getUsingDevelopmentComponents().isEmpty()) {
                         this.updateUsingDCs(dc);
                     }
                 }
@@ -165,7 +165,7 @@ public final class DevelopmentComponentFactory {
 
     /**
      * Return the development component matching the given vendor and component name.
-     * 
+     *
      * @param vendor
      *            vendor of development component.
      * @param name
@@ -178,7 +178,7 @@ public final class DevelopmentComponentFactory {
 
     /**
      * Return the development component matching the given {@link PublicPartReference}.
-     * 
+     *
      * @param ppRef
      *            reference to a development components public part.
      * @return the development component asked for or <code>null</code> if it is not registered.
@@ -189,7 +189,7 @@ public final class DevelopmentComponentFactory {
 
     /**
      * Remove a development component from this registry.
-     * 
+     *
      * @param component
      *            the development component to be removed from this registry.
      */

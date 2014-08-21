@@ -8,14 +8,12 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Iterator;
-
 import org.junit.Before;
 import org.junit.Test;
 
 /**
  * Unit tests for development components.
- * 
+ *
  * @author Dirk Weigenand
  */
 public class DevelopmentComponentTest {
@@ -53,20 +51,6 @@ public class DevelopmentComponentTest {
         // @CHECKSTYLE:OFF
         assertThat(false, equalTo(component.equals(null)));
         // @CHECKSTYLE:ON
-    }
-
-    /**
-     * Assert that public parts are returned sorted lexicographically when returned by {@link DevelopmentComponent#getPublicParts()}.
-     */
-    @Test
-    public void testGetPublicPartsReturnedAreSorted() {
-        final PublicPart part1 = new PublicPart(API, null, null, PublicPartType.COMPILE);
-        final PublicPart part2 = new PublicPart("ASSEMBLY", null, null, PublicPartType.COMPILE);
-        component.add(part1);
-        component.add(part2);
-        final Iterator<PublicPart> publicParts = component.getPublicParts().iterator();
-        assertThat(part1, is(equalTo(publicParts.next())));
-        assertThat(part2, is(equalTo(publicParts.next())));
     }
 
     /**

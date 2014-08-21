@@ -9,13 +9,12 @@ import org.apache.commons.lang.StringUtils;
 
 /**
  * Reference to a development components public part.
- * 
+ *
  * @author Dirk Weigenand
  */
 public class PublicPartReference {
     /**
-     * name of development component this <code>PublicPartReference</code>
-     * references.
+     * name of development component this <code>PublicPartReference</code> references.
      */
     private final String componentName;
 
@@ -45,9 +44,8 @@ public class PublicPartReference {
     private boolean atDeployTime;
 
     /**
-     * Creates a <code>PublicPartReference</code> with the given vendor,
-     * development component name and public part name.
-     * 
+     * Creates a <code>PublicPartReference</code> with the given vendor, development component name and public part name.
+     *
      * @param vendor
      *            development component vendor.
      * @param componentName
@@ -62,9 +60,8 @@ public class PublicPartReference {
     }
 
     /**
-     * Creates a <code>PublicPartReference</code> with the given vendor,
-     * development component name and an empty public part name.
-     * 
+     * Creates a <code>PublicPartReference</code> with the given vendor, development component name and an empty public part name.
+     *
      * @param vendor
      *            development component vendor.
      * @param componentName
@@ -156,7 +153,7 @@ public class PublicPartReference {
 
     /**
      * Set the name of public part this reference points to.
-     * 
+     *
      * @param name
      *            the name to set
      */
@@ -190,7 +187,7 @@ public class PublicPartReference {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#hashCode()
      */
     @Override
@@ -200,7 +197,7 @@ public class PublicPartReference {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -218,5 +215,17 @@ public class PublicPartReference {
         final PublicPartReference other = (PublicPartReference)obj;
 
         return hashCode() == other.hashCode();
+    }
+
+    /**
+     * Check whether this public part reference is a reference to the given development component.
+     *
+     * @param component
+     *            the development component to check
+     * @return <code>true</code>, when this public part reference is a reference to the given development component, <code>false</code>
+     *         otherwise.
+     */
+    public boolean references(final DevelopmentComponent component) {
+        return getVendor().equals(component.getVendor()) && getComponentName().equals(component.getName());
     }
 }

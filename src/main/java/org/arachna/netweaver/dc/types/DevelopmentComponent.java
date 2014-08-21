@@ -1,17 +1,15 @@
 package org.arachna.netweaver.dc.types;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
  * A NetWeaver development component.
- * 
+ *
  * @author Dirk Weigenand
  */
 public final class DevelopmentComponent {
@@ -61,8 +59,7 @@ public final class DevelopmentComponent {
     private final Set<PublicPart> publicParts = new HashSet<PublicPart>();
 
     /**
-     * contains references to development components used by this development
-     * component.
+     * contains references to development components used by this development component.
      */
     private final Set<PublicPartReference> usedComponents = new HashSet<PublicPartReference>();
 
@@ -92,8 +89,7 @@ public final class DevelopmentComponent {
     private final Set<String> resourceFolders = new LinkedHashSet<String>();
 
     /**
-     * folder the class files for this development component were generated to
-     * during the last build.
+     * folder the class files for this development component were generated to during the last build.
      */
     private String outputFolder = "";
 
@@ -103,9 +99,8 @@ public final class DevelopmentComponent {
     private String sourceEncoding;
 
     /**
-     * Create an instance of a development component with the given name, vendor
-     * and DC type.
-     * 
+     * Create an instance of a development component with the given name, vendor and DC type.
+     *
      * @param name
      *            name of this development component.
      * @param vendor
@@ -120,9 +115,8 @@ public final class DevelopmentComponent {
     }
 
     /**
-     * Create an instance of a development component with the given name, vendor
-     * and DC type {@link DevelopmentComponentType#unknown}.
-     * 
+     * Create an instance of a development component with the given name, vendor and DC type {@link DevelopmentComponentType#unknown}.
+     *
      * @param name
      *            name of this development component.
      * @param vendor
@@ -155,22 +149,19 @@ public final class DevelopmentComponent {
 
     /**
      * Adds a reference to a public part of a used development component.
-     * 
+     *
      * @param reference
-     *            reference to public part of other development component this
-     *            DC references.
+     *            reference to public part of other development component this DC references.
      */
     public void add(final PublicPartReference reference) {
         usedComponents.add(reference);
     }
 
     /**
-     * Adds the given references to public parts of a used development
-     * components.
-     * 
+     * Adds the given references to public parts of a used development components.
+     *
      * @param references
-     *            references to public parts of other development components
-     *            this DC references.
+     *            references to public parts of other development components this DC references.
      */
     public void addAll(final Collection<PublicPartReference> references) {
         if (references != null) {
@@ -180,15 +171,11 @@ public final class DevelopmentComponent {
 
     /**
      * Return all references to public parts of other DCs this DC references.
-     * 
+     *
      * @return all public part references to DC this DC uses (depends on).
      */
     public Collection<PublicPartReference> getUsedDevelopmentComponents() {
-        final List<PublicPartReference> references = new ArrayList<PublicPartReference>(usedComponents.size());
-        references.addAll(usedComponents);
-        Collections.sort(references, new PublicPartReferenceComparator());
-
-        return references;
+        return Collections.unmodifiableCollection(usedComponents);
     }
 
     /**
@@ -223,7 +210,7 @@ public final class DevelopmentComponent {
 
     /**
      * Add a development component that uses to this development component.
-     * 
+     *
      * @param component
      *            the development component to add to those using this DC.
      */
@@ -233,35 +220,26 @@ public final class DevelopmentComponent {
 
     /**
      * Return all development components that use this development component.
-     * 
+     *
      * @return all development components that use this development component.
      */
     public Collection<DevelopmentComponent> getUsingDevelopmentComponents() {
-        final List<DevelopmentComponent> usingDCs = new ArrayList<DevelopmentComponent>(usingComponents.size());
-        usingDCs.addAll(usingComponents);
-        Collections.sort(usingDCs, new DevelopmentComponentByNameComparator());
-
-        return usingDCs;
+        return Collections.unmodifiableCollection(usingComponents);
     }
 
     /**
-     * Get public parts of this DC. The returned collection is sorted by
-     * {@link PublicPartByNameComparator}.
-     * 
+     * Get public parts of this DC. The returned collection is sorted by {@link PublicPartByNameComparator}.
+     *
      * @return the publicParts
      */
     public Collection<PublicPart> getPublicParts() {
-        final List<PublicPart> parts = new ArrayList<PublicPart>(publicParts.size());
-        parts.addAll(publicParts);
-        Collections.sort(parts, new PublicPartByNameComparator());
-
-        return parts;
+        return Collections.unmodifiableCollection(publicParts);
     }
 
     /**
-     * Set the public parts for this development component. Clears the existing
-     * public parts and adds those public parts given as argument iff not null.
-     * 
+     * Set the public parts for this development component. Clears the existing public parts and adds those public parts given as argument
+     * iff not null.
+     *
      * @param publicParts
      *            public parts to set.
      */
@@ -275,7 +253,7 @@ public final class DevelopmentComponent {
 
     /**
      * Add a public part to this DC.
-     * 
+     *
      * @param publicPart
      *            public part to add to this DC
      */
@@ -309,7 +287,7 @@ public final class DevelopmentComponent {
 
     /**
      * Determines whether this DC needs a rebuild.
-     * 
+     *
      * @return the needsRebuild
      */
     public boolean isNeedsRebuild() {
@@ -318,10 +296,9 @@ public final class DevelopmentComponent {
 
     /**
      * Set whether this DC needs a rebuild.
-     * 
+     *
      * @param needsRebuild
-     *            <code>true</code> when this DC needs a rebuild,
-     *            <code>false</code> otherwise.
+     *            <code>true</code> when this DC needs a rebuild, <code>false</code> otherwise.
      */
     public void setNeedsRebuild(final boolean needsRebuild) {
         this.needsRebuild = needsRebuild;
@@ -329,9 +306,8 @@ public final class DevelopmentComponent {
 
     /**
      * Returns whether this development component is deprecated.
-     * 
-     * @return <code>true</code> if this development component is deprecated,
-     *         <code>false</code> otherwise.
+     *
+     * @return <code>true</code> if this development component is deprecated, <code>false</code> otherwise.
      */
     public boolean isDeprecated() {
         return isDeprecated;
@@ -339,10 +315,9 @@ public final class DevelopmentComponent {
 
     /**
      * Set whether this development component is deprecated.
-     * 
+     *
      * @param isDeprecated
-     *            <code>true</code> if this development component is deprecated,
-     *            <code>false</code> otherwise.
+     *            <code>true</code> if this development component is deprecated, <code>false</code> otherwise.
      */
     public void setDeprecated(final boolean isDeprecated) {
         this.isDeprecated = isDeprecated;
@@ -350,7 +325,7 @@ public final class DevelopmentComponent {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#toString()
      */
     @Override
@@ -367,9 +342,8 @@ public final class DevelopmentComponent {
     }
 
     /**
-     * Add the given folderName to the source folders of this development
-     * component.
-     * 
+     * Add the given folderName to the source folders of this development component.
+     *
      * @param folderName
      *            source folder to add to this development component.
      */
@@ -379,10 +353,9 @@ public final class DevelopmentComponent {
 
     /**
      * Set source folders for this development component.
-     * 
+     *
      * @param sourceFolders
-     *            the source folders to set for this DC. If the given collection
-     *            is null the DC will have no source folders afterwards.
+     *            the source folders to set for this DC. If the given collection is null the DC will have no source folders afterwards.
      */
     public void setSourceFolders(final Set<String> sourceFolders) {
         this.sourceFolders.clear();
@@ -394,7 +367,7 @@ public final class DevelopmentComponent {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#hashCode()
      */
     @Override
@@ -404,7 +377,7 @@ public final class DevelopmentComponent {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -426,12 +399,10 @@ public final class DevelopmentComponent {
     }
 
     /**
-     * Sets the folder the class files for this development component were
-     * generated to during the last build.
-     * 
+     * Sets the folder the class files for this development component were generated to during the last build.
+     *
      * @param outputFolder
-     *            folder the class files for this development component were
-     *            generated to during the last build
+     *            folder the class files for this development component were generated to during the last build
      */
     public void setOutputFolder(final String outputFolder) {
         if (outputFolder != null && !outputFolder.isEmpty()) {
@@ -443,11 +414,9 @@ public final class DevelopmentComponent {
     }
 
     /**
-     * Returns the folder the class files for this development component were
-     * generated to during the last build.
-     * 
-     * @return the outputFolder folder the class files for this development
-     *         component were generated to during the last build
+     * Returns the folder the class files for this development component were generated to during the last build.
+     *
+     * @return the outputFolder folder the class files for this development component were generated to during the last build
      */
     public String getOutputFolder() {
         return outputFolder;
@@ -455,7 +424,7 @@ public final class DevelopmentComponent {
 
     /**
      * Returns the short description of this development component.
-     * 
+     *
      * @return the short description of this development component
      */
     public String getCaption() {
@@ -464,7 +433,7 @@ public final class DevelopmentComponent {
 
     /**
      * Sets the short description of this development component.
-     * 
+     *
      * @param caption
      *            the short description of this development component
      */
@@ -478,13 +447,12 @@ public final class DevelopmentComponent {
     }
 
     /**
-     * Determine whether this development component has a runtime reference to
-     * the public part given by the {@link PublicPartReference} parameter.
-     * 
+     * Determine whether this development component has a runtime reference to the public part given by the {@link PublicPartReference}
+     * parameter.
+     *
      * @param ppRef
      *            public part reference to test
-     * @return <code>true</code> when the given public part is referenced at
-     *         runtim, <code>false</code> otherwise.
+     * @return <code>true</code> when the given public part is referenced at runtim, <code>false</code> otherwise.
      */
     public boolean hasRuntimeReference(final PublicPartReference ppRef) {
         boolean result = false;
@@ -500,12 +468,10 @@ public final class DevelopmentComponent {
     }
 
     /**
-     * Set the references to the public parts of other development components
-     * used by this component.
-     * 
+     * Set the references to the public parts of other development components used by this component.
+     *
      * @param usedComponents
-     *            references to public parts of development components used by
-     *            this development components.
+     *            references to public parts of development components used by this development components.
      */
     public void setUsedComponents(final Collection<PublicPartReference> usedComponents) {
         this.usedComponents.clear();
@@ -513,24 +479,20 @@ public final class DevelopmentComponent {
     }
 
     /**
-     * Returns the components name as
-     * <code>'vendor' + separator + 'name'.replace('/', separator)</code>.
-     * 
+     * Returns the components name as <code>'vendor' + separator + 'name'.replace('/', separator)</code>.
+     *
      * @param separator
-     *            the separator character to use between vendor and component
-     *            name and also replacing the slashes probably in the component
+     *            the separator character to use between vendor and component name and also replacing the slashes probably in the component
      *            name.
-     * @return the vendor/name combination normalized using the given separator
-     *         character.
+     * @return the vendor/name combination normalized using the given separator character.
      */
     public String getNormalizedName(final String separator) {
         return getVendor() + separator + getName().replaceAll("/", separator);
     }
 
     /**
-     * Returns a public part reference to the development component used to
-     * build this development component.
-     * 
+     * Returns a public part reference to the development component used to build this development component.
+     *
      * @return the buildPlugin
      */
     public PublicPartReference getBuildPlugin() {
@@ -547,7 +509,7 @@ public final class DevelopmentComponent {
 
     /**
      * Set the developement component type from the given type and sub type.
-     * 
+     *
      * @param type
      *            main type of development component.
      * @param subType
@@ -559,7 +521,7 @@ public final class DevelopmentComponent {
 
     /**
      * Set the encoding of source files to use.
-     * 
+     *
      * @param sourceEncoding
      *            encoding of source files to use.
      */
@@ -568,9 +530,8 @@ public final class DevelopmentComponent {
     }
 
     /**
-     * Return the encoding of source files to use for this development
-     * component.
-     * 
+     * Return the encoding of source files to use for this development component.
+     *
      * @return encoding of source files to use for this development component.
      */
     public String getSourceEncoding() {
@@ -578,9 +539,8 @@ public final class DevelopmentComponent {
     }
 
     /**
-     * Add the given sourceFolder to the collection of source folders containing
-     * unit tests.
-     * 
+     * Add the given sourceFolder to the collection of source folders containing unit tests.
+     *
      * @param sourceFolder
      *            source folder to add to folders containing unit tests.
      */
@@ -590,7 +550,7 @@ public final class DevelopmentComponent {
 
     /**
      * Return the collection of folders containing unit tests.
-     * 
+     *
      * @return collection of folders containing unit tests.
      */
     public Set<String> getTestSourceFolders() {
@@ -609,9 +569,8 @@ public final class DevelopmentComponent {
     }
 
     /**
-     * Add the given sourceFolder to the collection of source folders containing
-     * unit tests.
-     * 
+     * Add the given sourceFolder to the collection of source folders containing unit tests.
+     *
      * @param sourceFolder
      *            source folder to add to folders containing unit tests.
      */
@@ -621,7 +580,7 @@ public final class DevelopmentComponent {
 
     /**
      * Return the collection of folders containing resources.
-     * 
+     *
      * @return collection of folders containing resources.
      */
     public Set<String> getResourceFolders() {
