@@ -114,7 +114,7 @@ public class TopoSort {
      */
     private void findCircularDependencies(final TopoSortResult topoSortResult, final Map<String, Item> itemMap, final List<Item> items) {
         for (final Item item : items) {
-            findRecursivelyInUsedDCs(item.getComponent(), item, itemMap, topoSortResult, new HashSet<DevelopmentComponent>());
+            findRecursivelyInUsedDCs(0, item.getComponent(), item, itemMap, topoSortResult, new HashSet<DevelopmentComponent>());
         }
     }
 
@@ -133,9 +133,12 @@ public class TopoSort {
      * @param visitedParents
      *            collector object to avoid multiple visits on items (and infinite recursion aka StackOverflowError).
      */
-    private void findRecursivelyInUsedDCs(final DevelopmentComponent component, final Item parent, final Map<String, Item> itemMap,
-        final TopoSortResult topoSortResult, final Collection<DevelopmentComponent> visitedParents) {
-        if (topoSortResult.hasCircularDependency(component) || visitedParents.contains(parent)) {
+    private void findRecursivelyInUsedDCs(final int depth, final DevelopmentComponent component, final Item parent,
+        final Map<String, Item> itemMap, final TopoSortResult topoSortResult, final Collection<DevelopmentComponent> visitedParents) {
+        // System.err.println(String.format("%d: %s:%s %s:%s", depth, component.getVendor(), component.getName(), parent.getComponent()
+        // .getVendor(), parent.getComponent().getName()));
+
+        if (topoSortResult.hasCircularDependency(component) || visitedParents.contains(parent.getComponent())) {
             return;
         }
 
@@ -147,7 +150,7 @@ public class TopoSort {
         }
 
         for (final DevelopmentComponent usedDC : parent.getUsedDCs()) {
-            findRecursivelyInUsedDCs(component, itemMap.get(getComponentName(usedDC)), itemMap, topoSortResult, visitedParents);
+            findRecursivelyInUsedDCs(depth + 1, component, itemMap.get(getComponentName(usedDC)), itemMap, topoSortResult, visitedParents);
         }
     }
 
@@ -173,7 +176,8 @@ public class TopoSort {
      *            the development component whose using DCs have to be set up as needing a rebuild.
      */
     private void calculateDevelopmentComponentsThatNeedRebuilding(final Map<String, Item> components, final DevelopmentComponent component) {
-        if (!components.containsKey(getComponentName(component))) {
+        if (component.getCompartment() != null && component.getCompartment().isSourceState()
+            && !components.containsKey(getComponentName(component))) {
             component.setNeedsRebuild(true);
             final Item i = new Item(dcFactory, component);
             components.put(i.getName(), i);
