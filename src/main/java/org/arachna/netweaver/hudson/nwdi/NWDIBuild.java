@@ -40,6 +40,7 @@ import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 import org.arachna.netweaver.dc.types.IDevelopmentComponentFilter;
 import org.arachna.netweaver.hudson.nwdi.DCBuildResultParser.BuildResults;
+import org.arachna.netweaver.hudson.nwdi.TopoSortResult.CircularDependency;
 import org.arachna.netweaver.hudson.nwdi.changelog.DtrChangeLogParser;
 import org.arachna.netweaver.hudson.util.FilePathHelper;
 import org.arachna.netweaver.tools.DIToolCommandExecutionResult;
@@ -124,9 +125,11 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
     /**
      * Calculate build sequence for development components affected by activities that triggered this build.
      *
+     * @param logger
+     *            Logger to log circular dependencies to.
      * @return build sequence for development components affected by activities that triggered this build.
      */
-    public Collection<DevelopmentComponent> getAffectedDevelopmentComponents() {
+    public Collection<DevelopmentComponent> getAffectedDevelopmentComponents(final PrintStream logger) {
         if (affectedComponents == null) {
             final Collection<DevelopmentComponent> components = new LinkedList<DevelopmentComponent>();
             final AntHelper antHelper = new AntHelper(FilePathHelper.makeAbsolute(getWorkspace()), dcFactory);
@@ -144,11 +147,26 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
 
             // update usage relations from public part references.
             dcFactory.updateUsingDCs();
-            final ComponentsNeedingRebuildFinder finder = new ComponentsNeedingRebuildFinder();
-            final DependencySorter dependencySorter =
-                new DependencySorter(dcFactory, finder.calculateDevelopmentComponentsThatNeedRebuilding(components));
+            // final ComponentsNeedingRebuildFinder finder = new ComponentsNeedingRebuildFinder();
+            // final DependencySorter dependencySorter =
+            // new DependencySorter(dcFactory, finder.calculateDevelopmentComponentsThatNeedRebuilding(components));
 
-            affectedComponents = dependencySorter.determineBuildSequence();
+            final TopoSort topoSort = new TopoSort(dcFactory);
+            final TopoSortResult topoSortResult = topoSort.sort(components);
+            affectedComponents = topoSortResult.getDevelopmentComponents();
+
+            // Log circular dependencies to build logger.
+            if (logger != null && !topoSortResult.getCircularDependencies().isEmpty()) {
+                final StringBuilder dependencies = new StringBuilder("There are circular dependencies in this track:");
+
+                for (final CircularDependency dependency : topoSortResult.getCircularDependencies()) {
+                    dependencies.append(String.format("  %s:%s has circular dependency to %s:%s.\n", dependency.getComponent().getVendor(),
+                        dependency.getComponent().getName(), dependency.getDependency().getVendor(), dependency.getDependency().getName()));
+                }
+
+                logger.println(dependencies.toString());
+            }
+            // affectedComponents = dependencySorter.determineBuildSequence();
         }
 
         return affectedComponents;
@@ -202,7 +220,7 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
         final Collection<DevelopmentComponent> filteredDCs = new ArrayList<DevelopmentComponent>();
 
         if (filter != null) {
-            for (final DevelopmentComponent component : this.getAffectedDevelopmentComponents()) {
+            for (final DevelopmentComponent component : this.getAffectedDevelopmentComponents((PrintStream)null)) {
                 if (filter.accept(component)) {
                     filteredDCs.add(component);
                 }
@@ -355,7 +373,7 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
 
             saveDevelopmentConfigurationToWorkspace(nwdiBuild);
 
-            final Collection<DevelopmentComponent> affectedComponents = nwdiBuild.getAffectedDevelopmentComponents();
+            final Collection<DevelopmentComponent> affectedComponents = nwdiBuild.getAffectedDevelopmentComponents(logger);
             DIToolCommandExecutionResult result = new DIToolCommandExecutionResult("", 0);
             final boolean dryRun = Boolean.getBoolean("nwdibuild.dry.run");
 
