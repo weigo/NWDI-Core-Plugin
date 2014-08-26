@@ -107,6 +107,52 @@ public class TopoSortResult {
         public DevelopmentComponent getDependency() {
             return dependency;
         }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + (component == null ? 0 : component.hashCode());
+            result = prime * result + (dependency == null ? 0 : dependency.hashCode());
+            return result;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean equals(final Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            final CircularDependency other = (CircularDependency)obj;
+            if (component == null) {
+                if (other.component != null) {
+                    return false;
+                }
+            }
+            else if (!component.equals(other.component)) {
+                return false;
+            }
+            if (dependency == null) {
+                if (other.dependency != null) {
+                    return false;
+                }
+            }
+            else if (!dependency.equals(other.dependency)) {
+                return false;
+            }
+            return true;
+        }
     }
 
     /**

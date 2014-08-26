@@ -325,13 +325,12 @@ public final class DevelopmentComponent {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see java.lang.Object#toString()
      */
     @Override
     public String toString() {
-        return String.format("DevelopmentComponent [compartment=%s, vendor=%s, name=%s, publicParts=%s, type=%s, description=%s]",
-            compartment, vendor, name, publicParts, type, description);
+        return String.format("DC [vendor=%s, name=%s, type=%s]", vendor, name, type);
     }
 
     /**
@@ -367,7 +366,7 @@ public final class DevelopmentComponent {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see java.lang.Object#hashCode()
      */
     @Override
@@ -377,7 +376,7 @@ public final class DevelopmentComponent {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override

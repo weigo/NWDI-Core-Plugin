@@ -81,7 +81,7 @@ public class TopoSort {
             }
         }
 
-        if (oldSize > 0 && oldSize == topoSortResult.getDevelopmentComponents().size()) {
+        if (oldSize == topoSortResult.getDevelopmentComponents().size()) {
             findCircularDependencies(topoSortResult, itemMap, items);
         }
         else {
@@ -146,7 +146,6 @@ public class TopoSort {
 
         if (parent.getUsedDCs().contains(component)) {
             topoSortResult.add(component, parent.getComponent());
-            return;
         }
 
         for (final DevelopmentComponent usedDC : parent.getUsedDCs()) {
@@ -157,7 +156,9 @@ public class TopoSort {
     /**
      * Calculate development components that will need to be rebuilt and build a mapping of name to item wrapper.
      *
-     * @return mapping of name to item wrapper of components need to be rebuilt.
+     * @param componentsToRebuild
+     *            list of components that should be rebuilt.
+     * @return mapping of name to item wrapper of components (and components depending on them) need to be rebuilt.
      */
     private Map<String, Item> getItems(final Collection<DevelopmentComponent> componentsToRebuild) {
         final Map<String, Item> components = new HashMap<String, Item>();
@@ -179,13 +180,28 @@ public class TopoSort {
         if (component.getCompartment() != null && component.getCompartment().isSourceState()
             && !components.containsKey(getComponentName(component))) {
             component.setNeedsRebuild(true);
-            final Item i = new Item(dcFactory, component);
+            final Item i = new Item(component, createListOfUsedDCs(component));
             components.put(i.getName(), i);
 
             for (final DevelopmentComponent usingDC : i.getUsingDCs()) {
                 calculateDevelopmentComponentsThatNeedRebuilding(components, usingDC);
             }
         }
+    }
+
+    private Collection<DevelopmentComponent> createListOfUsedDCs(final DevelopmentComponent component) {
+        final Collection<DevelopmentComponent> usedDCs =
+            new ArrayList<DevelopmentComponent>(component.getUsedDevelopmentComponents().size());
+
+        for (final PublicPartReference reference : component.getUsedDevelopmentComponents()) {
+            final DevelopmentComponent e = dcFactory.get(reference);
+
+            if (e != null && e.getCompartment().isSourceState()) {
+                usedDCs.add(e);
+            }
+        }
+
+        return usedDCs;
     }
 
     /**
@@ -203,19 +219,12 @@ public class TopoSort {
          * @param dcFactory
          * @param component
          */
-        Item(final DevelopmentComponentFactory dcFactory, final DevelopmentComponent component) {
+        Item(final DevelopmentComponent component, final Collection<DevelopmentComponent> usedDCs) {
             this.component = component;
             name = component.getVendor() + ":" + component.getName();
 
             usingDCs.addAll(component.getUsingDevelopmentComponents());
-
-            for (final PublicPartReference reference : component.getUsedDevelopmentComponents()) {
-                final DevelopmentComponent e = dcFactory.get(reference);
-
-                if (e != null && e.getCompartment().isSourceState()) {
-                    usedDCs.add(e);
-                }
-            }
+            this.usedDCs.addAll(usedDCs);
         }
 
         /**
