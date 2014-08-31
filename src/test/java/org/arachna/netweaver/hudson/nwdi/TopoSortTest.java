@@ -24,7 +24,7 @@ import org.junit.Test;
 
 /**
  * Unit test for {@link DependencySorter}.
- *
+ * 
  * @author Dirk Weigenand
  */
 public class TopoSortTest {
@@ -49,7 +49,7 @@ public class TopoSortTest {
     @Before
     public void setUp() {
         dcFactory = new DevelopmentComponentFactory();
-        sorter = new TopoSort(dcFactory);
+        sorter = new TopoSort(dcFactory, System.err);
         sourceCompartment = Compartment.create("example.org_COMPARTMENT_1", CompartmentState.Source);
     }
 
