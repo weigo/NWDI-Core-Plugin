@@ -151,7 +151,7 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
             // final DependencySorter dependencySorter =
             // new DependencySorter(dcFactory, finder.calculateDevelopmentComponentsThatNeedRebuilding(components));
 
-            final TopoSort topoSort = new TopoSort(dcFactory);
+            final TopoSort topoSort = new TopoSort(dcFactory, logger);
             final TopoSortResult topoSortResult = topoSort.sort(components);
             affectedComponents = topoSortResult.getDevelopmentComponents();
 
@@ -368,7 +368,7 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
          *             re-thrown from executing the DC build
          */
         protected DIToolCommandExecutionResult buildDevelopmentComponents(final PrintStream logger) throws IOException,
-        InterruptedException {
+            InterruptedException {
             final NWDIBuild nwdiBuild = NWDIBuild.this;
 
             saveDevelopmentConfigurationToWorkspace(nwdiBuild);

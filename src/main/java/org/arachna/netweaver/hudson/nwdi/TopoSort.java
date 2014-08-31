@@ -3,6 +3,7 @@
  */
 package org.arachna.netweaver.hudson.nwdi;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -27,13 +28,19 @@ public class TopoSort {
     private final DevelopmentComponentFactory dcFactory;
 
     /**
+     * Logger to console.
+     */
+    private final PrintStream logger;
+
+    /**
      * Create an instance of the TopoSort class using the given registry/factory for development components.
      *
      * @param dcFactory
      *            registry/factory for development components.
      */
-    public TopoSort(final DevelopmentComponentFactory dcFactory) {
+    public TopoSort(final DevelopmentComponentFactory dcFactory, final PrintStream logger) {
         this.dcFactory = dcFactory;
+        this.logger = logger;
     }
 
     /**
@@ -149,7 +156,16 @@ public class TopoSort {
         }
 
         for (final DevelopmentComponent usedDC : parent.getUsedDCs()) {
-            findRecursivelyInUsedDCs(depth + 1, component, itemMap.get(getComponentName(usedDC)), itemMap, topoSortResult, visitedParents);
+            final String componentName = getComponentName(usedDC);
+            final Item dependency = itemMap.get(componentName);
+
+            if (dependency != null) {
+                findRecursivelyInUsedDCs(depth + 1, component, dependency, itemMap, topoSortResult, visitedParents);
+            }
+            else if (logger != null) {
+                logger.append(String.format("Cannot resolve dependency of %s:%s to '%s'.", component.getVendor(), component.getName(),
+                    componentName));
+            }
         }
     }
 
