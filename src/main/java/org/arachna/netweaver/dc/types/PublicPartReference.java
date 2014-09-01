@@ -185,11 +185,6 @@ public class PublicPartReference {
         return msg.toString();
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode() {
         return Arrays.hashCode(new Object[] { componentName, getName(), vendor });
@@ -197,7 +192,7 @@ public class PublicPartReference {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
