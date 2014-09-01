@@ -101,21 +101,11 @@ public class PublicPart {
         this.publicPart = publicPart;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString() {
         return String.format("PublicPart [publicPart=%s, caption=%s, type=%s, description=%s]", publicPart, caption, type, description);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode() {
         return Arrays.hashCode(new String[] { publicPart, type == null ? "" : type.toString() });
