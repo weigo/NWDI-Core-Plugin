@@ -7,7 +7,7 @@ import java.util.Arrays;
 
 /**
  * Public part of a development component.
- * 
+ *
  * @author Dirk Weigenand
  */
 public class PublicPart {
@@ -33,7 +33,7 @@ public class PublicPart {
 
     /**
      * Create a new public part object.
-     * 
+     *
      * @param name
      *            name of public part.
      * @param caption
@@ -103,30 +103,24 @@ public class PublicPart {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#toString()
      */
     @Override
     public String toString() {
-        return String.format("PublicPart [publicPart=%s, caption=%s, type=%s, description=%s]", publicPart, caption,
-            type, description);
+        return String.format("PublicPart [publicPart=%s, caption=%s, type=%s, description=%s]", publicPart, caption, type, description);
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#hashCode()
      */
     @Override
     public int hashCode() {
-        return Arrays.hashCode(new String[] { caption, description, publicPart, type == null ? "" : type.toString() });
+        return Arrays.hashCode(new String[] { publicPart, type == null ? "" : type.toString() });
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(final Object obj) {
         if (this == obj) {
@@ -143,12 +137,13 @@ public class PublicPart {
 
         final PublicPart other = (PublicPart)obj;
 
-        return Arrays.equals(new Object[] { caption, description, publicPart, type }, new Object[] { other.caption,
-            other.description, other.publicPart, other.type });
+        return hashCode() == other.hashCode();
     }
 
     /**
-     * @return the caption
+     * Get short description of this public part.
+     *
+     * @return caption or short description of this public part.
      */
     public String getCaption() {
         return caption;
@@ -156,7 +151,7 @@ public class PublicPart {
 
     /**
      * @param caption
-     *            the caption to set
+     *            caption or short description of this public part.
      */
     public void setCaption(final String caption) {
         this.caption = caption;
@@ -164,7 +159,7 @@ public class PublicPart {
 
     /**
      * Returns the type of this public part.
-     * 
+     *
      * @return the type of this public part
      */
     public PublicPartType getType() {
