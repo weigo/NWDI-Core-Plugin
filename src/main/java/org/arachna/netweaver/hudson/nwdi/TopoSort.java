@@ -51,8 +51,8 @@ public class TopoSort {
      */
     public TopoSortResult sort(final Collection<DevelopmentComponent> components) {
         final TopoSortResult topoSortResult = new TopoSortResult();
-        final Map<String, Item> itemMap = getItems(components);
-        topoSort(topoSortResult, itemMap, new ArrayList<Item>(itemMap.values()));
+        final Map<String, ComponentWrapper> itemMap = getComponentsToRebuild(components);
+        topoSort(topoSortResult, itemMap, new ArrayList<ComponentWrapper>(itemMap.values()));
 
         return topoSortResult;
     }
@@ -70,12 +70,13 @@ public class TopoSort {
      * @param items
      *            list of items to be sorted topologically.
      */
-    private void topoSort(final TopoSortResult topoSortResult, final Map<String, Item> itemMap, final List<Item> items) {
-        final ListIterator<Item> iterator = items.listIterator();
+    private void topoSort(final TopoSortResult topoSortResult, final Map<String, ComponentWrapper> itemMap,
+        final List<ComponentWrapper> items) {
+        final ListIterator<ComponentWrapper> iterator = items.listIterator();
         final int oldSize = topoSortResult.getDevelopmentComponents().size();
 
         while (iterator.hasNext()) {
-            final Item item = iterator.next();
+            final ComponentWrapper item = iterator.next();
 
             if (!item.hasUsedDCs()) {
                 final DevelopmentComponent component = item.getComponent();
@@ -119,8 +120,9 @@ public class TopoSort {
      * @param items
      *            list of items to inspect for circular dependencies.
      */
-    private void findCircularDependencies(final TopoSortResult topoSortResult, final Map<String, Item> itemMap, final List<Item> items) {
-        for (final Item item : items) {
+    private void findCircularDependencies(final TopoSortResult topoSortResult, final Map<String, ComponentWrapper> itemMap,
+        final List<ComponentWrapper> items) {
+        for (final ComponentWrapper item : items) {
             findRecursivelyInUsedDCs(0, item.getComponent(), item, itemMap, topoSortResult, new HashSet<DevelopmentComponent>());
         }
     }
@@ -140,8 +142,9 @@ public class TopoSort {
      * @param visitedParents
      *            collector object to avoid multiple visits on items (and infinite recursion aka StackOverflowError).
      */
-    private void findRecursivelyInUsedDCs(final int depth, final DevelopmentComponent component, final Item parent,
-        final Map<String, Item> itemMap, final TopoSortResult topoSortResult, final Collection<DevelopmentComponent> visitedParents) {
+    private void findRecursivelyInUsedDCs(final int depth, final DevelopmentComponent component, final ComponentWrapper parent,
+        final Map<String, ComponentWrapper> itemMap, final TopoSortResult topoSortResult,
+        final Collection<DevelopmentComponent> visitedParents) {
         // System.err.println(String.format("%d: %s:%s %s:%s", depth, component.getVendor(), component.getName(), parent.getComponent()
         // .getVendor(), parent.getComponent().getName()));
 
@@ -157,14 +160,11 @@ public class TopoSort {
 
         for (final DevelopmentComponent usedDC : parent.getUsedDCs()) {
             final String componentName = getComponentName(usedDC);
-            final Item dependency = itemMap.get(componentName);
+            final ComponentWrapper dependency = itemMap.get(componentName);
 
             if (dependency != null) {
+                // dependency = new ComponentWrapper(usedDC, createListOfUsedDCs(usedDC));
                 findRecursivelyInUsedDCs(depth + 1, component, dependency, itemMap, topoSortResult, visitedParents);
-            }
-            else if (logger != null) {
-                logger.append(String.format("Cannot resolve dependency of %s:%s to '%s'.", component.getVendor(), component.getName(),
-                    componentName));
             }
         }
     }
@@ -176,8 +176,8 @@ public class TopoSort {
      *            list of components that should be rebuilt.
      * @return mapping of name to item wrapper of components (and components depending on them) need to be rebuilt.
      */
-    private Map<String, Item> getItems(final Collection<DevelopmentComponent> componentsToRebuild) {
-        final Map<String, Item> components = new HashMap<String, Item>();
+    private Map<String, ComponentWrapper> getComponentsToRebuild(final Collection<DevelopmentComponent> componentsToRebuild) {
+        final Map<String, ComponentWrapper> components = new HashMap<String, ComponentWrapper>();
 
         for (final DevelopmentComponent dc : componentsToRebuild) {
             calculateDevelopmentComponentsThatNeedRebuilding(components, dc);
@@ -189,14 +189,16 @@ public class TopoSort {
     /**
      * Update the <code>needsRebuild</code> property recursively for the given components using DCs.
      *
+     * @param components
+     *            map of components processed so far.
      * @param component
      *            the development component whose using DCs have to be set up as needing a rebuild.
      */
-    private void calculateDevelopmentComponentsThatNeedRebuilding(final Map<String, Item> components, final DevelopmentComponent component) {
-        if (component.getCompartment() != null && component.getCompartment().isSourceState()
-            && !components.containsKey(getComponentName(component))) {
+    private void calculateDevelopmentComponentsThatNeedRebuilding(final Map<String, ComponentWrapper> components,
+        final DevelopmentComponent component) {
+        if (component.getCompartment() != null && !components.containsKey(getComponentName(component))) {
             component.setNeedsRebuild(true);
-            final Item i = new Item(component, createListOfUsedDCs(component));
+            final ComponentWrapper i = new ComponentWrapper(component, createListOfUsedDCs(component));
             components.put(i.getName(), i);
 
             for (final DevelopmentComponent usingDC : i.getUsingDCs()) {
@@ -205,9 +207,15 @@ public class TopoSort {
         }
     }
 
+    /**
+     * Create a collection of used DCs from the public part references of the given component.
+     *
+     * @param component
+     *            the component whose referenced development components are requested.
+     * @return collection of used DCs.
+     */
     private Collection<DevelopmentComponent> createListOfUsedDCs(final DevelopmentComponent component) {
-        final Collection<DevelopmentComponent> usedDCs =
-            new ArrayList<DevelopmentComponent>(component.getUsedDevelopmentComponents().size());
+        final Collection<DevelopmentComponent> usedDCs = new HashSet<DevelopmentComponent>(component.getUsedDevelopmentComponents().size());
 
         for (final PublicPartReference reference : component.getUsedDevelopmentComponents()) {
             final DevelopmentComponent e = dcFactory.get(reference);
@@ -221,21 +229,40 @@ public class TopoSort {
     }
 
     /**
+     * Wrapper around a development component (used for performance reasons).
      *
      * @author Dirk Weigenand
      */
-    private static final class Item implements Comparable<Item> {
+    private static final class ComponentWrapper implements Comparable<ComponentWrapper> {
+        /**
+         * Combination of vendor and component name.
+         */
         private final String name;
+
+        /**
+         * the component itself.
+         */
         private final DevelopmentComponent component;
+
+        /**
+         * components using this component.
+         */
         private final Collection<DevelopmentComponent> usingDCs = new HashSet<DevelopmentComponent>();
+
+        /**
+         * components used by this component.
+         */
         private final Collection<DevelopmentComponent> usedDCs = new HashSet<DevelopmentComponent>();
 
         /**
+         * Create a new wrapper instance around the given component.
          *
-         * @param dcFactory
          * @param component
+         *            the component to wrap.
+         * @param usedDCs
+         *            components used by this DC so that they don't need to be recomputed from the public part reference.
          */
-        Item(final DevelopmentComponent component, final Collection<DevelopmentComponent> usedDCs) {
+        ComponentWrapper(final DevelopmentComponent component, final Collection<DevelopmentComponent> usedDCs) {
             this.component = component;
             name = component.getVendor() + ":" + component.getName();
 
@@ -297,7 +324,7 @@ public class TopoSort {
             if (getClass() != obj.getClass()) {
                 return false;
             }
-            final Item other = (Item)obj;
+            final ComponentWrapper other = (ComponentWrapper)obj;
             if (component == null) {
                 if (other.component != null) {
                     return false;
@@ -319,7 +346,7 @@ public class TopoSort {
          * {@inheritDoc}
          */
         @Override
-        public int compareTo(final Item o) {
+        public int compareTo(final ComponentWrapper o) {
             return getName().compareTo(o.getName());
         }
 
