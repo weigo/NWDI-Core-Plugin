@@ -6,6 +6,7 @@ package org.arachna.netweaver.hudson.nwdi.changelog;
 import hudson.Util;
 import hudson.model.User;
 import hudson.scm.EditType;
+import hudson.scm.ChangeLogSet.AffectedFile;
 import hudson.scm.ChangeLogSet.Entry;
 
 import java.text.ParseException;
@@ -128,13 +129,13 @@ public final class DtrChangeLogEntry extends Entry {
      *            <code>ActivityResource</code> to add to change log.
      */
     private void createAndAddItem(final ActivityResource resource) {
-        Action action = Action.Edit;
+        Action action = Action.EDIT;
 
         if (resource.isDeleted()) {
-            action = Action.Delete;
+            action = Action.DELETE;
         }
         else if (Integer.valueOf(1).equals(resource.getSequenceNumber())) {
-            action = Action.Add;
+            action = Action.ADD;
         }
 
         final DevelopmentComponent dc = resource.getDevelopmentComponent();
@@ -155,6 +156,11 @@ public final class DtrChangeLogEntry extends Entry {
         }
 
         return affectedPaths;
+    }
+
+    @Override
+    public Collection<? extends AffectedFile> getAffectedFiles() {
+        return getItems();
     }
 
     /**
@@ -281,7 +287,7 @@ public final class DtrChangeLogEntry extends Entry {
      * 
      * @author Dirk Weigenand
      */
-    public static final class Item {
+    public static final class Item implements AffectedFile {
         /**
          * Path to resource in the affected DC.
          */
@@ -355,10 +361,10 @@ public final class DtrChangeLogEntry extends Entry {
         public EditType getEditType() {
             EditType editType = EditType.EDIT;
 
-            if (action.equals(Action.Delete)) {
+            if (action.equals(Action.DELETE)) {
                 editType = EditType.DELETE;
             }
-            else if (action.equals(Action.Add)) {
+            else if (action.equals(Action.ADD)) {
                 editType = EditType.ADD;
             }
 
@@ -421,26 +427,15 @@ public final class DtrChangeLogEntry extends Entry {
         /**
          * action denoting an add operation.
          */
-        Add("add"),
+        ADD("add"),
         /**
          * action denoting a delete operation.
          */
-        Delete("delete"),
+        DELETE("delete"),
         /**
          * action denoting an edit operation.
          */
-        Edit("edit");
-
-        /**
-         * Actions wrt. to resources in activities.
-         */
-        private static final Map<String, Action> ACTIONS = new HashMap<String, Action>();
-
-        static {
-            for (final Action action : values()) {
-                ACTIONS.put(action.toString(), action);
-            }
-        }
+        EDIT("edit");
 
         /**
          * operation denoted by an action.
@@ -463,17 +458,6 @@ public final class DtrChangeLogEntry extends Entry {
         @Override
         public String toString() {
             return name;
-        }
-
-        /**
-         * Get the action for the given string.
-         * 
-         * @param value
-         *            name of the action.
-         * @return the alias found or <code>null</code>.
-         */
-        public static Action fromString(final String value) {
-            return ACTIONS.get(value);
         }
     }
 }

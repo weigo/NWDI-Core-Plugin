@@ -125,7 +125,7 @@ public class DtrChangeLogParserTest {
 
         assertThat(
             entry.getItems(),
-            containsInAnyOrder(new Item("hamcrest.org/hamcrest/comp_/libraries/hamcrest-library-1.3.jar", Action.Add),
-                new Item("hamcrest.org/hamcrest/comp_/libraries", Action.Add)));
+            containsInAnyOrder(new Item("hamcrest.org/hamcrest/comp_/libraries/hamcrest-library-1.3.jar", Action.ADD),
+                new Item("hamcrest.org/hamcrest/comp_/libraries", Action.ADD)));
     }
 }

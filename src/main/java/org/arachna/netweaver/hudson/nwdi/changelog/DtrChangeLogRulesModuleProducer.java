@@ -71,7 +71,7 @@ public class DtrChangeLogRulesModuleProducer implements RulesModuleProducer {
 
         @Override
         public void begin(final String namespace, final String name, final Attributes attributes) throws Exception {
-            action = DtrChangeLogEntry.Action.fromString(attributes.getValue("action"));
+            action = DtrChangeLogEntry.Action.valueOf(attributes.getValue("action").toUpperCase());
         }
 
         @Override

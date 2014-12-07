@@ -28,6 +28,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
 import javax.xml.stream.XMLStreamException;
 
 import org.arachna.ant.AntHelper;
@@ -154,7 +155,9 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
             final TopoSort topoSort = new TopoSort(dcFactory, logger);
             final TopoSortResult topoSortResult = topoSort.sort(components);
             affectedComponents = topoSortResult.getDevelopmentComponents();
-
+            
+            logger.append("Components to be built: " + affectedComponents.toString());
+            
             // Log circular dependencies to build logger.
             if (logger != null && !topoSortResult.getCircularDependencies().isEmpty()) {
                 final StringBuilder dependencies = new StringBuilder("There are circular dependencies in this track:");
@@ -286,11 +289,6 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
         private static final String DEFAULT_ENCODING = "UTF-8";
 
         /**
-         * collection of reporter plugins to be run prior to building.
-         */
-        private final List<Publisher> reporters = new ArrayList<Publisher>();
-
-        /**
          * Builds all (changed) development components and updates the in core information about them (i.e. all DCs associated with the
          * current track in the development configuration stored in this build) so that this information can be used in post build tasks for
          * e.g. quality control or generation of documentation.
@@ -305,7 +303,6 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
         protected Result doRun(final BuildListener listener) throws Exception {
             final AntHelper antHelper = new AntHelper(FilePathHelper.makeAbsolute(getWorkspace()), dcFactory);
             final NWDIProject project = (NWDIProject)getProject();
-            reporters.addAll(project.getPublishersList().toList());
             Result result = Result.SUCCESS;
 
             if (!preBuild(listener, project.getBuilders())) {
@@ -426,16 +423,16 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
         private void saveDevelopmentConfigurationToWorkspace(final NWDIBuild nwdiBuild) throws IOException, InterruptedException {
             final DevelopmentConfigurationXmlWriter xmlWriter =
                 new DevelopmentConfigurationXmlWriter(nwdiBuild.getDevelopmentConfiguration());
-            final StringWriter xml = new StringWriter();
             try {
+                final StringWriter xml = new StringWriter();
                 xmlWriter.write(xml);
+                final FilePath xmlFP = new FilePath(nwdiBuild.getWorkspace(), "DevelopmentConfiguration.xml");
+                xmlFP.write(xml.toString(), DEFAULT_ENCODING);
             }
             catch (final XMLStreamException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-            final FilePath xmlFP = new FilePath(nwdiBuild.getWorkspace(), "DevelopmentConfiguration.xml");
-            xmlFP.write(xml.toString(), "UTF-8");
         }
 
         /**
@@ -454,13 +451,21 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
 
         @Override
         protected void post2(final BuildListener listener) throws Exception {
-            if (!performAllBuildSteps(listener, reporters, true)) {
+            if (!performAllBuildSteps(listener, project.getPublishersList(), true)) {
                 setResult(Result.FAILURE);
             }
 
             if (!performAllBuildSteps(listener, project.getProperties(), true)) {
                 setResult(Result.FAILURE);
             }
+        }
+        
+        @Override
+        public void cleanUp(@Nonnull BuildListener listener) throws Exception {
+            // at this point it's too late to mark the build as a failure, so ignore return value.
+            performAllBuildSteps(listener, project.getPublishersList(), false);
+            performAllBuildSteps(listener, project.getProperties(), false);
+            super.cleanUp(listener);
         }
     }
 
