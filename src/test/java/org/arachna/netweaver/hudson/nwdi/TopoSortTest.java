@@ -61,20 +61,23 @@ public class TopoSortTest {
         dcFactory = null;
     }
 
-    // @Test
+    @Test
     public void testStackOverflowError() {
         final DevelopmentComponentFactory dcFactory = new DevelopmentComponentFactory();
         final DevelopmentConfigurationReader reader = new DevelopmentConfigurationReader(dcFactory);
         reader.execute(new InputStreamReader(getClass().getResourceAsStream(
-            "/org/arachna/netweaver/hudson/nwdi/DevelopmentConfiguration1.xml")));
+            "/org/arachna/netweaver/hudson/nwdi/DevelopmentConfiguration.xml")));
         dcFactory.updateUsingDCs();
         final Collection<DevelopmentComponent> components = new HashSet<DevelopmentComponent>();
 
-        for (final DevelopmentComponent component : dcFactory.getAll()) {
-            component.setNeedsRebuild(component.getCompartment().isSourceState());
-            components.add(component);
-        }
+        // for (final DevelopmentComponent component : dcFactory.getAll()) {
+        // component.setNeedsRebuild(component.getCompartment().isSourceState());
+        // components.add(component);
+        // }
 
+        DevelopmentComponent c = dcFactory.get("gisa.de", "qms/service/ejb");
+        c.setNeedsRebuild(true);
+        components.add(c);
         final TopoSortResult result = sorter.sort(components);
 
         System.err.println("Dependencies:");

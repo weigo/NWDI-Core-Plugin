@@ -52,6 +52,7 @@ public class TopoSort {
     public TopoSortResult sort(final Collection<DevelopmentComponent> components) {
         final TopoSortResult topoSortResult = new TopoSortResult();
         final Map<String, ComponentWrapper> itemMap = getComponentsToRebuild(components);
+
         topoSort(topoSortResult, itemMap, new ArrayList<ComponentWrapper>(itemMap.values()));
 
         return topoSortResult;
@@ -77,6 +78,15 @@ public class TopoSort {
 
         while (iterator.hasNext()) {
             final ComponentWrapper item = iterator.next();
+
+            // remove usedDCs that don't need rebuilding from dependencies.
+            Collection<DevelopmentComponent> usedDCs = new ArrayList<DevelopmentComponent>(item.getUsedDCs());
+
+            for (DevelopmentComponent usedDC : usedDCs) {
+                if (!usedDC.isNeedsRebuild()) {
+                    item.removeUsedDC(usedDC);
+                }
+            }
 
             if (!item.hasUsedDCs()) {
                 final DevelopmentComponent component = item.getComponent();
@@ -145,10 +155,7 @@ public class TopoSort {
     private void findRecursivelyInUsedDCs(final int depth, final DevelopmentComponent component, final ComponentWrapper parent,
         final Map<String, ComponentWrapper> itemMap, final TopoSortResult topoSortResult,
         final Collection<DevelopmentComponent> visitedParents) {
-        // System.err.println(String.format("%d: %s:%s %s:%s", depth, component.getVendor(), component.getName(), parent.getComponent()
-        // .getVendor(), parent.getComponent().getName()));
-
-        if (topoSortResult.hasCircularDependency(component) || visitedParents.contains(parent.getComponent())) {
+        if (topoSortResult.hasCircularDependency(component) || (parent != null && visitedParents.contains(parent.getComponent()))) {
             return;
         }
 
@@ -162,10 +169,7 @@ public class TopoSort {
             final String componentName = getComponentName(usedDC);
             final ComponentWrapper dependency = itemMap.get(componentName);
 
-            if (dependency != null) {
-                // dependency = new ComponentWrapper(usedDC, createListOfUsedDCs(usedDC));
-                findRecursivelyInUsedDCs(depth + 1, component, dependency, itemMap, topoSortResult, visitedParents);
-            }
+            findRecursivelyInUsedDCs(depth + 1, component, dependency, itemMap, topoSortResult, visitedParents);
         }
     }
 
@@ -220,6 +224,7 @@ public class TopoSort {
         for (final PublicPartReference reference : component.getUsedDevelopmentComponents()) {
             final DevelopmentComponent e = dcFactory.get(reference);
 
+            // only look at DCs that are in source state and need rebuilding themselves.
             if (e != null && e.getCompartment().isSourceState()) {
                 usedDCs.add(e);
             }
@@ -282,9 +287,7 @@ public class TopoSort {
          * @param usedDC
          */
         public void removeUsedDC(final DevelopmentComponent usedDC) {
-            if (!usedDCs.remove(usedDC)) {
-                System.err.println(String.format("Could not remove %s:%s from %s!", usedDC.getVendor(), usedDC.getName(), getName()));
-            }
+            usedDCs.remove(usedDC);
         }
 
         /**
