@@ -45,5 +45,6 @@ public final class DtrChangeLogParser extends ChangeLogParser {
      */
     protected void parse(final DtrChangeLogSet changeSet, final Reader reader) {
         new DigesterHelper<DtrChangeLogSet>(new DtrChangeLogRulesModuleProducer()).update(reader, changeSet);
+        changeSet.sort();
     }
 }

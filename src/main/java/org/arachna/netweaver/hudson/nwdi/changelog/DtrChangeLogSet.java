@@ -43,6 +43,8 @@ public final class DtrChangeLogSet extends ChangeLogSet<DtrChangeLogEntry> {
         for (final Activity activity : activities) {
             add(new DtrChangeLogEntry(activity));
         }
+        
+        sort();
     }
 
     /**
