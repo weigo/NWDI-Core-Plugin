@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.arachna.netweaver.tools;
 
@@ -26,12 +26,12 @@ import org.arachna.netweaver.dc.types.JdkHomeAlias;
 
 /**
  * Base class for executors of NWDI tools (cbstool, dctool, etc.).
- * 
+ *
  * @author Dirk Weigenand
  */
 public abstract class AbstractDIToolExecutor {
     /**
-     * 
+     *
      */
     private static final String JAVA_HOME = "JAVA_HOME";
 
@@ -67,7 +67,7 @@ public abstract class AbstractDIToolExecutor {
 
     /**
      * create DC tool executor with the given command line generator and given command build.
-     * 
+     *
      * @param launcher
      *            the launcher to use executing the DC tool.
      * @param workspace
@@ -88,7 +88,7 @@ public abstract class AbstractDIToolExecutor {
 
     /**
      * Execute dc tool with the given {@link DIToolCommandBuilder}.
-     * 
+     *
      * @param commandBuilder
      *            builder for dc tool commands
      * @return content of log file created by the executed dc tool.
@@ -122,25 +122,20 @@ public abstract class AbstractDIToolExecutor {
 
     /**
      * Create an <code>InputStream</code> containing the given NWDI tool commands.
-     * 
+     *
      * @param commands
      *            list of NWDI tool commands
      * @return <code>InputStream</code> containing the given NWDI tool commands.
      */
     private InputStream createCommandInputStream(final List<String> commands) {
-        final StringBuilder cmds = new StringBuilder();
         final String separator = isUnix() ? "\n" : "\r\n";
 
-        for (final String cmd : commands) {
-            cmds.append(cmd).append(separator);
-        }
-
-        return new ByteArrayInputStream(cmds.toString().getBytes(Charset.defaultCharset()));
+        return new ByteArrayInputStream(StringUtils.join(commands, separator).getBytes(Charset.defaultCharset()));
     }
 
     /**
      * Creates the command line for tool execution.
-     * 
+     *
      * @return the created command line.
      */
     private ArgumentListBuilder createToolCommand() {
@@ -158,7 +153,7 @@ public abstract class AbstractDIToolExecutor {
 
     /**
      * Determines whether this executor runs on Unix or not.
-     * 
+     *
      * @return <code>true</code> iff this launcher runs on Unix, <code>false</code> otherwise.
      */
     protected boolean isUnix() {
@@ -167,7 +162,7 @@ public abstract class AbstractDIToolExecutor {
 
     /**
      * Generate the fully qualified command to be used to execute the dc tool.
-     * 
+     *
      * @return fully qualified command to be used to execute the dc tool.
      */
     private String getFullyQualifiedToolCommand() {
@@ -176,7 +171,7 @@ public abstract class AbstractDIToolExecutor {
 
     /**
      * Get a file instance for the tool command to use.
-     * 
+     *
      * @return a file instance pointing to the tool command to use.
      */
     protected final File getToolCommand() {
@@ -185,21 +180,21 @@ public abstract class AbstractDIToolExecutor {
 
     /**
      * Determine the name of the command to be executed. I.e. the name of the shell script or batch file.
-     * 
+     *
      * @return the name of the shell script or batch file to be executed.
      */
     protected abstract String getCommandName();
 
     /**
      * Get the path to the tool to be executed.
-     * 
+     *
      * @return path under NWDITOOLLIB folder containing the tool.
      */
     protected abstract File getToolPath();
 
     /**
      * Prepare the environment variables for the launcher.
-     * 
+     *
      * @return the map containing the environment variable name mapping to their corresponding values.
      */
     private Map<String, String> createEnvironment() {
@@ -219,7 +214,7 @@ public abstract class AbstractDIToolExecutor {
 
     /**
      * Determine the time in seconds passed since the given start time and log it using the message given.
-     * 
+     *
      * @param start
      *            begin of action whose duration should be logged.
      * @param message
@@ -238,7 +233,7 @@ public abstract class AbstractDIToolExecutor {
 
     /**
      * Log the given message.
-     * 
+     *
      * @param message
      *            the message to log.
      */
@@ -249,7 +244,7 @@ public abstract class AbstractDIToolExecutor {
     /**
      * Read the NWDI tool library location from the DiToolDescriptor. Throws an IllegalStateException if this location has not been
      * configured yet.
-     * 
+     *
      * @return NWDI tool library location
      */
     protected final String getNwdiToolLibrary() {
@@ -265,5 +260,14 @@ public abstract class AbstractDIToolExecutor {
      */
     protected final DIToolDescriptor getDiToolDescriptor() {
         return diToolDescriptor;
+    }
+
+    /**
+     * Provide the workspace folder to implementors.
+     *
+     * @return a {@link FilePath} object representing the workspace of the current build.
+     */
+    protected final FilePath getWorkspace() {
+        return workspace;
     }
 }

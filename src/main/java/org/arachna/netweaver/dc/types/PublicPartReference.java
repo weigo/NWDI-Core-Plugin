@@ -44,6 +44,11 @@ public class PublicPartReference {
     private boolean atDeployTime;
 
     /**
+     * hash code of this public part reference.
+     */
+    private final int hashCode;
+
+    /**
      * Creates a <code>PublicPartReference</code> with the given vendor, development component name and public part name.
      *
      * @param vendor
@@ -57,6 +62,7 @@ public class PublicPartReference {
         this.vendor = vendor;
         this.componentName = componentName;
         this.name = name;
+        hashCode = Arrays.hashCode(new Object[] { componentName, getName(), vendor });
     }
 
     /**
@@ -187,12 +193,12 @@ public class PublicPartReference {
 
     @Override
     public int hashCode() {
-        return Arrays.hashCode(new Object[] { componentName, getName(), vendor });
+        return hashCode;
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -207,9 +213,7 @@ public class PublicPartReference {
             return false;
         }
 
-        final PublicPartReference other = (PublicPartReference)obj;
-
-        return hashCode() == other.hashCode();
+        return hashCode() == obj.hashCode();
     }
 
     /**

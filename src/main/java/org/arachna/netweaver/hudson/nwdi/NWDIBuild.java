@@ -14,7 +14,6 @@ import hudson.model.AbstractBuild;
 import hudson.model.Run;
 import hudson.tasks.BuildStep;
 import hudson.tasks.Builder;
-import hudson.tasks.Publisher;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
@@ -148,16 +146,11 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
 
             // update usage relations from public part references.
             dcFactory.updateUsingDCs();
-            // final ComponentsNeedingRebuildFinder finder = new ComponentsNeedingRebuildFinder();
-            // final DependencySorter dependencySorter =
-            // new DependencySorter(dcFactory, finder.calculateDevelopmentComponentsThatNeedRebuilding(components));
 
             final TopoSort topoSort = new TopoSort(dcFactory, logger);
             final TopoSortResult topoSortResult = topoSort.sort(components);
             affectedComponents = topoSortResult.getDevelopmentComponents();
-            
-            logger.append("Components to be built: " + affectedComponents.toString());
-            
+
             // Log circular dependencies to build logger.
             if (logger != null && !topoSortResult.getCircularDependencies().isEmpty()) {
                 final StringBuilder dependencies = new StringBuilder("There are circular dependencies in this track:");
@@ -169,7 +162,6 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
 
                 logger.println(dependencies.toString());
             }
-            // affectedComponents = dependencySorter.determineBuildSequence();
         }
 
         return affectedComponents;
@@ -459,9 +451,9 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
                 setResult(Result.FAILURE);
             }
         }
-        
+
         @Override
-        public void cleanUp(@Nonnull BuildListener listener) throws Exception {
+        public void cleanUp(@Nonnull final BuildListener listener) throws Exception {
             // at this point it's too late to mark the build as a failure, so ignore return value.
             performAllBuildSteps(listener, project.getPublishersList(), false);
             performAllBuildSteps(listener, project.getProperties(), false);
