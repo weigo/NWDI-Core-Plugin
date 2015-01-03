@@ -153,6 +153,11 @@ public class TopoSortResult {
             }
             return true;
         }
+
+        @Override
+        public String toString() {
+            return "CircularDependency [component=" + component + ", dependency=" + dependency + "]";
+        }
     }
 
     /**

@@ -26,6 +26,7 @@ import java.util.List;
 
 import net.sf.json.JSONObject;
 
+import org.arachna.ant.AntHelper;
 import org.arachna.netweaver.dc.types.Compartment;
 import org.arachna.netweaver.dc.types.CompartmentState;
 import org.arachna.netweaver.dc.types.DevelopmentComponent;
@@ -42,7 +43,7 @@ import org.kohsuke.stapler.StaplerRequest;
 
 /**
  * Interface to NetWeaver Developer Infrastructure.
- * 
+ *
  * @author Dirk Weigenand
  */
 public class NWDIScm extends SCM {
@@ -73,7 +74,7 @@ public class NWDIScm extends SCM {
 
     /**
      * Create an instance of a <code>NWDIScm</code>.
-     * 
+     *
      * @param dtrUser
      *            user to authenticate with.
      * @param password
@@ -91,7 +92,7 @@ public class NWDIScm extends SCM {
 
     /**
      * Create parser for DTR change logs.
-     * 
+     *
      * {@inheritDoc}
      */
     @Override
@@ -118,13 +119,15 @@ public class NWDIScm extends SCM {
         final PrintStream logger = listener.getLogger();
 
         project.updateDevelopmentConfiguration(logger, currentBuild.getDtcFolder());
+
         final Collection<Activity> activities = new LinkedList<Activity>();
         final DCToolCommandExecutor executor = currentBuild.getDCToolExecutor(launcher);
 
         final DevelopmentComponentFactory dcFactory = currentBuild.getDevelopmentComponentFactory();
 
         DIToolCommandExecutionResult result = currentBuild.getCBSToolExecutor(launcher).listDevelopmentComponents(dcFactory);
-        final DevelopmentComponentUpdater updater = new DevelopmentComponentUpdater(FilePathHelper.makeAbsolute(workspace), dcFactory);
+        final AntHelper antHelper = new AntHelper(FilePathHelper.makeAbsolute(workspace), dcFactory);
+        final DevelopmentComponentUpdater updater = new DevelopmentComponentUpdater(antHelper);
 
         if (result.isExitCodeOk()) {
             final NWDIBuild lastSuccessfulBuild = project.getLastSuccessfulBuild();
@@ -146,19 +149,19 @@ public class NWDIScm extends SCM {
             setNeedsRebuildPropertyOnAllDevelopmentComponentsInSourceState(config, cleanCopy);
 
             if (cleanCopy || !activities.isEmpty()) {
-                // synchronize sources
-                result = executor.synchronizeDevelopmentComponents(dcFactory, cleanCopy, true);
-                // update used DCs
-                updater.execute();
+                result = executor.synchronizeDevelopmentComponentsInSourceState(cleanCopy);
+                // update DCs with on disk information
+                updater.execute(dcFactory.getAll());
 
                 if (result.isExitCodeOk()) {
-                    // synchronize used DCs (in archive state)
-                    result = executor.synchronizeDevelopmentComponents(dcFactory, cleanCopy, false);
+                    result =
+                        executor.synchronizeDevelopmentComponentsInArchiveState(dcFactory, antHelper,
+                            currentBuild.getAffectedDevelopmentComponents(logger));
                 }
             }
         }
 
-        updater.execute();
+        updater.execute(dcFactory.getAll());
 
         build.addAction(new NWDIRevisionState());
         writeChangeLog(build, changelogFile, activities);
@@ -168,7 +171,7 @@ public class NWDIScm extends SCM {
 
     /**
      * Set the needsRebuild property on all development components in source state if a clean build was requested.
-     * 
+     *
      * @param config
      *            the development configuration containing the DCs
      * @param cleanCopy
@@ -220,7 +223,7 @@ public class NWDIScm extends SCM {
 
     /**
      * Write the change log using the given build, file and list of activities.
-     * 
+     *
      * @param build
      *            the {@link AbstractBuild} to use writing the change log.
      * @param changelogFile
@@ -237,7 +240,7 @@ public class NWDIScm extends SCM {
 
     /**
      * {@link SCMDescriptor} for {@link NWDIProject}.
-     * 
+     *
      * @author Dirk Weigenand
      */
     @Extension
@@ -269,7 +272,7 @@ public class NWDIScm extends SCM {
 
     /**
      * Get list of activities since last run. If <code>lastRun</code> is <code>null</code> all activities will be read.
-     * 
+     *
      * @param logger
      *            the logger to use.
      * @param browser
@@ -310,7 +313,7 @@ public class NWDIScm extends SCM {
 
     /**
      * Returns an instance of {@link DtrBrowser} using the given development configuration.
-     * 
+     *
      * @param config
      *            the development configuration to be used to connect to the DTR.
      * @return the {@link DtrBrowser} for browsing the DTR for activities.
@@ -321,7 +324,7 @@ public class NWDIScm extends SCM {
 
     /**
      * Determine the time in seconds passed since the given start time and log it using the message given.
-     * 
+     *
      * @param logger
      *            the logger to use.
      * @param start

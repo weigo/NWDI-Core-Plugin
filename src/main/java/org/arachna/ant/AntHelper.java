@@ -11,7 +11,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.arachna.netweaver.dc.types.CompartmentState;
 import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.DevelopmentComponentType;
@@ -21,7 +20,7 @@ import org.arachna.netweaver.dc.types.PublicPartType;
 
 /**
  * Helper for building ant projects/tasks.
- * 
+ *
  * @author Dirk Weigenand
  */
 public class AntHelper {
@@ -33,8 +32,7 @@ public class AntHelper {
     /**
      * An all folder names accepting filter.
      */
-    private static final SourceDirectoryFilter ALL_SOURCE_FOLDERS_ACCEPTING_FILTER =
-        new AllSourceFoldersAcceptingFilter();
+    private static final SourceDirectoryFilter ALL_SOURCE_FOLDERS_ACCEPTING_FILTER = new AllSourceFoldersAcceptingFilter();
 
     /**
      * registry for development components.
@@ -48,7 +46,7 @@ public class AntHelper {
 
     /**
      * Create an instance of the ant helper.
-     * 
+     *
      * @param pathToWorkspace
      *            path to workspace the build is taking place on
      * @param dcFactory
@@ -60,18 +58,15 @@ public class AntHelper {
     }
 
     /**
-     * Iterate over the DCs source folders and return those that actually exist
-     * in the file system.
-     * 
+     * Iterate over the DCs source folders and return those that actually exist in the file system.
+     *
      * @param component
      *            development component to get the existing source folders for.
      * @param filter
-     *            determines which source folders should be included in the
-     *            resulting collection of source folders
+     *            determines which source folders should be included in the resulting collection of source folders
      * @return source folders that exist in the DCs directory structure.
      */
-    private Collection<File> getExistingSourceFolders(final DevelopmentComponent component,
-        final SourceDirectoryFilter filter) {
+    private Collection<File> getExistingSourceFolders(final DevelopmentComponent component, final SourceDirectoryFilter filter) {
         final Collection<File> sourceFolders = new ArrayList<File>();
 
         for (final String sourceFolder : component.getSourceFolders()) {
@@ -86,14 +81,12 @@ public class AntHelper {
     }
 
     /**
-     * Create a set of paths using the public part references of the given
-     * development component.
-     * 
+     * Create a set of paths using the public part references of the given development component.
+     *
      * @param component
      *            development component the ant class path shall be created for.
-     * 
-     * @return set of paths built from the public part references of the given
-     *         development component
+     *
+     * @return set of paths built from the public part references of the given development component
      */
     public Set<String> createClassPath(final DevelopmentComponent component) {
         final Set<String> paths = new HashSet<String>();
@@ -114,15 +107,13 @@ public class AntHelper {
     }
 
     /**
-     * Calculate the absolute path to the artifacts of the public part in the
-     * given development component.
-     * 
+     * Calculate the absolute path to the artifacts of the public part in the given development component.
+     *
      * @param component
      *            development component
      * @param name
      *            name of public part
-     * @return absolute path to artifacts of the given public part in the given
-     *         development component.
+     * @return absolute path to artifacts of the given public part in the given development component.
      */
     public String getBaseLocation(final DevelopmentComponent component, final String name) {
         String ppName = name;
@@ -136,8 +127,7 @@ public class AntHelper {
             }
         }
 
-        if (DevelopmentComponentType.ExternalLibrary.equals(component.getType())
-            && CompartmentState.Source.equals(component.getCompartment().getState())) {
+        if (DevelopmentComponentType.ExternalLibrary.equals(component.getType()) && component.getCompartment().isSourceState()) {
             return String.format("%s/libraries", this.getBaseLocation(component));
         }
 
@@ -145,27 +135,24 @@ public class AntHelper {
     }
 
     /**
-     * Return the location of the public part relative to the given base
-     * location.
-     * 
-     * The location is that of the given public part under
-     * <code>gen/default</code> or the <code>gen/default</code> folder.
-     * 
+     * Return the location of the public part relative to the given base location.
+     *
+     * The location is that of the given public part under <code>gen/default</code> or the <code>gen/default</code> folder.
+     *
      * @param baseLocation
      *            location of development component
      * @param name
      *            name of public part.
-     * @return the path to the artifacts of the given public part in the given
-     *         location of development component.
+     * @return the path to the artifacts of the given public part in the given location of development component.
      */
     String getPublicPartLocation(final String baseLocation, final String name) {
-        return Util.fixEmpty(name) != null ? String.format("%s/gen/default/public/%s/lib/java", baseLocation, name)
-            : String.format("%s/gen/default", baseLocation);
+        return Util.fixEmpty(name) != null ? String.format("%s/gen/default/public/%s/lib/java", baseLocation, name) : String.format(
+            "%s/gen/default", baseLocation);
     }
 
     /**
      * Returns the absolute path to workspace.
-     * 
+     *
      * @return absolute path to workspace.
      */
     public String getPathToWorkspace() {
@@ -174,7 +161,7 @@ public class AntHelper {
 
     /**
      * Get the location of a development component in workspace.
-     * 
+     *
      * @param component
      *            development component the location is to be calculated for.
      * @return the location of the given component in the workspace.
@@ -185,11 +172,10 @@ public class AntHelper {
 
     /**
      * Get the location of a development components public part in workspace.
-     * 
+     *
      * @param ppRef
      *            reference to public part
-     * @return the location of the files comprising the given public part
-     *         reference
+     * @return the location of the files comprising the given public part reference
      */
     public String getLocation(final PublicPartReference ppRef) {
         return getPublicPartLocation(this.getBaseLocation(ppRef.getVendor(), ppRef.getComponentName()), ppRef.getName());
@@ -197,7 +183,7 @@ public class AntHelper {
 
     /**
      * Calculate the base path using the given vendor and component name.
-     * 
+     *
      * @param vendor
      *            the vendor of the given component
      * @param name
@@ -209,9 +195,8 @@ public class AntHelper {
     }
 
     /**
-     * Creates a collection of source folders for the given development
-     * component.
-     * 
+     * Creates a collection of source folders for the given development component.
+     *
      * @param component
      *            development component to create source file sets for.
      * @return a collection of source folders of the given development component
@@ -221,19 +206,15 @@ public class AntHelper {
     }
 
     /**
-     * Creates a collection of source folders for the given development
-     * component filtered using the given filter.
-     * 
+     * Creates a collection of source folders for the given development component filtered using the given filter.
+     *
      * @param component
      *            development component to create source file sets for.
      * @param filter
-     *            a filter that determines which of the source folders should be
-     *            added to the result list
-     * @return a collection of source folders of the given development component
-     *         filtered using the given filter for source directories
+     *            a filter that determines which of the source folders should be added to the result list
+     * @return a collection of source folders of the given development component filtered using the given filter for source directories
      */
-    public Collection<String> createSourceFileSets(final DevelopmentComponent component,
-        final SourceDirectoryFilter filter) {
+    public Collection<String> createSourceFileSets(final DevelopmentComponent component, final SourceDirectoryFilter filter) {
         final Collection<String> sources = new HashSet<String>();
 
         for (final File srcFolder : getExistingSourceFolders(component, filter)) {

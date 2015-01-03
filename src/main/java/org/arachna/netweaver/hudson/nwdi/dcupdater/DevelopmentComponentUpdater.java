@@ -9,12 +9,12 @@ import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.Charset;
+import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.arachna.ant.AntHelper;
 import org.arachna.netweaver.dc.types.DevelopmentComponent;
-import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.DevelopmentComponentType;
 import org.arachna.xml.DigesterHelper;
 import org.arachna.xml.RulesModuleProducer;
@@ -22,15 +22,10 @@ import org.arachna.xml.RulesModuleProducer;
 /**
  * Update development components with information read from the on disk representation of those DCs (i.e. .confdef, .dcdef, project
  * properties and various JEE configuration files).
- * 
+ *
  * @author Dirk Weigenand
  */
 public final class DevelopmentComponentUpdater {
-    /**
-     * List of development components to be updated.
-     */
-    private final DevelopmentComponentFactory dcFactory;
-
     /**
      * helper class.
      */
@@ -38,23 +33,23 @@ public final class DevelopmentComponentUpdater {
 
     /**
      * Create an instance of <code>DevelopmentComponentUpdater</code>.
-     * 
-     * @param location
-     *            path to folder where development components are situated.
-     * @param dcFactory
-     *            registry for development components.
+     *
+     * @param antHelper
+     *            Helper class for gathering information development components.
      */
-    public DevelopmentComponentUpdater(final String location, final DevelopmentComponentFactory dcFactory) {
-        this.dcFactory = dcFactory;
-        antHelper = new AntHelper(location, dcFactory);
+    public DevelopmentComponentUpdater(final AntHelper antHelper) {
+        this.antHelper = antHelper;
     }
 
     /**
      * Loops through all components and updates information read from dc tool with information from file system (i.e. configuration data of
      * DCs: .dcdef, Project.wdproperties, etc.)
+     *
+     * @param components
+     *            collection of development components to update.
      */
-    public void execute() {
-        for (final DevelopmentComponent component : dcFactory.getAll()) {
+    public void execute(final Collection<DevelopmentComponent> components) {
+        for (final DevelopmentComponent component : components) {
             DcPropertiesReaderDescriptor.All.update(antHelper, component);
 
             for (final DcPropertiesReaderDescriptor descriptor : DcPropertiesReaderDescriptor.values()) {
@@ -70,7 +65,7 @@ public final class DevelopmentComponentUpdater {
 
     /**
      * Descriptor for configuration files to update a development component from.
-     * 
+     *
      * @author Dirk Weigenand
      */
     private enum DcPropertiesReaderDescriptor {
@@ -80,22 +75,22 @@ public final class DevelopmentComponentUpdater {
         WebDynpro(DevelopmentComponentType.WebDynpro, new WebDynproProjectPropertiesRulesModuleProducer(),
             "src/packages/ProjectProperties.wdproperties"),
 
-        /**
-         * Descriptor for DCs of type Portal Application Module.
-         */
-        PortalApplicationModule(DevelopmentComponentType.PortalApplicationModule, new PortalApplicationConfigurationRulesModuleProducer(),
-            "dist/PORTAL-INF/portalapp.xml"),
+            /**
+             * Descriptor for DCs of type Portal Application Module.
+             */
+            PortalApplicationModule(DevelopmentComponentType.PortalApplicationModule, new PortalApplicationConfigurationRulesModuleProducer(),
+                "dist/PORTAL-INF/portalapp.xml"),
 
-        /**
-         * Descriptor for DCs of type Portal Standalone Application.
-         */
-        PortalApplicationStandalone(DevelopmentComponentType.PortalApplicationStandalone,
-            new PortalApplicationConfigurationRulesModuleProducer(), "dist/PORTAL-INF/portalapp.xml"),
+                /**
+                 * Descriptor for DCs of type Portal Standalone Application.
+                 */
+                PortalApplicationStandalone(DevelopmentComponentType.PortalApplicationStandalone,
+                    new PortalApplicationConfigurationRulesModuleProducer(), "dist/PORTAL-INF/portalapp.xml"),
 
-        /**
-         * Special type meaning all development component types.
-         */
-        All(null, new DcDefinitionRulesModuleProducer(), ".dcdef");
+                    /**
+                     * Special type meaning all development component types.
+                     */
+                    All(null, new DcDefinitionRulesModuleProducer(), ".dcdef");
 
         /**
          * type of development component.
@@ -114,7 +109,7 @@ public final class DevelopmentComponentUpdater {
 
         /**
          * Create descriptor instance with given type, rules producer and config file name.
-         * 
+         *
          * @param dcType
          *            type of development component may be null.
          * @param rulesModuleProducer
@@ -131,7 +126,7 @@ public final class DevelopmentComponentUpdater {
 
         /**
          * Get a reader for the configuration file.
-         * 
+         *
          * @param config
          *            configuration file object.
          * @return reader for configuration file.
@@ -145,7 +140,7 @@ public final class DevelopmentComponentUpdater {
 
         /**
          * Update the given development component with the properties defined by this descriptor.
-         * 
+         *
          * @param antHelper
          *            helper class for extracting file names.
          * @param component
@@ -169,7 +164,7 @@ public final class DevelopmentComponentUpdater {
 
     /**
      * Read the public parts of the current development component and add them to it.
-     * 
+     *
      * @param component
      *            development component to determine public parts for.
      */
