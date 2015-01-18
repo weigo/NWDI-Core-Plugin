@@ -75,8 +75,7 @@ public final class DCToolCommandExecutor extends AbstractDIToolExecutor {
         final long startSyncDCs = System.currentTimeMillis();
         log(Messages.DCToolCommandExecutor_synchronizing_development_components());
         final DIToolCommandExecutionResult result =
-            wrapAndExecute(commandFactory.createSyncDevelopmentComponentsInArchiveStateCommandBuilder(new DCsToSynchronizeCollector(
-                dcFactory, antHelper).execute(components)));
+            wrapAndExecute(commandFactory.createSyncDevelopmentComponentsInArchiveStateCommandBuilder(dcFactory, antHelper, components));
         duration(startSyncDCs, Messages.DCToolCommandExecutor_done_synchronizing_development_components());
 
         return result;
@@ -192,16 +191,24 @@ public final class DCToolCommandExecutor extends AbstractDIToolExecutor {
         }
 
         /**
-         * {@inheritDoc}
+         * Wrap commands in load- and exit-commands when the list of commands produced by the wrapped command build is not empty.
+         *
+         * This enables a performance optimisation when no commands are to be executed. In this case the expensive loading of the
+         * <code>dctool</code> can be skipped. This will shave several 10 seconds off the build.
+         *
+         * @return list of commands to be executed. This list is empty, when the list of commands produced by the wrapped builder is empty.
          */
         @Override
         public List<String> execute() {
             final List<String> commands = new LinkedList<String>();
+            final List<String> wrappedCommands = wrappedBuilder.execute();
 
-            commands.addAll(loadConfigCommandBuilder.execute());
-            commands.addAll(wrappedBuilder.execute());
+            if (!wrappedCommands.isEmpty()) {
+                commands.addAll(loadConfigCommandBuilder.execute());
+                commands.addAll(wrappedCommands);
 
-            commands.add(loadConfigCommandBuilder.getExitCommand());
+                commands.add(loadConfigCommandBuilder.getExitCommand());
+            }
 
             return commands;
         }

@@ -11,8 +11,8 @@ import org.arachna.netweaver.tools.DIToolCommandBuilder;
 import org.arachna.netweaver.tools.DIToolDescriptor;
 
 /**
- * Command builder for DC toll loadconfig commands.
- * 
+ * Command builder for DC tool loadconfig commands.
+ *
  * @author Dirk Weigenand
  */
 class LoadConfigCommandBuilder implements DIToolCommandBuilder {
@@ -27,7 +27,7 @@ class LoadConfigCommandBuilder implements DIToolCommandBuilder {
     private final LoadConfigTemplate template;
 
     /**
-     * 
+     *
      * @param dcToolDescriptor
      * @param template
      */
@@ -52,7 +52,7 @@ class LoadConfigCommandBuilder implements DIToolCommandBuilder {
 
     /**
      * Get the command for loading a development configuration.
-     * 
+     *
      * @return command for loading a development configuration.
      */
     String getLoadConfigCommand() {
@@ -62,7 +62,7 @@ class LoadConfigCommandBuilder implements DIToolCommandBuilder {
 
     /**
      * Get the command to enable timing of dc tool commands.
-     * 
+     *
      * @return command to enable timing of dc tool commands.
      */
     String getTimingCommand() {
@@ -71,7 +71,7 @@ class LoadConfigCommandBuilder implements DIToolCommandBuilder {
 
     /**
      * Return the exit command to use for the respective NetWeaver environment.
-     * 
+     *
      * @return exit command.
      */
     String getExitCommand() {

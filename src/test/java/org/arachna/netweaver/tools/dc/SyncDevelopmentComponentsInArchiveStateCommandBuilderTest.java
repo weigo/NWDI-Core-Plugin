@@ -9,6 +9,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import java.util.Arrays;
 import java.util.List;
 
+import org.arachna.ant.AntHelper;
 import org.arachna.netweaver.dc.types.BuildVariant;
 import org.arachna.netweaver.dc.types.Compartment;
 import org.arachna.netweaver.dc.types.CompartmentState;
@@ -69,8 +70,10 @@ public class SyncDevelopmentComponentsInArchiveStateCommandBuilderTest {
         final Compartment compartment = Compartment.create(EXAMPLE_SC, CompartmentState.Archive);
         final DevelopmentComponent component = dcFactory.create(VENDOR, "dc1");
         compartment.add(component);
-
-        builder = new SyncDevelopmentComponentsInArchiveStateCommandBuilder(createDevelopmentConfiguration(), Arrays.asList(component));
+        final AntHelper antHelper = new AntHelper("", dcFactory);
+        builder =
+            new SyncDevelopmentComponentsInArchiveStateCommandBuilder(createDevelopmentConfiguration(), dcFactory, antHelper,
+                Arrays.asList(component));
     }
 
     /**

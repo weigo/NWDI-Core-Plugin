@@ -1,45 +1,29 @@
 /**
- * 
+ *
  */
 package org.arachna.netweaver.tools.dc;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import org.arachna.netweaver.dc.types.Compartment;
+import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.arachna.netweaver.dc.types.JdkHomeAlias;
 
 /**
  * Templates for syncing/unsyncing single/all DCs from a compartment.
- * 
+ *
  * @author Dirk Weigenand
  */
 enum SyncDcCommandTemplate {
     /**
      * Template for NW 7.0.
      */
-    V70("syncdc -s %s -n %s -v %s -m inactive -y;", "syncdc -s %s -n %s -v %s -m archive --syncused;",
-        "syncalldcs -s %s -m archive;", "syncalldcs -s %s -m inactive;", "unsyncdc -s %s -n %s -v %s;"),
+    V70("syncdc -s %s -n %s -v %s -m inactive -y;", "syncdc -s %s -n %s -v %s -m archive --syncused;", "syncalldcs -s %s -m archive;",
+        "syncalldcs -s %s -m inactive;", "unsyncdc -s %s -n %s -v %s;"),
 
-    /**
-     * Template for NW 7.1+.
-     */
-    V71("syncdc -c %s -n %s -v %s -m inactive -f", "syncdc -c %s -n %s -v %s -m archive",
-        "syncalldcs -c %s -m archive", "syncalldcs -c %s -m inactive", "unsyncdc -c %s -n %s -v %s");
-
-    /**
-     * mapping from JdkHomeAlias to template used for generating DC tool
-     * commands for synchronizing development components.
-     */
-    @SuppressWarnings("serial")
-    private static final Map<JdkHomeAlias, SyncDcCommandTemplate> TEMPLATES =
-        new HashMap<JdkHomeAlias, SyncDcCommandTemplate>() {
-            {
-                put(JdkHomeAlias.Jdk131Home, V70);
-                put(JdkHomeAlias.Jdk142Home, V70);
-                put(JdkHomeAlias.Jdk150Home, V71);
-                put(JdkHomeAlias.Jdk160Home, V71);
-            }
-        };
+        /**
+         * Template for NW 7.1+.
+         */
+        V71("syncdc -c %s -n %s -v %s -m inactive -f", "syncdc -c %s -n %s -v %s -m archive", "syncalldcs -c %s -m archive",
+            "syncalldcs -c %s -m inactive", "unsyncdc -c %s -n %s -v %s");
 
     /**
      * template to use for creating a 'syncdc' in inactive state command.
@@ -67,23 +51,18 @@ enum SyncDcCommandTemplate {
     private String unsyncDcTemplate;
 
     /**
-     * Create an instance of a command template provider using the given
-     * templates.
-     * 
+     * Create an instance of a command template provider using the given templates.
+     *
      * @param syncInactiveDcTemplate
-     *            template to use for creating a 'syncdc' in inactive state
-     *            command.
+     *            template to use for creating a 'syncdc' in inactive state command.
      * @param syncArchiveDcTemplate
-     *            template to use for creating a 'syncdc' in active state
-     *            command.
+     *            template to use for creating a 'syncdc' in active state command.
      * @param syncAllDcsForGivenCompartmentInArchiveModeTemplate
-     *            template to use for creating a 'syncalldcs' in active state
-     *            command for a given compartment.
+     *            template to use for creating a 'syncalldcs' in active state command for a given compartment.
      * @param syncAllDcsInInactiveModeTemplate
      *            template for creating a 'syncalldcs' in archive mode command.
      * @param unsyncDcTemplate
-     *            template to use for creating a 'unsyncdc' in active state
-     *            command.
+     *            template to use for creating a 'unsyncdc' in active state command.
      */
     SyncDcCommandTemplate(final String syncInactiveDcTemplate, final String syncArchiveDcTemplate,
         final String syncAllDcsForGivenCompartmentInArchiveModeTemplate, final String syncAllDcsInInactiveModeTemplate,
@@ -96,72 +75,85 @@ enum SyncDcCommandTemplate {
     }
 
     /**
-     * Returns template to use for creating a 'syncdc' in inactive state
-     * command.
-     * 
-     * @return template to use for creating a 'syncdc' in inactive state
-     *         command.
-     */
-    String getSyncInactiveDcTemplate() {
-        return syncInactiveDcTemplate;
-    }
-
-    /**
-     * Returns template to use for creating a 'syncdc' in active state command.
-     * 
-     * @return template to use for creating a 'syncdc' in active state command.
-     */
-    String getSyncArchiveDcTemplate() {
-        return syncArchiveDcTemplate;
-    }
-
-    /**
-     * Returns template to use for creating a 'syncalldcs' in active state
-     * command for a given compartment.
-     * 
-     * @return template to use for creating a 'syncalldcs' in active state
-     *         command for a given compartment.
-     */
-    String getSyncAllDcsForGivenCompartmentInArchiveModeTemplate() {
-        return syncAllDcsForGivenCompartmentInArchiveModeTemplate;
-    }
-
-    /**
-     * Returns the template to create a 'syncalldcs' command for synchronizing
-     * DCs in inactive mode.
-     * 
-     * @return template to create a 'syncalldcs' command for synchronizing DCs
-     *         in inactive mode.
-     */
-    String getSyncAllDcsInInactiveModeTemplate() {
-        return syncAllDcsInInactiveModeTemplate;
-    }
-
-    /**
-     * Returns template to use for creating a 'unsyncdc' in active state
-     * command.
-     * 
-     * @return template to use for creating a 'unsyncdc' in active state
-     *         command.
-     */
-    String getUnsyncDcTemplate() {
-        return unsyncDcTemplate;
-    }
-
-    /**
      * Create a template for synchronizing development components.
-     * 
+     *
      * @param alias
      *            Alias for JDK_HOME.
      * @return template corresponding to the given alias.
      */
     public static final SyncDcCommandTemplate create(final JdkHomeAlias alias) {
-        final SyncDcCommandTemplate template = TEMPLATES.get(alias);
+        SyncDcCommandTemplate template = null;
 
-        if (template == null) {
+        switch (alias) {
+        case Jdk131Home:
+        case Jdk142Home:
+            template = V70;
+            break;
+
+        case Jdk150Home:
+        case Jdk160Home:
+            template = V71;
+            break;
+
+        default:
             throw new IllegalStateException(String.format("Could not map SyncDcCommandTemplate onto %s!", alias));
         }
 
         return template;
+    }
+
+    /**
+     * Create command for synchronizing DCs in source state.
+     *
+     * @param compartment
+     *            the compartment whose components should be synchronized in source state.
+     * @return command for synchronizing DCs in source state.
+     */
+    String createSyncDcsInInActiveModeCommand(final Compartment compartment) {
+        return String.format(syncAllDcsInInactiveModeTemplate, compartment.getName());
+    }
+
+    /**
+     * Create command to unsynchronize the given DC.
+     *
+     * @param component
+     *            DC to unsynchronize.
+     * @return dctool command to unsynchronize the given DC
+     */
+    String createUnsyncDCCommand(final DevelopmentComponent component) {
+        return String.format(unsyncDcTemplate, component.getCompartment().getName(), component.getName(), component.getVendor());
+    }
+
+    /**
+     * Create command for synchronizing the given DC in inactive state.
+     *
+     * @param component
+     *            DC to synchronize.
+     * @return dctool command to synchronize the given DC
+     */
+    String createSyncInactiveDCCommand(final DevelopmentComponent component) {
+        return String.format(syncInactiveDcTemplate, component.getCompartment().getName(), component.getName(), component.getVendor());
+    }
+
+    /**
+     * Create command for synchronizing the given DC in inactive state.
+     *
+     * @param component
+     *            DC to synchronize.
+     * @return dctool command to synchronize the given DC
+     */
+    String createSyncArchiveDCCommand(final DevelopmentComponent component) {
+        return String.format(syncArchiveDcTemplate, component.getCompartment().getName(), component.getName(), component.getVendor());
+    }
+
+    /**
+     * Create command for synchronizing all components in the given compartment.
+     *
+     * @param compartment
+     *            compartment to synchronize.
+     * @return synchronize compartment command.
+     */
+    String createSyncCompartmentInArchiveModeCommand(final Compartment compartment) {
+        return String.format(syncAllDcsForGivenCompartmentInArchiveModeTemplate, compartment.getName());
     }
 }

@@ -5,7 +5,9 @@ package org.arachna.netweaver.tools.dc;
 
 import java.util.Collection;
 
+import org.arachna.ant.AntHelper;
 import org.arachna.netweaver.dc.types.DevelopmentComponent;
+import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 import org.arachna.netweaver.tools.DIToolCommandBuilder;
 
@@ -36,13 +38,15 @@ public final class CommandFactory {
     /**
      * Creates a DC tool command builder for building synchronizing development components commands (for components in archive state).
      *
+     * @param antHelper
+     * @param dcFactory
      * @param components
      *            development components to be used calculating the DCs to be synchronized
      * @return a command builder for creating 'syncdc' commands.
      */
-    public DIToolCommandBuilder createSyncDevelopmentComponentsInArchiveStateCommandBuilder(
-        final Collection<DevelopmentComponent> components) {
-        return new SyncDevelopmentComponentsInArchiveStateCommandBuilder(developmentConfiguration, components);
+    public DIToolCommandBuilder createSyncDevelopmentComponentsInArchiveStateCommandBuilder(final DevelopmentComponentFactory dcFactory,
+        final AntHelper antHelper, final Collection<DevelopmentComponent> components) {
+        return new SyncDevelopmentComponentsInArchiveStateCommandBuilder(developmentConfiguration, dcFactory, antHelper, components);
     }
 
     /**
