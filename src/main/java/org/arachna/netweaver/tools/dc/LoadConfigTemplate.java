@@ -1,16 +1,13 @@
 /**
- * 
+ *
  */
 package org.arachna.netweaver.tools.dc;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import org.arachna.netweaver.dc.types.JdkHomeAlias;
 
 /**
  * Template for generating <code>loadconfig</code> and <code>timing</code> commands.
- * 
+ *
  * @author Dirk Weigenand
  */
 enum LoadConfigTemplate {
@@ -22,19 +19,6 @@ enum LoadConfigTemplate {
      * template for connecting and disconnecting a dctool to/from the NWDI (NetWeaver 7.1 and onwards).
      */
     V71("loadconfig -u %s -p %s -v \"%s\" -l \"%s\"", "timing on", "spool spool.txt", "tracefile tracefile.txt", "exit");
-
-    /**
-     * mapping of {@link JdkHomeAlias}es to template matching the respective NetWeaver version.
-     */
-    @SuppressWarnings("serial")
-    private static final Map<JdkHomeAlias, LoadConfigTemplate> VALUES = new HashMap<JdkHomeAlias, LoadConfigTemplate>() {
-        {
-            put(JdkHomeAlias.Jdk131Home, V70);
-            put(JdkHomeAlias.Jdk142Home, V70);
-            put(JdkHomeAlias.Jdk150Home, V71);
-            put(JdkHomeAlias.Jdk160Home, V71);
-        }
-    };
 
     /**
      * template string for generation of a <code>loadconfig</code> command.
@@ -64,7 +48,7 @@ enum LoadConfigTemplate {
     /**
      * Create a <code>LoadConfigTemplate</code> with the given template strings for <code>loadconfig</code> and <code>timing</code>
      * commands.
-     * 
+     *
      * @param loadConfigCommand
      *            template string for generation of a <code>loadconfig</code> command.
      * @param timingCommand
@@ -122,15 +106,26 @@ enum LoadConfigTemplate {
 
     /**
      * Create a template from the given {@link JdkHomeAlias}.
-     * 
+     *
      * @param alias
      *            JDK home from which to map to template.
      * @return template for given alias.
      */
     static LoadConfigTemplate fromJdkHomeAlias(final JdkHomeAlias alias) {
-        final LoadConfigTemplate template = VALUES.get(alias);
+        LoadConfigTemplate template = null;
 
-        if (template == null) {
+        switch (alias) {
+        case Jdk131Home:
+        case Jdk142Home:
+            template = V70;
+            break;
+
+        case Jdk150Home:
+        case Jdk160Home:
+            template = V71;
+            break;
+
+        default:
             throw new IllegalStateException(String.format("Could not map JDK home alias %s to template!", alias));
         }
 

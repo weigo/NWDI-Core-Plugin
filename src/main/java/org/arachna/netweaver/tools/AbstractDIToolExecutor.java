@@ -96,25 +96,29 @@ public abstract class AbstractDIToolExecutor {
      *             might be thrown be the {@link ProcStarter} used to execute the DC tool commands.
      */
     public DIToolCommandExecutionResult execute(final DIToolCommandBuilder commandBuilder) throws IOException {
-        final ProcStarter starter = launcher.launch();
-        starter.pwd(workspace);
-        starter.envs(createEnvironment());
-        final ArgumentListBuilder toolCommand = createToolCommand();
-        starter.cmds(toolCommand);
         final List<String> commands = commandBuilder.execute();
-        starter.stdin(createCommandInputStream(commands));
-
         final ByteArrayOutputStream result = new ByteArrayOutputStream();
-        final ForkOutputStream tee = new ForkOutputStream(launcher.getListener().getLogger(), result);
-        starter.stdout(tee);
+        int exitCode = 0;
 
-        int exitCode = -1;
+        if (!commands.isEmpty()) {
+            final ProcStarter starter = launcher.launch();
+            starter.pwd(workspace);
+            starter.envs(createEnvironment());
+            final ArgumentListBuilder toolCommand = createToolCommand();
+            starter.cmds(toolCommand);
+            starter.stdin(createCommandInputStream(commands));
 
-        try {
-            exitCode = starter.join();
-        }
-        catch (final InterruptedException e) {
-            result.write("\nOperation has been interrupted!".getBytes(Charset.defaultCharset()));
+            final ForkOutputStream tee = new ForkOutputStream(launcher.getListener().getLogger(), result);
+            starter.stdout(tee);
+
+            exitCode = -1;
+
+            try {
+                exitCode = starter.join();
+            }
+            catch (final InterruptedException e) {
+                result.write("\nOperation has been interrupted!".getBytes(Charset.defaultCharset()));
+            }
         }
 
         return new DIToolCommandExecutionResult(result.toString(Charset.defaultCharset().name()), exitCode);
