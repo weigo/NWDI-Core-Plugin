@@ -142,7 +142,13 @@ final class SyncDevelopmentComponentsInArchiveStateCommandBuilder extends Abstra
         final Set<PublicPartReference> ppRefs = new LinkedHashSet<PublicPartReference>();
 
         for (final DevelopmentComponent component : components) {
-            ppRefs.add(component.getBuildPlugin());
+            if (component.getBuildPlugin() != null) {
+                ppRefs.add(component.getBuildPlugin());
+            }
+            else {
+                Logger.getLogger(this.getClass().getName()).log(Level.FINE,
+                    String.format("%s has no compartment!", component.getNormalizedName("~")));
+            }
         }
 
         final Collection<String> synchronizeCompartmentCommands = new LinkedHashSet<String>();
