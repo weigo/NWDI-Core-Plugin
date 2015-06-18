@@ -13,6 +13,9 @@ The plugin also exposes an object model to be used by other plugins to add funct
 ## Building and installing the plugin
 
 The plugin is not available through the Jenkins update center yet. To build the plugin you'll need to clone the following GitHub repositories:
+
+See https://wiki.jenkins-ci.org/display/JENKINS/Plugin+tutorial#Plugintutorial-SettingUpEnvironment for inital Jenkins plugin configuration. Esp. settings.xml settings.
+
 ```
 git clone git://github.com/weigo/NWDI-config-plugin.git
 git clone git://github.com/weigo/NWDI-pom-Plugin.git

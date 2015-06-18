@@ -94,7 +94,12 @@ public class TopoSort {
                 iterator.remove();
 
                 for (final DevelopmentComponent usingDC : item.getUsingDCs()) {
-                    itemMap.get(getComponentName(usingDC)).removeUsedDC(component);
+                	ComponentWrapper componentItem=itemMap.get(getComponentName(usingDC));
+                    
+                	if (componentItem!=null) {
+                		componentItem.removeUsedDC(component);
+                	}
+                	
                 }
             }
         }
