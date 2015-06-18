@@ -124,6 +124,11 @@ final class ActivityListParser extends AbstractResourceParser {
      *             when there was an error parsing the activity's date.
      */
     private Activity createActivity(final Node node) throws JaxenException, ParseException {
+    	if ("".equals(checkInDateXPath.stringValueOf(node))) {
+    		// filter empty dates
+    		return null;
+    	}
+    	
         return new Activity(getActivityUrl(node), getPrincipal(node), getComment(node), getCheckInDate(node));
     }
 
