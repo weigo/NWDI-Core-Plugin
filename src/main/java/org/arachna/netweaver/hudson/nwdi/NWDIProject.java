@@ -174,7 +174,20 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
         if (cleanCopy) {
             final long start = System.currentTimeMillis();
             logger.append(Messages.NWDIProject_wipe_workspace());
-            build.getWorkspace().deleteContents();
+            
+            if (build!=null) {
+            	FilePath workspace=build.getWorkspace();
+            	if (workspace!=null) {
+            		workspace.deleteContents();
+            	} else {
+                	// workspace empty, maybe throw an exception
+            		return null;
+            	}
+            } else {
+            	// Build empty, maybe throw an exception
+            	return null;
+            }
+            
             logger.println(Messages.NWDIProject_duration_template("",
                 String.format("%f", (System.currentTimeMillis() - start) / THOUSAND_MILLI_SECONDS)));
         }
@@ -546,13 +559,13 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
          */
         private FormValidation validateNwdiToolLibraryFolder(final String folderName) {
             FormValidation result = FormValidation.ok();
-            final String nwdiToolLibFolder = Util.fixEmptyAndTrim(folderName);
+            final String internalNwdiToolLibFolder = Util.fixEmptyAndTrim(folderName);
 
-            if (nwdiToolLibFolder == null) {
+            if (internalNwdiToolLibFolder == null) {
                 result = FormValidation.error(Messages.NWDIProject_NwdiToolLibFolder_missing());
             }
             else {
-                final FilePath folder = new FilePath(new File(nwdiToolLibFolder));
+                final FilePath folder = new FilePath(new File(internalNwdiToolLibFolder));
 
                 try {
                     if (!folder.exists()) {
@@ -653,10 +666,10 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
          */
         public ListBoxModel doFillBuildSpaceNameItems() {
             final ListBoxModel items = new ListBoxModel();
-            for (final String buildSpaceName : getBuildSpaceNames()) {
+            for (final String internalBuildSpaceName : getBuildSpaceNames()) {
                 // build space names are of the form:
                 // [A-Z0-9]{3}_[A-Z-a-z0-9]+_D
-                items.add(buildSpaceName.split("_")[1], buildSpaceName);
+                items.add(internalBuildSpaceName.split("_")[1], internalBuildSpaceName);
             }
 
             return items;
