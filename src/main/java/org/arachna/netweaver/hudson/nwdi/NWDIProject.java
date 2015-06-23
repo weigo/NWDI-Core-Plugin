@@ -181,11 +181,11 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
             		workspace.deleteContents();
             	} else {
                 	// workspace empty, maybe throw an exception
-            		return null;
+            		return false;
             	}
             } else {
             	// Build empty, maybe throw an exception
-            	return null;
+            	return false;
             }
             
             logger.println(Messages.NWDIProject_duration_template("",

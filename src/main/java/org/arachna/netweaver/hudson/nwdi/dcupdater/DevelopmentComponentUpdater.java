@@ -74,6 +74,12 @@ public final class DevelopmentComponentUpdater {
 		}
 	}
 
+	/**
+	 * thread for forking off updates
+	 * 
+	 * @author cmertins
+	 *
+	 */
 	class DCDownloader implements Runnable {
 
 		private AntHelper internalAntHelper;
