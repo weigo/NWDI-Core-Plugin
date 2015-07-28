@@ -253,20 +253,19 @@ public class TopoSort {
 			if (usedDevelopmentComponents != null) {
 				int size = usedDevelopmentComponents.size();
 
-				if (size > 0) {
-					usedDCs = new HashSet<DevelopmentComponent>(size);
+				usedDCs = new HashSet<DevelopmentComponent>(size);
 
-					for (final PublicPartReference reference : usedDevelopmentComponents) {
-						final DevelopmentComponent e = dcFactory.get(reference);
+				for (final PublicPartReference reference : usedDevelopmentComponents) {
+					final DevelopmentComponent e = dcFactory.get(reference);
 
-						// only look at DCs that are in source state and need
-						// rebuilding
-						// themselves.
-						if (e != null && e.getCompartment() != null && e.getCompartment().isSourceState()) {
-							usedDCs.add(e);
-						}
+					// only look at DCs that are in source state and need
+					// rebuilding
+					// themselves.
+					if (e != null && e.getCompartment() != null && e.getCompartment().isSourceState()) {
+						usedDCs.add(e);
 					}
 				}
+
 			}
 
 		}
