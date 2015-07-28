@@ -230,7 +230,7 @@ public class TopoSort {
             final DevelopmentComponent e = dcFactory.get(reference);
 
             // only look at DCs that are in source state and need rebuilding themselves.
-            if (e != null && e.getCompartment().isSourceState()) {
+            if (e != null && e.getCompartment()!=null && e.getCompartment().isSourceState()) {
                 usedDCs.add(e);
             }
         }
