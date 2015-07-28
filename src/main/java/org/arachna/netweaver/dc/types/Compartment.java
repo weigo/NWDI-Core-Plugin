@@ -470,12 +470,14 @@ public final class Compartment {
             result = getClass() == obj.getClass();
 
             if (result) {
-                final Compartment other = (Compartment)obj;
-
-                result =
-                    Arrays.equals(new Object[] { developmentConfiguration, softwareComponent, name, vendor },
-                        new Object[] { other.developmentConfiguration, other.softwareComponent, other.name,
-                            other.vendor });
+            	if (obj instanceof Compartment) {
+	                final Compartment other = (Compartment)obj;
+	
+	                result =
+	                    Arrays.equals(new Object[] { developmentConfiguration, softwareComponent, name, vendor },
+	                        new Object[] { other.developmentConfiguration, other.softwareComponent, other.name,
+	                            other.vendor });
+            	}
             }
         }
 
