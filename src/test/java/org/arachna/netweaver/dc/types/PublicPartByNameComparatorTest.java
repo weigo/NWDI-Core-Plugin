@@ -4,8 +4,7 @@
 package org.arachna.netweaver.dc.types;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 
 import org.junit.After;
 import org.junit.Before;
@@ -55,7 +54,7 @@ public class PublicPartByNameComparatorTest {
      */
     @Test
     public final void testPublicPartsCompareLexicographicallyWithRespectToTheirNamesLhsLtRhs() {
-        assertThat(this.comparator.compare(this.part1, this.part2), is(equalTo(-1)));
+        assertThat(this.comparator.compare(this.part1, this.part2), is(lessThan(0)));
     }
 
     /**
@@ -65,7 +64,7 @@ public class PublicPartByNameComparatorTest {
      */
     @Test
     public final void testPublicPartsCompareLexicographicallyWithRespectToTheirNamesLhsGtRhs() {
-        assertThat(this.comparator.compare(this.part2, this.part1), is(equalTo(1)));
+        assertThat(this.comparator.compare(this.part2, this.part1), is(greaterThan(0)));
     }
 
     /**

@@ -14,17 +14,8 @@ public final class PublicPartByNameComparator implements Comparator<PublicPart>,
      */
     private static final long serialVersionUID = 4160842624880016549L;
 
-    /**
-     * Compares two {@link PublicPart}s by their respective public part names.
-     * 
-     * @param part1
-     *            first public part to use in comparison.
-     * @param part2
-     *            second public part to use in comparison.
-     * @return {@link StringComparatorResultMapper#mapResultToSpecificationValues(int)}
-     *         .
-     */
+    @Override
     public int compare(final PublicPart part1, final PublicPart part2) {
-        return StringComparatorResultMapper.mapResultToSpecificationValues(part1.getPublicPart().compareTo(part2.getPublicPart()));
+        return part1.getPublicPart().compareTo(part2.getPublicPart());
     }
 }

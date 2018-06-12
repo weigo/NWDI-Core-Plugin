@@ -65,7 +65,7 @@ import org.kohsuke.stapler.StaplerResponse;
  * 
  * @author Dirk Weigenand
  */
-public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> implements SCMedItem, BuildableItemWithBuildWrappers, TopLevelItem {
+public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> implements BuildableItemWithBuildWrappers, TopLevelItem {
     /**
      * Constant for a 1000 milliseconds.
      */
@@ -127,25 +127,14 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
      */
     @DataBoundConstructor
     public NWDIProject(final String name, final String buildSpaceName, final boolean cleanCopy) {
-        super(Hudson.getInstance(), name);
+        super(Jenkins.getInstance(), name);
         this.buildSpaceName = buildSpaceName;
         this.cleanCopy = cleanCopy;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Class<NWDIBuild> getBuildClass() {
         return NWDIBuild.class;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Hudson getParent() {
-        return Hudson.getInstance();
     }
 
     /**

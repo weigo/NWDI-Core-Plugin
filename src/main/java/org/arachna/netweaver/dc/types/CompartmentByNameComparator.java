@@ -20,19 +20,13 @@ public final class CompartmentByNameComparator implements Comparator<Compartment
 
     /**
      * Compare two compartments lexicographically wrt. to their names.
-     * 
-     * @param compartment1
-     *            first compartment for comparison
-     * @param compartment2
-     *            second compartment for comparison
-     * 
-     *            {@inheritDoc}
      */
+    @Override
     public int compare(final Compartment compartment1, final Compartment compartment2) {
         int result = 0;
 
         if (compartment1 != null && compartment2 != null) {
-            result = StringComparatorResultMapper.mapResultToSpecificationValues(compartment1.getName().compareTo(compartment2.getName()));
+            result = compartment1.getName().compareTo(compartment2.getName());
         }
         else if (compartment1 != null) {
             result = 1;
@@ -43,5 +37,4 @@ public final class CompartmentByNameComparator implements Comparator<Compartment
 
         return result;
     }
-
 }

@@ -3,18 +3,28 @@
  */
 package org.arachna.netweaver.hudson.dtr.browser;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.conn.PoolingClientConnectionManager;
+import org.apache.http.conn.HttpClientConnectionManager;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
+
+import hudson.util.IOUtils;
 
 /**
  * DTR client using the <code>http</code> protocol.
@@ -30,12 +40,14 @@ final class DtrHttpClient {
     /**
      * HTTP client to use for requests.
      */
-    private final DefaultHttpClient httpClient = new DefaultHttpClient(new PoolingClientConnectionManager());
+    private final CloseableHttpClient httpClient;
 
     /**
      * Context to use for conversations.
      */
     private final HttpContext localContext = new BasicHttpContext();
+
+    private HttpClientConnectionManager connectionManager = new BasicHttpClientConnectionManager();
 
     /**
      * Create an instance of a <code>DtrHttpClient</code>.
@@ -48,9 +60,9 @@ final class DtrHttpClient {
     public DtrHttpClient(final String dtrUser, final String password) {
         validateArgument(dtrUser, "DTR user");
         validateArgument(password, "password");
-
-        httpClient.getCredentialsProvider().setCredentials(AuthScope.ANY,
-            new UsernamePasswordCredentials(dtrUser, password));
+        CredentialsProvider credsProvider = new BasicCredentialsProvider();
+        credsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(dtrUser, password));
+        httpClient = HttpClients.custom().setConnectionManager(connectionManager).setDefaultCredentialsProvider(credsProvider).build();
     }
 
     /**
@@ -63,8 +75,7 @@ final class DtrHttpClient {
      */
     private void validateArgument(final String arg, final String argumentDescription) {
         if (arg == null || arg.trim().length() == 0) {
-            throw new IllegalArgumentException(String.format("The argument '%s' must not be null or empty!",
-                argumentDescription));
+            throw new IllegalArgumentException(String.format("The argument '%s' must not be null or empty!", argumentDescription));
         }
     }
 
@@ -79,17 +90,30 @@ final class DtrHttpClient {
      */
     InputStream getContent(final String queryUrl) throws IOException {
         logger.fine(queryUrl);
+        CloseableHttpResponse response = null;
+        ByteArrayOutputStream content = new ByteArrayOutputStream();
 
-        final HttpGet httpget = new HttpGet(queryUrl);
-        final HttpResponse response = httpClient.execute(httpget, localContext);
+        try {
+            final HttpGet httpget = new HttpGet(queryUrl);
+            response = httpClient.execute(httpget, localContext);
+            IOUtils.copy(response.getEntity().getContent(), content);
+        }
+        catch (UnsupportedOperationException e) {
+            logger.log(Level.WARNING, e.getLocalizedMessage(), e);
+        }
+        finally {
+            if (response != null) {
+                response.close();
+            }
+        }
 
-        return response.getEntity().getContent();
+        return new ByteArrayInputStream(content.toByteArray());
     }
 
     /**
      * Shut down the underlying {@link DefaultHTTPClient}'s connection manager.
      */
     public void close() {
-        httpClient.getConnectionManager().shutdown();
+        connectionManager.shutdown();
     }
 }

@@ -51,7 +51,7 @@ abstract class AbstractResourceParser {
      * Extracts the node's value as text at the given index.
      * 
      * @param nodes
-     *            a list of {@link Nodes} representing a XPath selection result.
+     *            a list of {@link Node} objects representing a XPath selection result.
      * @param index
      *            index into the list of nodes
      * 

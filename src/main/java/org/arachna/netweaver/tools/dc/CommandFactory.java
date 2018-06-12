@@ -38,8 +38,8 @@ public final class CommandFactory {
     /**
      * Creates a DC tool command builder for building synchronizing development components commands (for components in archive state).
      *
-     * @param antHelper
-     * @param dcFactory
+     * @param dcFactory factory for development components
+     * @param antHelper helper for building paths
      * @param components
      *            development components to be used calculating the DCs to be synchronized
      * @return a command builder for creating 'syncdc' commands.

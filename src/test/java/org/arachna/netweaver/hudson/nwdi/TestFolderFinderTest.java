@@ -6,9 +6,11 @@ package org.arachna.netweaver.hudson.nwdi;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.List;
 
 import org.junit.Test;
 
@@ -61,8 +63,34 @@ public class TestFolderFinderTest {
         }
 
         @Override
-        protected Collection<InputStream> getJavaSources(final String encoding, final String sourceFolder) {
-            return Arrays.asList(getClass().getResourceAsStream(resource));
+        protected List<TestFolderFinder.FileDescriptor> getJavaSources(final String encoding, final String sourceFolder) {
+            return Arrays.asList((FileDescriptor)new RessourceDescriptor(sourceFolder + resource, getClass().getResourceAsStream(resource)));
+        }
+
+        class RessourceDescriptor extends TestFolderFinder.FileDescriptor {
+            private String resource;
+            private InputStream content;
+
+            RessourceDescriptor(File file) {
+                super(file);
+                // TODO Auto-generated constructor stub
+            }
+
+            RessourceDescriptor(String resource, InputStream content) {
+                super(null);
+                this.resource = resource;
+                this.content = content;
+            }
+
+            @Override
+            InputStream getContent() throws IOException {
+                return content;
+            }
+
+            @Override
+            String getAbsolutePath() {
+                return resource;
+            }
         }
     }
 }

@@ -100,6 +100,7 @@ enum SyncDcCommandTemplate {
 
             case Jdk150Home:
             case Jdk160Home:
+            case Jdk180Home:
                 template = V71;
                 break;
 

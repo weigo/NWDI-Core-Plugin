@@ -25,9 +25,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * JUnit-Test for reading '.confdef' configuration files using
- * {@link ConfDefReader}.
- * 
+ * JUnit-Test for reading '.confdef' configuration files using {@link ConfDefReader}.
+ *
  * @author Dirk Weigenand
  */
 public final class ConfDefReaderTest {
@@ -79,9 +78,7 @@ public final class ConfDefReaderTest {
     }
 
     /**
-     * Test method for
-     * {@link org.arachna.netweaver.hudson.nwdi.confdef.ConfdefReader1#execute(java.io.Reader)}
-     * .
+     * Test method for {@link org.arachna.netweaver.hudson.nwdi.confdef.ConfdefReader1#execute(java.io.Reader)} .
      */
     @Test
     public void testConfigurationElementRules() {
@@ -92,9 +89,7 @@ public final class ConfDefReaderTest {
     }
 
     /**
-     * Test method for
-     * {@link org.arachna.netweaver.hudson.nwdi.confdef.ConfdefReader1#execute(java.io.Reader)}
-     * .
+     * Test method for {@link org.arachna.netweaver.hudson.nwdi.confdef.ConfdefReader1#execute(java.io.Reader)} .
      */
     @Test
     public void testConfigurationDescriptionRule() {
@@ -104,9 +99,7 @@ public final class ConfDefReaderTest {
     }
 
     /**
-     * Test method for
-     * {@link org.arachna.netweaver.hudson.nwdi.confdef.ConfdefReader1#execute(java.io.Reader)}
-     * .
+     * Test method for {@link org.arachna.netweaver.hudson.nwdi.confdef.ConfdefReader1#execute(java.io.Reader)} .
      */
     @Test
     public void testConfigurationBuildServerRule() {
@@ -116,9 +109,7 @@ public final class ConfDefReaderTest {
     }
 
     /**
-     * Test method for
-     * {@link org.arachna.netweaver.hudson.nwdi.confdef.ConfdefReader1#execute(java.io.Reader)}
-     * .
+     * Test method for {@link org.arachna.netweaver.hudson.nwdi.confdef.ConfdefReader1#execute(java.io.Reader)} .
      */
     @Test
     public void testConfigurationCompartmentRule() {
@@ -136,9 +127,7 @@ public final class ConfDefReaderTest {
     }
 
     /**
-     * Test method for
-     * {@link org.arachna.netweaver.hudson.nwdi.confdef.ConfdefReader1#execute(java.io.Reader)}
-     * .
+     * Test method for {@link org.arachna.netweaver.hudson.nwdi.confdef.ConfdefReader1#execute(java.io.Reader)} .
      */
     @Test
     public void testConfigurationCompartmentDtrUrlRule() {
@@ -150,9 +139,7 @@ public final class ConfDefReaderTest {
     }
 
     /**
-     * Test method for
-     * {@link org.arachna.netweaver.hudson.nwdi.confdef.ConfdefReader1#execute(java.io.Reader)}
-     * .
+     * Test method for {@link org.arachna.netweaver.hudson.nwdi.confdef.ConfdefReader1#execute(java.io.Reader)} .
      */
     @Test
     public void testConfigurationCompartmentInactiveLocationRule() {
@@ -164,9 +151,7 @@ public final class ConfDefReaderTest {
     }
 
     /**
-     * Test method for
-     * {@link org.arachna.netweaver.hudson.nwdi.confdef.ConfdefReader1#execute(java.io.Reader)}
-     * .
+     * Test method for {@link org.arachna.netweaver.hudson.nwdi.confdef.ConfdefReader1#execute(java.io.Reader)} .
      */
     @Test
     public void testConfigurationCompartmentDependenciesRule() {
@@ -182,9 +167,7 @@ public final class ConfDefReaderTest {
     }
 
     /**
-     * Test method for
-     * {@link org.arachna.netweaver.hudson.nwdi.confdef.ConfdefReader1#execute(java.io.Reader)}
-     * .
+     * Test method for {@link org.arachna.netweaver.hudson.nwdi.confdef.ConfdefReader1#execute(java.io.Reader)} .
      */
     @Test
     public void testConfigurationCompartmentBuildVariantsRule() {
@@ -195,13 +178,14 @@ public final class ConfDefReaderTest {
         final BuildVariant expectedBuildVariant = new BuildVariant("default", true);
         expectedBuildVariant.add(new BuildOption("com.sap.jdk.home_path_key", "JDK1.3.1_HOME"));
         expectedBuildVariant.add(new BuildOption("com.sap.jdk.javac.force_fork", "true"));
+        System.err.println(compartment.getBuildVariants());
+        System.err.println(expectedBuildVariant);
+
         assertThat(compartment.getBuildVariants(), hasItem(expectedBuildVariant));
     }
 
     /**
-     * Test method for
-     * {@link org.arachna.netweaver.hudson.nwdi.confdef.ConfdefReader1#execute(java.io.Reader)}
-     * .
+     * Test method for {@link org.arachna.netweaver.hudson.nwdi.confdef.ConfdefReader1#execute(java.io.Reader)} .
      */
     @Test
     public void testReadExampleConfDef() {
@@ -220,9 +204,7 @@ public final class ConfDefReaderTest {
     }
 
     /**
-     * Test method for
-     * {@link org.arachna.netweaver.hudson.nwdi.confdef.ConfdefReader1#execute(java.io.Reader)}
-     * .
+     * Test method for {@link org.arachna.netweaver.hudson.nwdi.confdef.ConfdefReader1#execute(java.io.Reader)} .
      */
     @Test
     public void testReadExampleConfDefAndVerifyThatGetCompartmentsReturnsTheCorrectCompartments() {
@@ -235,19 +217,19 @@ public final class ConfDefReaderTest {
 
     /**
      * Read development configuration from given resource on class path.
-     * 
+     *
      * @param configFileName
      *            name of config file on class path.
      * @return the development configuration read from the configuration file.
      */
     private DevelopmentConfiguration getConfiguration(final String configFileName) {
-        return configurationReader.execute(new InputStreamReader(this.getClass().getResourceAsStream(
-            String.format("/org/arachna/netweaver/hudson/nwdi/%s", configFileName))));
+        return configurationReader.execute(new InputStreamReader(
+            this.getClass().getResourceAsStream(String.format("/org/arachna/netweaver/hudson/nwdi/%s", configFileName))));
     }
 
     /**
      * Get a collection of expected compartment names.
-     * 
+     *
      * @return collection of expected compartment names
      */
     private Set<String> getExpectedCompartmentNames() {

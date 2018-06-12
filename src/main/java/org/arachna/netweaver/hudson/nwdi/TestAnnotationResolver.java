@@ -3,12 +3,13 @@
  */
 package org.arachna.netweaver.hudson.nwdi;
 
-import japa.parser.ast.body.ClassOrInterfaceDeclaration;
-import japa.parser.ast.body.MethodDeclaration;
-import japa.parser.ast.expr.AnnotationExpr;
-import japa.parser.ast.expr.NameExpr;
-import japa.parser.ast.type.ClassOrInterfaceType;
-import japa.parser.ast.visitor.VoidVisitorAdapter;
+import com.github.javaparser.ast.NodeList;
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.expr.AnnotationExpr;
+import com.github.javaparser.ast.type.ClassOrInterfaceType;
+import com.github.javaparser.ast.type.Type;
+import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 
 import java.util.List;
 
@@ -46,8 +47,7 @@ public class TestAnnotationResolver extends VoidVisitorAdapter<Object> {
 
         if (annotations != null) {
             for (final AnnotationExpr annotation : annotations) {
-                final NameExpr nameExpr = annotation.getName();
-                if ("org.junit.Test".equals(classNameResolver.resolveClassName(nameExpr.getName()))) {
+                if ("org.junit.Test".equals(classNameResolver.resolveClassName(annotation.getNameAsString()))) {
                     junitTestFound = true;
                     break;
                 }
@@ -63,14 +63,14 @@ public class TestAnnotationResolver extends VoidVisitorAdapter<Object> {
      */
     @Override
     public void visit(final ClassOrInterfaceDeclaration classOrInterfaceDeclaration, final Object arg) {
-        final List<ClassOrInterfaceType> classOrInterfaces = classOrInterfaceDeclaration.getExtends();
+        final List<ClassOrInterfaceType> classOrInterfaces = classOrInterfaceDeclaration.getExtendedTypes();
 
         if (classOrInterfaces != null) {
             for (final ClassOrInterfaceType classOrInterface : classOrInterfaces) {
-                if ("junit.framework.TestCase".equals(classNameResolver.resolveClassName(classOrInterface.getName()))) {
-                    junitTestFound = true;
-                    break;
-                }
+                    if ("junit.framework.TestCase".equals(classNameResolver.resolveClassName(classOrInterface.getName().getIdentifier()))) {
+                        junitTestFound = true;
+                        break;
+                    }
             }
         }
     }

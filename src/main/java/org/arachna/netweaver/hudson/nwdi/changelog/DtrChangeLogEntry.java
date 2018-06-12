@@ -212,7 +212,7 @@ public final class DtrChangeLogEntry extends Entry {
     /**
      * @param checkInTime
      *            the checkInTime to set
-     * @throws ParseException
+     * @throws IllegalArgumentException when the checkInTime could not be parsed
      */
     public void setCheckInTime(final String checkInTime) {
         final SimpleDateFormat format = new SimpleDateFormat(DATE_FORMAT_SPEC);

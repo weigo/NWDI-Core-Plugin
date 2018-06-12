@@ -2,12 +2,11 @@
 
 ## Introduction
 
-The NWDI-Core-Plugin integrates the SAP NetWeaver development infrastructure (NWDI) into the Jenkins continuous integration environment.The plugin adds various new capabilities to Jenkins:
+The NWDI-Core-Plugin integrates the SAP NetWeaver development infrastructure (NWDI) into the Jenkins continuous integration environment.
+The plugin adds various new capabilities to Jenkins:
 
 * A new project type that lets the user configure a CBS build space (or NWDI track) to monitor for changes and build.
-
 * A new source code management system (SCM) that monitors the configured track for changes to development components.
-
 * A new type of build that synchronizes changed development components (and their dependencies) to a Jenkins workspace and builds those components.
 The plugin also exposes an object model to be used by other plugins to add functionality with respect to SAP NetWeaver development components to Jenkins.
 ## Building and installing the plugin

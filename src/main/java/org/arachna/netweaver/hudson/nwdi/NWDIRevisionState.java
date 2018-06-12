@@ -29,14 +29,6 @@ public final class NWDIRevisionState extends SCMRevisionState implements Seriali
     private static final long serialVersionUID = 3469572897964624203L;
 
     /**
-     * A collection of activities checked in since the last build.
-     * 
-     * @deprecated should be removed, only retained for backwards compatibility.
-     */
-    @Deprecated
-    private final transient Collection<Activity> activities = null;
-
-    /**
      * Date and time this instance of <code>NWDIRevisionState</code> was
      * created.
      */
@@ -72,10 +64,10 @@ public final class NWDIRevisionState extends SCMRevisionState implements Seriali
     }
 
     /**
-     * Returns the date & time this instance of <code>NWDIRevisionState</code>
+     * Returns the date &amp; time this instance of <code>NWDIRevisionState</code>
      * was created.
      * 
-     * @return date & time this instance of <code>NWDIRevisionState</code> was
+     * @return date &amp; time this instance of <code>NWDIRevisionState</code> was
      *         created.
      */
     public Date getCreationDate() {

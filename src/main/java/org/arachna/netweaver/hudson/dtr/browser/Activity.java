@@ -154,7 +154,7 @@ public final class Activity {
     }
 
     /**
-     * Returns the path part of the activity url (i.e. the string after '&path=').
+     * Returns the path part of the activity url (i.e. the string after '&amp;path=').
      * 
      * @return the path part of the activity url
      */

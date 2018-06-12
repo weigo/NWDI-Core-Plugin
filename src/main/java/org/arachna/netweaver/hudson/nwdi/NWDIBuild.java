@@ -113,7 +113,7 @@ public final class NWDIBuild extends AbstractBuild<NWDIProject, NWDIBuild> {
             try {
                 developmentConfiguration = new ConfDefReader().execute(new StringReader(getDtcFolder().child(".confdef").readToString()));
             }
-            catch (final IOException e) {
+            catch (final IOException | InterruptedException e) {
                 throw new IllegalStateException(e);
             }
         }

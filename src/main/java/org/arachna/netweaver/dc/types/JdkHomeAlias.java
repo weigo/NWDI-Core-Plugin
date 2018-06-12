@@ -27,7 +27,12 @@ public enum JdkHomeAlias {
     /**
      * JDK 1.6.0 home path.
      */
-    Jdk160Home("JDK1.6.0_HOME", "1.6");
+    Jdk160Home("JDK1.6.0_HOME", "1.6"),
+
+    /**
+     * JDK 1.8.0 home path.
+     */
+    Jdk180Home("JDK1.8.0_HOME", "1.8");
 
     /**
      * Name of the alias.
@@ -89,8 +94,8 @@ public enum JdkHomeAlias {
     /**
      * Get the alias for the Java version Jenkins is running in.
      * 
-     * @return the alias matching the Java version or {@link Jdk160Home} when no
-     *         match could be found (i.e. it's running Java 7 or higher).
+     * @return the alias matching the Java version or {@link #Jdk180Home} when no
+     *         match could be found (i.e. it's running Java 8 or higher).
      */
     public static JdkHomeAlias fromJavaVersion() {
         final String version = System.getProperty("java.version");
@@ -101,6 +106,6 @@ public enum JdkHomeAlias {
             }
         }
 
-        return Jdk160Home;
+        return Jdk180Home;
     }
 }
