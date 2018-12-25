@@ -424,4 +424,18 @@ public final class DevelopmentConfiguration {
     public void setVersion(final String version) {
         this.version = version;
     }
+
+    /**
+     * Set the needsRebuild property on all development components in source state if a clean build was requested.
+     *
+     * @param calculator
+     *            Determines whether a development component needs to be rebuilt.
+     */
+    public void setNeedsRebuild(final NeedsRebuildCalculator calculator) {
+        for (final Compartment compartment : getCompartments(CompartmentState.Source)) {
+            for (final DevelopmentComponent component : compartment.getDevelopmentComponents()) {
+                component.setNeedsRebuild(calculator.needsRebuild(component));
+            }
+        }
+    }
 }

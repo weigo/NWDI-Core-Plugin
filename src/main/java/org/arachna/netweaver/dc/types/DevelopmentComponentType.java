@@ -10,7 +10,7 @@ import org.apache.commons.lang.StringUtils;
 
 /**
  * Types of development components.
- * 
+ *
  * @author Dirk Weigenand
  */
 public enum DevelopmentComponentType {
@@ -122,7 +122,7 @@ public enum DevelopmentComponentType {
     /**
      * Allowed types of development component.
      */
-    private static final Map<String, DevelopmentComponentType> TYPES = new HashMap<String, DevelopmentComponentType>();
+    private static final Map<String, DevelopmentComponentType> TYPES = new HashMap<>();
 
     static {
         for (final DevelopmentComponentType dcType : values()) {
@@ -147,7 +147,7 @@ public enum DevelopmentComponentType {
 
     /**
      * Create an instance of a <code>DevelopmentComponentType</code> with the given type. The sub type is empty (non existant).
-     * 
+     *
      * @param type
      *            the type of the development component.
      * @param canContainJavaSources
@@ -160,7 +160,7 @@ public enum DevelopmentComponentType {
 
     /**
      * Create an instance of a <code>DevelopmentComponentType</code> with the given type and sub type.
-     * 
+     *
      * @param type
      *            the type of the development component.
      * @param subType
@@ -186,7 +186,7 @@ public enum DevelopmentComponentType {
 
     /**
      * Returns <code>true</code> when development components of this type can contain java source, <code>false</code> otherwise.
-     * 
+     *
      * @return <code>true</code> when development components of this type can contain java source, <code>false</code> otherwise.
      */
     public boolean canContainJavaSources() {
@@ -196,7 +196,7 @@ public enum DevelopmentComponentType {
     /**
      * factory method for creating development component types. If the given arguments do not match any type in this enum a
      * {@link DevelopmentComponentType#unknown} is returned.
-     * 
+     *
      * @param typeName
      *            name of the requested type of development components.
      * @param subTypeName
