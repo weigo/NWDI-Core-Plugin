@@ -37,6 +37,7 @@ public class TopoSort {
      *
      * @param dcFactory
      *            registry/factory for development components.
+     * @param logger logger to log messages into
      */
     public TopoSort(final DevelopmentComponentFactory dcFactory, final PrintStream logger) {
         this.dcFactory = dcFactory;
@@ -46,6 +47,7 @@ public class TopoSort {
     /**
      * Sort the development components to be built topologically (determine build their order).
      *
+     * @param components development components to be sorted in their respective build order
      * @return the result of the topological sort containing the development components in build order. The result object will also contain
      *         circular dependencies between the components.
      */

@@ -7,9 +7,10 @@ import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.BuildListener;
+import hudson.model.Job;
+import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.model.AbstractBuild;
-import hudson.model.AbstractProject;
 import hudson.scm.ChangeLogParser;
 import hudson.scm.PollingResult;
 import hudson.scm.PollingResult.Change;
@@ -27,11 +28,10 @@ import java.util.List;
 import net.sf.json.JSONObject;
 
 import org.arachna.ant.AntHelper;
-import org.arachna.netweaver.dc.types.Compartment;
-import org.arachna.netweaver.dc.types.CompartmentState;
 import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
+import org.arachna.netweaver.dc.types.NeedsRebuildCalculator;
 import org.arachna.netweaver.hudson.dtr.browser.Activity;
 import org.arachna.netweaver.hudson.dtr.browser.DtrBrowser;
 import org.arachna.netweaver.hudson.nwdi.changelog.ChangeLogService;
@@ -146,7 +146,9 @@ public class NWDIScm extends SCM {
 
             final boolean cleanCopy = currentBuild.getPreviousBuild() == null || this.cleanCopy;
 
-            setNeedsRebuildPropertyOnAllDevelopmentComponentsInSourceState(config, cleanCopy);
+            if (cleanCopy) {
+                config.setNeedsRebuild(new CleanWorkspaceAlwaysNeedsRebuildCalculatorImpl());
+            }
 
             if (cleanCopy || !activities.isEmpty()) {
                 result = executor.synchronizeDevelopmentComponentsInSourceState(cleanCopy);
@@ -169,27 +171,8 @@ public class NWDIScm extends SCM {
         return result.isExitCodeOk();
     }
 
-    /**
-     * Set the needsRebuild property on all development components in source state if a clean build was requested.
-     *
-     * @param config
-     *            the development configuration containing the DCs
-     * @param cleanCopy
-     *            <code>true</code> when a clean build was requested, <code>false</code> otherwise.
-     */
-    private void setNeedsRebuildPropertyOnAllDevelopmentComponentsInSourceState(final DevelopmentConfiguration config,
-        final boolean cleanCopy) {
-        if (cleanCopy) {
-            for (final Compartment compartment : config.getCompartments(CompartmentState.Source)) {
-                for (final DevelopmentComponent component : compartment.getDevelopmentComponents()) {
-                    component.setNeedsRebuild(true);
-                }
-            }
-        }
-    }
-
     @Override
-    public SCMRevisionState calcRevisionsFromBuild(final AbstractBuild<?, ?> build, final Launcher launcher, final TaskListener listener)
+    public SCMRevisionState calcRevisionsFromBuild(final Run<?, ?> build, FilePath workspace, final Launcher launcher, final TaskListener listener)
         throws IOException, InterruptedException {
         listener.getLogger().println(Messages.NWDIScm_calculating_revisions_from_build(build.getNumber()));
 
@@ -199,8 +182,8 @@ public class NWDIScm extends SCM {
     }
 
     @Override
-    protected PollingResult compareRemoteRevisionWith(final AbstractProject<?, ?> project, final Launcher launcher, final FilePath path,
-        final TaskListener listener, final SCMRevisionState revisionState) throws IOException, InterruptedException {
+    public PollingResult compareRemoteRevisionWith(final Job<?, ?> project, final Launcher launcher, final FilePath path,
+                                                      final TaskListener listener, final SCMRevisionState baseLine) throws IOException, InterruptedException {
         final NWDIProject nwdiProject = (NWDIProject)project;
         NWDIBuild lastBuild = nwdiProject.getLastSuccessfulBuild();
 
@@ -213,12 +196,12 @@ public class NWDIScm extends SCM {
 
         logger.println(Messages.NWDIScm_comparing_base_line_activities_with_activities_accumulated_since_last_build(lastBuild.getNumber()));
         final List<Activity> activities =
-            getActivities(logger, getDtrBrowser(lastBuild.getDevelopmentConfiguration()), null, (NWDIRevisionState)revisionState);
+            getActivities(logger, getDtrBrowser(lastBuild.getDevelopmentConfiguration()), null, (NWDIRevisionState) baseLine);
 
         final Change changeState = activities.isEmpty() ? Change.NONE : Change.SIGNIFICANT;
         logger.println(Messages.NWDIScm_found_changes(changeState.toString()));
 
-        return new PollingResult(revisionState, new NWDIRevisionState(), changeState);
+        return new PollingResult(baseLine, new NWDIRevisionState(), changeState);
     }
 
     /**
@@ -239,7 +222,7 @@ public class NWDIScm extends SCM {
     }
 
     /**
-     * {@link SCMDescriptor} for {@link NWDIProject}.
+     * {@link SCMDescriptor} for {@link NWDIScm}.
      *
      * @author Dirk Weigenand
      */
@@ -336,5 +319,18 @@ public class NWDIScm extends SCM {
         final long duration = System.currentTimeMillis() - start;
 
         logger.println(Messages.NWDIProject_duration_template(message, String.format("%f", duration / A_THOUSAND_MSECS)));
+    }
+
+    private static class CleanWorkspaceAlwaysNeedsRebuildCalculatorImpl implements NeedsRebuildCalculator {
+        /**
+         * Determine whether the given development component needs to be rebuilt.
+         *
+         * @param component the development component to look at.
+         * @return whether the development component should be rebuilt ({@code}true{@code}) or not ({@code}false{@code}).
+         */
+        @Override
+        public boolean needsRebuild(DevelopmentComponent component) {
+            return true;
+        }
     }
 }

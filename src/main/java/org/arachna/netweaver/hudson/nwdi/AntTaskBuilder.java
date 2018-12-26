@@ -48,7 +48,7 @@ public abstract class AntTaskBuilder extends Builder {
      *            options for the ant process (ANT_OPTS environment variable)
      * @return returns <code>true</code> when the ant build returned successfully, <code>false</code> otherwise
      * @throws InterruptedException
-     *             <<<<<<< HEAD forward exception so callers can cancel build.
+     *             forward exception so callers can cancel build.
      */
     protected final boolean execute(final AbstractBuild<?, ?> build, final Launcher launcher, final BuildListener listener,
         final String defaultTarget, final String buildFileName, final String antOpts) throws InterruptedException {

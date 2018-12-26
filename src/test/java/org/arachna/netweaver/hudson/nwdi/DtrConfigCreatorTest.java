@@ -176,10 +176,7 @@ public final class DtrConfigCreatorTest {
             assertTrue(String.format("xpath '%s' did not match in document '%s'.", xPath, content), engine
                 .getMatchingNodes(xPath, document).getLength() == 1);
         }
-        catch (final SAXException e) {
-            fail(e.getMessage());
-        }
-        catch (final IOException e) {
+        catch (final SAXException | IOException | InterruptedException e) {
             fail(e.getMessage());
         }
         catch (final XpathException e) {
@@ -195,10 +192,7 @@ public final class DtrConfigCreatorTest {
             Assert.assertEquals(String.format("xpath '%s' did not match in document '%s'.", xPath, content),
                 engine.evaluate(xPath, document), value);
         }
-        catch (final SAXException e) {
-            fail(e.getMessage());
-        }
-        catch (final IOException e) {
+        catch (final SAXException | IOException | InterruptedException e) {
             fail(e.getMessage());
         }
         catch (final XpathException e) {
@@ -218,10 +212,7 @@ public final class DtrConfigCreatorTest {
                 fail("Assert failed: Path " + path.getName() + " does not exist.");
             }
         }
-        catch (final IOException e) {
-            fail(e.getMessage());
-        }
-        catch (final InterruptedException e) {
+        catch (final IOException | InterruptedException e) {
             fail(e.getMessage());
         }
     }

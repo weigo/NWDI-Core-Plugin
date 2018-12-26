@@ -64,6 +64,7 @@ public final class DCToolCommandExecutor extends AbstractDIToolExecutor {
      *            registry for development components.
      * @param antHelper
      *            helper to determine location of development components in workspace.
+     * @param components List of development components to synchronize (in Archive State).
      * @return the result of the syncdc-command operation.
      * @throws IOException
      *             re-thrown from dctool execution
@@ -200,7 +201,7 @@ public final class DCToolCommandExecutor extends AbstractDIToolExecutor {
          */
         @Override
         public List<String> execute() {
-            final List<String> commands = new LinkedList<String>();
+            final List<String> commands = new LinkedList<>();
             final List<String> wrappedCommands = wrappedBuilder.execute();
 
             if (!wrappedCommands.isEmpty()) {

@@ -7,26 +7,26 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.github.javaparser.JavaParser;
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.PackageDeclaration;
+import com.github.javaparser.ast.body.BodyDeclaration;
+import com.github.javaparser.ast.body.TypeDeclaration;
+import org.apache.commons.lang.StringUtils;
 import org.arachna.javaparser.ClassNameResolver;
 import org.arachna.util.io.FileFinder;
 
-import japa.parser.JavaParser;
-import japa.parser.ParseException;
-import japa.parser.TokenMgrError;
-import japa.parser.ast.CompilationUnit;
-import japa.parser.ast.PackageDeclaration;
-import japa.parser.ast.body.BodyDeclaration;
-import japa.parser.ast.body.TypeDeclaration;
-
 /**
  * Finder to determine whether folders contain unit tests.
- * 
+ *
  * @author Dirk Weigenand
  */
 class TestFolderFinder {
@@ -37,7 +37,7 @@ class TestFolderFinder {
 
     /**
      * Determine whether the given source folder contains unit tests.
-     * 
+     *
      * @param encoding
      *            encoding to use for reading of source files.
      * @param sourceFolder
@@ -47,20 +47,15 @@ class TestFolderFinder {
     boolean isTestFolder(final String encoding, final String sourceFolder) {
         for (final FileDescriptor source : getJavaSources(encoding, sourceFolder)) {
             try {
-                final CompilationUnit compilationUnit = JavaParser.parse(source.getContent(), encoding);
-                final PackageDeclaration packageDescriptor = compilationUnit.getPackage();
+                String enc = StringUtils.isEmpty(encoding) ? "UTF-8" : encoding;
+                final CompilationUnit compilationUnit = JavaParser.parse(source.getContent(), Charset.forName(enc));
+                final Optional<PackageDeclaration> packageDescriptor = compilationUnit.getPackageDeclaration();
 
-                if (packageDescriptor != null && compilationUnitContainsJUnitTest(compilationUnit, packageDescriptor)) {
+                if (packageDescriptor != null && compilationUnitContainsJUnitTest(compilationUnit, packageDescriptor.get())) {
                     return true;
                 }
             }
-            catch (final ParseException e) {
-                logger.log(Level.WARNING, source.getAbsolutePath() + ": " + e.getLocalizedMessage(), e);
-            }
             catch (final IOException e) {
-                logger.log(Level.WARNING, source.getAbsolutePath() + ": " + e.getLocalizedMessage(), e);
-            }
-            catch (TokenMgrError e) {
                 logger.log(Level.WARNING, source.getAbsolutePath() + ": " + e.getLocalizedMessage(), e);
             }
         }
@@ -97,7 +92,7 @@ class TestFolderFinder {
 
         // inspect method declarations for @Test annotation (JUnit4).
         if (!testPropertyResolver.junitTestFound()) {
-            final List<TypeDeclaration> typeDeclarations = compilationUnit.getTypes();
+            final List<? extends TypeDeclaration> typeDeclarations = compilationUnit.getTypes();
 
             if (typeDeclarations != null) {
                 for (final TypeDeclaration type : typeDeclarations) {

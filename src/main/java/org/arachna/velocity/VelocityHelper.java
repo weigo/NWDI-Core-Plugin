@@ -23,16 +23,12 @@ public final class VelocityHelper {
 
     /**
      * Create a new instance of this <code>VelocityHelper</code> using the given logger for logging of velocity related messages.
-     * 
-     * @param logger
-     *            use for logging of messages
      */
     public VelocityHelper() {
         try {
             engine = new VelocityEngine();
             final Properties properties = new Properties();
             properties.load(this.getClass().getResourceAsStream("/org/arachna/netweaver/hudson/nwdi/velocity.properties"));
-            engine.setProperty(VelocityEngine.RUNTIME_LOG_LOGSYSTEM, new VelocityLogChute(Logger.getLogger(getClass().getName())));
             engine.setProperty(RuntimeConstants.RESOURCE_LOADER, "classpath");
             engine.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
             engine.init(properties);

@@ -40,6 +40,6 @@ public final class PublicPartReferenceComparator implements Comparator<PublicPar
             }
         }
 
-        return StringComparatorResultMapper.mapResultToSpecificationValues(result);
+        return result;
     }
 }

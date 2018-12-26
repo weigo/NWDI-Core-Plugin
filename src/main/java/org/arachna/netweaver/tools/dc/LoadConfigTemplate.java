@@ -49,19 +49,14 @@ enum LoadConfigTemplate {
      * Create a <code>LoadConfigTemplate</code> with the given template strings for <code>loadconfig</code> and <code>timing</code>
      * commands.
      *
-     * @param loadConfigCommand
-     *            template string for generation of a <code>loadconfig</code> command.
-     * @param timingCommand
-     *            template string for generation of a <code>timing</code> command.
-     * @param spoolCommand
-     *            command to enable writing into a spool file.
-     * @param tracefileCommand
-     *            command to enable writing into a trace file.
-     * @param exitCommand
-     *            exit command.
+     * @param loadConfigCommand template string for generation of a <code>loadconfig</code> command.
+     * @param timingCommand     template string for generation of a <code>timing</code> command.
+     * @param spoolCommand      command to enable writing into a spool file.
+     * @param tracefileCommand  command to enable writing into a trace file.
+     * @param exitCommand       exit command.
      */
     LoadConfigTemplate(final String loadConfigCommand, final String timingCommand, final String spoolCommand,
-        final String tracefileCommand, final String exitCommand) {
+                       final String tracefileCommand, final String exitCommand) {
         this.loadConfigCommand = loadConfigCommand;
         this.timingCommand = timingCommand;
         this.spoolCommand = spoolCommand;
@@ -107,26 +102,26 @@ enum LoadConfigTemplate {
     /**
      * Create a template from the given {@link JdkHomeAlias}.
      *
-     * @param alias
-     *            JDK home from which to map to template.
+     * @param alias JDK home from which to map to template.
      * @return template for given alias.
      */
     static LoadConfigTemplate fromJdkHomeAlias(final JdkHomeAlias alias) {
         LoadConfigTemplate template = null;
 
         switch (alias) {
-        case Jdk131Home:
-        case Jdk142Home:
-            template = V70;
-            break;
+            case Jdk131Home:
+            case Jdk142Home:
+                template = V70;
+                break;
 
-        case Jdk150Home:
-        case Jdk160Home:
-            template = V71;
-            break;
+            case Jdk150Home:
+            case Jdk160Home:
+            case Jdk180Home:
+                template = V71;
+                break;
 
-        default:
-            throw new IllegalStateException(String.format("Could not map JDK home alias %s to template!", alias));
+            default:
+                throw new IllegalStateException(String.format("Could not map JDK home alias %s to template!", alias));
         }
 
         return template;

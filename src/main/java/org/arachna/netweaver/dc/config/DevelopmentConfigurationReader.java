@@ -50,9 +50,6 @@ public class DevelopmentConfigurationReader implements RulesModuleProducer {
         return new DigesterHelper<DevelopmentConfiguration>(this).execute(reader);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     @Override
     public RulesModule getRulesModule() {
         return new AbstractRulesModule() {

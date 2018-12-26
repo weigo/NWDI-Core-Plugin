@@ -15,7 +15,7 @@ import java.util.Set;
 /**
  * A class representing an NWDI development configuration description, i.e. the name of the development configuration and the compartments
  * contained therein.
- * 
+ *
  * @author Dirk Weigenand
  */
 public final class DevelopmentConfiguration {
@@ -50,14 +50,6 @@ public final class DevelopmentConfiguration {
     private final String workspace;
 
     /**
-     * compartments contained in this development configuration.
-     * 
-     * @deprecated Not used anymore. Retain for backward compatibility with builds saved via XStream.
-     */
-    @Deprecated
-    // FIXME: remove in a future version!
-    private final transient Set<Compartment> compartments = new HashSet<Compartment>();
-    /**
      * map 'scName' to compartment.
      */
     private final Map<String, Compartment> compartmentMap = new HashMap<String, Compartment>();
@@ -79,9 +71,8 @@ public final class DevelopmentConfiguration {
 
     /**
      * Create a development configuration with the given name.
-     * 
-     * @param name
-     *            name of the development configuration to create.
+     *
+     * @param name name of the development configuration to create.
      */
     public DevelopmentConfiguration(final String name) {
         if (name == null || name.trim().length() == 0) {
@@ -94,9 +85,8 @@ public final class DevelopmentConfiguration {
 
     /**
      * Find the start index of the workspace name in the given development configuration name.
-     * 
-     * @param name
-     *            development configuration name.
+     *
+     * @param name development configuration name.
      * @return the start index of the workspace name in the given development configuration name.
      */
     private int getBeginIndexOfWorkspace(final String name) {
@@ -107,9 +97,8 @@ public final class DevelopmentConfiguration {
 
     /**
      * Find the end index of the workspace name in the given development configuration name.
-     * 
-     * @param name
-     *            development configuration name.
+     *
+     * @param name development configuration name.
      * @return the end index of the workspace name in the given development configuration name.
      */
     private int getEndIndexOfWorkspace(final String name) {
@@ -120,9 +109,8 @@ public final class DevelopmentConfiguration {
 
     /**
      * Add a compartment to this development configuration.
-     * 
-     * @param compartment
-     *            compartment to add.
+     *
+     * @param compartment compartment to add.
      */
     public void add(final Compartment compartment) {
         if (compartment != null) {
@@ -133,9 +121,8 @@ public final class DevelopmentConfiguration {
 
     /**
      * Add all given compartments to this development configuration.
-     * 
-     * @param compartments
-     *            compartments to add to this development configuration.
+     *
+     * @param compartments compartments to add to this development configuration.
      */
     public void addAll(final List<Compartment> compartments) {
         for (final Compartment compartment : compartments) {
@@ -145,7 +132,7 @@ public final class DevelopmentConfiguration {
 
     /**
      * Get the name of this development configuration.
-     * 
+     *
      * @return the name of this development configuration.
      */
     public String getName() {
@@ -154,7 +141,7 @@ public final class DevelopmentConfiguration {
 
     /**
      * Get the compartments contained in this development configuration.
-     * 
+     *
      * @return the compartments
      */
     public Collection<Compartment> getCompartments() {
@@ -163,9 +150,8 @@ public final class DevelopmentConfiguration {
 
     /**
      * Returns the compartments filtered by the given {@link CompartmentState}.
-     * 
-     * @param state
-     *            <code>CompartmentState</code> that should be filtered by.
+     *
+     * @param state <code>CompartmentState</code> that should be filtered by.
      * @return compartments filtered by the given {@link CompartmentState}.
      */
     public Collection<Compartment> getCompartments(final CompartmentState state) {
@@ -182,9 +168,8 @@ public final class DevelopmentConfiguration {
 
     /**
      * Get a compartment by name.
-     * 
-     * @param name
-     *            name of compartment
+     *
+     * @param name name of compartment
      * @return the compartment found or <code>null</code>.
      */
     public Compartment getCompartment(final String name) {
@@ -193,7 +178,7 @@ public final class DevelopmentConfiguration {
 
     /**
      * Get the description of this development configuration.
-     * 
+     *
      * @return the description
      */
     public String getDescription() {
@@ -202,9 +187,8 @@ public final class DevelopmentConfiguration {
 
     /**
      * Set the description of this development configuration.
-     * 
-     * @param description
-     *            the description to set
+     *
+     * @param description the description to set
      */
     public void setDescription(final String description) {
         this.description = description;
@@ -212,7 +196,7 @@ public final class DevelopmentConfiguration {
 
     /**
      * Get the short description of this development configuration.
-     * 
+     *
      * @return the caption
      */
     public String getCaption() {
@@ -221,9 +205,8 @@ public final class DevelopmentConfiguration {
 
     /**
      * Set the short description of this development configuration.
-     * 
-     * @param caption
-     *            the caption to set
+     *
+     * @param caption the caption to set
      */
     public void setCaption(final String caption) {
         this.caption = caption;
@@ -231,7 +214,7 @@ public final class DevelopmentConfiguration {
 
     /**
      * Get the location in the file system of this development configuration.
-     * 
+     *
      * @return the location
      */
     public String getLocation() {
@@ -240,9 +223,8 @@ public final class DevelopmentConfiguration {
 
     /**
      * Set the location in the file system of this development configuration.
-     * 
-     * @param location
-     *            the location to set
+     *
+     * @param location the location to set
      */
     public void setLocation(final String location) {
         this.location = location;
@@ -258,7 +240,7 @@ public final class DevelopmentConfiguration {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#hashCode()
      */
     @Override
@@ -268,7 +250,7 @@ public final class DevelopmentConfiguration {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -283,7 +265,7 @@ public final class DevelopmentConfiguration {
             return false;
         }
 
-        final DevelopmentConfiguration other = (DevelopmentConfiguration)obj;
+        final DevelopmentConfiguration other = (DevelopmentConfiguration) obj;
 
         return name.equals(other.name);
     }
@@ -296,8 +278,7 @@ public final class DevelopmentConfiguration {
     }
 
     /**
-     * @param buildVariant
-     *            the buildVariant to set
+     * @param buildVariant the buildVariant to set
      */
     public void setBuildVariant(final BuildVariant buildVariant) {
         this.buildVariant = buildVariant;
@@ -305,7 +286,7 @@ public final class DevelopmentConfiguration {
 
     /**
      * Return the URL to the CMS server.
-     * 
+     *
      * @return the cmsUrl
      */
     public String getCmsUrl() {
@@ -314,9 +295,8 @@ public final class DevelopmentConfiguration {
 
     /**
      * Set URL to CMS server.
-     * 
-     * @param cmsUrl
-     *            the cmsUrl to set
+     *
+     * @param cmsUrl the cmsUrl to set
      */
     public void setCmsUrl(final String cmsUrl) {
         this.cmsUrl = cmsUrl;
@@ -330,8 +310,7 @@ public final class DevelopmentConfiguration {
     }
 
     /**
-     * @param buildServer
-     *            the buildServer to set
+     * @param buildServer the buildServer to set
      */
     public void setBuildServer(final String buildServer) {
         this.buildServer = buildServer;
@@ -339,7 +318,7 @@ public final class DevelopmentConfiguration {
 
     /**
      * Return the name of the DTR workspace for this development configuration.
-     * 
+     *
      * @return the name of the DTR workspace for this development configuration.
      */
     public String getWorkspace() {
@@ -349,7 +328,7 @@ public final class DevelopmentConfiguration {
     /**
      * Returns the URL for the DTR this development configuration is stored on. The returned string is empty when no compartment in source
      * state is contained in this development configuration.
-     * 
+     *
      * @return URL for the DTR this development configuration is stored on.
      */
     public String getDtrServerUrl() {
@@ -367,11 +346,11 @@ public final class DevelopmentConfiguration {
 
     /**
      * Get the {@link JdkHomeAlias} associated with the {@link BuildVariant} of this development configuration.
-     * 
-     * @return the JdkHomeAlias associated with the build variant of this development configuration iff there is one defined and a {@see
-     *         #COM_SAP_JDK_HOME_PATH_KEY} build option is defined.
-     * 
-     *         Returns <code>null</code> otherwise.
+     *
+     * @return the JdkHomeAlias associated with the build variant of this development configuration iff there is one defined and a {@link
+     * BuildVariant#COM_SAP_JDK_HOME_PATH_KEY} build option is defined.
+     * <br>
+     * Returns the alias matching the running JVMs version otherwise.
      */
     public JdkHomeAlias getJdkHomeAlias() {
         final BuildVariant buildVariant = getBuildVariant();
@@ -390,10 +369,10 @@ public final class DevelopmentConfiguration {
 
     /**
      * Returns the source version to use for generating javadoc documentation.
-     * 
+     * <p>
      * Uses the {@link JdkHomeAlias} defined in the development configuration. If there is no alias defined use the JDK version the ant task
      * is run with.
-     * 
+     *
      * @return java source version to use generating javadoc documentation.
      */
     public String getSourceVersion() {
@@ -402,8 +381,7 @@ public final class DevelopmentConfiguration {
 
         if (alias != null) {
             sourceVersion = alias.getSourceVersion();
-        }
-        else {
+        } else {
             final String[] versionParts = System.getProperty("java.version").replace('_', '.').split("\\.");
             sourceVersion = String.format("%s.%s", versionParts[0], versionParts[1]);
         }
@@ -414,9 +392,8 @@ public final class DevelopmentConfiguration {
     /**
      * Accept a visitor of this development configuration. Iterate over its compartments and development components and call the respective
      * visit method.
-     * 
-     * @param visitor
-     *            visitor for this development configuration.
+     *
+     * @param visitor visitor for this development configuration.
      */
     public void accept(final DevelopmentConfigurationVisitor visitor) {
         visitor.visit(this);
@@ -432,7 +409,7 @@ public final class DevelopmentConfiguration {
 
     /**
      * Return the version of this development configuration.
-     * 
+     *
      * @return version of this development configuration.
      */
     public String getVersion() {
@@ -441,11 +418,24 @@ public final class DevelopmentConfiguration {
 
     /**
      * Set the version of this development configuration.
-     * 
-     * @param version
-     *            the version to set
+     *
+     * @param version the version to set
      */
     public void setVersion(final String version) {
         this.version = version;
+    }
+
+    /**
+     * Set the needsRebuild property on all development components in source state if a clean build was requested.
+     *
+     * @param calculator
+     *            Determines whether a development component needs to be rebuilt.
+     */
+    public void setNeedsRebuild(final NeedsRebuildCalculator calculator) {
+        for (final Compartment compartment : getCompartments(CompartmentState.Source)) {
+            for (final DevelopmentComponent component : compartment.getDevelopmentComponents()) {
+                component.setNeedsRebuild(calculator.needsRebuild(component));
+            }
+        }
     }
 }

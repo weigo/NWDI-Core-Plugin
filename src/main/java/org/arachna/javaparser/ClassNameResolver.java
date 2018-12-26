@@ -3,9 +3,10 @@
  */
 package org.arachna.javaparser;
 
-import japa.parser.ast.ImportDeclaration;
-import japa.parser.ast.body.Parameter;
-import japa.parser.ast.expr.NameExpr;
+import com.github.javaparser.ast.ImportDeclaration;
+import com.github.javaparser.ast.body.Parameter;
+import com.github.javaparser.ast.expr.Name;
+import com.github.javaparser.ast.expr.NameExpr;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -53,7 +54,7 @@ public class ClassNameResolver {
     /**
      * mapping from class name to a {@link NameExpr}.
      */
-    private final Map<String, NameExpr> classNameMapping = new HashMap<String, NameExpr>();
+    private final Map<String, Name> classNameMapping = new HashMap<>();
 
     /**
      * Name of package this ClassNameResolver shall resolve class names for.
@@ -73,14 +74,14 @@ public class ClassNameResolver {
 
         if (imports != null) {
             for (final ImportDeclaration declaration : imports) {
-                final NameExpr nameExpression = declaration.getName();
-                classNameMapping.put(nameExpression.getName(), nameExpression);
+                final Name name = declaration.getName();
+                classNameMapping.put(name.getIdentifier(), name);
             }
         }
     }
 
     /**
-     * Determine the full class name (i.e. String --> java.lang.String) of the given {@link Parameter} object.
+     * Determine the full class name (i.e. String &rarr; java.lang.String) of the given {@link Parameter} object.
      * 
      * @param parameter
      *            the Parameter to determine the class name for.
@@ -91,7 +92,7 @@ public class ClassNameResolver {
     }
 
     /**
-     * Determine the full class name (i.e. String --> java.lang.String) of the given unqualified class name.
+     * Determine the full class name (i.e. String &rarr; java.lang.String) of the given unqualified class name.
      * 
      * @param className
      *            unqualified class name to determine the fully qualified class name for.

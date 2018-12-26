@@ -4,8 +4,7 @@
 package org.arachna.netweaver.dc.types;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 
 import org.junit.After;
 import org.junit.Before;
@@ -78,8 +77,8 @@ public class PublicPartReferenceComparatorTest {
     public final void testThatCompareWithSameVendorSortsAndEmptyPublicPartNameLexicographicallyByDCName() {
         final PublicPartReference dcRefToA = new PublicPartReference(EXAMPLE_COM, DC_A, "");
         final PublicPartReference dcRefToB = new PublicPartReference(EXAMPLE_COM, DC_B, "");
-        assertThat(comparator.compare(dcRefToA, dcRefToB), is(equalTo(-1)));
-        assertThat(comparator.compare(dcRefToB, dcRefToA), is(equalTo(1)));
+        assertThat(comparator.compare(dcRefToA, dcRefToB), is(lessThan(0)));
+        assertThat(comparator.compare(dcRefToB, dcRefToA), is(greaterThan(0)));
     }
 
     /**
@@ -89,8 +88,8 @@ public class PublicPartReferenceComparatorTest {
     public final void testThatCompareWithSameVendorAndSameDCNameSortsLexicographicallyByPublicPartName() {
         final PublicPartReference dcRefToA = new PublicPartReference(EXAMPLE_COM, DC_A, PUBLIC_PART_A);
         final PublicPartReference dcRefToB = new PublicPartReference(EXAMPLE_COM, DC_A, PUBLIC_PART_B);
-        assertThat(comparator.compare(dcRefToA, dcRefToB), is(equalTo(-1)));
-        assertThat(comparator.compare(dcRefToB, dcRefToA), is(equalTo(1)));
+        assertThat(comparator.compare(dcRefToA, dcRefToB), is(lessThan(0)));
+        assertThat(comparator.compare(dcRefToB, dcRefToA), is(greaterThan(0)));
     }
 
     /**
@@ -100,8 +99,8 @@ public class PublicPartReferenceComparatorTest {
     public final void testThatCompareWithSameVendorAndDifferentDCNameSortsLexicographicallyByDCNameAndThenPublicPartName() {
         final PublicPartReference dcRefToA = new PublicPartReference(EXAMPLE_COM, DC_A, PUBLIC_PART_A);
         final PublicPartReference dcRefToB = new PublicPartReference(EXAMPLE_COM, DC_B, PUBLIC_PART_A);
-        assertThat(comparator.compare(dcRefToA, dcRefToB), is(equalTo(-1)));
-        assertThat(comparator.compare(dcRefToB, dcRefToA), is(equalTo(1)));
+        assertThat(comparator.compare(dcRefToA, dcRefToB), is(lessThan(0)));
+        assertThat(comparator.compare(dcRefToB, dcRefToA), is(greaterThan(0)));
     }
 
     /**
@@ -113,7 +112,7 @@ public class PublicPartReferenceComparatorTest {
     public final void testThatCompareWithDifferentVendorAndEqualDCNameSortsLexicographicallyByVendorAndThenDCNameAndThenPublicPartName() {
         final PublicPartReference dcRefToA = new PublicPartReference(EXAMPLE_COM, DC_A, PUBLIC_PART_A);
         final PublicPartReference dcRefToB = new PublicPartReference("example.org", DC_A, PUBLIC_PART_A);
-        assertThat(comparator.compare(dcRefToA, dcRefToB), is(equalTo(-1)));
-        assertThat(comparator.compare(dcRefToB, dcRefToA), is(equalTo(1)));
+        assertThat(comparator.compare(dcRefToA, dcRefToB), is(lessThan(0)));
+        assertThat(comparator.compare(dcRefToB, dcRefToA), is(greaterThan(0)));
     }
 }

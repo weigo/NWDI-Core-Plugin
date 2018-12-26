@@ -1,30 +1,34 @@
 /**
- * 
+ *
  */
 package org.arachna.netweaver.hudson.nwdi;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
-import japa.parser.JavaParser;
-import japa.parser.ParseException;
-import japa.parser.ast.CompilationUnit;
-import japa.parser.ast.body.BodyDeclaration;
-import japa.parser.ast.body.TypeDeclaration;
 
+import com.github.javaparser.JavaParser;
+import com.github.javaparser.ParseException;
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.PackageDeclaration;
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.body.TypeDeclaration;
 import org.arachna.javaparser.ClassNameResolver;
 import org.junit.Test;
 
+import java.nio.charset.Charset;
+import java.util.List;
+
 /**
  * Unit tests for {@link TestAnnotationResolver}.
- * 
+ *
  * @author Dirk Weigenand
  */
 public class TestPropertyResolverTest {
     /**
-     * Test method for {@link TestAnnotationResolver#visit(japa.parser.ast.body.MethodDeclaration, java.lang.Object)}.
-     * 
-     * @throws ParseException
-     *             when the test class contains errors.
+     * Test method for {@link TestAnnotationResolver#visit(MethodDeclaration, java.lang.Object)}.
+     *
+     * @throws ParseException when the test class contains errors.
      */
     @Test
     public final void testVisitMethodDeclaration() throws ParseException {
@@ -32,8 +36,8 @@ public class TestPropertyResolverTest {
         final TestAnnotationResolver resolver = createResolver(compilationUnit);
 
         for (final TypeDeclaration type : compilationUnit.getTypes()) {
-            for (final BodyDeclaration body : type.getMembers()) {
-                body.accept(resolver, null);
+            for (MethodDeclaration method : (List<MethodDeclaration>) type.getMethods()) {
+                method.accept(resolver, null);
             }
         }
 
@@ -41,10 +45,9 @@ public class TestPropertyResolverTest {
     }
 
     /**
-     * Test method for {@link TestAnnotationResolver#visit(japa.parser.ast.body.ClassOrInterfaceDeclaration, java.lang.Object)} .
-     * 
-     * @throws ParseException
-     *             when the test class contains errors.
+     * Test method for {@link TestAnnotationResolver#visit(ClassOrInterfaceDeclaration, java.lang.Object)} .
+     *
+     * @throws ParseException when the test class contains errors.
      */
     @Test
     public final void testVisitClassOrInterfaceDeclarationObject() throws ParseException {
@@ -60,8 +63,10 @@ public class TestPropertyResolverTest {
      * @return
      */
     protected TestAnnotationResolver createResolver(final CompilationUnit compilationUnit) {
-        return new TestAnnotationResolver(new ClassNameResolver(compilationUnit.getPackage().getName().getName(),
-            compilationUnit.getImports()));
+        PackageDeclaration packageDeclaration = compilationUnit.getPackageDeclaration().get();
+        String packageName = packageDeclaration.getNameAsString();
+        return new TestAnnotationResolver(new ClassNameResolver(packageName,
+                compilationUnit.getImports()));
     }
 
     /**
@@ -70,6 +75,6 @@ public class TestPropertyResolverTest {
      * @throws ParseException
      */
     protected CompilationUnit getCompilationUnit(final String ressourceName) throws ParseException {
-        return JavaParser.parse(getClass().getResourceAsStream(ressourceName), "UTF-8");
+        return JavaParser.parse(getClass().getResourceAsStream(ressourceName), Charset.forName("UTF-8"));
     }
 }
