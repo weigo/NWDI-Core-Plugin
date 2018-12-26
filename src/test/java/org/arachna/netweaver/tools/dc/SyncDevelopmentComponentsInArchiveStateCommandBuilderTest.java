@@ -17,6 +17,7 @@ import org.arachna.netweaver.dc.types.DevelopmentComponent;
 import org.arachna.netweaver.dc.types.DevelopmentComponentFactory;
 import org.arachna.netweaver.dc.types.DevelopmentConfiguration;
 import org.arachna.netweaver.dc.types.JdkHomeAlias;
+import org.arachna.netweaver.dc.types.PublicPartReference;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -27,19 +28,29 @@ import org.junit.Test;
  */
 public class SyncDevelopmentComponentsInArchiveStateCommandBuilderTest {
     /**
-     *
+     * Name of development component used at build time.
      */
-    private static final String SYNCDC_IN_ARCHIVE_MODE_TEMPLATE = "syncdc -s %s -n %s -v %s -m archive --syncused;";
+    private static final String BUILD_TIME_DC = "build_time_dc";
 
     /**
-     *
+     * Example Vendor.
      */
     private static final String VENDOR = "example.com";
+
+    /**
+     * SAP Vendor.
+     */
+    private static final String SAP_VENDOR = "sap.com";
 
     /**
      * Example software component.
      */
     private static final String EXAMPLE_SC = "example.com_EXAMPLE_SC_1";
+
+    /**
+     * Example SC with build time dependencies.
+     */
+    private static final String BUILD_DEPS_SC = "sap.com_BUILD_DEPS_SC_1";
 
     /**
      * dctool command builder under test.
@@ -57,14 +68,22 @@ public class SyncDevelopmentComponentsInArchiveStateCommandBuilderTest {
     public void setUp() {
         dcFactory = new DevelopmentComponentFactory();
 
-        final Compartment compartment = Compartment.create(EXAMPLE_SC, CompartmentState.Archive);
+        Compartment compartment = Compartment.create(EXAMPLE_SC, CompartmentState.Source);
         final DevelopmentComponent component = dcFactory.create(VENDOR, "dc1");
         compartment.add(component);
 
+        final DevelopmentConfiguration developmentConfiguration = createDevelopmentConfiguration();
+        developmentConfiguration.add(compartment);
         final AntHelper antHelper = new AntHelper("", dcFactory);
-        builder =
-            new SyncDevelopmentComponentsInArchiveStateCommandBuilder(createDevelopmentConfiguration(), dcFactory, antHelper,
-                Arrays.asList(component));
+
+        compartment = Compartment.create(BUILD_DEPS_SC, CompartmentState.Archive);
+        final DevelopmentComponent buildTimeDC = dcFactory.create(SAP_VENDOR, BUILD_TIME_DC);
+        compartment.add(buildTimeDC);
+        component.add(new PublicPartReference(SAP_VENDOR, BUILD_TIME_DC));
+        developmentConfiguration.add(compartment);
+
+        builder = new SyncDevelopmentComponentsInArchiveStateCommandBuilder(developmentConfiguration, dcFactory, antHelper,
+            Arrays.asList(component));
     }
 
     /**
@@ -84,9 +103,9 @@ public class SyncDevelopmentComponentsInArchiveStateCommandBuilderTest {
     @Test
     public void assertSynchronizerSynchronizesDCsInArchiveModeWhenDependencyIsFromSAPAndNotOnDisk() {
         final List<String> commands = builder.executeInternal();
-        final DevelopmentComponent usedDC = dcFactory.get(VENDOR, "dc1");
+        final DevelopmentComponent usedDC = dcFactory.get(SAP_VENDOR, BUILD_TIME_DC);
         assertThat(commands.size(), equalTo(1));
-        final String expected = String.format(SYNCDC_IN_ARCHIVE_MODE_TEMPLATE, EXAMPLE_SC, usedDC.getName(), usedDC.getVendor());
+        final String expected = SyncDcCommandTemplate.V70.createSyncArchiveDCCommand(usedDC);
         assertThat(commands.get(0), equalTo(expected));
     }
 }

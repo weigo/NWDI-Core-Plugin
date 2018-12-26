@@ -94,12 +94,16 @@ public class TopoSort {
                 iterator.remove();
 
                 for (final DevelopmentComponent usingDC : item.getUsingDCs()) {
-                	ComponentWrapper componentItem=itemMap.get(getComponentName(usingDC));
-                    
-                	if (componentItem!=null) {
-                		componentItem.removeUsedDC(component);
-                	}
-                	
+                    String componentName = getComponentName(usingDC);
+                    logger.println(String.format("Attempt to remove usage of '%s' from '%s'.", component.getNormalizedName("~"), componentName));
+                    ComponentWrapper componentItem = itemMap.get(componentName);
+
+                    if (componentItem != null) {
+                        componentItem.removeUsedDC(component);
+                    }
+                    else {
+                        logger.println(String.format("Could not find '%s' in using DCs.", componentName));
+                    }
                 }
             }
         }

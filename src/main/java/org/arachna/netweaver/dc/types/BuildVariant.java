@@ -1,15 +1,22 @@
+/*
+ *
+ */
 package org.arachna.netweaver.dc.types;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
 /**
  * build variant to use for a compartment.
- * 
+ *
  * @author Dirk Weigenand
  */
 public final class BuildVariant {
@@ -35,7 +42,7 @@ public final class BuildVariant {
 
     /**
      * Create a build variant with the given name.
-     * 
+     *
      * @param name
      *            name of build variant.
      * @param requiredForActivation
@@ -52,7 +59,7 @@ public final class BuildVariant {
 
     /**
      * Returns the name of this build variant.
-     * 
+     *
      * @return the name of this build variant.
      */
     public String getName() {
@@ -61,7 +68,7 @@ public final class BuildVariant {
 
     /**
      * Add an build option to this build variant.
-     * 
+     *
      * @param name
      *            Name of build option
      * @param value
@@ -73,7 +80,7 @@ public final class BuildVariant {
 
     /**
      * Add build option to this build variant.
-     * 
+     *
      * @param option
      *            new build option.
      */
@@ -83,7 +90,7 @@ public final class BuildVariant {
 
     /**
      * Return the value of the named build option or <code>null</code> if it does not exist.
-     * 
+     *
      * @param name
      *            Name of the build option asked for
      * @return the value of the named build option or <code>null</code> if it does not exist.
@@ -94,7 +101,7 @@ public final class BuildVariant {
 
     /**
      * Returns the names of build options of this BuildVariant.
-     * 
+     *
      * @return the names of build options of this BuildVariant.
      */
     public Collection<String> getBuildOptionNames() {
@@ -103,7 +110,7 @@ public final class BuildVariant {
 
     /**
      * Get the Jdk home path from build options if it exists.
-     * 
+     *
      * @return the Jdk home path it defined in build options <code>null</code> otherwise.
      */
     public String getJdkHomePath() {
@@ -112,7 +119,7 @@ public final class BuildVariant {
 
     /**
      * Indicate whether this build variant is required to execute prior to activation of activities.
-     * 
+     *
      * @return <code>true</code> when this build variant is required for activation, <code>false</code> otherwise.
      */
     public boolean isRequiredForActivation() {
@@ -126,17 +133,30 @@ public final class BuildVariant {
     public int hashCode() {
         final HashCodeBuilder builder = new HashCodeBuilder();
         builder.append(name).append(requiredForActivation);
+        final List<Map.Entry<String, String>> entries = new ArrayList<Map.Entry<String, String>>(buildOptions.entrySet());
 
-        for (final Map.Entry<String, String> buildOption : buildOptions.entrySet()) {
+        entries.sort(new Comparator<Map.Entry<String, String>>() {
+            @Override
+            public int compare(final Entry<String, String> arg0, final Entry<String, String> arg1) {
+                return arg0.getKey().compareTo(arg1.getKey());
+            }
+        });
+
+        for (final Map.Entry<String, String> buildOption : entries) {
             builder.append(buildOption.getKey()).append(buildOption.getValue());
         }
 
         return builder.toHashCode();
     }
 
+    @Override
+    public String toString() {
+        return "BuildVariant [name=" + name + ", requiredForActivation=" + requiredForActivation + ", buildOptions=" + buildOptions + "]";
+    }
+
     /**
      * {@inheritDoc}
-     * 
+     *
      * Compare with other build variant property-wise.
      */
     @Override
@@ -157,7 +177,7 @@ public final class BuildVariant {
 
     /**
      * Merge the build options from the given build varaint into this one (only if it has the same name).
-     * 
+     *
      * @param variant
      *            build variant whose build options are to merge into this.
      */

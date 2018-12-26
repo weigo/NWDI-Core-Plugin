@@ -13,6 +13,8 @@ import org.apache.commons.digester3.binder.DigesterLoader;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.SAXException;
 
+import hudson.util.IOUtils;
+
 /**
  * Helper class for parsing XML files using Digester3.
  * 
@@ -53,6 +55,16 @@ public final class DigesterHelper<T> {
             return createDigester().<T> parse(reader);
         }
         catch (final SAXException e) {
+            Logger logger = Logger.getLogger(getClass().getName());
+            logger.log(Level.SEVERE, String.format("org.xml.sax.driver: '%s'", System.getProperty("org.xml.sax.driver")), e);
+            logger.log(Level.SEVERE, String.format("org.xml.sax.parser: '%s'", System.getProperty("org.xml.sax.parser")), e);
+
+            try {
+                logger.log(Level.SEVERE, String.format("SAXException occured while reading:\n", IOUtils.toString(reader)), e);
+            }
+            catch (IOException e1) {
+                logger.log(Level.SEVERE, "", e1);
+            }
             throw new IllegalStateException(e);
         }
         catch (final IOException e) {
@@ -85,7 +97,10 @@ public final class DigesterHelper<T> {
             return digester.<T> parse(reader);
         }
         catch (final SAXException e) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, String.format("SAXException occured while updating '%s'", updatee), e);
+            Logger logger = Logger.getLogger(getClass().getName());
+            logger.log(Level.SEVERE, String.format("SAXException occured while updating '%s'", updatee), e);
+            logger.log(Level.SEVERE, String.format("org.xml.sax.driver: '%s'", System.getProperty("org.xml.sax.driver")), e);
+            logger.log(Level.SEVERE, String.format("org.xml.sax.parser: '%s'", System.getProperty("org.xml.sax.parser")), e);
             throw new IllegalStateException(e);
         }
         catch (final IOException e) {

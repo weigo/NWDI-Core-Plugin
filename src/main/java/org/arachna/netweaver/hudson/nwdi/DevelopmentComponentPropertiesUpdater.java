@@ -35,8 +35,8 @@ final class DevelopmentComponentPropertiesUpdater implements DevelopmentConfigur
     /**
      * parser for <code>build.xml</code> files.
      */
-    private final DigesterHelper<DevelopmentComponent> digesterHelper = new DigesterHelper<DevelopmentComponent>(
-        new BuildXmlRulesModuleProducer());
+    private final DigesterHelper<DevelopmentComponent> digesterHelper =
+        new DigesterHelper<DevelopmentComponent>(new BuildXmlRulesModuleProducer());
 
     /**
      * Create updater for development component properties with the given {@link AntHelper} instance.
@@ -84,9 +84,16 @@ final class DevelopmentComponentPropertiesUpdater implements DevelopmentConfigur
                     digesterHelper.update(new InputStreamReader(new FileInputStream(buildXml), Charset.forName("UTF-8")), component);
                 }
                 catch (final IllegalStateException ise) {
-                    Logger.getLogger(getClass().getName()).log(Level.SEVERE,
-                        String.format("IllegalStateException occured while updating '%s'", component), ise);
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, String.format(
+                        "IllegalStateException occured while updating '%s' from '%s'.", component, buildXml.getAbsolutePath()), ise);
                 }
+                catch (final NullPointerException npe) {
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE,
+                        String.format("NullPointerException occured while updating '%s' from '%s'.", component.getNormalizedName("~"),
+                            buildXml.getAbsolutePath()),
+                        npe);
+                }
+
             }
             else {
                 final String base = antHelper.getBaseLocation(component);

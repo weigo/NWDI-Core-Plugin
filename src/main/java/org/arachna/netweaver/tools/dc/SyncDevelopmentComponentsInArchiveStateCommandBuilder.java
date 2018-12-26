@@ -55,13 +55,13 @@ final class SyncDevelopmentComponentsInArchiveStateCommandBuilder extends Abstra
         "sap.com_LMSLD_1", "sap.com_LMTOOLS_1", "sap.com_MESSAGING_1", "sap.com_MMRSERVER_1", "sap.com_MOINBUILDT_1", "sap.com_NETPDK_1",
         "sap.com_NWTEC_1", "sap.com_PISCPBUILDT_1", "sap.com_PISCPEXT_1", "sap.com_RTC_1", "sap.com_RTCSTREAM_1", "sap.com_SAPBUILDT_1",
         "sap.com_SAPNWDEMO_1", "sap.com_SAPXI3RDPARTY_1", "sap.com_SAPXIADMIN_1", "sap.com_SAPXIAF_1", "sap.com_SAPXICONS_1",
-        "sap.com_SAPXIESR_1", "sap.com_SAPXIGUILIB_1", "sap.com_SAPXITOOL_1", "sap.com_SEACORE_1", "sap.com_SEAFACADE_1",
-        "sap.com_SEAUI_1", "sap.com_SECURITYEXT_1", "sap.com_SERVERCORE_1", "sap.com_SERVICECOMP_1", "sap.com_SOAMON_1",
-        "sap.com_SOAMONBASIC_1", "sap.com_SRUI_1", "sap.com_SWLIFECYCL_1", "sap.com_THLCORE_1", "sap.com_TMWLUI_1", "sap.com_UDDI_1",
-        "sap.com_UKMSJAVA_1", "sap.com_UMEADMIN_1", "sap.com_UWLJWF_1", "sap.com_VC70RUNTIME_1", "sap.com_VCBASE_1", "sap.com_VCCORERT_1",
+        "sap.com_SAPXIESR_1", "sap.com_SAPXIGUILIB_1", "sap.com_SAPXITOOL_1", "sap.com_SEACORE_1", "sap.com_SEAFACADE_1", "sap.com_SEAUI_1",
+        "sap.com_SECURITYEXT_1", "sap.com_SERVERCORE_1", "sap.com_SERVICECOMP_1", "sap.com_SOAMON_1", "sap.com_SOAMONBASIC_1",
+        "sap.com_SRUI_1", "sap.com_SWLIFECYCL_1", "sap.com_THLCORE_1", "sap.com_TMWLUI_1", "sap.com_UDDI_1", "sap.com_UKMSJAVA_1",
+        "sap.com_UMEADMIN_1", "sap.com_UWLJWF_1", "sap.com_VC70RUNTIME_1", "sap.com_VCBASE_1", "sap.com_VCCORERT_1",
         "sap.com_VCFRAMEWORK_1", "sap.com_VCFREESTYLEKIT_1", "sap.com_VCKITBI_1", "sap.com_VOICERT_1", "sap.com_VOICEVC_1",
-        "sap.com_VTPBUILDT_1", "sap.com_WDADOBE_1", "sap.com_WDAPPS_1", "sap.com_WDEXTENSIONS_1", "sap.com_WDFLEX_1",
-        "sap.com_WDRUNTIME_1", "sap.com_WDRUNTIMEEXT_1", "sap.com_WSRM_1", "sap.com_XICNTSAPBASIS_1"));
+        "sap.com_VTPBUILDT_1", "sap.com_WDADOBE_1", "sap.com_WDAPPS_1", "sap.com_WDEXTENSIONS_1", "sap.com_WDFLEX_1", "sap.com_WDRUNTIME_1",
+        "sap.com_WDRUNTIMEEXT_1", "sap.com_WSRM_1", "sap.com_XICNTSAPBASIS_1"));
 
     /**
      * Provides templates for the various sync/unsync dc commands.
@@ -157,7 +157,11 @@ final class SyncDevelopmentComponentsInArchiveStateCommandBuilder extends Abstra
         for (final PublicPartReference ppRef : ppRefs) {
             component = dcFactory.get(ppRef);
 
-            if (!isAlreadySynchronized(component)) {
+            if (component == null) {
+                Logger.getLogger(this.getClass().getName()).log(Level.FINE,
+                    String.format("Could not resolve public part reference %s!", ppRef.toString()));
+            }
+            else if (!isAlreadySynchronized(component)) {
                 synchronizeCompartmentCommands.add(template.createSyncCompartmentInArchiveModeCommand(component.getCompartment()));
             }
         }
