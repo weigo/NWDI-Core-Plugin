@@ -14,8 +14,6 @@ import org.apache.commons.io.IOUtils;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.SAXException;
 
-import hudson.util.IOUtils;
-
 /**
  * Helper class for parsing XML files using Digester3.
  * 
