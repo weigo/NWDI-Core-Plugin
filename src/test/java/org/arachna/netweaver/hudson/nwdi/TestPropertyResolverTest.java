@@ -8,6 +8,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseException;
+import com.github.javaparser.ParseResult;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.PackageDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
@@ -75,6 +76,8 @@ public class TestPropertyResolverTest {
      * @throws ParseException
      */
     protected CompilationUnit getCompilationUnit(final String ressourceName) throws ParseException {
-        return JavaParser.parse(getClass().getResourceAsStream(ressourceName), Charset.forName("UTF-8"));
+        final ParseResult<CompilationUnit> parseResult =
+            new JavaParser().parse(getClass().getResourceAsStream(ressourceName), Charset.forName("UTF-8"));
+        return parseResult.getResult().get();
     }
 }

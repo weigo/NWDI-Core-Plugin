@@ -17,6 +17,8 @@ import hudson.scm.PollingResult.Change;
 import hudson.scm.SCMDescriptor;
 import hudson.scm.SCMRevisionState;
 import hudson.scm.SCM;
+import hudson.util.Secret;
+import jenkins.model.Jenkins;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,6 +41,7 @@ import org.arachna.netweaver.hudson.nwdi.dcupdater.DevelopmentComponentUpdater;
 import org.arachna.netweaver.hudson.util.FilePathHelper;
 import org.arachna.netweaver.tools.DIToolCommandExecutionResult;
 import org.arachna.netweaver.tools.dc.DCToolCommandExecutor;
+import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
 /**
@@ -65,7 +68,7 @@ public class NWDIScm extends SCM {
     /**
      * password to use for authentication against the DTR.
      */
-    private final transient String password;
+    private final transient Secret password;
 
     /**
      * Service for reading/writing DTR change logs.
@@ -83,7 +86,8 @@ public class NWDIScm extends SCM {
      *            indicate whether only changed development components should be loaded from the NWDI or all that are contained in the
      *            indicated CBS workspace
      */
-    public NWDIScm(final boolean cleanCopy, final String dtrUser, final String password) {
+    @DataBoundConstructor
+    public NWDIScm(final boolean cleanCopy, final String dtrUser, final Secret password) {
         super();
         this.cleanCopy = cleanCopy;
         this.dtrUser = dtrUser;
@@ -302,7 +306,7 @@ public class NWDIScm extends SCM {
      * @return the {@link DtrBrowser} for browsing the DTR for activities.
      */
     private DtrBrowser getDtrBrowser(final DevelopmentConfiguration config) {
-        return new DtrBrowser(config, dtrUser, password);
+        return new DtrBrowser(config, dtrUser, password.getPlainText());
     }
 
     /**

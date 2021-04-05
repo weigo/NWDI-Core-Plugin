@@ -46,6 +46,7 @@ import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 
+import hudson.util.Secret;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
 
@@ -351,7 +352,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
         /**
          * password to use when authenticating.
          */
-        private String password;
+        private Secret password;
 
         /**
          * folder where the NWDI tool library files are stored.
@@ -402,7 +403,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
         /**
          * @return the password
          */
-        public String getPassword() {
+        public Secret getPassword() {
             return password;
         }
 
@@ -410,7 +411,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
          * @param password
          *            the password to set
          */
-        public void setPassword(final String password) {
+        public void setPassword(final Secret password) {
             this.password = password;
         }
 
@@ -476,12 +477,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
          */
         @Override
         public boolean configure(final StaplerRequest req, final JSONObject json) throws FormException {
-            jdkHomePaths = Util.fixNull(json.getString("jdkHomePaths"));
-            nwdiToolLibFolder = Util.fixNull(json.getString("nwdiToolLibFolder"));
-            nwdiToolLibFolder71 = Util.fixNull(json.getString("nwdiToolLibFolder71"));
-            user = Util.fixNull(json.getString("user"));
-            password = Util.fixNull(json.getString("password"));
-            cbsUrl = Util.fixNull(json.getString("cbsUrl"));
+            req.bindJSON(this, json);
 
             save();
 
@@ -672,7 +668,7 @@ public class NWDIProject extends AbstractProject<NWDIProject, NWDIBuild> impleme
          * @return a new {@link DIToolDescriptor} configured to run an {@link org.arachna.netweaver.tools.AbstractDIToolExecutor}.
          */
         public DIToolDescriptor getDIToolDescriptor() {
-            return new DIToolDescriptor(getUser(), getPassword(), getNwdiToolLibraryFolder(), getCbsUrl(), getConfiguredJdkHomePaths());
+            return new DIToolDescriptor(getUser(), getPassword().getPlainText(), getNwdiToolLibraryFolder(), getCbsUrl(), getConfiguredJdkHomePaths());
         }
 
         /**

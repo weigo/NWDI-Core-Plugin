@@ -97,7 +97,6 @@ public class TopoSort {
 
                 for (final DevelopmentComponent usingDC : item.getUsingDCs()) {
                     String componentName = getComponentName(usingDC);
-                    logger.println(String.format("Attempt to remove usage of '%s' from '%s'.", component.getNormalizedName("~"), componentName));
                     ComponentWrapper componentItem = itemMap.get(componentName);
 
                     if (componentItem != null) {

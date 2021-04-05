@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.arachna.netweaver.hudson.nwdi;
 
@@ -16,6 +16,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.github.javaparser.JavaParser;
+import com.github.javaparser.ParseResult;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.PackageDeclaration;
 import com.github.javaparser.ast.body.BodyDeclaration;
@@ -48,7 +49,8 @@ class TestFolderFinder {
         for (final FileDescriptor source : getJavaSources(encoding, sourceFolder)) {
             try {
                 String enc = StringUtils.isEmpty(encoding) ? "UTF-8" : encoding;
-                final CompilationUnit compilationUnit = JavaParser.parse(source.getContent(), Charset.forName(enc));
+                final ParseResult<CompilationUnit> parseResult = new JavaParser().parse(source.getContent(), Charset.forName(enc));
+                final CompilationUnit compilationUnit = parseResult.getResult().get();
                 final Optional<PackageDeclaration> packageDescriptor = compilationUnit.getPackageDeclaration();
 
                 if (packageDescriptor != null && compilationUnitContainsJUnitTest(compilationUnit, packageDescriptor.get())) {
@@ -76,7 +78,7 @@ class TestFolderFinder {
 
     /**
      * Determine whether the given compilation unit contains JUnit tests.
-     * 
+     *
      * @param compilationUnit
      *            the compilation unit to test for JUnit tests.
      * @param packageDescriptor

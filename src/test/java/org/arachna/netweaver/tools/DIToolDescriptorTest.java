@@ -53,7 +53,8 @@ public class DIToolDescriptorTest {
     @Test
     public final void assertGetJavaHomeReturnsJvmHomeWhenNoJdkHomePathIsRegisteredForAGivenAlias() {
         final File javaHome = new File(System.getProperty("java.home"));
-        assertThat(descriptor.getJavaHome(JdkHomeAlias.Jdk131Home), equalTo(javaHome.getParent()));
+        final String descriptorJavaHome = descriptor.getJavaHome(JdkHomeAlias.Jdk131Home);
+        assertThat(descriptorJavaHome, equalTo(javaHome.getAbsolutePath()));
     }
 
     /**
